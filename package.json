@@ -1,0 +1,14 @@
+{
+  "name": "paulprae-com",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered career platform — paulprae.com",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "ingest": "tsx scripts/ingest-linkedin.ts",
+    "generate": "tsx scripts/generate-resume.ts",
+    "pipeline": "npm run ingest && npm run generate && npm run build"
+  }
+}
