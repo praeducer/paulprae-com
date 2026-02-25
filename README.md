@@ -120,8 +120,11 @@ paulprae-com/
 
 ## Documentation
 
-Technical documentation lives in the `docs/` directory:
-- [`docs/technical-design-document.md`](docs/technical-design-document.md) — Full architecture, schema, and implementation plan
+| Doc | Purpose |
+|---|---|
+| [`docs/technical-design-document.md`](docs/technical-design-document.md) | Full architecture, schema, and implementation plan |
+| [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows-specific setup: Dev Drive, filesystem layout, cross-machine parity |
+| [`scripts/setup/`](scripts/setup/) | Automated setup scripts for Windows (Dev Drive config, tool installation) |
 
 ## License
 
