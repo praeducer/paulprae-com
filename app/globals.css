@@ -1,3 +1,99 @@
-/* TODO: Tailwind imports + custom prose styles + print styles */
-/* See CLAUDE.md for typography and design specifications */
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* ─── Resume Prose Overrides ─────────────────────────────────────────────── */
+/* Tailwind Typography prose defaults tuned for a professional resume layout */
+
+.resume-prose h1 {
+  @apply text-3xl font-bold tracking-tight text-slate-900 mb-1;
+}
+
+.resume-prose h2 {
+  @apply text-lg font-semibold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mt-8 mb-4;
+}
+
+.resume-prose h3 {
+  @apply text-base font-semibold text-slate-900 mb-0;
+}
+
+.resume-prose h3 + p {
+  @apply mt-0;
+}
+
+.resume-prose p {
+  @apply text-sm leading-relaxed text-slate-700;
+}
+
+.resume-prose ul {
+  @apply text-sm leading-relaxed text-slate-700 pl-5 my-2;
+}
+
+.resume-prose li {
+  @apply my-0.5;
+}
+
+.resume-prose strong {
+  @apply font-semibold text-slate-800;
+}
+
+.resume-prose a {
+  @apply text-blue-700 no-underline hover:underline;
+}
+
+.resume-prose hr {
+  @apply border-slate-200 my-6;
+}
+
+/* ─── Print Styles ───────────────────────────────────────────────────────── */
+/* Clean PDF output when printing from browser (Cmd+P / Ctrl+P) */
+
+@media print {
+  body {
+    @apply bg-white text-black;
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+
+  .resume-prose {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .resume-prose h1 {
+    font-size: 20pt;
+    margin-bottom: 2pt;
+  }
+
+  .resume-prose h2 {
+    font-size: 11pt;
+    margin-top: 14pt;
+    margin-bottom: 4pt;
+    page-break-after: avoid;
+  }
+
+  .resume-prose h3 {
+    font-size: 11pt;
+    page-break-after: avoid;
+  }
+
+  .resume-prose p,
+  .resume-prose li {
+    font-size: 10pt;
+    orphans: 3;
+    widows: 3;
+  }
+
+  .resume-prose a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .resume-prose hr {
+    margin: 8pt 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
