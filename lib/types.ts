@@ -106,6 +106,12 @@ export interface LinkedInCourse {
   "Associated With": string;
 }
 
+export interface LinkedInEmail {
+  "Email Address": string;
+  "Confirmed": string;
+  "Primary": string;
+}
+
 // ─── B. Normalized CareerData ────────────────────────────────────────────────
 // The canonical intermediate representation per TDD §5.1.
 // Written to data/career-data.json by ingest, consumed by generate.

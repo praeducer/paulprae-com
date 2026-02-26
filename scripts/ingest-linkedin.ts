@@ -18,6 +18,7 @@ import fs from "fs";
 import path from "path";
 import Papa from "papaparse";
 import { z } from "zod";
+import { PATHS, LINKEDIN_CSV_FILES } from "../lib/config.js";
 import type {
   CareerData,
   CareerPosition,
@@ -43,32 +44,13 @@ import type {
   LinkedInHonor,
   LinkedInVolunteering,
   LinkedInCourse,
+  LinkedInEmail,
   IngestResult,
 } from "../lib/types.js";
 
-// ─── Configuration ───────────────────────────────────────────────────────────
-
-const LINKEDIN_DIR = path.join(process.cwd(), "data", "linkedin");
-const OUTPUT_PATH = path.join(process.cwd(), "data", "career-data.json");
-
-// Map of CSV filenames (case-insensitive) → parser function name
-const KNOWN_CSV_FILES: Record<string, string> = {
-  "positions.csv": "positions",
-  "education.csv": "education",
-  "skills.csv": "skills",
-  "certifications.csv": "certifications",
-  "projects.csv": "projects",
-  "publications.csv": "publications",
-  "profile.csv": "profile",
-  "languages.csv": "languages",
-  "recommendations_received.csv": "recommendations",
-  "honors.csv": "honors",
-  "volunteering.csv": "volunteering",
-  "courses.csv": "courses",
-};
-
 // ─── Date Normalization ──────────────────────────────────────────────────────
-// LinkedIn exports dates as "Mon YYYY" (e.g., "Jan 2020") or just "YYYY"
+// LinkedIn exports dates as "Mon YYYY" (e.g., "Jan 2020"), "YYYY",
+// ISO dates ("2020-01-15"), or slash dates ("01/2020").
 
 const MONTH_MAP: Record<string, string> = {
   jan: "01", feb: "02", mar: "03", apr: "04", may: "05", jun: "06",
@@ -88,6 +70,10 @@ function normalizeDate(raw: string | undefined | null): string {
 
   // "2020" → "2020"
   if (/^\d{4}$/.test(trimmed)) return trimmed;
+
+  // "2020-01" or "2020-01-15" → "2020-01" (keep month precision)
+  const isoDate = trimmed.match(/^(\d{4}-\d{2})(?:-\d{2})?$/);
+  if (isoDate) return isoDate[1];
 
   // "01/2020" or "1/2020" → "2020-01"
   const slashDate = trimmed.match(/^(\d{1,2})\/(\d{4})$/);
@@ -110,8 +96,14 @@ function safeString(val: string | undefined | null): string {
 
 // ─── CSV Parsing ─────────────────────────────────────────────────────────────
 
+/** Strip UTF-8 BOM that Windows LinkedIn exports often prepend. */
+function stripBOM(content: string): string {
+  return content.charCodeAt(0) === 0xFEFF ? content.slice(1) : content;
+}
+
 function parseCSV<T>(filePath: string): T[] {
-  const content = fs.readFileSync(filePath, "utf-8");
+  const raw = fs.readFileSync(filePath, "utf-8");
+  const content = stripBOM(raw);
   const result = Papa.parse<T>(content, {
     header: true,
     skipEmptyLines: true,
@@ -211,13 +203,8 @@ function normalizeProfile(rows: LinkedInProfile[]): CareerProfile {
   const row = rows[0];
   if (!row) {
     return {
-      name: "",
-      headline: "",
-      summary: "",
-      location: "",
-      email: "",
-      linkedin: "",
-      website: "",
+      name: "", headline: "", summary: "", location: "",
+      email: "", linkedin: "", website: "",
     };
   }
   return {
@@ -229,6 +216,24 @@ function normalizeProfile(rows: LinkedInProfile[]): CareerProfile {
     linkedin: "",
     website: "",
   };
+}
+
+/** Extract primary confirmed email from Email Addresses.csv */
+function extractEmail(rows: LinkedInEmail[]): string {
+  // Prefer primary + confirmed, then any confirmed, then first available
+  const primary = rows.find(
+    (r) => safeString(r["Primary"]).toLowerCase() === "yes"
+      && safeString(r["Confirmed"]).toLowerCase() === "yes"
+  );
+  if (primary) return safeString(primary["Email Address"]);
+
+  const confirmed = rows.find(
+    (r) => safeString(r["Confirmed"]).toLowerCase() === "yes"
+  );
+  if (confirmed) return safeString(confirmed["Email Address"]);
+
+  const first = rows[0];
+  return first ? safeString(first["Email Address"]) : "";
 }
 
 function normalizeLanguages(rows: LinkedInLanguage[]): CareerLanguage[] {
@@ -377,19 +382,19 @@ function ingest(): IngestResult {
   const warnings: string[] = [];
 
   console.log("\n📂 LinkedIn Data Ingestion Pipeline\n");
-  console.log(`   Source: ${LINKEDIN_DIR}`);
-  console.log(`   Output: ${OUTPUT_PATH}\n`);
+  console.log(`   Source: ${PATHS.linkedinDir}`);
+  console.log(`   Output: ${PATHS.careerDataOutput}\n`);
 
   // Check source directory exists
-  if (!fs.existsSync(LINKEDIN_DIR)) {
+  if (!fs.existsSync(PATHS.linkedinDir)) {
     errors.push(
-      `Directory not found: ${LINKEDIN_DIR}\n   Create it and add your LinkedIn CSV exports.`
+      `Directory not found: ${PATHS.linkedinDir}\n   Create it and add your LinkedIn CSV exports.`
     );
     return { success: false, careerData: null, errors, warnings, stats: { csvFilesFound: 0, csvFilesParsed: 0, positions: 0, education: 0, skills: 0, certifications: 0, projects: 0, publications: 0 } };
   }
 
   // Discover CSV files
-  const allFiles = fs.readdirSync(LINKEDIN_DIR);
+  const allFiles = fs.readdirSync(PATHS.linkedinDir);
   const csvFiles = allFiles.filter((f) => f.toLowerCase().endsWith(".csv"));
 
   console.log(`   Found ${csvFiles.length} CSV file(s):\n`);
@@ -418,11 +423,14 @@ function ingest(): IngestResult {
   };
 
   let csvFilesParsed = 0;
+  // Email is extracted separately and merged after the loop so that
+  // Profile.csv (which creates a fresh profile object) can't overwrite it.
+  let extractedEmail = "";
 
   for (const file of csvFiles) {
-    const filePath = path.join(LINKEDIN_DIR, file);
+    const filePath = path.join(PATHS.linkedinDir, file);
     const key = file.toLowerCase();
-    const csvType = KNOWN_CSV_FILES[key];
+    const csvType = LINKEDIN_CSV_FILES[key];
 
     if (!csvType) {
       console.log(`   ⏭ ${file} (not career-relevant, skipping)`);
@@ -455,6 +463,9 @@ function ingest(): IngestResult {
         case "profile":
           data.profile = normalizeProfile(parseCSV<LinkedInProfile>(filePath));
           break;
+        case "email":
+          extractedEmail = extractEmail(parseCSV<LinkedInEmail>(filePath));
+          break;
         case "languages":
           data.languages = normalizeLanguages(parseCSV<LinkedInLanguage>(filePath));
           break;
@@ -480,6 +491,11 @@ function ingest(): IngestResult {
   }
 
   console.log("");
+
+  // Merge email into profile (after loop so Profile.csv can't overwrite)
+  if (extractedEmail) {
+    data.profile.email = extractedEmail;
+  }
 
   // Check minimum data requirements
   if (data.positions.length === 0 && data.education.length === 0) {
@@ -514,11 +530,11 @@ function ingest(): IngestResult {
   }
 
   // Write output
-  const outputDir = path.dirname(OUTPUT_PATH);
+  const outputDir = path.dirname(PATHS.careerDataOutput);
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
-  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(data, null, 2), "utf-8");
+  fs.writeFileSync(PATHS.careerDataOutput, JSON.stringify(data, null, 2), "utf-8");
 
   const stats = {
     csvFilesFound: csvFiles.length,
@@ -543,7 +559,8 @@ function ingest(): IngestResult {
   if (data.honors.length > 0) console.log(`      ${data.honors.length} honors`);
   if (data.volunteering.length > 0) console.log(`      ${data.volunteering.length} volunteering entries`);
   if (data.courses.length > 0) console.log(`      ${data.courses.length} courses`);
-  console.log(`\n   📝 Written to: ${OUTPUT_PATH}\n`);
+  if (data.profile.email) console.log(`      email: ${data.profile.email}`);
+  console.log(`\n   📝 Written to: ${PATHS.careerDataOutput}\n`);
 
   if (warnings.length > 0) {
     console.log("   ⚠ Warnings:");
