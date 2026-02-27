@@ -17,6 +17,9 @@ export const PATHS = {
   knowledgeDir: path.join(ROOT, "data", "knowledge"),
   careerDataOutput: path.join(ROOT, "data", "career-data.json"),
   resumeOutput: path.join(ROOT, "content", "resume.md"),
+  pdfOutput: path.join(ROOT, "out", "resume.pdf"),
+  docxOutput: path.join(ROOT, "out", "resume.docx"),
+  templatesDir: path.join(ROOT, "templates"),
   envFile: path.join(ROOT, ".env.local"),
 } as const;
 

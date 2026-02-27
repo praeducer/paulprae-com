@@ -1,0 +1,108 @@
+// resume.typ — Professional Typst template for Pandoc-generated resume
+//
+// This template is applied when Pandoc converts Markdown → Typst.
+// Pandoc generates Typst markup from resume.md, and this template
+// controls the visual styling of the compiled PDF.
+//
+// Usage (called automatically by scripts/export-resume.ts):
+//   pandoc content/resume.md -o /tmp/resume.typ --to typst
+//   typst compile /tmp/resume.typ out/resume.pdf --font-path templates/
+
+// ─── Page Setup ──────────────────────────────────────────────────────────────
+
+#set page(
+  paper: "us-letter",
+  margin: (top: 0.5in, bottom: 0.5in, left: 0.6in, right: 0.6in),
+)
+
+// ─── Typography ──────────────────────────────────────────────────────────────
+
+#set text(
+  font: ("Inter", "Helvetica Neue", "Arial", "sans-serif"),
+  size: 10pt,
+  fill: rgb("#1a1a1a"),
+  lang: "en",
+)
+
+#set par(
+  leading: 0.6em,
+  justify: false,
+)
+
+// ─── Headings ────────────────────────────────────────────────────────────────
+
+// H1 — Candidate name (large, bold)
+#show heading.where(level: 1): it => {
+  set text(size: 22pt, weight: "bold", fill: rgb("#111111"))
+  set block(above: 0.3em, below: 0.2em)
+  it
+}
+
+// H2 — Section headers (e.g., Professional Experience, Education)
+#show heading.where(level: 2): it => {
+  set text(size: 12pt, weight: "bold", fill: rgb("#111111"), tracking: 0.03em)
+  set block(above: 0.8em, below: 0.3em)
+  block(
+    width: 100%,
+    {
+      upper(it.body)
+      v(2pt)
+      line(length: 100%, stroke: 0.5pt + rgb("#cccccc"))
+    }
+  )
+}
+
+// H3 — Job titles, degree names
+#show heading.where(level: 3): it => {
+  set text(size: 10.5pt, weight: "bold", fill: rgb("#222222"))
+  set block(above: 0.6em, below: 0.15em)
+  it
+}
+
+// ─── Horizontal Rules ────────────────────────────────────────────────────────
+// Pandoc emits --- as horizontal rules; hide them since H2 has its own line
+
+#show line: it => {
+  // Only suppress full-width horizontal rules (section dividers from ---)
+  if it.length == 100% {
+    v(0.1em)
+  } else {
+    it
+  }
+}
+
+// ─── Lists ───────────────────────────────────────────────────────────────────
+
+#set list(
+  indent: 0.3em,
+  body-indent: 0.5em,
+  marker: [•],
+)
+
+// ─── Links ───────────────────────────────────────────────────────────────────
+
+#show link: it => {
+  set text(fill: rgb("#2563eb"))
+  it
+}
+
+// ─── Strong/Bold Text ────────────────────────────────────────────────────────
+// Company names and dates appear as **bold** in the markdown
+
+#show strong: it => {
+  set text(weight: "bold", fill: rgb("#222222"))
+  it
+}
+
+// ─── Block Quotes ────────────────────────────────────────────────────────────
+// Not typically used in resumes, but style defensively
+
+#show quote: it => {
+  set text(style: "italic", fill: rgb("#555555"))
+  it
+}
+
+// ─── Page Break Avoidance ────────────────────────────────────────────────────
+// Prevent orphaned headings (heading at bottom of page, content on next)
+
+#show heading: set block(breakable: false)

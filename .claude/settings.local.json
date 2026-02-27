@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(pandoc:*)",
+      "Bash(wsl:*)",
+      "Bash(ls:*)",
+      "Bash(cd:*)",
+      "Bash(where npm:*)",
+      "Bash(node:*)"
+    ]
+  }
+}

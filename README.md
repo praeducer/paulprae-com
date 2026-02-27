@@ -20,8 +20,9 @@ LinkedIn CSV Export → Ingestion Script → Claude API → Markdown Resume → 
 
 1. **Ingest** LinkedIn data exports and knowledge base JSONs into a unified career data file
 2. **Generate** a professional Markdown resume by calling Claude Opus 4.6 with structured career data + brand guidelines
-3. **Build** a responsive static site with Next.js that renders the Markdown resume
-4. **Deploy** automatically to Vercel on every push to `main`
+3. **Export** the Markdown resume to PDF (via Pandoc + Typst) and DOCX (via Pandoc)
+4. **Build** a responsive static site with Next.js that renders the Markdown resume
+5. **Deploy** automatically to Vercel on every push to `main`
 
 ## Tech Stack
 
@@ -31,6 +32,7 @@ LinkedIn CSV Export → Ingestion Script → Claude API → Markdown Resume → 
 | Styling | Tailwind CSS 4.x |
 | Markdown | react-markdown + remark-gfm |
 | AI Generation | Anthropic Claude API (Opus 4.6) |
+| Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF) |
 | Deployment | Vercel (free tier, auto-deploy from GitHub) |
 | Dev Tooling | Claude Code CLI + Cursor |
 
@@ -41,12 +43,20 @@ LinkedIn CSV Export → Ingestion Script → Claude API → Markdown Resume → 
 - Node.js 24+ (via nvm)
 - npm or pnpm
 - Anthropic API key ([console.anthropic.com](https://console.anthropic.com/))
+- Pandoc ([pandoc.org](https://pandoc.org/installing.html)) — for resume export
+- Typst ([typst.app](https://github.com/typst/typst)) — for PDF export
 
 ### Setup
 
 ```bash
 git clone https://github.com/praeducer/paulprae-com.git
 cd paulprae-com
+
+# Install all dependencies (Node.js, npm packages, pandoc, typst)
+# Linux/WSL/macOS:
+bash scripts/setup/install-pipeline-deps.sh
+# Windows: powershell -NoProfile -File scripts\setup\install-dev-tools.ps1
+
 npm install
 
 # Configure environment
@@ -61,12 +71,15 @@ cp .env.local.example .env.local
 ### Run the Pipeline
 
 ```bash
-# Full pipeline: ingest → generate → build
+# Full pipeline: ingest → generate → export → build
 npm run pipeline
 
 # Or run steps individually:
 npm run ingest      # Parse LinkedIn CSVs + knowledge JSONs → career-data.json
 npm run generate    # Call Claude API → content/resume.md
+npm run export      # Convert to PDF + DOCX (requires pandoc + typst)
+npm run export:pdf  # PDF only
+npm run export:docx # DOCX only
 npm run build       # Next.js static export → out/
 ```
 
@@ -95,7 +108,8 @@ paulprae-com/
 │   ├── linkedin/           # LinkedIn CSV exports (gitignored)
 │   └── knowledge/          # Knowledge base JSONs (gitignored)
 ├── docs/                   # Technical documentation and design docs
-├── scripts/                # Build pipeline scripts (ingest, generate)
+├── scripts/                # Build pipeline scripts (ingest, generate, export)
+├── templates/              # Export templates (resume.typ, reference.docx)
 ├── lib/                    # Shared utilities and TypeScript types
 ├── public/                 # Static assets (favicon, OG image)
 ├── .env.local.example      # Environment variable template
@@ -124,7 +138,7 @@ paulprae-com/
 |---|---|
 | [`docs/technical-design-document.md`](docs/technical-design-document.md) | Full architecture, schema, and implementation plan |
 | [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows-specific setup: Dev Drive, filesystem layout, cross-machine parity |
-| [`scripts/setup/`](scripts/setup/) | Automated setup scripts for Windows (Dev Drive config, tool installation) |
+| [`scripts/setup/`](scripts/setup/) | Automated setup scripts (Windows + Linux/WSL) for dev environment and pipeline deps |
 
 ## License
 

@@ -1,8 +1,8 @@
 # Windows Development Environment Setup Guide
 
-> **Purpose:** Windows-specific environment setup for developing paulprae.com and related projects. Covers Dev Drive, filesystem layout, and cross-machine parity. For project installation, dependencies, and running the app, see the [project README](../README.md).
+> **Purpose:** Windows-specific environment setup for developing paulprae.com and related projects. Covers Dev Drive, filesystem layout, security guardrails, and cross-machine parity. For project installation, dependencies, and running the app, see the [project README](../README.md).
 >
-> **Last updated:** 2025-02-25
+> **Last updated:** 2026-02-27
 > **Applies to:** All development machines (laptop + desktop)
 
 ---
@@ -26,41 +26,39 @@
 
 Track all development machines here to maintain parity. See [Cross-Machine Parity](#8-cross-machine-parity) for what must match.
 
-### Laptop: PRAI (Primary)
+### Laptop (Primary)
 
 | Spec | Detail |
 |---|---|
 | **Machine** | ASUS ROG Strix SCAR 18 (G835LX) |
-| **Computer Name** | PRAI |
 | **CPU** | Intel Core Ultra 9 275HX (24 cores / 24 threads) |
 | **RAM** | 32 GB |
-| **GPU** | NVIDIA GeForce RTX 5090 Laptop GPU + Intel integrated |
-| **Storage** | WD PC SN8000S NVMe 2 TB (~1.7 TB free as of 2025-02-25) |
-| **OS** | Windows 11 Pro 24H2 (Build 26200.7922) |
-| **WSL** | WSL 2.6.3.0, Kernel 6.6.87.2-1, Ubuntu installed |
-| **WSL User** | praeducer |
-| **Windows User** | paulp |
+| **GPU** | NVIDIA RTX 5090 Laptop + Intel integrated |
+| **Storage** | 2 TB NVMe |
+| **OS** | Windows 11 Pro 24H2 |
+| **WSL** | WSL2, Ubuntu |
 | **Dev Drive** | D: — 250 GB VHDX (dynamically expanding), ReFS, labeled "DevDrive" |
 | **Setup date** | 2025-02-25 |
 | **Setup status** | In progress |
 
-### Desktop: Alienware Aurora 16
+### Desktop
 
 | Spec | Detail |
 |---|---|
 | **Machine** | Alienware Aurora 16 Desktop |
-| **Computer Name** | TBD |
-| **CPU** | Intel Core i9 |
-| **RAM** | TBD |
-| **GPU** | NVIDIA GeForce RTX 4090 (24 GB VRAM) |
-| **Storage** | TBD |
-| **OS** | Windows + WSL2 (Ubuntu) |
-| **WSL** | WSL2, Ubuntu, Docker Desktop with WSL2 integration |
-| **Dev Drive** | Replicate laptop: D: — 250 GB VHDX, dynamically expanding, ReFS |
-| **Additional software** | CUDA Toolkit 12.8, NVIDIA Container Toolkit, Docker Desktop, Neo4j Desktop, Ollama, Open WebUI |
-| **Related repo** | [praeducer/my-local-ai-env](https://github.com/praeducer/my-local-ai-env) — local AI stack setup (separate from paulprae-com) |
-| **Setup date** | TBD |
-| **Setup status** | Not started — Dev Drive setup pending |
+| **CPU** | Intel Core i9-14900KF (24 cores / 32 threads) |
+| **RAM** | 64 GB |
+| **GPU** | NVIDIA RTX 4090 (24 GB VRAM) |
+| **Storage** | ~1.89 TB NVMe |
+| **OS** | Windows 11 Pro for Workstations |
+| **WSL** | WSL2, Ubuntu 24.04 LTS |
+| **Dev Drive** | D: — 250 GB VHDX (dynamically expanding), ReFS, labeled "DevDrive" — **pending creation** |
+| **Additional software** | CUDA Toolkit, NVIDIA Container Toolkit, Docker Desktop, Neo4j Desktop, Ollama, Open WebUI |
+| **Related repo** | [my-local-ai-env](https://github.com/praeducer/my-local-ai-env) — local AI stack (separate from paulprae-com) |
+| **Setup date** | 2026-02-27 |
+| **Setup status** | In progress — Dev Drive pending, WSL configured, git config set |
+
+> **Machine-specific details** (hostnames, usernames, OS build numbers, exact versions) are stored locally in `machine-inventory.local.md` (gitignored). See [Cross-Machine Parity](#8-cross-machine-parity).
 
 > **Note:** The desktop has a heavier AI/ML stack (CUDA, Docker, Ollama, Neo4j) documented in [my-local-ai-env](https://github.com/praeducer/my-local-ai-env). That repo covers the WSL/Docker/GPU side. This guide covers only the Windows Dev Drive and tooling setup relevant to paulprae-com.
 
@@ -101,16 +99,22 @@ Get-Volume -DriveLetter C | Select-Object @{N="FreeGB";E={[math]::Round($_.SizeR
 - **Projects live where their tools run.** Node.js/Windows projects on Dev Drive. Docker/Python projects in WSL ext4.
 - **Never cross filesystems for heavy I/O.** `/mnt/c` from WSL and `\\wsl$\` from Windows both add significant overhead.
 - **Short root paths.** `D:\dev` avoids Windows 260-char path limits (deep `node_modules`).
+- **Least privilege by default.** Use Administrator only for system-level changes (Dev Drive, registry, machine policies).
+- **Use trusted local scripts only.** Run scripts from this repo; avoid copy-pasting commands from unknown sources.
 
 ### Initial Setup
 
-```bash
-# Windows (any terminal) — temporary workspace before Dev Drive
-mkdir -p /c/dev
+```powershell
+# Windows PowerShell — temporary workspace before Dev Drive
+New-Item -ItemType Directory -Force -Path C:\dev | Out-Null
+```
 
+```bash
 # WSL/Ubuntu
 mkdir -p ~/dev
 ```
+
+If you use Git Bash on Windows, equivalent command is `mkdir -p /c/dev`.
 
 After Dev Drive exists, move repos to `D:\dev\` (see [section 4](#4-dev-drive-setup)).
 
@@ -171,7 +175,7 @@ fsutil devdrv trust D:
 
 # 3. Allow common dev filters (Docker, monitoring)
 # See: https://learn.microsoft.com/en-us/windows/dev-drive/#filters-for-common-scenarios
-fsutil devdrv setfiltersallowed "PrjFlt, MsSecFlt, WdFilter, bindFlt, wcifs, FileInfo"
+fsutil devdrv setFiltersAllowed /volume D: "PrjFlt, MsSecFlt, WdFilter, bindFlt, wcifs, FileInfo"
 ```
 
 ### Create Directory Structure
@@ -185,7 +189,8 @@ mkdir D:\packages\pip
 Or run the automated script:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts\setup\setup-dev-drive.ps1
+# Admin PowerShell
+powershell -NoProfile -File scripts\setup\setup-dev-drive.ps1
 ```
 
 ### Move Repos to Dev Drive
@@ -225,6 +230,28 @@ wsl --version
 mkdir -p ~/dev
 ```
 
+### WSL Performance Tuning (.wslconfig)
+
+Create `C:\Users\<username>\.wslconfig` to [control WSL2 resource limits](https://learn.microsoft.com/en-us/windows/wsl/wsl-config). Without this, WSL defaults to 50% of RAM and all processors.
+
+```ini
+# C:\Users\<username>\.wslconfig
+[wsl2]
+memory=32GB          # Cap at half of 64GB — leaves room for Windows + IDE
+processors=12        # 12 of 32 logical CPUs
+swap=16GB
+networkingMode=mirrored   # WSL shares Windows network stack
+dnsTunneling=true
+firewall=true
+autoProxy=true
+
+[experimental]
+autoMemoryReclaim=gradual   # Slowly return unused memory to Windows
+sparseVhd=true              # Reclaim disk space from deleted WSL files
+```
+
+> After changes: `wsl --shutdown`, wait ~8 seconds, then relaunch. See [MS docs: .wslconfig settings](https://learn.microsoft.com/en-us/windows/wsl/wsl-config#wslconfig).
+
 ### When to Use WSL vs Windows (Dev Drive)
 
 | Use WSL (`~/dev`) | Use Windows (`D:\dev`) |
@@ -241,10 +268,12 @@ Install tools on `C:\` using [winget](https://learn.microsoft.com/en-us/windows/
 
 | Tool | Install Command | Docs |
 |---|---|---|
-| **Git** | `winget install Git.Git` | [git-scm.com](https://git-scm.com/doc) |
-| **Node.js LTS** | `winget install OpenJS.NodeJS.LTS` | [nodejs.org](https://nodejs.org/en/download/) |
-| **VS Code** | `winget install Microsoft.VisualStudioCode` | [code.visualstudio.com](https://code.visualstudio.com/docs) |
-| **GitHub CLI** | `winget install GitHub.cli` | [cli.github.com](https://cli.github.com/manual/) |
+| **Git** | `winget install --id Git.Git --exact` | [git-scm.com](https://git-scm.com/doc) |
+| **Node.js LTS** | `winget install --id OpenJS.NodeJS.LTS --exact` | [nodejs.org](https://nodejs.org/en/download/) |
+| **VS Code** | `winget install --id Microsoft.VisualStudioCode --exact` | [code.visualstudio.com](https://code.visualstudio.com/docs) |
+| **GitHub CLI** | `winget install --id GitHub.cli --exact` | [cli.github.com](https://cli.github.com/manual/) |
+| **Pandoc** | `winget install --id JohnMacFarlane.Pandoc --exact` | [pandoc.org](https://pandoc.org/installing.html) |
+| **Typst** | `winget install --id Typst.Typst --exact` | [typst.app](https://github.com/typst/typst) |
 
 After Node.js is installed (restart terminal first):
 
@@ -256,8 +285,8 @@ After Node.js is installed (restart terminal first):
 Or run the convenience script which installs all of the above idempotently:
 
 ```powershell
-# Admin PowerShell
-powershell -ExecutionPolicy Bypass -File scripts\setup\install-dev-tools.ps1
+# Regular PowerShell (do not run elevated)
+powershell -NoProfile -File scripts\setup\install-dev-tools.ps1
 ```
 
 ### Git Configuration (Windows-specific)
@@ -289,8 +318,8 @@ After creating Dev Drive, redirect package caches per [MS recommendations](https
 ### npm Cache
 
 ```powershell
-# Admin PowerShell
-setx /M npm_config_cache D:\packages\npm
+# Regular PowerShell (user scope; least privilege)
+setx npm_config_cache D:\packages\npm
 
 # Move existing cache (if any)
 robocopy "%AppData%\npm-cache" D:\packages\npm /E /MOVE
@@ -304,7 +333,7 @@ npm config get cache
 ### pip Cache (for Python projects)
 
 ```powershell
-setx /M PIP_CACHE_DIR D:\packages\pip
+setx PIP_CACHE_DIR D:\packages\pip
 ```
 
 > See [pip docs: caching](https://pip.pypa.io/en/stable/topics/caching/) for details.
@@ -312,7 +341,8 @@ setx /M PIP_CACHE_DIR D:\packages\pip
 Or run the automated script which handles all of this:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts\setup\setup-dev-drive.ps1
+# Admin PowerShell
+powershell -NoProfile -File scripts\setup\setup-dev-drive.ps1
 ```
 
 ---
@@ -327,9 +357,10 @@ powershell -ExecutionPolicy Bypass -File scripts\setup\setup-dev-drive.ps1
 | Dev Drive config | 250 GB VHDX, dynamically expanding, ReFS | Wizard (section 4) |
 | Directory structure | `D:\dev\`, `D:\packages\npm\`, `D:\packages\pip\` | `setup-dev-drive.ps1` |
 | Git config | autocrlf, longpaths, default branch | Commands in section 6 |
-| npm cache location | `D:\packages\npm` | `setup-dev-drive.ps1` |
+| npm cache location | `D:\packages\npm` (user env var) | `setup-dev-drive.ps1` |
 | Node.js major version | Same LTS across machines | `node --version` |
 | WSL distro | Ubuntu with `~/dev` | `wsl --install -d Ubuntu` |
+| .wslconfig | Same resource limits (adjusted per machine RAM) | Manual (section 5) |
 | .env.local contents | Same API keys | Manual — use a password manager |
 
 ### What Can Differ
@@ -339,14 +370,15 @@ VHD file path (varies by Windows username), computer name, hardware specs, addit
 ### New Machine Quick Reference
 
 1. `git clone https://github.com/praeducer/paulprae-com.git C:\dev\paulprae-com`
-2. Run `scripts\setup\install-dev-tools.ps1` (admin PowerShell)
+2. Run `scripts\setup\install-dev-tools.ps1` (regular PowerShell)
 3. Restart terminal, run git config commands from section 6
 4. Create Dev Drive via Settings wizard (section 4 values)
 5. Run `scripts\setup\setup-dev-drive.ps1` (admin PowerShell)
 6. `robocopy C:\dev\paulprae-com D:\dev\paulprae-com /E /MOVE`
 7. Follow [project README](../README.md) for `npm install`, `.env.local`, and first run
 8. `wsl -e bash -c 'mkdir -p ~/dev'`
-9. Update Machine Inventory (section 1) and commit
+9. Create `.wslconfig` per section 5, then `wsl --shutdown`
+10. Update Machine Inventory (section 1) and commit
 
 ### Keeping Machines in Sync
 
@@ -354,6 +386,7 @@ VHD file path (varies by Windows username), computer name, hardware specs, addit
 - **Secrets (.env.local):** Password manager. Copy manually per machine.
 - **Tool versions:** Periodically verify `node --version`, `git --version` match.
 - **This guide:** Commit environment changes here so the other machine can replicate.
+- **Privilege model:** Regular shell for tooling/tasks; admin shell only for Dev Drive and other machine-level changes.
 
 ---
 
@@ -378,6 +411,18 @@ VHD file path (varies by Windows username), computer name, hardware specs, addit
 **Rationale:** Safer (no partition resize risk), reproducible across machines, flexible. Overhead negligible on NVMe. See [MS docs on VHD vs partition](https://learn.microsoft.com/en-us/windows/dev-drive/#how-to-choose-between-using-a-disk-partition-or-vhd).
 
 **Standard wizard values:** Name `DevDrive`, Location `C:\Users\<username>\`, 250 GB, VHDX, Dynamically expanding, Drive letter `D:`.
+
+### 2026-02-27: WSL .wslconfig Added
+
+**Decision:** Create `.wslconfig` on all machines with bounded memory (half of system RAM), 12 processors, mirrored networking, and experimental memory reclamation.
+
+**Rationale:** Without `.wslconfig`, WSL defaults to 50% RAM and all CPUs with no memory reclamation. Mirrored networking simplifies localhost access between Windows and WSL. `autoMemoryReclaim=gradual` prevents the Vmmem process from hogging memory after WSL workloads complete. See [MS docs: .wslconfig](https://learn.microsoft.com/en-us/windows/wsl/wsl-config).
+
+### 2026-02-27: Git Repos Must Not Live in Cloud-Synced Folders
+
+**Decision:** Never store git repositories in OneDrive, iCloudDrive, or other cloud-synced directories.
+
+**Rationale:** Cloud sync services cause `.git` directory corruption from file-locking race conditions, bloat cloud storage with `node_modules` and `.git/objects`, and create phantom merge conflicts. All repos should live on Dev Drive (`D:\dev\`) or WSL (`~/dev/`) and sync exclusively through GitHub.
 
 ---
 

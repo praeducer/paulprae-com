@@ -521,12 +521,56 @@ The entire flow from data to deployed site:
 1. Export data from LinkedIn → drop CSVs in data/linkedin/
 2. Run: npx tsx scripts/ingest-linkedin.ts
 3. Run: npx tsx scripts/generate-resume.ts
-4. Review content/resume.md, make any manual edits
-5. git add . && git commit -m "Update resume" && git push
-6. Vercel auto-deploys within ~60 seconds
+4. Run: npx tsx scripts/export-resume.ts  (PDF + DOCX)
+5. Review content/resume.md, make any manual edits
+6. git add . && git commit -m "Update resume" && git push
+7. Vercel auto-deploys within ~60 seconds
 ```
 
+**Full pipeline shortcut:** `npm run pipeline` (runs ingest → generate → export → build sequentially)
+
 This pipeline can be run whenever LinkedIn data changes or when Paul wants to adjust the resume targeting.
+
+#### 5.6 Resume Export Layer (PDF & DOCX)
+
+The export layer converts the AI-generated Markdown resume into recruiter-friendly PDF and DOCX formats using two system-level tools:
+
+- **Pandoc** (MD → DOCX): Industry-standard document converter with 18+ years of active development. Produces native Word documents with proper styles, headings, and ATS-parseable structure.
+- **Typst** (MD → PDF via Pandoc intermediate): Modern Rust-based typesetter that produces publication-grade PDF typography. Pandoc converts Markdown to Typst markup, then Typst compiles to PDF using a custom template.
+
+```
+Pipeline flow:
+  content/resume.md
+       |
+       +──→ pandoc (MD → DOCX) ──→ out/resume.docx
+       |         uses templates/reference.docx for styling
+       |
+       +──→ pandoc (MD → Typst) → typst compile ──→ out/resume.pdf
+                uses templates/resume.typ for styling
+```
+
+**System dependencies (not npm packages):**
+
+| Tool | Install | Purpose |
+|------|---------|---------|
+| Pandoc | `sudo apt-get install -y pandoc` | Markdown → DOCX, Markdown → Typst |
+| Typst | `cargo install typst-cli` | Typst → PDF compilation |
+
+**Architecture Decision Record: Pandoc + Typst vs Alternatives**
+
+| Approach | Output Quality | Custom Code | Dependencies | Maintenance |
+|----------|---------------|-------------|--------------|-------------|
+| **Pandoc + Typst** ✅ | Publication-grade PDF, native DOCX | ~80 lines (1 script) | 2 system binaries, 0 npm | Pandoc: 35k★, Typst: 35k★ |
+| Puppeteer / md-to-pdf | Browser-rendered PDF (CSS dependent) | ~60 lines | 1 npm (Chromium ~400MB) | Chromium version churn |
+| Node.js docx package | Programmatic DOCX (no PDF) | ~200+ lines | 1 npm | Manual style mapping |
+| LaTeX via Pandoc | Gold-standard PDF | ~80 lines + .tex template | texlive (~2GB) | LaTeX ecosystem complexity |
+
+**Future consideration — MCP integration (Phase 2/3):**
+The `mcp-pandoc` server by vivekVells could enable Claude agents to trigger format conversion as a tool call during chat (e.g., a "Download as PDF" button in the Phase 2 chat interface). Current tradeoffs:
+- Cost: Current approach = $0 (local binaries) vs MCP = server hosting or local process overhead
+- Benefit: Enables agent-driven conversion without shell access
+- Tradeoff: `mcp-pandoc` is in early development; PDF support still being built
+- Recommendation: Adopt in Phase 2 when the chat interface needs on-demand export
 
 ---
 

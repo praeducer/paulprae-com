@@ -18,6 +18,7 @@
 | AI | Anthropic Claude API via @anthropic-ai/sdk | Latest |
 | CSV Parsing | PapaParse | Latest |
 | Script Runner | tsx | Latest |
+| Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF) | System binaries |
 | Deployment | Vercel (static export, free tier) | Latest |
 
 ## Key Conventions
@@ -37,8 +38,9 @@ components/     → Reusable React components (resume-renderer, etc.)
 content/        → Generated content (resume.md) — DO NOT EDIT DIRECTLY
 data/linkedin/  → LinkedIn CSV exports (gitignored, sensitive PII)
 data/knowledge/ → Knowledge base JSONs (gitignored, personal content)
-scripts/        → Build pipeline scripts (ingest-linkedin.ts, generate-resume.ts)
-lib/            → Shared utilities, TypeScript interfaces (types.ts)
+scripts/        → Build pipeline scripts (ingest-linkedin.ts, generate-resume.ts, export-resume.ts)
+templates/      → Export templates (resume.typ for PDF, reference.docx for DOCX)
+lib/            → Shared utilities, TypeScript interfaces (types.ts), pipeline config
 public/         → Static assets (favicon, OG image)
 docs/           → Technical documentation and architecture docs
 ```
@@ -86,11 +88,14 @@ The build pipeline transforms raw career data into a deployed site:
 ```
 1. npm run ingest    → Parse LinkedIn CSVs + knowledge JSONs → data/career-data.json
 2. npm run generate  → Load career data → Claude API (Opus 4.6) → content/resume.md
-3. npm run build     → Next.js reads resume.md at build time → static HTML in out/
-4. git push          → Vercel auto-deploys from main branch
+3. npm run export    → Pandoc + Typst convert resume.md → out/resume.pdf + out/resume.docx
+4. npm run build     → Next.js reads resume.md at build time → static HTML in out/
+5. git push          → Vercel auto-deploys from main branch
 ```
 
-**Full pipeline shortcut:** `npm run pipeline` (runs all steps sequentially)
+**Full pipeline shortcut:** `npm run pipeline` (runs ingest → generate → export → build sequentially)
+
+**System dependencies for export:** `pandoc` and `typst` must be installed (see TDD §5.6).
 
 ## Common Commands
 
@@ -100,7 +105,10 @@ npm run build       # Production build (static export to out/)
 npm run start       # Serve production build locally
 npm run ingest      # Parse LinkedIn data → career-data.json
 npm run generate    # Generate resume via Claude API → resume.md
-npm run pipeline    # Full pipeline: ingest → generate → build
+npm run export      # Export resume to PDF + DOCX (requires pandoc + typst)
+npm run export:pdf  # Export PDF only
+npm run export:docx # Export DOCX only
+npm run pipeline    # Full pipeline: ingest → generate → export → build
 ```
 
 ## Phase 2 Preview (Do Not Implement Yet)

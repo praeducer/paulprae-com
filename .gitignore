@@ -23,6 +23,10 @@ build/
 
 # Sensitive data — LinkedIn exports contain PII
 data/linkedin/*.csv
+# Machine-specific inventory (hostnames, usernames, build numbers)
+machine-inventory.local.md
+*.local.md
+!.env.local.example
 data/knowledge/*.json
 data/career-data.json
 data/**/*.pdf

@@ -9,7 +9,10 @@
     "start": "next start",
     "ingest": "tsx scripts/ingest-linkedin.ts",
     "generate": "tsx scripts/generate-resume.ts",
-    "pipeline": "npm run ingest && npm run generate && npm run build"
+    "export": "tsx scripts/export-resume.ts",
+    "export:pdf": "tsx scripts/export-resume.ts --format pdf",
+    "export:docx": "tsx scripts/export-resume.ts --format docx",
+    "pipeline": "npm run ingest && npm run generate && npm run export && npm run build"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

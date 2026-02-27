@@ -13,12 +13,13 @@
 #   - Verifies trust and configures filesystem filters
 #     (https://learn.microsoft.com/en-us/windows/dev-drive/#filters-for-common-scenarios)
 #
-# Usage: powershell -ExecutionPolicy Bypass -File scripts\setup\setup-dev-drive.ps1
+# Usage: powershell -NoProfile -File scripts\setup\setup-dev-drive.ps1
 # Requires: Run as Administrator. Dev Drive already mounted at D:
 
 #Requires -RunAsAdministrator
 
 $ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
 $DevDrive = "D:"
 
 Write-Host "`n=== Dev Drive Post-Setup ===" -ForegroundColor Cyan
@@ -30,7 +31,7 @@ if (-not (Test-Path $DevDrive)) {
 }
 
 # Check if it's a Dev Drive
-$query = fsutil devdrv query $DevDrive 2>&1
+fsutil devdrv query $DevDrive 2>&1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
     Write-Warning "$DevDrive exists but may not be a Dev Drive."
 } else {
@@ -54,8 +55,8 @@ Write-Host "`n--- Package caches ---" -ForegroundColor Cyan
 
 # npm: https://docs.npmjs.com/cli/v10/using-npm/config#cache
 $npmTarget = "$DevDrive\packages\npm"
-if ([System.Environment]::GetEnvironmentVariable("npm_config_cache", "Machine") -ne $npmTarget) {
-    [System.Environment]::SetEnvironmentVariable("npm_config_cache", $npmTarget, "Machine")
+if ([System.Environment]::GetEnvironmentVariable("npm_config_cache", "User") -ne $npmTarget) {
+    [System.Environment]::SetEnvironmentVariable("npm_config_cache", $npmTarget, "User")
     Write-Host "[SET] npm_config_cache -> $npmTarget" -ForegroundColor Green
 } else {
     Write-Host "[SKIP] npm cache already configured" -ForegroundColor Yellow
@@ -63,8 +64,8 @@ if ([System.Environment]::GetEnvironmentVariable("npm_config_cache", "Machine") 
 
 # pip: https://pip.pypa.io/en/stable/topics/caching/
 $pipTarget = "$DevDrive\packages\pip"
-if ([System.Environment]::GetEnvironmentVariable("PIP_CACHE_DIR", "Machine") -ne $pipTarget) {
-    [System.Environment]::SetEnvironmentVariable("PIP_CACHE_DIR", $pipTarget, "Machine")
+if ([System.Environment]::GetEnvironmentVariable("PIP_CACHE_DIR", "User") -ne $pipTarget) {
+    [System.Environment]::SetEnvironmentVariable("PIP_CACHE_DIR", $pipTarget, "User")
     Write-Host "[SET] PIP_CACHE_DIR -> $pipTarget" -ForegroundColor Green
 } else {
     Write-Host "[SKIP] pip cache already configured" -ForegroundColor Yellow
@@ -76,7 +77,7 @@ Write-Host "`n--- Trust & filters ---" -ForegroundColor Cyan
 fsutil devdrv trust $DevDrive 2>&1 | Out-Null
 Write-Host "[OK] $DevDrive trusted" -ForegroundColor Green
 
-fsutil devdrv setfiltersallowed "PrjFlt, MsSecFlt, WdFilter, bindFlt, wcifs, FileInfo" 2>&1 | Out-Null
+fsutil devdrv setFiltersAllowed /volume $DevDrive "PrjFlt, MsSecFlt, WdFilter, bindFlt, wcifs, FileInfo" 2>&1 | Out-Null
 Write-Host "[OK] Common dev filters allowed" -ForegroundColor Green
 
 Write-Host "`n=== Done ===" -ForegroundColor Cyan
