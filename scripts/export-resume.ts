@@ -16,6 +16,7 @@
 
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 import { execFileSync } from "child_process";
 import { PATHS } from "../lib/config.js";
 import { stripHtmlComments } from "../lib/markdown.js";
@@ -81,6 +82,15 @@ function loadAndCleanMarkdown(): string {
 
 // ─── Export Functions ────────────────────────────────────────────────────────
 
+/** Extract stderr message from an execFileSync error, if available. */
+function extractStderr(err: unknown): string {
+  if (err instanceof Error && "stderr" in err) {
+    const stderr = (err as { stderr: Buffer }).stderr?.toString().trim();
+    if (stderr) return stderr;
+  }
+  return err instanceof Error ? err.message : String(err);
+}
+
 function ensureOutputDir(): void {
   const outDir = path.dirname(PATHS.pdfOutput);
   if (!fs.existsSync(outDir)) {
@@ -91,13 +101,19 @@ function ensureOutputDir(): void {
 function exportDocx(markdown: string): void {
   console.log("   📄 Generating DOCX...");
 
-  const tempMd = path.join(path.dirname(PATHS.docxOutput), "_resume_tmp.md");
+  const suffix = crypto.randomUUID().slice(0, 8);
+  const tempMd = path.join(path.dirname(PATHS.docxOutput), `_resume_tmp_${suffix}.md`);
   fs.writeFileSync(tempMd, markdown, "utf-8");
 
   try {
-    execFileSync("pandoc", [tempMd, "-o", PATHS.docxOutput, "--from", "markdown", "--to", "docx"], {
-      stdio: ["pipe", "pipe", "pipe"],
-    });
+    try {
+      execFileSync("pandoc", [tempMd, "-o", PATHS.docxOutput, "--from", "markdown", "--to", "docx"], {
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+    } catch (err: unknown) {
+      console.error(`      ❌ Pandoc DOCX conversion failed:\n      ${extractStderr(err)}`);
+      process.exit(1);
+    }
 
     const stats = fs.statSync(PATHS.docxOutput);
     if (stats.size === 0) {
@@ -115,17 +131,31 @@ function exportDocx(markdown: string): void {
 function exportPdf(markdown: string): void {
   console.log("   📕 Generating PDF...");
 
-  const tempMd = path.join(path.dirname(PATHS.pdfOutput), "_resume_tmp.md");
-  const tempTyp = path.join(path.dirname(PATHS.pdfOutput), "_resume_tmp.typ");
+  const suffix = crypto.randomUUID().slice(0, 8);
+  const tempMd = path.join(path.dirname(PATHS.pdfOutput), `_resume_tmp_${suffix}.md`);
+  const tempTyp = path.join(path.dirname(PATHS.pdfOutput), `_resume_tmp_${suffix}.typ`);
   const templateTyp = PATHS.pdfStylesheet;
+
+  // Validate stylesheet exists before starting conversion
+  if (!fs.existsSync(templateTyp)) {
+    console.error(`      ❌ Typst stylesheet not found: ${templateTyp}`);
+    console.error("         Expected at: scripts/resume-pdf.typ");
+    console.error("         Ensure the file exists and has not been moved or deleted.");
+    process.exit(1);
+  }
 
   fs.writeFileSync(tempMd, markdown, "utf-8");
 
   try {
     // Step 1: Pandoc MD → Typst markup
-    execFileSync("pandoc", [tempMd, "-o", tempTyp, "--from", "markdown", "--to", "typst"], {
-      stdio: ["pipe", "pipe", "pipe"],
-    });
+    try {
+      execFileSync("pandoc", [tempMd, "-o", tempTyp, "--from", "markdown", "--to", "typst"], {
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+    } catch (err: unknown) {
+      console.error(`      ❌ Pandoc MD→Typst conversion failed:\n      ${extractStderr(err)}`);
+      process.exit(1);
+    }
 
     // Step 2: Prepend our template to the Pandoc-generated Typst content
     const templateContent = fs.readFileSync(templateTyp, "utf-8");
@@ -133,9 +163,14 @@ function exportPdf(markdown: string): void {
     fs.writeFileSync(tempTyp, templateContent + "\n" + pandocTypst, "utf-8");
 
     // Step 3: Typst compile → PDF
-    execFileSync("typst", ["compile", tempTyp, PATHS.pdfOutput], {
-      stdio: ["pipe", "pipe", "pipe"],
-    });
+    try {
+      execFileSync("typst", ["compile", tempTyp, PATHS.pdfOutput], {
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+    } catch (err: unknown) {
+      console.error(`      ❌ Typst PDF compilation failed:\n      ${extractStderr(err)}`);
+      process.exit(1);
+    }
 
     const stats = fs.statSync(PATHS.pdfOutput);
     if (stats.size === 0) {
@@ -251,13 +286,23 @@ function updateManifest(format: ExportFormat): void {
     ].join("\n");
     fs.writeFileSync(PATHS.versionsManifest, template, "utf-8");
   } else {
-    // Append entry after "## Version Log" header
+    // Insert or replace entry after "## Version Log" header (dedup by date+sha)
     const existing = fs.readFileSync(PATHS.versionsManifest, "utf-8");
     const marker = "## Version Log";
     const idx = existing.indexOf(marker);
     if (idx !== -1) {
       const insertAt = idx + marker.length;
-      const updated = existing.slice(0, insertAt) + "\n\n" + entry + existing.slice(insertAt);
+      const afterMarker = existing.slice(insertAt);
+
+      // Remove any existing entry with the same date+sha to prevent duplicates
+      const escapedDate = date.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const escapedSha = sha.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const entryPattern = new RegExp(
+        `\\n*### ${escapedDate}\\n- \\*\\*Commit:\\*\\* \`${escapedSha}\`[\\s\\S]*?(?=\\n### |$)`,
+      );
+      const cleanedAfter = afterMarker.replace(entryPattern, "");
+
+      const updated = existing.slice(0, insertAt) + "\n\n" + entry + cleanedAfter;
       fs.writeFileSync(PATHS.versionsManifest, updated, "utf-8");
     } else {
       // Fallback: append to end

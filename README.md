@@ -32,7 +32,9 @@ LinkedIn CSV Export → Ingestion Script → Claude API → Markdown Resume → 
 | Styling | Tailwind CSS 4.x |
 | Markdown | react-markdown + remark-gfm |
 | AI Generation | Anthropic Claude API (Opus 4.6) |
+| Validation | Zod (schema validation) |
 | Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF) |
+| Testing | Vitest (150+ unit and integration tests) |
 | Deployment | Vercel (free tier, auto-deploy from GitHub) |
 | Dev Tooling | Claude Code CLI + Cursor |
 
@@ -83,6 +85,14 @@ npm run export:docx # DOCX only
 npm run build       # Next.js static export → out/
 ```
 
+### Testing
+
+```bash
+npm test              # Run all tests
+npm run test:unit     # Unit tests only (pure logic, no generated files needed)
+npm run test:pipeline # Pipeline integration tests (validates generated outputs)
+```
+
 ### Local Development
 
 ```bash
@@ -108,10 +118,11 @@ paulprae-com/
 │   │   ├── linkedin/       # LinkedIn CSV exports (gitignored — may contain unparsed columns)
 │   │   └── knowledge/      # Knowledge base JSONs (committed — recruiter-facing content)
 │   └── generated/          # Pipeline output: career-data.json + resume.md (committed), PDF + DOCX (gitignored)
+├── tests/                  # Unit tests (Vitest) + pipeline integration tests
 ├── docs/                   # Technical documentation and design docs
 ├── scripts/                # Build pipeline + export scripts + resume-pdf.typ stylesheet
-├── lib/                    # Shared utilities and TypeScript types
-├── public/                 # Static assets (favicon, OG image)
+├── lib/                    # Shared utilities (config, types, markdown helpers)
+├── public/                 # Static assets
 ├── .env.local.example      # Environment variable template
 ├── CLAUDE.md               # Claude Code project memory
 └── next.config.ts          # Next.js configuration
@@ -137,8 +148,14 @@ paulprae-com/
 | Doc | Purpose |
 |---|---|
 | [`docs/technical-design-document.md`](docs/technical-design-document.md) | Full architecture, schema, and implementation plan |
+| [`docs/pipeline-setup-checklist.md`](docs/pipeline-setup-checklist.md) | Step-by-step pipeline setup: API keys, LinkedIn data, first run |
+| [`docs/linux-dev-environment-setup.md`](docs/linux-dev-environment-setup.md) | Linux/WSL setup: nvm, Claude Code CLI, Cursor, pipeline deps |
 | [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows-specific setup: Dev Drive, filesystem layout, cross-machine parity |
 | [`scripts/setup/`](scripts/setup/) | Automated setup scripts (Windows + Linux/WSL) for dev environment and pipeline deps |
+
+## Resume Versioning
+
+Each pipeline run archives the resume to `data/generated/versions/` and logs it in [`data/generated/VERSIONS.md`](data/generated/VERSIONS.md). Use git tags (`resume/YYYY-MM-DD`) for milestone versions.
 
 ## License
 

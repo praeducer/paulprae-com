@@ -50,7 +50,7 @@ The script installs pandoc, typst, nvm, Node.js, npm dependencies, Claude Code C
 | OS | Ubuntu 22.04+ | Other Debian-based distros should work |
 | Kernel | ≥ 6.2 | Required for Claude Code sandbox ([Landlock v3](https://docs.kernel.org/userspace-api/landlock.html)) |
 | RAM | 4 GB | 8+ GB recommended |
-| Node.js | 20+ (LTS) | Installed via nvm (section 4) |
+| Node.js | 22+ (LTS) | Installed via nvm (section 4) |
 
 Check your kernel version:
 
@@ -175,7 +175,7 @@ nvm alias default lts/*
 ### Verify
 
 ```bash
-node --version    # Expected: v22.x (or current LTS)
+node --version    # Expected: v22.x or v24.x (current LTS)
 npm --version     # Expected: 10.x+
 which node        # Expected: ~/.nvm/versions/node/.../bin/node
 ```

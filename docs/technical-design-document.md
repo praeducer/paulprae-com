@@ -1,9 +1,9 @@
 # Technical Design Document: paulprae.com — AI-Powered Career Platform
 
 **Author:** Paul Prae & Claude (Anthropic)
-**Version:** 1.0
-**Date:** February 24, 2026
-**Status:** Ready for Implementation
+**Version:** 1.1
+**Date:** February 28, 2026
+**Status:** Phase 1 — Implemented and Deployed
 
 ---
 
@@ -107,8 +107,8 @@ Paul's confirmed LinkedIn data export CSVs serve as the primary structured data 
 
 | File | Columns | Row Count | Purpose |
 |------|---------|-----------|---------|
-| `Skills.csv` | Name | 63 | Technical and professional skills |
-| `Projects.csv` | Title, Description, Url, Started On, Finished On | 28 | Portfolio projects with descriptions |
+| `Skills.csv` | Name | 70+ | Technical and professional skills |
+| `Projects.csv` | Title, Description, Url, Started On, Finished On | 29 | Portfolio projects with descriptions |
 | `Publications.csv` | Name, Published On, Description, Publisher, Url | 2 | Academic and professional publications |
 | `Certifications.csv` | Name, Url, Authority, Started On, Finished On, License Number | 10 | Professional certifications (AWS, edX, etc.) |
 
@@ -126,13 +126,18 @@ These are expected when Paul requests a complete LinkedIn data archive:
 
 ### Supplementary Data Sources
 
-| Source | Format | Content |
-|--------|--------|---------|
-| `paul_prae_knowledge_base.json` | JSON | Comprehensive career narrative, skills taxonomy, project details, recommendations, personal brand elements |
-| `job_search_knowledge_base.json` | JSON | Career objectives, go-to-market strategy, personal brand, target companies |
-| `Paul_Prae_Resume_2026.1.pdf` | PDF | Current formatted resume (reference for content and structure) |
-| `PaulPrae_Resume_Google_Drive.pdf` | PDF | Detailed resume with project descriptions (reference for rich content) |
-| Cover letter files (`.txt`) | Text | Tailored narratives for specific roles/companies |
+The knowledge base lives in `data/sources/knowledge/` organized into subdirectories:
+
+| Directory | Content |
+|-----------|---------|
+| `career/` | Profile enrichment (`profile.json`), career narratives, role-specific details |
+| `brand/` | Personal brand elements, positioning, messaging |
+| `strategy/` | Job search strategy, target companies, go-to-market approach |
+| `agents/` | AI agent configurations and prompts |
+| `content/` | Curated content snippets and writing samples |
+| `_meta/` | Schema definitions and knowledge base metadata |
+
+All knowledge base JSONs are committed to git (recruiter-facing content). The ingestion script recursively traverses all subdirectories, loading files matching the `KnowledgeEntry` schema directly and wrapping other JSON structures with category/title derived from filepath.
 
 ### Data Pipeline Strategy
 
@@ -444,6 +449,7 @@ interface CareerData {
     startDate: string;
     endDate: string;
     notes: string;
+    activities: string;
   }>;
   skills: string[];
   certifications: Array<{
@@ -467,6 +473,12 @@ interface CareerData {
     url?: string;
     description: string;
   }>;
+  languages: Array<{ name: string; proficiency: string }>;
+  recommendations: Array<{ recommender: string; text: string; date: string }>;
+  honors: Array<{ title: string; issuer: string; date: string; description: string }>;
+  volunteering: Array<{ organization: string; role: string; cause: string; startDate: string; endDate: string | null; description: string }>;
+  courses: Array<{ name: string; number: string; associatedWith: string }>;
+  knowledge: KnowledgeEntry[];
 }
 ```
 
@@ -571,6 +583,39 @@ The `mcp-pandoc` server by vivekVells could enable Claude agents to trigger form
 - Benefit: Enables agent-driven conversion without shell access
 - Tradeoff: `mcp-pandoc` is in early development; PDF support still being built
 - Recommendation: Adopt in Phase 2 when the chat interface needs on-demand export
+
+#### 5.7 Resume Version Archival
+
+Each export run automatically:
+1. Copies `resume.{md,pdf,docx}` to `data/generated/versions/resume-YYYY-MM-DD-<git-sha>.{md,pdf,docx}` (gitignored)
+2. Appends a version entry to `data/generated/VERSIONS.md` (committed) with timestamp, git SHA, and file sizes
+3. `VERSIONS.md` also contains a "Sent To" table for tracking which resume version was sent to which recruiter
+
+Milestone versions can be tagged: `git tag -a resume/YYYY-MM-DD -m "description"`
+
+#### 5.8 Test Suite
+
+The project uses **Vitest** (v4, ESM-native, TypeScript built-in) with 150+ tests across 5 test files:
+
+| File | Tests | Scope |
+|------|-------|-------|
+| `tests/config.test.ts` | ~11 | Config paths, constants, validation |
+| `tests/ingest.test.ts` | ~56 | CSV parsing, date normalization, knowledge base loading, Zod validation |
+| `tests/generate.test.ts` | ~28 | Prompt construction, resume content quality, brand voice |
+| `tests/export.test.ts` | ~17 | PDF/DOCX generation, file size validation, version archival |
+| `tests/pipeline.test.ts` | ~40 | End-to-end output validation, ATS keywords, section coverage |
+
+**Test commands:**
+```bash
+npm test              # All tests
+npm run test:unit     # Unit tests only (no generated files needed)
+npm run test:pipeline # Pipeline integration tests (validates generated outputs)
+```
+
+**Key patterns:**
+- Pipeline tests use `it.skipIf(!data)` to gracefully handle missing outputs (before first pipeline run)
+- Test fixtures in `tests/fixtures/sample-data.ts` provide typed sample data for all CSV types
+- Scripts export `_testExports` for unit testing internal functions, with `isDirectRun` guards to prevent auto-execution on import
 
 ---
 

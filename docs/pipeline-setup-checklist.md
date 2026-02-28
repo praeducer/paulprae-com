@@ -10,7 +10,7 @@
 ## Prerequisites
 
 Before starting, ensure you have:
-- Node.js 20+ installed ([nodejs.org](https://nodejs.org/en/download/) or via nvm)
+- Node.js 22+ (LTS) installed ([nodejs.org](https://nodejs.org/en/download/) or via nvm)
 - Git configured and this repo cloned
 - A terminal in the project root directory
 
@@ -139,7 +139,7 @@ pandoc --version
 typst --version
 ```
 
-> Skip this step if you only need the web resume. The pipeline will warn but not fail if Pandoc/Typst are missing (only the export step will be skipped).
+> The `npm run export` step will **fail** if pandoc/typst are missing. If you only need the web resume, run `npm run ingest`, `npm run generate`, and `npm run build` individually — only the export step requires these tools.
 
 ---
 
@@ -167,7 +167,17 @@ npm run build       # Build static site → out/
 
 ---
 
-### 8. Preview Locally
+### 8. Run Tests
+
+```bash
+npm test
+```
+
+All 150+ tests should pass. If any fail, check the troubleshooting section below.
+
+---
+
+### 9. Preview Locally
 
 ```bash
 npm run dev

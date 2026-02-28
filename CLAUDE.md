@@ -17,8 +17,11 @@
 | Markdown | react-markdown + remark-gfm | Latest |
 | AI | Anthropic Claude API via @anthropic-ai/sdk | Latest |
 | CSV Parsing | PapaParse | Latest |
+| Validation | Zod | Latest |
+| Env Loading | dotenv | Latest |
 | Script Runner | tsx | Latest |
 | Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF) | System binaries |
+| Testing | Vitest | 4.x |
 | Deployment | Vercel (static export, free tier) | Latest |
 
 ## Key Conventions
@@ -39,8 +42,9 @@ data/sources/linkedin/ → LinkedIn CSV exports (gitignored — raw exports may 
 data/sources/knowledge/→ Knowledge base JSONs (committed — recruiter-facing content for Phase 2 RAG)
 data/generated/        → Pipeline outputs: career-data.json + resume.md (committed), PDF + DOCX (gitignored)
 scripts/               → Pipeline scripts (ingest, generate, export) + resume-pdf.typ stylesheet
-lib/                   → Shared utilities, TypeScript interfaces, pipeline config
-public/                → Static assets (favicon, OG image)
+lib/                   → Shared utilities: config.ts, types.ts, markdown.ts, knowledge-types.ts
+tests/                 → Unit and integration tests (Vitest)
+public/                → Static assets
 docs/                  → Technical documentation and architecture docs
 ```
 
@@ -69,7 +73,7 @@ docs/                  → Technical documentation and architecture docs
 When generating resume content or any copy for paulprae.com, follow these guidelines:
 
 - **Tone:** Confident, technically precise, action-oriented
-- **Perspective:** First-person for summaries, third-person acceptable for bios
+- **Perspective:** Third-person professional (no "I" statements)
 - **Emphasis areas:**
   - AI engineering leadership and architecture
   - Healthcare domain expertise (Arine, BCBS, Humana ecosystem)
@@ -108,6 +112,9 @@ npm run export      # Export resume to PDF + DOCX (requires pandoc + typst)
 npm run export:pdf  # Export PDF only
 npm run export:docx # Export DOCX only
 npm run pipeline    # Full pipeline: ingest → generate → export → build
+npm test            # Run all tests (Vitest)
+npm run test:unit   # Unit tests only (pure logic)
+npm run test:pipeline # Pipeline integration tests (validates generated outputs)
 ```
 
 ## Phase 2 Preview (Do Not Implement Yet)
