@@ -27,8 +27,12 @@ function getResumeFileBase(): string {
       const name: string | undefined = data?.profile?.name;
       if (name) {
         // "Paul Prae" → "Paul-Prae-Resume"
-        const slug = name.trim().replace(/\s+/g, "-");
-        return `${slug}-Resume`;
+        // Sanitize: collapse whitespace to hyphens, strip non-alphanumeric except hyphens
+        const slug = name
+          .trim()
+          .replace(/\s+/g, "-")
+          .replace(/[^a-zA-Z0-9-]/g, "");
+        if (slug) return `${slug}-Resume`;
       }
     }
   } catch {
@@ -39,6 +43,9 @@ function getResumeFileBase(): string {
 
 /** Filename base for resume outputs, e.g. "Paul-Prae-Resume" or "Resume" (fallback). */
 export const RESUME_FILE_BASE = getResumeFileBase();
+
+/** Exported for testing only — do not use directly; use RESUME_FILE_BASE instead. */
+export const _testExports = { getResumeFileBase };
 
 export const PATHS = {
   linkedinDir: path.join(ROOT, "data", "sources", "linkedin"),

@@ -174,7 +174,7 @@ describe("validateResumeOutput", () => {
 // ─── Resume Content Quality Checks ──────────────────────────────────────────
 // These tests validate the SAMPLE resume fixture for quality patterns.
 // When the real resume is generated, the same patterns should hold.
-// Run these against the actual resume.md for full QA.
+// Run these against the actual generated resume for full QA.
 
 describe("resume content quality (fixture)", () => {
   const resume = SAMPLE_RESUME_CLEAN;

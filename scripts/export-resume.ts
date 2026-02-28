@@ -302,7 +302,10 @@ function updateManifest(format: ExportFormat): void {
       );
       const cleanedAfter = afterMarker.replace(entryPattern, "");
 
-      const updated = existing.slice(0, insertAt) + "\n\n" + entry + cleanedAfter;
+      // Normalize: strip leading whitespace from remaining content, then add consistent spacing
+      const trimmedAfter = cleanedAfter.replace(/^\s*/, "");
+      const separator = trimmedAfter ? "\n" : "";
+      const updated = existing.slice(0, insertAt) + "\n\n" + entry + separator + trimmedAfter;
       fs.writeFileSync(PATHS.versionsManifest, updated, "utf-8");
     } else {
       // Fallback: append to end

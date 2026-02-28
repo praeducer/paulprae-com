@@ -28,10 +28,13 @@ data/sources/linkedin/*.zip:Zone.Identifier
 
 # Pipeline: binary build artifacts (regenerable via npm run export)
 # Covers recruiter-friendly naming (Paul-Prae-Resume.pdf) and fallback (Resume.pdf)
+# Legacy lowercase patterns included for safety
 data/generated/*-Resume.pdf
 data/generated/*-Resume.docx
 data/generated/Resume.pdf
 data/generated/Resume.docx
+data/generated/resume.pdf
+data/generated/resume.docx
 
 # Pipeline: version archive (timestamped copies of each export, regenerable)
 data/generated/versions/

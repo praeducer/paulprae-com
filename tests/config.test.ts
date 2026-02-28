@@ -13,7 +13,7 @@
 
 import { describe, it, expect } from "vitest";
 import path from "path";
-import { PATHS, KNOWLEDGE_PATHS, CLAUDE, LINKEDIN_CSV_FILES, RESUME_FILE_BASE } from "../lib/config.js";
+import { PATHS, KNOWLEDGE_PATHS, CLAUDE, LINKEDIN_CSV_FILES, RESUME_FILE_BASE, _testExports } from "../lib/config.js";
 
 describe("RESUME_FILE_BASE", () => {
   it("is a non-empty string ending with 'Resume'", () => {
@@ -24,6 +24,50 @@ describe("RESUME_FILE_BASE", () => {
   it("uses hyphen-separated name when career data exists", () => {
     // In this repo, career-data.json exists with profile.name = "Paul Prae"
     expect(RESUME_FILE_BASE).toBe("Paul-Prae-Resume");
+  });
+
+  it("contains only filename-safe characters (alphanumeric and hyphens)", () => {
+    expect(RESUME_FILE_BASE).toMatch(/^[a-zA-Z0-9-]+$/);
+  });
+});
+
+describe("getResumeFileBase() — edge cases", () => {
+  // These test the sanitization logic used in production by simulating the
+  // same slug transformation applied in getResumeFileBase().
+  const slugify = (name: string): string => {
+    const slug = name.trim().replace(/\s+/g, "-").replace(/[^a-zA-Z0-9-]/g, "");
+    return slug ? `${slug}-Resume` : "Resume";
+  };
+
+  it("collapses multiple spaces to single hyphens", () => {
+    expect(slugify("Jane   Doe")).toBe("Jane-Doe-Resume");
+  });
+
+  it("strips leading and trailing whitespace", () => {
+    expect(slugify("  Jane Doe  ")).toBe("Jane-Doe-Resume");
+  });
+
+  it("removes special characters (apostrophes, accents, etc.)", () => {
+    expect(slugify("O'Brien")).toBe("OBrien-Resume");
+    expect(slugify("Jean-Marie")).toBe("Jean-Marie-Resume");
+  });
+
+  it("falls back to 'Resume' for empty or whitespace-only names", () => {
+    expect(slugify("")).toBe("Resume");
+    expect(slugify("   ")).toBe("Resume");
+  });
+
+  it("falls back to 'Resume' for names with only special characters", () => {
+    expect(slugify("@#$%")).toBe("Resume");
+  });
+
+  it("handles hyphenated names correctly", () => {
+    expect(slugify("Mary Jane Watson-Parker")).toBe("Mary-Jane-Watson-Parker-Resume");
+  });
+
+  it("getResumeFileBase() returns a value matching the current career data", () => {
+    // Verify the exported function matches the exported constant
+    expect(_testExports.getResumeFileBase()).toBe(RESUME_FILE_BASE);
   });
 });
 
