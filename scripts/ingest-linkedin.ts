@@ -55,8 +55,18 @@ import type {
 // ISO dates ("2020-01-15"), or slash dates ("01/2020").
 
 const MONTH_MAP: Record<string, string> = {
-  jan: "01", feb: "02", mar: "03", apr: "04", may: "05", jun: "06",
-  jul: "07", aug: "08", sep: "09", oct: "10", nov: "11", dec: "12",
+  jan: "01",
+  feb: "02",
+  mar: "03",
+  apr: "04",
+  may: "05",
+  jun: "06",
+  jul: "07",
+  aug: "08",
+  sep: "09",
+  oct: "10",
+  nov: "11",
+  dec: "12",
 };
 
 function normalizeDate(raw: string | undefined | null): string {
@@ -148,7 +158,9 @@ print(json.dumps(extracted))
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.warn(`   ⚠ Zip extraction failed: ${message}`);
-    console.warn("   You can manually extract the zip: unzip <file>.zip -d data/sources/linkedin/\n");
+    console.warn(
+      "   You can manually extract the zip: unzip <file>.zip -d data/sources/linkedin/\n",
+    );
     return null;
   }
 }
@@ -157,7 +169,7 @@ print(json.dumps(extracted))
 
 /** Strip UTF-8 BOM that Windows LinkedIn exports often prepend. */
 function stripBOM(content: string): string {
-  return content.charCodeAt(0) === 0xFEFF ? content.slice(1) : content;
+  return content.charCodeAt(0) === 0xfeff ? content.slice(1) : content;
 }
 
 function parseCSV<T>(filePath: string): T[] {
@@ -173,7 +185,7 @@ function parseCSV<T>(filePath: string): T[] {
   if (result.errors.length > 0) {
     for (const err of result.errors) {
       console.warn(
-        `  ⚠ Parse warning in ${path.basename(filePath)} row ${err.row ?? "?"}: ${err.message}`
+        `  ⚠ Parse warning in ${path.basename(filePath)} row ${err.row ?? "?"}: ${err.message}`,
       );
     }
   }
@@ -213,14 +225,10 @@ function normalizeEducation(rows: LinkedInEducation[]): CareerEducation[] {
 }
 
 function normalizeSkills(rows: LinkedInSkill[]): string[] {
-  return rows
-    .map((r) => safeString(r["Name"]))
-    .filter((name) => name.length > 0);
+  return rows.map((r) => safeString(r["Name"])).filter((name) => name.length > 0);
 }
 
-function normalizeCertifications(
-  rows: LinkedInCertification[]
-): CareerCertification[] {
+function normalizeCertifications(rows: LinkedInCertification[]): CareerCertification[] {
   return rows
     .filter((r) => safeString(r["Name"]))
     .map((r) => ({
@@ -244,9 +252,7 @@ function normalizeProjects(rows: LinkedInProject[]): CareerProject[] {
     }));
 }
 
-function normalizePublications(
-  rows: LinkedInPublication[]
-): CareerPublication[] {
+function normalizePublications(rows: LinkedInPublication[]): CareerPublication[] {
   return rows
     .filter((r) => safeString(r["Name"]))
     .map((r) => ({
@@ -262,8 +268,13 @@ function normalizeProfile(rows: LinkedInProfile[]): CareerProfile {
   const row = rows[0];
   if (!row) {
     return {
-      name: "", headline: "", summary: "", location: "",
-      email: "", linkedin: "", website: "",
+      name: "",
+      headline: "",
+      summary: "",
+      location: "",
+      email: "",
+      linkedin: "",
+      website: "",
     };
   }
   return {
@@ -281,14 +292,13 @@ function normalizeProfile(rows: LinkedInProfile[]): CareerProfile {
 function extractEmail(rows: LinkedInEmail[]): string {
   // Prefer primary + confirmed, then any confirmed, then first available
   const primary = rows.find(
-    (r) => safeString(r["Primary"]).toLowerCase() === "yes"
-      && safeString(r["Confirmed"]).toLowerCase() === "yes"
+    (r) =>
+      safeString(r["Primary"]).toLowerCase() === "yes" &&
+      safeString(r["Confirmed"]).toLowerCase() === "yes",
   );
   if (primary) return safeString(primary["Email Address"]);
 
-  const confirmed = rows.find(
-    (r) => safeString(r["Confirmed"]).toLowerCase() === "yes"
-  );
+  const confirmed = rows.find((r) => safeString(r["Confirmed"]).toLowerCase() === "yes");
   if (confirmed) return safeString(confirmed["Email Address"]);
 
   const first = rows[0];
@@ -304,9 +314,7 @@ function normalizeLanguages(rows: LinkedInLanguage[]): CareerLanguage[] {
     }));
 }
 
-function normalizeRecommendations(
-  rows: LinkedInRecommendation[]
-): CareerRecommendation[] {
+function normalizeRecommendations(rows: LinkedInRecommendation[]): CareerRecommendation[] {
   return rows
     .filter((r) => safeString(r["Text"]))
     .map((r) => ({
@@ -327,9 +335,7 @@ function normalizeHonors(rows: LinkedInHonor[]): CareerHonor[] {
     }));
 }
 
-function normalizeVolunteering(
-  rows: LinkedInVolunteering[]
-): CareerVolunteering[] {
+function normalizeVolunteering(rows: LinkedInVolunteering[]): CareerVolunteering[] {
   return rows
     .filter((r) => safeString(r["Organization"]))
     .map((r) => ({
@@ -438,10 +444,7 @@ function isKnowledgeEntry(obj: unknown): obj is KnowledgeEntry {
 }
 
 /** Wrap arbitrary JSON data as a KnowledgeEntry for Claude context. */
-function wrapAsKnowledgeEntry(
-  filePath: string,
-  data: unknown,
-): KnowledgeEntry {
+function wrapAsKnowledgeEntry(filePath: string, data: unknown): KnowledgeEntry {
   const relPath = path.relative(PATHS.knowledgeDir, filePath);
   const parts = relPath.split(path.sep);
   const category = parts.length > 1 ? parts[0] : "general";
@@ -508,81 +511,103 @@ const CareerDataSchema = z.object({
     linkedin: z.string(),
     website: z.string(),
   }),
-  positions: z.array(z.object({
-    title: z.string().min(1, "Position title is required"),
-    company: z.string().min(1, "Company name is required"),
-    location: z.string(),
-    startDate: z.string().min(1, "Start date is required"),
-    endDate: z.string().nullable(),
-    description: z.string(),
-    highlights: z.array(z.string()),
-  })),
-  education: z.array(z.object({
-    school: z.string().min(1, "School name is required"),
-    degree: z.string(),
-    field: z.string(),
-    startDate: z.string(),
-    endDate: z.string(),
-    notes: z.string(),
-    activities: z.string(),
-  })),
+  positions: z.array(
+    z.object({
+      title: z.string().min(1, "Position title is required"),
+      company: z.string().min(1, "Company name is required"),
+      location: z.string(),
+      startDate: z.string().min(1, "Start date is required"),
+      endDate: z.string().nullable(),
+      description: z.string(),
+      highlights: z.array(z.string()),
+    }),
+  ),
+  education: z.array(
+    z.object({
+      school: z.string().min(1, "School name is required"),
+      degree: z.string(),
+      field: z.string(),
+      startDate: z.string(),
+      endDate: z.string(),
+      notes: z.string(),
+      activities: z.string(),
+    }),
+  ),
   skills: z.array(z.string()),
-  certifications: z.array(z.object({
-    name: z.string(),
-    authority: z.string(),
-    date: z.string(),
-    licenseNumber: z.string().optional(),
-    url: z.string().optional(),
-  })),
-  projects: z.array(z.object({
-    title: z.string(),
-    description: z.string(),
-    url: z.string().optional(),
-    startDate: z.string(),
-    endDate: z.string().optional(),
-  })),
-  publications: z.array(z.object({
-    name: z.string(),
-    publisher: z.string(),
-    date: z.string(),
-    url: z.string().optional(),
-    description: z.string(),
-  })),
-  languages: z.array(z.object({
-    name: z.string(),
-    proficiency: z.string(),
-  })),
-  recommendations: z.array(z.object({
-    recommender: z.string(),
-    text: z.string(),
-    date: z.string(),
-  })),
-  honors: z.array(z.object({
-    title: z.string(),
-    issuer: z.string(),
-    date: z.string(),
-    description: z.string(),
-  })),
-  volunteering: z.array(z.object({
-    organization: z.string(),
-    role: z.string(),
-    cause: z.string(),
-    startDate: z.string(),
-    endDate: z.string().nullable(),
-    description: z.string(),
-  })),
-  courses: z.array(z.object({
-    name: z.string(),
-    number: z.string(),
-    associatedWith: z.string(),
-  })),
-  knowledge: z.array(z.object({
-    category: z.string(),
-    title: z.string(),
-    content: z.string(),
-    tags: z.array(z.string()).optional(),
-    relatedPositions: z.array(z.string()).optional(),
-  })),
+  certifications: z.array(
+    z.object({
+      name: z.string(),
+      authority: z.string(),
+      date: z.string(),
+      licenseNumber: z.string().optional(),
+      url: z.string().optional(),
+    }),
+  ),
+  projects: z.array(
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      url: z.string().optional(),
+      startDate: z.string(),
+      endDate: z.string().optional(),
+    }),
+  ),
+  publications: z.array(
+    z.object({
+      name: z.string(),
+      publisher: z.string(),
+      date: z.string(),
+      url: z.string().optional(),
+      description: z.string(),
+    }),
+  ),
+  languages: z.array(
+    z.object({
+      name: z.string(),
+      proficiency: z.string(),
+    }),
+  ),
+  recommendations: z.array(
+    z.object({
+      recommender: z.string(),
+      text: z.string(),
+      date: z.string(),
+    }),
+  ),
+  honors: z.array(
+    z.object({
+      title: z.string(),
+      issuer: z.string(),
+      date: z.string(),
+      description: z.string(),
+    }),
+  ),
+  volunteering: z.array(
+    z.object({
+      organization: z.string(),
+      role: z.string(),
+      cause: z.string(),
+      startDate: z.string(),
+      endDate: z.string().nullable(),
+      description: z.string(),
+    }),
+  ),
+  courses: z.array(
+    z.object({
+      name: z.string(),
+      number: z.string(),
+      associatedWith: z.string(),
+    }),
+  ),
+  knowledge: z.array(
+    z.object({
+      category: z.string(),
+      title: z.string(),
+      content: z.string(),
+      tags: z.array(z.string()).optional(),
+      relatedPositions: z.array(z.string()).optional(),
+    }),
+  ),
 });
 
 function buildStats(csvFilesFound: number, csvFilesParsed: number, data: CareerData) {
@@ -610,7 +635,15 @@ function ingest(): IngestResult {
 
   // Initialize empty CareerData (defined early so buildStats can reference it in error paths)
   const data: CareerData = {
-    profile: { name: "", headline: "", summary: "", location: "", email: "", linkedin: "", website: "" },
+    profile: {
+      name: "",
+      headline: "",
+      summary: "",
+      location: "",
+      email: "",
+      linkedin: "",
+      website: "",
+    },
     positions: [],
     education: [],
     skills: [],
@@ -628,7 +661,7 @@ function ingest(): IngestResult {
   // Check source directory exists
   if (!fs.existsSync(PATHS.linkedinDir)) {
     errors.push(
-      `Directory not found: ${PATHS.linkedinDir}\n   Create it and add your LinkedIn CSV exports.`
+      `Directory not found: ${PATHS.linkedinDir}\n   Create it and add your LinkedIn CSV exports.`,
     );
     return { success: false, careerData: null, errors, warnings, stats: buildStats(0, 0, data) };
   }
@@ -644,7 +677,7 @@ function ingest(): IngestResult {
 
   if (csvFiles.length === 0) {
     errors.push(
-      "No CSV files found in data/sources/linkedin/.\n   Export your data from LinkedIn → Settings → Data Privacy → Get a copy of your data\n   Select \"Download larger data archive\" and place CSV files in data/sources/linkedin/"
+      'No CSV files found in data/sources/linkedin/.\n   Export your data from LinkedIn → Settings → Data Privacy → Get a copy of your data\n   Select "Download larger data archive" and place CSV files in data/sources/linkedin/',
     );
     return { success: false, careerData: null, errors, warnings, stats: buildStats(0, 0, data) };
   }
@@ -697,7 +730,9 @@ function ingest(): IngestResult {
           data.languages = normalizeLanguages(parseCSV<LinkedInLanguage>(filePath));
           break;
         case "recommendations":
-          data.recommendations = normalizeRecommendations(parseCSV<LinkedInRecommendation>(filePath));
+          data.recommendations = normalizeRecommendations(
+            parseCSV<LinkedInRecommendation>(filePath),
+          );
           break;
         case "honors":
           data.honors = normalizeHonors(parseCSV<LinkedInHonor>(filePath));
@@ -737,12 +772,18 @@ function ingest(): IngestResult {
   // Check minimum data requirements
   if (data.positions.length === 0 && data.education.length === 0) {
     errors.push(
-      "Insufficient data: no positions and no education records found.\n   Ensure Positions.csv and/or Education.csv are in data/sources/linkedin/\n   Make sure you selected \"Download larger data archive\" when exporting from LinkedIn."
+      'Insufficient data: no positions and no education records found.\n   Ensure Positions.csv and/or Education.csv are in data/sources/linkedin/\n   Make sure you selected "Download larger data archive" when exporting from LinkedIn.',
     );
   }
 
   if (errors.length > 0) {
-    return { success: false, careerData: null, errors, warnings, stats: buildStats(csvFiles.length, csvFilesParsed, data) };
+    return {
+      success: false,
+      careerData: null,
+      errors,
+      warnings,
+      stats: buildStats(csvFiles.length, csvFilesParsed, data),
+    };
   }
 
   // Validate with Zod
@@ -751,7 +792,13 @@ function ingest(): IngestResult {
     for (const issue of validation.error.issues) {
       errors.push(`Validation error at ${issue.path.join(".")}: ${issue.message}`);
     }
-    return { success: false, careerData: null, errors, warnings, stats: buildStats(csvFiles.length, csvFilesParsed, data) };
+    return {
+      success: false,
+      careerData: null,
+      errors,
+      warnings,
+      stats: buildStats(csvFiles.length, csvFilesParsed, data),
+    };
   }
 
   // Write output
@@ -771,9 +818,11 @@ function ingest(): IngestResult {
   console.log(`      ${stats.projects} projects`);
   console.log(`      ${stats.publications} publications`);
   if (data.languages.length > 0) console.log(`      ${data.languages.length} languages`);
-  if (data.recommendations.length > 0) console.log(`      ${data.recommendations.length} recommendations`);
+  if (data.recommendations.length > 0)
+    console.log(`      ${data.recommendations.length} recommendations`);
   if (data.honors.length > 0) console.log(`      ${data.honors.length} honors`);
-  if (data.volunteering.length > 0) console.log(`      ${data.volunteering.length} volunteering entries`);
+  if (data.volunteering.length > 0)
+    console.log(`      ${data.volunteering.length} volunteering entries`);
   if (data.courses.length > 0) console.log(`      ${data.courses.length} courses`);
   if (data.knowledge.length > 0) console.log(`      ${data.knowledge.length} knowledge entries`);
   if (data.profile.email) console.log(`      email: ${data.profile.email}`);
@@ -825,19 +874,18 @@ export const _testExports = {
 // ─── Execute ─────────────────────────────────────────────────────────────────
 // Only run when executed directly (not when imported for testing).
 
-const isDirectRun = ["ingest-linkedin.ts", "ingest-linkedin.js"]
-  .includes(path.basename(process.argv[1] ?? ""));
+const isDirectRun = ["ingest-linkedin.ts", "ingest-linkedin.js"].includes(
+  path.basename(process.argv[1] ?? ""),
+);
 
 if (isDirectRun) {
+  const result = ingest();
 
-const result = ingest();
-
-if (!result.success) {
-  console.error("\n❌ Ingestion failed:\n");
-  for (const err of result.errors) {
-    console.error(`   ${err}\n`);
+  if (!result.success) {
+    console.error("\n❌ Ingestion failed:\n");
+    for (const err of result.errors) {
+      console.error(`   ${err}\n`);
+    }
+    process.exit(1);
   }
-  process.exit(1);
-}
-
 } // end if (isDirectRun)

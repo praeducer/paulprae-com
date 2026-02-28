@@ -28,35 +28,35 @@ Track all development machines here to maintain parity. See [Cross-Machine Parit
 
 ### Laptop (Primary)
 
-| Spec | Detail |
-|---|---|
-| **Machine** | ASUS ROG Strix SCAR 18 (G835LX) |
-| **CPU** | Intel Core Ultra 9 275HX (24 cores / 24 threads) |
-| **RAM** | 32 GB |
-| **GPU** | NVIDIA RTX 5090 Laptop + Intel integrated |
-| **Storage** | 2 TB NVMe |
-| **OS** | Windows 11 Pro 24H2 |
-| **WSL** | WSL2, Ubuntu |
-| **Dev Drive** | D: — 250 GB VHDX (dynamically expanding), ReFS, labeled "DevDrive" |
-| **Setup date** | 2025-02-25 |
-| **Setup status** | In progress |
+| Spec             | Detail                                                             |
+| ---------------- | ------------------------------------------------------------------ |
+| **Machine**      | ASUS ROG Strix SCAR 18 (G835LX)                                    |
+| **CPU**          | Intel Core Ultra 9 275HX (24 cores / 24 threads)                   |
+| **RAM**          | 32 GB                                                              |
+| **GPU**          | NVIDIA RTX 5090 Laptop + Intel integrated                          |
+| **Storage**      | 2 TB NVMe                                                          |
+| **OS**           | Windows 11 Pro 24H2                                                |
+| **WSL**          | WSL2, Ubuntu                                                       |
+| **Dev Drive**    | D: — 250 GB VHDX (dynamically expanding), ReFS, labeled "DevDrive" |
+| **Setup date**   | 2025-02-25                                                         |
+| **Setup status** | In progress                                                        |
 
 ### Desktop
 
-| Spec | Detail |
-|---|---|
-| **Machine** | Alienware Aurora 16 Desktop |
-| **CPU** | Intel Core i9-14900KF (24 cores / 32 threads) |
-| **RAM** | 64 GB |
-| **GPU** | NVIDIA RTX 4090 (24 GB VRAM) |
-| **Storage** | ~1.89 TB NVMe |
-| **OS** | Windows 11 Pro for Workstations |
-| **WSL** | WSL2, Ubuntu 24.04 LTS |
-| **Dev Drive** | D: — 250 GB VHDX (dynamically expanding), ReFS, labeled "DevDrive" |
-| **Additional software** | CUDA Toolkit, NVIDIA Container Toolkit, Docker Desktop, Neo4j Desktop, Ollama, Open WebUI |
-| **Related repo** | [my-local-ai-env](https://github.com/praeducer/my-local-ai-env) — local AI stack (separate from paulprae-com) |
-| **Setup date** | 2026-02-27 |
-| **Setup status** | In progress — Dev Drive created, WSL configured, git config set |
+| Spec                    | Detail                                                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Machine**             | Alienware Aurora 16 Desktop                                                                                   |
+| **CPU**                 | Intel Core i9-14900KF (24 cores / 32 threads)                                                                 |
+| **RAM**                 | 64 GB                                                                                                         |
+| **GPU**                 | NVIDIA RTX 4090 (24 GB VRAM)                                                                                  |
+| **Storage**             | ~1.89 TB NVMe                                                                                                 |
+| **OS**                  | Windows 11 Pro for Workstations                                                                               |
+| **WSL**                 | WSL2, Ubuntu 24.04 LTS                                                                                        |
+| **Dev Drive**           | D: — 250 GB VHDX (dynamically expanding), ReFS, labeled "DevDrive"                                            |
+| **Additional software** | CUDA Toolkit, NVIDIA Container Toolkit, Docker Desktop, Neo4j Desktop, Ollama, Open WebUI                     |
+| **Related repo**        | [my-local-ai-env](https://github.com/praeducer/my-local-ai-env) — local AI stack (separate from paulprae-com) |
+| **Setup date**          | 2026-02-27                                                                                                    |
+| **Setup status**        | In progress — Dev Drive created, WSL configured, git config set                                               |
 
 > **Machine-specific details** (hostnames, usernames, OS build numbers, exact versions) are stored locally in `machine-inventory.local.md` (gitignored). See [Cross-Machine Parity](#8-cross-machine-parity).
 
@@ -68,11 +68,11 @@ Track all development machines here to maintain parity. See [Cross-Machine Parit
 
 See the [official Dev Drive prerequisites](https://learn.microsoft.com/en-us/windows/dev-drive/#prerequisites):
 
-| Requirement | Minimum | Recommended |
-|---|---|---|
-| OS | Windows 11 Build 22621.2338+ | 24H2+ (for [block cloning](https://learn.microsoft.com/en-us/windows-server/storage/refs/block-cloning)) |
-| RAM | 8 GB | 16+ GB |
-| Free disk space | 50 GB (Dev Drive minimum) | 100+ GB |
+| Requirement     | Minimum                      | Recommended                                                                                              |
+| --------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------- |
+| OS              | Windows 11 Build 22621.2338+ | 24H2+ (for [block cloning](https://learn.microsoft.com/en-us/windows-server/storage/refs/block-cloning)) |
+| RAM             | 8 GB                         | 16+ GB                                                                                                   |
+| Free disk space | 50 GB (Dev Drive minimum)    | 100+ GB                                                                                                  |
 
 Verify:
 
@@ -86,13 +86,13 @@ Get-Volume -DriveLetter C | Select-Object @{N="FreeGB";E={[math]::Round($_.SizeR
 
 ## 3. Filesystem Layout
 
-| Location | Purpose | Filesystem | Why |
-|---|---|---|---|
-| `C:\` | OS, installed applications, dev tools | NTFS | [MS recommends tools stay on C:](https://learn.microsoft.com/en-us/windows/dev-drive/#what-should-i-put-on-my-dev-drive) |
-| `D:\dev\` | Source repos, project files | ReFS (Dev Drive) | [Performance mode](https://learn.microsoft.com/en-us/microsoft-365/security/defender-endpoint/microsoft-defender-endpoint-antivirus-performance-mode), async Defender scans, block cloning |
-| `D:\packages\` | Package caches (npm, pip, etc.) | ReFS (Dev Drive) | [Recommended by MS](https://learn.microsoft.com/en-us/windows/dev-drive/#storing-package-cache-on-dev-drive) for biggest I/O win |
-| `C:\dev\` | Temporary workspace (pre-Dev Drive) | NTFS | Fallback; short path, no spaces |
-| `~/dev` (WSL) | Linux-native projects | ext4 | [WSL does not benefit from Dev Drive](https://learn.microsoft.com/en-us/windows/dev-drive/#does-dev-drive-work-with-wsl-project-files) |
+| Location       | Purpose                               | Filesystem       | Why                                                                                                                                                                                        |
+| -------------- | ------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `C:\`          | OS, installed applications, dev tools | NTFS             | [MS recommends tools stay on C:](https://learn.microsoft.com/en-us/windows/dev-drive/#what-should-i-put-on-my-dev-drive)                                                                   |
+| `D:\dev\`      | Source repos, project files           | ReFS (Dev Drive) | [Performance mode](https://learn.microsoft.com/en-us/microsoft-365/security/defender-endpoint/microsoft-defender-endpoint-antivirus-performance-mode), async Defender scans, block cloning |
+| `D:\packages\` | Package caches (npm, pip, etc.)       | ReFS (Dev Drive) | [Recommended by MS](https://learn.microsoft.com/en-us/windows/dev-drive/#storing-package-cache-on-dev-drive) for biggest I/O win                                                           |
+| `C:\dev\`      | Temporary workspace (pre-Dev Drive)   | NTFS             | Fallback; short path, no spaces                                                                                                                                                            |
+| `~/dev` (WSL)  | Linux-native projects                 | ext4             | [WSL does not benefit from Dev Drive](https://learn.microsoft.com/en-us/windows/dev-drive/#does-dev-drive-work-with-wsl-project-files)                                                     |
 
 ### Key Principles
 
@@ -126,12 +126,12 @@ After Dev Drive exists, move repos to `D:\dev\` (see [section 4](#4-dev-drive-se
 
 ### What Dev Drive Gives You
 
-| Benefit | Impact | MS Docs |
-|---|---|---|
+| Benefit                       | Impact                                                       | MS Docs                                                                                                                                               |
+| ----------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Defender Performance Mode** | Antivirus scans run async instead of blocking every file I/O | [Performance mode](https://learn.microsoft.com/en-us/microsoft-365/security/defender-endpoint/microsoft-defender-endpoint-antivirus-performance-mode) |
-| **Block Cloning (24H2+)** | File copies become metadata operations | [Block cloning on ReFS](https://learn.microsoft.com/en-us/windows-server/storage/refs/block-cloning) |
-| **ReFS** | Resilient to corruption from unexpected power loss | [ReFS overview](https://learn.microsoft.com/en-us/windows-server/storage/refs/refs-overview) |
-| **Filter Control** | Choose which filesystem filters attach | [Filter configuration](https://learn.microsoft.com/en-us/windows/dev-drive/#how-do-i-configure-additional-filters-on-dev-drive) |
+| **Block Cloning (24H2+)**     | File copies become metadata operations                       | [Block cloning on ReFS](https://learn.microsoft.com/en-us/windows-server/storage/refs/block-cloning)                                                  |
+| **ReFS**                      | Resilient to corruption from unexpected power loss           | [ReFS overview](https://learn.microsoft.com/en-us/windows-server/storage/refs/refs-overview)                                                          |
+| **Filter Control**            | Choose which filesystem filters attach                       | [Filter configuration](https://learn.microsoft.com/en-us/windows/dev-drive/#how-do-i-configure-additional-filters-on-dev-drive)                       |
 
 ### Step-by-Step: Windows Settings Wizard
 
@@ -141,13 +141,13 @@ After Dev Drive exists, move repos to `D:\dev\` (see [section 4](#4-dev-drive-se
 
 Use these values on **all machines** for parity:
 
-| Field | Value | Rationale |
-|---|---|---|
-| **Virtual hard disk name** | `DevDrive` | Shows in Disk Management |
-| **Location** | `C:\Users\<username>\` | [Per-user path recommended by MS](https://learn.microsoft.com/en-us/windows/dev-drive/#create-new-vhd) to avoid unintentional sharing |
-| **Virtual hard disk size** | `250 GB` | Multiple repos + node_modules + package caches. Dynamically expanding — only consumes actual space used |
-| **Virtual hard disk format** | `VHDX` | [MS recommended](https://learn.microsoft.com/en-us/windows/dev-drive/#create-new-vhd) — up to 64 TB, resilient to I/O failure |
-| **Disk type** | `Dynamically expanding` | [MS recommended](https://learn.microsoft.com/en-us/windows/dev-drive/#create-new-vhd) — no wasted space |
+| Field                        | Value                   | Rationale                                                                                                                             |
+| ---------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Virtual hard disk name**   | `DevDrive`              | Shows in Disk Management                                                                                                              |
+| **Location**                 | `C:\Users\<username>\`  | [Per-user path recommended by MS](https://learn.microsoft.com/en-us/windows/dev-drive/#create-new-vhd) to avoid unintentional sharing |
+| **Virtual hard disk size**   | `250 GB`                | Multiple repos + node_modules + package caches. Dynamically expanding — only consumes actual space used                               |
+| **Virtual hard disk format** | `VHDX`                  | [MS recommended](https://learn.microsoft.com/en-us/windows/dev-drive/#create-new-vhd) — up to 64 TB, resilient to I/O failure         |
+| **Disk type**                | `Dynamically expanding` | [MS recommended](https://learn.microsoft.com/en-us/windows/dev-drive/#create-new-vhd) — no wasted space                               |
 
 4. Format as Dev Drive when prompted. Assign drive letter **D:** and label **DevDrive**.
 
@@ -156,6 +156,7 @@ Use these values on **all machines** for parity:
 ### Why VHD Instead of Partition
 
 See [MS docs: How to choose between using a disk partition or VHD](https://learn.microsoft.com/en-us/windows/dev-drive/#how-to-choose-between-using-a-disk-partition-or-vhd). We chose VHD (VHDX) because:
+
 - **Safer:** No partition resize risk on a production machine
 - **Reproducible:** Same wizard values work on any machine
 - **Flexible:** Easy to resize, back up, or delete
@@ -275,6 +276,7 @@ sparseVhd=true              # Reclaim disk space from deleted WSL files
 For shell configuration, Node.js, Claude Code CLI, Cursor, and pipeline dependencies **inside WSL**, follow the **[Linux Dev Environment Setup Guide](linux-dev-environment-setup.md)**.
 
 That guide covers:
+
 - Shell health checks (PATH corruption, nvm loading, cargo env guards)
 - Node.js installation via nvm
 - Pipeline dependencies (pandoc, typst)
@@ -292,21 +294,21 @@ bash scripts/setup/install-pipeline-deps.sh
 
 Windows and WSL maintain **separate** Claude Code settings files:
 
-| Platform | Settings Path |
-|---|---|
-| Windows | `C:\Users\<username>\.claude\settings.json` |
-| WSL | `~/.claude/settings.json` |
+| Platform | Settings Path                               |
+| -------- | ------------------------------------------- |
+| Windows  | `C:\Users\<username>\.claude\settings.json` |
+| WSL      | `~/.claude/settings.json`                   |
 
 Keep both in sync manually. The WSL copy should omit Windows-specific entries like `additionalDirectories` (which use Windows paths). See the [Linux guide's Claude Code section](linux-dev-environment-setup.md#6-claude-code-cli) for the canonical permission set.
 
 ### 5.5 When to Use WSL vs Windows (Dev Drive)
 
-| Use WSL (`~/dev`) | Use Windows (`D:\dev`) |
-|---|---|
-| Docker-based projects | Node.js / Next.js (e.g., paulprae-com) |
-| Python ML/AI (CUDA, PyTorch) | .NET / C# projects |
-| Linux-specific toolchains | Vercel-deployed projects |
-| Claude Code CLI (sandboxed) | Quick edits via Cursor on Windows |
+| Use WSL (`~/dev`)            | Use Windows (`D:\dev`)                 |
+| ---------------------------- | -------------------------------------- |
+| Docker-based projects        | Node.js / Next.js (e.g., paulprae-com) |
+| Python ML/AI (CUDA, PyTorch) | .NET / C# projects                     |
+| Linux-specific toolchains    | Vercel-deployed projects               |
+| Claude Code CLI (sandboxed)  | Quick edits via Cursor on Windows      |
 
 ---
 
@@ -314,20 +316,20 @@ Keep both in sync manually. The WSL copy should omit Windows-specific entries li
 
 Install tools on `C:\` using [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) (Microsoft's official package manager). See each tool's docs for configuration:
 
-| Tool | Install Command | Docs |
-|---|---|---|
-| **Git** | `winget install --id Git.Git --exact` | [git-scm.com](https://git-scm.com/doc) |
-| **Node.js LTS** | `winget install --id OpenJS.NodeJS.LTS --exact` | [nodejs.org](https://nodejs.org/en/download/) |
-| **VS Code** | `winget install --id Microsoft.VisualStudioCode --exact` | [code.visualstudio.com](https://code.visualstudio.com/docs) |
-| **GitHub CLI** | `winget install --id GitHub.cli --exact` | [cli.github.com](https://cli.github.com/manual/) |
-| **Pandoc** | `winget install --id JohnMacFarlane.Pandoc --exact` | [pandoc.org](https://pandoc.org/installing.html) |
-| **Typst** | `winget install --id Typst.Typst --exact` | [typst.app](https://github.com/typst/typst) |
+| Tool            | Install Command                                          | Docs                                                        |
+| --------------- | -------------------------------------------------------- | ----------------------------------------------------------- |
+| **Git**         | `winget install --id Git.Git --exact`                    | [git-scm.com](https://git-scm.com/doc)                      |
+| **Node.js LTS** | `winget install --id OpenJS.NodeJS.LTS --exact`          | [nodejs.org](https://nodejs.org/en/download/)               |
+| **VS Code**     | `winget install --id Microsoft.VisualStudioCode --exact` | [code.visualstudio.com](https://code.visualstudio.com/docs) |
+| **GitHub CLI**  | `winget install --id GitHub.cli --exact`                 | [cli.github.com](https://cli.github.com/manual/)            |
+| **Pandoc**      | `winget install --id JohnMacFarlane.Pandoc --exact`      | [pandoc.org](https://pandoc.org/installing.html)            |
+| **Typst**       | `winget install --id Typst.Typst --exact`                | [typst.app](https://github.com/typst/typst)                 |
 
 After Node.js is installed (restart terminal first):
 
-| Tool | Install Command | Docs |
-|---|---|---|
-| **Vercel CLI** | `npm install -g vercel` | [vercel.com/docs/cli](https://vercel.com/docs/cli) |
+| Tool            | Install Command                            | Docs                                                                 |
+| --------------- | ------------------------------------------ | -------------------------------------------------------------------- |
+| **Vercel CLI**  | `npm install -g vercel`                    | [vercel.com/docs/cli](https://vercel.com/docs/cli)                   |
 | **Claude Code** | `npm install -g @anthropic-ai/claude-code` | [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code) |
 
 Or run the convenience script which installs all of the above idempotently:
@@ -399,17 +401,17 @@ powershell -NoProfile -File scripts\setup\setup-dev-drive.ps1
 
 ### What Must Match
 
-| Setting | Value | Enforced by |
-|---|---|---|
-| Dev Drive letter | `D:` | Wizard (section 4) |
-| Dev Drive config | 250 GB VHDX, dynamically expanding, ReFS | Wizard (section 4) |
-| Directory structure | `D:\dev\`, `D:\packages\npm\`, `D:\packages\pip\` | `setup-dev-drive.ps1` |
-| Git config | autocrlf, longpaths, default branch | Commands in section 6 |
-| npm cache location | `D:\packages\npm` (user env var) | `setup-dev-drive.ps1` |
-| Node.js major version | Same LTS across machines | `node --version` |
-| WSL distro | Ubuntu with `~/dev` | `wsl --install -d Ubuntu` |
-| .wslconfig | Same resource limits (adjusted per machine RAM) | Manual (section 5) |
-| .env.local contents | Same API keys | Manual — use a password manager |
+| Setting               | Value                                             | Enforced by                     |
+| --------------------- | ------------------------------------------------- | ------------------------------- |
+| Dev Drive letter      | `D:`                                              | Wizard (section 4)              |
+| Dev Drive config      | 250 GB VHDX, dynamically expanding, ReFS          | Wizard (section 4)              |
+| Directory structure   | `D:\dev\`, `D:\packages\npm\`, `D:\packages\pip\` | `setup-dev-drive.ps1`           |
+| Git config            | autocrlf, longpaths, default branch               | Commands in section 6           |
+| npm cache location    | `D:\packages\npm` (user env var)                  | `setup-dev-drive.ps1`           |
+| Node.js major version | Same LTS across machines                          | `node --version`                |
+| WSL distro            | Ubuntu with `~/dev`                               | `wsl --install -d Ubuntu`       |
+| .wslconfig            | Same resource limits (adjusted per machine RAM)   | Manual (section 5)              |
+| .env.local contents   | Same API keys                                     | Manual — use a password manager |
 
 ### What Can Differ
 

@@ -18,9 +18,9 @@
 
 export interface LinkedInPosition {
   "Company Name": string;
-  "Title": string;
-  "Description": string;
-  "Location": string;
+  Title: string;
+  Description: string;
+  Location: string;
   "Started On": string;
   "Finished On": string;
 }
@@ -28,88 +28,88 @@ export interface LinkedInPosition {
 export interface LinkedInEducation {
   "School Name": string;
   "Degree Name": string;
-  "Notes": string;
+  Notes: string;
   "Started On": string;
   "Finished On": string;
-  "Activities": string;
+  Activities: string;
 }
 
 export interface LinkedInSkill {
-  "Name": string;
+  Name: string;
 }
 
 export interface LinkedInCertification {
-  "Name": string;
-  "Url": string;
-  "Authority": string;
+  Name: string;
+  Url: string;
+  Authority: string;
   "Started On": string;
   "Finished On": string;
   "License Number": string;
 }
 
 export interface LinkedInProject {
-  "Title": string;
-  "Description": string;
-  "Url": string;
+  Title: string;
+  Description: string;
+  Url: string;
   "Started On": string;
   "Finished On": string;
 }
 
 export interface LinkedInPublication {
-  "Name": string;
+  Name: string;
   "Published On": string;
-  "Description": string;
-  "Publisher": string;
-  "Url": string;
+  Description: string;
+  Publisher: string;
+  Url: string;
 }
 
 export interface LinkedInProfile {
   "First Name": string;
   "Last Name": string;
-  "Headline": string;
-  "Summary": string;
-  "Industry": string;
+  Headline: string;
+  Summary: string;
+  Industry: string;
   "Geo Location": string;
 }
 
 export interface LinkedInLanguage {
-  "Name": string;
-  "Proficiency": string;
+  Name: string;
+  Proficiency: string;
 }
 
 export interface LinkedInRecommendation {
-  "Recommender": string;
-  "Text": string;
-  "Date": string;
-  "Status": string;
+  Recommender: string;
+  Text: string;
+  Date: string;
+  Status: string;
 }
 
 export interface LinkedInHonor {
-  "Title": string;
-  "Issuer": string;
+  Title: string;
+  Issuer: string;
   "Issued On": string;
-  "Description": string;
+  Description: string;
 }
 
 export interface LinkedInVolunteering {
-  "Organization": string;
-  "Role": string;
-  "Cause": string;
+  Organization: string;
+  Role: string;
+  Cause: string;
   "Started On": string;
   "Finished On": string;
-  "Description": string;
+  Description: string;
 }
 
 export interface LinkedInCourse {
-  "Name": string;
-  "Number": string;
+  Name: string;
+  Number: string;
   "Associated With": string;
 }
 
 export interface LinkedInEmail {
   "Email Address": string;
-  "Confirmed": string;
-  "Primary": string;
+  Confirmed: string;
+  Primary: string;
 }
 
 // ─── A2. Knowledge Base Entry ────────────────────────────────────────────────

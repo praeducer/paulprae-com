@@ -10,19 +10,21 @@
 
 ## Tech Stack (Phase 1)
 
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| Framework | Next.js (App Router, TypeScript strict, Turbopack) | 16.1.x |
-| Styling | Tailwind CSS | 4.x |
-| Markdown | react-markdown + remark-gfm | Latest |
-| AI | Anthropic Claude API via @anthropic-ai/sdk | Latest |
-| CSV Parsing | PapaParse | Latest |
-| Validation | Zod | Latest |
-| Env Loading | dotenv | Latest |
-| Script Runner | tsx | Latest |
-| Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF) | System binaries |
-| Testing | Vitest | 4.x |
-| Deployment | Vercel (static export, free tier) | Latest |
+| Layer         | Technology                                         | Version         |
+| ------------- | -------------------------------------------------- | --------------- |
+| Framework     | Next.js (App Router, TypeScript strict, Turbopack) | 16.1.x          |
+| Styling       | Tailwind CSS                                       | 4.x             |
+| Markdown      | react-markdown + remark-gfm                        | Latest          |
+| AI            | Anthropic Claude API via @anthropic-ai/sdk         | Latest          |
+| CSV Parsing   | PapaParse                                          | Latest          |
+| Validation    | Zod                                                | Latest          |
+| Env Loading   | dotenv                                             | Latest          |
+| Script Runner | tsx                                                | Latest          |
+| Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF)                  | System binaries |
+| Linting       | ESLint 9 (flat config) + eslint-config-next        | Latest          |
+| Formatting    | Prettier                                           | 3.x             |
+| Testing       | Vitest                                             | 4.x             |
+| Deployment    | Vercel (static export, free tier)                  | Latest          |
 
 ## Key Conventions
 
@@ -115,11 +117,16 @@ npm run pipeline    # Full pipeline: ingest → generate → export → build
 npm test            # Run all tests (Vitest)
 npm run test:unit   # Unit tests only (pure logic)
 npm run test:pipeline # Pipeline integration tests (validates generated outputs)
+npm run lint        # ESLint check (cached)
+npm run lint:fix    # ESLint auto-fix
+npm run format      # Prettier format all files
+npm run format:check # Prettier check (CI-friendly)
 ```
 
 ## Phase 2 Preview (Do Not Implement Yet)
 
 Phase 2 will transform this into a full-stack platform:
+
 - **Supabase** PostgreSQL database with pgvector for career data + embeddings
 - **Vercel AI SDK 6** with `@ai-sdk/anthropic` for streaming chat and resume generation
 - **AI chat interface** where recruiters ask questions about Paul's career (RAG over career data)
@@ -130,6 +137,7 @@ Phase 2 will transform this into a full-stack platform:
 ## Phase 3 Preview (Do Not Implement Yet)
 
 Phase 3 adds knowledge graph and automation:
+
 - **Neo4j AuraDB** career knowledge graph (Person → Role → Company → Project → Skill → Outcome)
 - **AI Agent** with tool-calling via Vercel AI SDK 6 Agent class
 - **n8n workflows** for automated data ingestion and content enrichment

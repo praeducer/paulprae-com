@@ -13,7 +13,14 @@
 
 import { describe, it, expect } from "vitest";
 import path from "path";
-import { PATHS, KNOWLEDGE_PATHS, CLAUDE, LINKEDIN_CSV_FILES, RESUME_FILE_BASE, _testExports } from "../lib/config.js";
+import {
+  PATHS,
+  KNOWLEDGE_PATHS,
+  CLAUDE,
+  LINKEDIN_CSV_FILES,
+  RESUME_FILE_BASE,
+  _testExports,
+} from "../lib/config.js";
 
 describe("RESUME_FILE_BASE", () => {
   it("is a non-empty string ending with 'Resume'", () => {
@@ -35,7 +42,10 @@ describe("getResumeFileBase() — edge cases", () => {
   // These test the sanitization logic used in production by simulating the
   // same slug transformation applied in getResumeFileBase().
   const slugify = (name: string): string => {
-    const slug = name.trim().replace(/\s+/g, "-").replace(/[^a-zA-Z0-9-]/g, "");
+    const slug = name
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-zA-Z0-9-]/g, "");
     return slug ? `${slug}-Resume` : "Resume";
   };
 
@@ -137,10 +147,19 @@ describe("CLAUDE", () => {
 describe("LINKEDIN_CSV_FILES", () => {
   it("maps all 13 expected CSV files", () => {
     const expectedFiles = [
-      "positions.csv", "education.csv", "skills.csv", "certifications.csv",
-      "projects.csv", "publications.csv", "profile.csv", "languages.csv",
-      "recommendations_received.csv", "honors.csv", "volunteering.csv",
-      "courses.csv", "email addresses.csv",
+      "positions.csv",
+      "education.csv",
+      "skills.csv",
+      "certifications.csv",
+      "projects.csv",
+      "publications.csv",
+      "profile.csv",
+      "languages.csv",
+      "recommendations_received.csv",
+      "honors.csv",
+      "volunteering.csv",
+      "courses.csv",
+      "email addresses.csv",
     ];
     for (const file of expectedFiles) {
       expect(LINKEDIN_CSV_FILES[file]).toBeDefined();

@@ -45,12 +45,12 @@ The script installs pandoc, typst, nvm, Node.js, npm dependencies, Claude Code C
 
 ## 2. System Requirements & Kernel Check
 
-| Requirement | Minimum | Notes |
-|---|---|---|
-| OS | Ubuntu 22.04+ | Other Debian-based distros should work |
-| Kernel | ≥ 6.2 | Required for Claude Code sandbox ([Landlock v3](https://docs.kernel.org/userspace-api/landlock.html)) |
-| RAM | 4 GB | 8+ GB recommended |
-| Node.js | 22+ (LTS) | Installed via nvm (section 4) |
+| Requirement | Minimum       | Notes                                                                                                 |
+| ----------- | ------------- | ----------------------------------------------------------------------------------------------------- |
+| OS          | Ubuntu 22.04+ | Other Debian-based distros should work                                                                |
+| Kernel      | ≥ 6.2         | Required for Claude Code sandbox ([Landlock v3](https://docs.kernel.org/userspace-api/landlock.html)) |
+| RAM         | 4 GB          | 8+ GB recommended                                                                                     |
+| Node.js     | 22+ (LTS)     | Installed via nvm (section 4)                                                                         |
 
 Check your kernel version:
 
@@ -402,18 +402,18 @@ npm run dev
 
 Run these commands to confirm everything is working:
 
-| Command | Expected Output |
-|---|---|
-| `uname -r` | ≥ 6.2 |
-| `node --version` | v22.x (or current LTS) |
-| `npm --version` | 10.x+ |
-| `which node` | `~/.nvm/versions/node/.../bin/node` |
-| `claude --version` | Current version (e.g., 2.x.x) |
-| `which claude` | `~/.nvm/versions/node/.../bin/claude` |
-| `cursor --version` | Responds with version |
-| `pandoc --version \| head -1` | pandoc 3.x+ |
-| `typst --version` | typst 0.x.x |
-| `cd ~/dev/paulprae-com && npm run dev` | Site at localhost:3000 |
+| Command                                | Expected Output                       |
+| -------------------------------------- | ------------------------------------- |
+| `uname -r`                             | ≥ 6.2                                 |
+| `node --version`                       | v22.x (or current LTS)                |
+| `npm --version`                        | 10.x+                                 |
+| `which node`                           | `~/.nvm/versions/node/.../bin/node`   |
+| `claude --version`                     | Current version (e.g., 2.x.x)         |
+| `which claude`                         | `~/.nvm/versions/node/.../bin/claude` |
+| `cursor --version`                     | Responds with version                 |
+| `pandoc --version \| head -1`          | pandoc 3.x+                           |
+| `typst --version`                      | typst 0.x.x                           |
+| `cd ~/dev/paulprae-com && npm run dev` | Site at localhost:3000                |
 
 ---
 

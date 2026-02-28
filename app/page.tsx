@@ -24,14 +24,9 @@ export default function Home() {
         <h1 className="text-2xl font-bold mb-4">paulprae.com</h1>
         <p className="text-slate-600">
           Resume not yet generated. Run{" "}
-          <code className="bg-slate-100 px-2 py-0.5 rounded text-sm">
-            npm run pipeline
-          </code>{" "}
-          after adding your LinkedIn data to{" "}
-          <code className="bg-slate-100 px-2 py-0.5 rounded text-sm">
-            data/sources/linkedin/
-          </code>
-          .
+          <code className="bg-slate-100 px-2 py-0.5 rounded text-sm">npm run pipeline</code> after
+          adding your LinkedIn data to{" "}
+          <code className="bg-slate-100 px-2 py-0.5 rounded text-sm">data/sources/linkedin/</code>.
         </p>
       </main>
     );
@@ -43,9 +38,7 @@ export default function Home() {
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 print:py-4 print:px-0 print:max-w-none">
       <article className="resume-prose prose prose-slate max-w-none">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {cleanMarkdown}
-        </ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanMarkdown}</ReactMarkdown>
       </article>
     </main>
   );

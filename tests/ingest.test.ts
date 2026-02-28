@@ -14,7 +14,7 @@
  * - BOM characters from Windows exports break parsing if not stripped
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "fs";
 import path from "path";
 import { _testExports } from "../scripts/ingest-linkedin.js";
@@ -166,7 +166,16 @@ describe("normalizePositions", () => {
   });
 
   it("filters out empty entries", () => {
-    const empty = [{ "Company Name": "", Title: "", Description: "", Location: "", "Started On": "", "Finished On": "" }];
+    const empty = [
+      {
+        "Company Name": "",
+        Title: "",
+        Description: "",
+        Location: "",
+        "Started On": "",
+        "Finished On": "",
+      },
+    ];
     expect(normalizePositions(empty)).toHaveLength(0);
   });
 
@@ -187,7 +196,16 @@ describe("normalizeEducation", () => {
   });
 
   it("filters out entries with empty school name", () => {
-    const empty = [{ "School Name": "", "Degree Name": "", Notes: "", "Started On": "", "Finished On": "", Activities: "" }];
+    const empty = [
+      {
+        "School Name": "",
+        "Degree Name": "",
+        Notes: "",
+        "Started On": "",
+        "Finished On": "",
+        Activities: "",
+      },
+    ];
     expect(normalizeEducation(empty)).toHaveLength(0);
   });
 });
@@ -219,7 +237,16 @@ describe("normalizeCertifications", () => {
   });
 
   it("sets empty optional fields to undefined", () => {
-    const noCert = [{ Name: "Test", Url: "", Authority: "Auth", "Started On": "", "Finished On": "", "License Number": "" }];
+    const noCert = [
+      {
+        Name: "Test",
+        Url: "",
+        Authority: "Auth",
+        "Started On": "",
+        "Finished On": "",
+        "License Number": "",
+      },
+    ];
     const result = normalizeCertifications(noCert);
     expect(result[0].licenseNumber).toBeUndefined();
     expect(result[0].url).toBeUndefined();
@@ -480,7 +507,9 @@ describe("CareerDataSchema", () => {
   it("accepts knowledge entries with optional tags", () => {
     const withTags = {
       ...SAMPLE_CAREER_DATA,
-      knowledge: [{ category: "a", title: "b", content: "c", tags: ["x"], relatedPositions: ["y"] }],
+      knowledge: [
+        { category: "a", title: "b", content: "c", tags: ["x"], relatedPositions: ["y"] },
+      ],
     };
     const result = CareerDataSchema.safeParse(withTags);
     expect(result.success).toBe(true);

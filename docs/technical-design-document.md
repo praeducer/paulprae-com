@@ -30,12 +30,12 @@ Build and deploy a personal professional website at **paulprae.com** that positi
 
 ### Success Criteria
 
-| Metric | Target | Timeframe |
-|--------|--------|-----------|
-| Site live with AI-generated resume | Deployed and shareable | 1 week from start |
-| Full interactive platform live | Chat interface + dynamic resume | 4–6 weeks from start |
-| Interview conversion rate | Resume link → interview callback | Ongoing measurement |
-| Lighthouse performance scores | 90+ across all categories | Phase 2 launch |
+| Metric                             | Target                           | Timeframe            |
+| ---------------------------------- | -------------------------------- | -------------------- |
+| Site live with AI-generated resume | Deployed and shareable           | 1 week from start    |
+| Full interactive platform live     | Chat interface + dynamic resume  | 4–6 weeks from start |
+| Interview conversion rate          | Resume link → interview callback | Ongoing measurement  |
+| Lighthouse performance scores      | 90+ across all categories        | Phase 2 launch       |
 
 ### Target Audience
 
@@ -56,46 +56,46 @@ Build and deploy a personal professional website at **paulprae.com** that positi
 
 ### Functional Requirements
 
-| ID | Requirement | Phase |
-|----|-------------|-------|
-| FR-1 | Ingest LinkedIn CSV export data (Skills, Projects, Publications, Certifications, Positions, Education) and generate a professional Markdown resume using Claude | 1 |
-| FR-2 | Render the Markdown resume as a styled, responsive single-page static site | 1 |
-| FR-3 | Deploy automatically to Vercel on every `git push` to `main` | 1 |
-| FR-4 | Store all career data in a structured PostgreSQL database via Supabase | 2 |
-| FR-5 | Provide an AI conversational interface (chat) where recruiters can ask questions about Paul's career | 2 |
-| FR-6 | Generate dynamic resumes tailored to a specific job description and company using RAG over career data | 2 |
-| FR-7 | Support PDF export of generated resumes | 2 |
-| FR-8 | Admin interface (auth-gated) for managing career content | 2 |
-| FR-9 | Knowledge graph of career relationships (skills → projects → roles → outcomes) via Neo4j | 3 |
-| FR-10 | Automated data pipelines via n8n for ingestion, embedding generation, and content updates | 3 |
+| ID    | Requirement                                                                                                                                                     | Phase |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| FR-1  | Ingest LinkedIn CSV export data (Skills, Projects, Publications, Certifications, Positions, Education) and generate a professional Markdown resume using Claude | 1     |
+| FR-2  | Render the Markdown resume as a styled, responsive single-page static site                                                                                      | 1     |
+| FR-3  | Deploy automatically to Vercel on every `git push` to `main`                                                                                                    | 1     |
+| FR-4  | Store all career data in a structured PostgreSQL database via Supabase                                                                                          | 2     |
+| FR-5  | Provide an AI conversational interface (chat) where recruiters can ask questions about Paul's career                                                            | 2     |
+| FR-6  | Generate dynamic resumes tailored to a specific job description and company using RAG over career data                                                          | 2     |
+| FR-7  | Support PDF export of generated resumes                                                                                                                         | 2     |
+| FR-8  | Admin interface (auth-gated) for managing career content                                                                                                        | 2     |
+| FR-9  | Knowledge graph of career relationships (skills → projects → roles → outcomes) via Neo4j                                                                        | 3     |
+| FR-10 | Automated data pipelines via n8n for ingestion, embedding generation, and content updates                                                                       | 3     |
 
 ### Non-Functional Requirements
 
-| ID | Requirement | Target |
-|----|-------------|--------|
-| NFR-1 | Page load time (Largest Contentful Paint) | < 2.5 seconds |
-| NFR-2 | Lighthouse scores (Performance, Accessibility, Best Practices, SEO) | 90+ each |
-| NFR-3 | Mobile responsiveness | Fully responsive from 320px width |
-| NFR-4 | Accessibility | WCAG 2.1 AA compliant |
-| NFR-5 | Availability | 99.9% (Vercel + Supabase SLAs) |
-| NFR-6 | Cost | $0/month through Phase 1; < $25/month in Phase 2 (API costs only) |
-| NFR-7 | Security | No PII exposure; admin routes auth-gated; API keys server-side only |
+| ID    | Requirement                                                         | Target                                                              |
+| ----- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| NFR-1 | Page load time (Largest Contentful Paint)                           | < 2.5 seconds                                                       |
+| NFR-2 | Lighthouse scores (Performance, Accessibility, Best Practices, SEO) | 90+ each                                                            |
+| NFR-3 | Mobile responsiveness                                               | Fully responsive from 320px width                                   |
+| NFR-4 | Accessibility                                                       | WCAG 2.1 AA compliant                                               |
+| NFR-5 | Availability                                                        | 99.9% (Vercel + Supabase SLAs)                                      |
+| NFR-6 | Cost                                                                | $0/month through Phase 1; < $25/month in Phase 2 (API costs only)   |
+| NFR-7 | Security                                                            | No PII exposure; admin routes auth-gated; API keys server-side only |
 
 ### Technology Stack (Locked)
 
-| Layer | Technology | Version (Feb 2026) |
-|-------|-----------|-------------------|
-| **Framework** | Next.js (App Router, TypeScript, Turbopack) | 16.1.6 |
-| **UI Components** | shadcn/ui (Radix UI primitives, Tailwind CSS) | CLI 3.0+ |
-| **Styling** | Tailwind CSS | 4.x |
-| **AI SDK** | Vercel AI SDK | 6.0.97 |
-| **LLM** | Anthropic Claude (Opus 4.6 for generation, Sonnet 4.5 for chat) | Current |
-| **Database** | Supabase (PostgreSQL + pgvector) | Latest cloud |
-| **Auth** | Supabase Auth (@supabase/ssr) | Latest |
-| **Deployment** | Vercel | Free tier |
-| **Dev Tooling** | Claude Code CLI + Cursor | Latest |
-| **Knowledge Graph** (Phase 3) | Neo4j AuraDB | 2026.01+ |
-| **Workflow Automation** (Phase 3) | n8n (self-hosted or cloud) | Latest |
+| Layer                             | Technology                                                      | Version (Feb 2026) |
+| --------------------------------- | --------------------------------------------------------------- | ------------------ |
+| **Framework**                     | Next.js (App Router, TypeScript, Turbopack)                     | 16.1.6             |
+| **UI Components**                 | shadcn/ui (Radix UI primitives, Tailwind CSS)                   | CLI 3.0+           |
+| **Styling**                       | Tailwind CSS                                                    | 4.x                |
+| **AI SDK**                        | Vercel AI SDK                                                   | 6.0.97             |
+| **LLM**                           | Anthropic Claude (Opus 4.6 for generation, Sonnet 4.5 for chat) | Current            |
+| **Database**                      | Supabase (PostgreSQL + pgvector)                                | Latest cloud       |
+| **Auth**                          | Supabase Auth (@supabase/ssr)                                   | Latest             |
+| **Deployment**                    | Vercel                                                          | Free tier          |
+| **Dev Tooling**                   | Claude Code CLI + Cursor                                        | Latest             |
+| **Knowledge Graph** (Phase 3)     | Neo4j AuraDB                                                    | 2026.01+           |
+| **Workflow Automation** (Phase 3) | n8n (self-hosted or cloud)                                      | Latest             |
 
 ---
 
@@ -105,37 +105,37 @@ Build and deploy a personal professional website at **paulprae.com** that positi
 
 Paul's confirmed LinkedIn data export CSVs serve as the primary structured data source. The following files are available and have been validated:
 
-| File | Columns | Row Count | Purpose |
-|------|---------|-----------|---------|
-| `Skills.csv` | Name | 70+ | Technical and professional skills |
-| `Projects.csv` | Title, Description, Url, Started On, Finished On | 29 | Portfolio projects with descriptions |
-| `Publications.csv` | Name, Published On, Description, Publisher, Url | 2 | Academic and professional publications |
-| `Certifications.csv` | Name, Url, Authority, Started On, Finished On, License Number | 10 | Professional certifications (AWS, edX, etc.) |
+| File                 | Columns                                                       | Row Count | Purpose                                      |
+| -------------------- | ------------------------------------------------------------- | --------- | -------------------------------------------- |
+| `Skills.csv`         | Name                                                          | 70+       | Technical and professional skills            |
+| `Projects.csv`       | Title, Description, Url, Started On, Finished On              | 29        | Portfolio projects with descriptions         |
+| `Publications.csv`   | Name, Published On, Description, Publisher, Url               | 2         | Academic and professional publications       |
+| `Certifications.csv` | Name, Url, Authority, Started On, Finished On, License Number | 10        | Professional certifications (AWS, edX, etc.) |
 
 ### Additional LinkedIn Export Files (from full data export)
 
 These are expected when Paul requests a complete LinkedIn data archive:
 
-| File | Expected Columns | Purpose |
-|------|-----------------|---------|
-| `Positions.csv` | Company Name, Title, Description, Location, Started On, Finished On | Employment history |
-| `Education.csv` | School Name, Degree Name, Notes, Started On, Finished On, Activities | Education background |
-| `Profile.csv` | First Name, Last Name, Headline, Summary, Industry, Geo Location | Profile metadata |
-| `Recommendations_Received.csv` | Recommender, Text, Date, Status | Endorsements and recommendations |
-| `Connections.csv` | First Name, Last Name, Email, Company, Position, Connected On | Network (for analytics, not displayed) |
+| File                           | Expected Columns                                                     | Purpose                                |
+| ------------------------------ | -------------------------------------------------------------------- | -------------------------------------- |
+| `Positions.csv`                | Company Name, Title, Description, Location, Started On, Finished On  | Employment history                     |
+| `Education.csv`                | School Name, Degree Name, Notes, Started On, Finished On, Activities | Education background                   |
+| `Profile.csv`                  | First Name, Last Name, Headline, Summary, Industry, Geo Location     | Profile metadata                       |
+| `Recommendations_Received.csv` | Recommender, Text, Date, Status                                      | Endorsements and recommendations       |
+| `Connections.csv`              | First Name, Last Name, Email, Company, Position, Connected On        | Network (for analytics, not displayed) |
 
 ### Supplementary Data Sources
 
 The knowledge base lives in `data/sources/knowledge/` organized into subdirectories:
 
-| Directory | Content |
-|-----------|---------|
-| `career/` | Profile enrichment (`profile.json`), career narratives, role-specific details |
-| `brand/` | Personal brand elements, positioning, messaging |
-| `strategy/` | Job search strategy, target companies, go-to-market approach |
-| `agents/` | AI agent configurations and prompts |
-| `content/` | Curated content snippets and writing samples |
-| `_meta/` | Schema definitions and knowledge base metadata |
+| Directory   | Content                                                                       |
+| ----------- | ----------------------------------------------------------------------------- |
+| `career/`   | Profile enrichment (`profile.json`), career narratives, role-specific details |
+| `brand/`    | Personal brand elements, positioning, messaging                               |
+| `strategy/` | Job search strategy, target companies, go-to-market approach                  |
+| `agents/`   | AI agent configurations and prompts                                           |
+| `content/`  | Curated content snippets and writing samples                                  |
+| `_meta/`    | Schema definitions and knowledge base metadata                                |
 
 All knowledge base JSONs are committed to git (recruiter-facing content). The ingestion script recursively traverses all subdirectories, loading files matching the `KnowledgeEntry` schema directly and wrapping other JSON structures with category/title derived from filepath.
 
@@ -196,13 +196,13 @@ graph TB
 
 **Phase 1 Stack Summary:**
 
-| Layer | Implementation |
-|-------|---------------|
-| **Frontend** | Next.js 16 static export, single page, Tailwind CSS, responsive layout |
-| **Backend** | None (static site) — all generation happens at build time |
-| **Data** | Flat files: LinkedIn CSVs + knowledge base JSONs parsed at build time |
-| **AI** | Anthropic Claude API called during build to generate Markdown resume |
-| **Infrastructure** | Vercel free tier with GitHub auto-deploy; optional custom domain |
+| Layer              | Implementation                                                         |
+| ------------------ | ---------------------------------------------------------------------- |
+| **Frontend**       | Next.js 16 static export, single page, Tailwind CSS, responsive layout |
+| **Backend**        | None (static site) — all generation happens at build time              |
+| **Data**           | Flat files: LinkedIn CSVs + knowledge base JSONs parsed at build time  |
+| **AI**             | Anthropic Claude API called during build to generate Markdown resume   |
+| **Infrastructure** | Vercel free tier with GitHub auto-deploy; optional custom domain       |
 
 ---
 
@@ -289,13 +289,13 @@ graph TB
 
 **Phase 2 Stack Summary:**
 
-| Layer | Implementation |
-|-------|---------------|
-| **Frontend** | Next.js 16 App Router: static marketing pages (SSG), chat interface (client component with `useChat`), dynamic resume viewer (server component with streaming), admin dashboard (auth-gated) |
-| **Backend** | Next.js API Routes and Server Actions: chat endpoint using `streamText()`, resume generation endpoint using `generateText()`, CRUD endpoints for career data management |
-| **Data** | Supabase PostgreSQL: normalized tables for career data, `documents` table with pgvector embeddings for RAG retrieval. Supabase Auth for admin access. Supabase Storage for file uploads. |
-| **AI** | Vercel AI SDK 6 with `@ai-sdk/anthropic` provider: Sonnet 4.5 for chat (fast, cost-effective), Opus 4.6 for resume generation (highest quality). Embedding model for vectorizing career content chunks. RAG pipeline: embed query → pgvector similarity search → retrieve relevant chunks → inject into Claude prompt. |
-| **Infrastructure** | Vercel (frontend + API routes), Supabase Cloud (database + auth + storage). GitHub Actions for CI. Custom domain `paulprae.com`. |
+| Layer              | Implementation                                                                                                                                                                                                                                                                                                         |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Frontend**       | Next.js 16 App Router: static marketing pages (SSG), chat interface (client component with `useChat`), dynamic resume viewer (server component with streaming), admin dashboard (auth-gated)                                                                                                                           |
+| **Backend**        | Next.js API Routes and Server Actions: chat endpoint using `streamText()`, resume generation endpoint using `generateText()`, CRUD endpoints for career data management                                                                                                                                                |
+| **Data**           | Supabase PostgreSQL: normalized tables for career data, `documents` table with pgvector embeddings for RAG retrieval. Supabase Auth for admin access. Supabase Storage for file uploads.                                                                                                                               |
+| **AI**             | Vercel AI SDK 6 with `@ai-sdk/anthropic` provider: Sonnet 4.5 for chat (fast, cost-effective), Opus 4.6 for resume generation (highest quality). Embedding model for vectorizing career content chunks. RAG pipeline: embed query → pgvector similarity search → retrieve relevant chunks → inject into Claude prompt. |
+| **Infrastructure** | Vercel (frontend + API routes), Supabase Cloud (database + auth + storage). GitHub Actions for CI. Custom domain `paulprae.com`.                                                                                                                                                                                       |
 
 ---
 
@@ -393,14 +393,14 @@ graph TB
 
 **Phase 3 Stack Summary:**
 
-| Layer | Implementation |
-|-------|---------------|
-| **Frontend** | Enhanced Next.js 16: interactive career timeline visualization, skill/project relationship explorer, advanced multi-turn chat with memory, company-specific resume customization UI |
-| **Backend** | AI Agent orchestration via Vercel AI SDK 6 `Agent` abstraction with tool-calling. Agent decides at runtime whether to query the knowledge graph (Cypher), search vectors (pgvector), or fetch web data for company research. |
-| **Data** | Supabase PostgreSQL (operational data + vectors) + Neo4j AuraDB (career knowledge graph). Graph model captures relationships: Person → held Role → at Company → delivered Project → used Skill → achieved Outcome. |
-| **AI** | Claude Agent with tools: `queryGraph` (Neo4j Cypher), `searchVectors` (pgvector similarity), `searchWeb` (company/role research). Vercel AI SDK 6 Agent class handles multi-step reasoning and tool approval. Ollama available as a local development fallback. |
-| **Automation** | n8n workflows: (1) LinkedIn re-ingest pipeline triggered by file upload to Supabase Storage, (2) company/industry enrichment pipeline that scrapes news and updates the graph, (3) site health monitoring and analytics. |
-| **Infrastructure** | Vercel + Supabase Cloud + Neo4j AuraDB Free tier + n8n (self-hosted on a $10/month VPS or n8n Cloud). Future: Rust microservices for performance-critical operations like batch embedding generation. |
+| Layer              | Implementation                                                                                                                                                                                                                                                  |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Frontend**       | Enhanced Next.js 16: interactive career timeline visualization, skill/project relationship explorer, advanced multi-turn chat with memory, company-specific resume customization UI                                                                             |
+| **Backend**        | AI Agent orchestration via Vercel AI SDK 6 `Agent` abstraction with tool-calling. Agent decides at runtime whether to query the knowledge graph (Cypher), search vectors (pgvector), or fetch web data for company research.                                    |
+| **Data**           | Supabase PostgreSQL (operational data + vectors) + Neo4j AuraDB (career knowledge graph). Graph model captures relationships: Person → held Role → at Company → delivered Project → used Skill → achieved Outcome.                                              |
+| **AI**             | Claude Agent with tools: `queryGraph` (Neo4j Cypher), `searchVectors` (pgvector similarity), `searchWeb` (company/role research). Vercel AI SDK 6 Agent class handles multi-step reasoning and tool approval. Ollama available as a local development fallback. |
+| **Automation**     | n8n workflows: (1) LinkedIn re-ingest pipeline triggered by file upload to Supabase Storage, (2) company/industry enrichment pipeline that scrapes news and updates the graph, (3) site health monitoring and analytics.                                        |
+| **Infrastructure** | Vercel + Supabase Cloud + Neo4j AuraDB Free tier + n8n (self-hosted on a $10/month VPS or n8n Cloud). Future: Rust microservices for performance-critical operations like batch embedding generation.                                                           |
 
 ---
 
@@ -476,7 +476,14 @@ interface CareerData {
   languages: Array<{ name: string; proficiency: string }>;
   recommendations: Array<{ recommender: string; text: string; date: string }>;
   honors: Array<{ title: string; issuer: string; date: string; description: string }>;
-  volunteering: Array<{ organization: string; role: string; cause: string; startDate: string; endDate: string | null; description: string }>;
+  volunteering: Array<{
+    organization: string;
+    role: string;
+    cause: string;
+    startDate: string;
+    endDate: string | null;
+    description: string;
+  }>;
   courses: Array<{ name: string; number: string; associatedWith: string }>;
   knowledge: KnowledgeEntry[];
 }
@@ -493,6 +500,7 @@ A TypeScript script (`scripts/generate-resume.ts`) that:
 5. Is idempotent and re-runnable — update data, re-run script, get new resume
 
 The prompt will instruct Claude to:
+
 - Structure the resume with clear sections: Summary, Experience, Education, Skills, Certifications, Projects, Publications
 - Use Paul's brand voice: confident, technically precise, action-oriented
 - Emphasize AI engineering leadership, healthcare domain expertise, and Fortune 500 delivery track record
@@ -512,9 +520,10 @@ A minimal Next.js 16 application with:
 - **Print styles**: CSS `@media print` rules so the page prints cleanly as a PDF from the browser
 
 **Build configuration** (`next.config.ts`):
+
 ```typescript
 const nextConfig = {
-  output: 'export',  // Static HTML export for Phase 1
+  output: "export", // Static HTML export for Phase 1
 };
 ```
 
@@ -563,22 +572,23 @@ Pipeline flow:
 
 **System dependencies (not npm packages):**
 
-| Tool | Install | Purpose |
-|------|---------|---------|
+| Tool   | Install                          | Purpose                           |
+| ------ | -------------------------------- | --------------------------------- |
 | Pandoc | `sudo apt-get install -y pandoc` | Markdown → DOCX, Markdown → Typst |
-| Typst | `cargo install typst-cli` | Typst → PDF compilation |
+| Typst  | `cargo install typst-cli`        | Typst → PDF compilation           |
 
 **Architecture Decision Record: Pandoc + Typst vs Alternatives**
 
-| Approach | Output Quality | Custom Code | Dependencies | Maintenance |
-|----------|---------------|-------------|--------------|-------------|
-| **Pandoc + Typst** ✅ | Publication-grade PDF, native DOCX | ~80 lines (1 script) | 2 system binaries, 0 npm | Pandoc: 35k★, Typst: 35k★ |
-| Puppeteer / md-to-pdf | Browser-rendered PDF (CSS dependent) | ~60 lines | 1 npm (Chromium ~400MB) | Chromium version churn |
-| Node.js docx package | Programmatic DOCX (no PDF) | ~200+ lines | 1 npm | Manual style mapping |
-| LaTeX via Pandoc | Gold-standard PDF | ~80 lines + .tex template | texlive (~2GB) | LaTeX ecosystem complexity |
+| Approach              | Output Quality                       | Custom Code               | Dependencies             | Maintenance                |
+| --------------------- | ------------------------------------ | ------------------------- | ------------------------ | -------------------------- |
+| **Pandoc + Typst** ✅ | Publication-grade PDF, native DOCX   | ~80 lines (1 script)      | 2 system binaries, 0 npm | Pandoc: 35k★, Typst: 35k★  |
+| Puppeteer / md-to-pdf | Browser-rendered PDF (CSS dependent) | ~60 lines                 | 1 npm (Chromium ~400MB)  | Chromium version churn     |
+| Node.js docx package  | Programmatic DOCX (no PDF)           | ~200+ lines               | 1 npm                    | Manual style mapping       |
+| LaTeX via Pandoc      | Gold-standard PDF                    | ~80 lines + .tex template | texlive (~2GB)           | LaTeX ecosystem complexity |
 
 **Future consideration — MCP integration (Phase 2/3):**
 The `mcp-pandoc` server by vivekVells could enable Claude agents to trigger format conversion as a tool call during chat (e.g., a "Download as PDF" button in the Phase 2 chat interface). Current tradeoffs:
+
 - Cost: Current approach = $0 (local binaries) vs MCP = server hosting or local process overhead
 - Benefit: Enables agent-driven conversion without shell access
 - Tradeoff: `mcp-pandoc` is in early development; PDF support still being built
@@ -587,6 +597,7 @@ The `mcp-pandoc` server by vivekVells could enable Claude agents to trigger form
 #### 5.7 Resume Version Archival
 
 Each export run automatically:
+
 1. Copies `resume.{md,pdf,docx}` to `data/generated/versions/resume-YYYY-MM-DD-<git-sha>.{md,pdf,docx}` (gitignored)
 2. Appends a version entry to `data/generated/VERSIONS.md` (committed) with timestamp, git SHA, and file sizes
 3. `VERSIONS.md` also contains a "Sent To" table for tracking which resume version was sent to which recruiter
@@ -597,15 +608,16 @@ Milestone versions can be tagged: `git tag -a resume/YYYY-MM-DD -m "description"
 
 The project uses **Vitest** (v4, ESM-native, TypeScript built-in) with 150+ tests across 5 test files:
 
-| File | Tests | Scope |
-|------|-------|-------|
-| `tests/config.test.ts` | ~11 | Config paths, constants, validation |
-| `tests/ingest.test.ts` | ~56 | CSV parsing, date normalization, knowledge base loading, Zod validation |
-| `tests/generate.test.ts` | ~28 | Prompt construction, resume content quality, brand voice |
-| `tests/export.test.ts` | ~17 | PDF/DOCX generation, file size validation, version archival |
-| `tests/pipeline.test.ts` | ~40 | End-to-end output validation, ATS keywords, section coverage |
+| File                     | Tests | Scope                                                                   |
+| ------------------------ | ----- | ----------------------------------------------------------------------- |
+| `tests/config.test.ts`   | ~11   | Config paths, constants, validation                                     |
+| `tests/ingest.test.ts`   | ~56   | CSV parsing, date normalization, knowledge base loading, Zod validation |
+| `tests/generate.test.ts` | ~28   | Prompt construction, resume content quality, brand voice                |
+| `tests/export.test.ts`   | ~17   | PDF/DOCX generation, file size validation, version archival             |
+| `tests/pipeline.test.ts` | ~40   | End-to-end output validation, ATS keywords, section coverage            |
 
 **Test commands:**
+
 ```bash
 npm test              # All tests
 npm run test:unit     # Unit tests only (no generated files needed)
@@ -613,6 +625,7 @@ npm run test:pipeline # Pipeline integration tests (validates generated outputs)
 ```
 
 **Key patterns:**
+
 - Pipeline tests use `it.skipIf(!data)` to gracefully handle missing outputs (before first pipeline run)
 - Test fixtures in `tests/fixtures/sample-data.ts` provide typed sample data for all CSV types
 - Scripts export `_testExports` for unit testing internal functions, with `isDirectRun` guards to prevent auto-execution on import
@@ -782,9 +795,9 @@ CREATE POLICY "Admin write access" ON documents FOR ALL USING (auth.role() = 'au
 **Server-side (`app/api/chat/route.ts`):**
 
 ```typescript
-import { streamText } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
-import { createClient } from '@/lib/supabase/server';
+import { streamText } from "ai";
+import { anthropic } from "@ai-sdk/anthropic";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
@@ -797,16 +810,16 @@ export async function POST(req: Request) {
   const queryEmbedding = await generateEmbedding(lastMessage);
 
   // Retrieve relevant career context via pgvector
-  const { data: relevantDocs } = await supabase.rpc('match_documents', {
+  const { data: relevantDocs } = await supabase.rpc("match_documents", {
     query_embedding: queryEmbedding,
     match_threshold: 0.7,
     match_count: 8,
   });
 
-  const context = relevantDocs?.map(d => d.content).join('\n\n') ?? '';
+  const context = relevantDocs?.map((d) => d.content).join("\n\n") ?? "";
 
   const result = streamText({
-    model: anthropic('claude-sonnet-4-5-20250514'),
+    model: anthropic("claude-sonnet-4-5-20250514"),
     system: `You are an AI assistant on Paul Prae's professional website.
 Your role is to help recruiters and hiring managers learn about Paul's
 qualifications, experience, and fit for their open positions.
@@ -833,11 +846,11 @@ Guidelines:
 Uses Vercel AI SDK 6's `useChat` hook from `@ai-sdk/react`:
 
 ```typescript
-import { useChat } from '@ai-sdk/react';
+import { useChat } from "@ai-sdk/react";
 
 export function Chat() {
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: '/api/chat',
+    api: "/api/chat",
   });
   // Render chat UI with messages, input field, and send button
 }
@@ -850,8 +863,8 @@ export function Chat() {
 Accepts a job description and company name. Uses RAG to pull the most relevant career content, then calls Claude Opus 4.6 to generate a tailored resume in Markdown format.
 
 ```typescript
-import { generateText } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
+import { generateText } from "ai";
+import { anthropic } from "@ai-sdk/anthropic";
 
 export async function POST(req: Request) {
   const { jobDescription, companyName } = await req.json();
@@ -860,19 +873,22 @@ export async function POST(req: Request) {
   const jdEmbedding = await generateEmbedding(jobDescription);
 
   // Retrieve most relevant career content
-  const { data: relevantDocs } = await supabase.rpc('match_documents', {
+  const { data: relevantDocs } = await supabase.rpc("match_documents", {
     query_embedding: jdEmbedding,
     match_threshold: 0.5,
     match_count: 15,
   });
 
   // Also fetch structured data
-  const { data: positions } = await supabase.from('positions').select('*').order('start_date', { ascending: false });
-  const { data: skills } = await supabase.from('skills').select('*').eq('is_featured', true);
-  const { data: certifications } = await supabase.from('certifications').select('*');
+  const { data: positions } = await supabase
+    .from("positions")
+    .select("*")
+    .order("start_date", { ascending: false });
+  const { data: skills } = await supabase.from("skills").select("*").eq("is_featured", true);
+  const { data: certifications } = await supabase.from("certifications").select("*");
 
   const result = await generateText({
-    model: anthropic('claude-opus-4-6-20250414'),
+    model: anthropic("claude-opus-4-6-20250414"),
     prompt: `Generate a professional resume in Markdown for Paul Prae,
 tailored specifically for the following position:
 
@@ -881,7 +897,7 @@ Job Description:
 ${jobDescription}
 
 Relevant career context:
-${relevantDocs?.map(d => d.content).join('\n\n')}
+${relevantDocs?.map((d) => d.content).join("\n\n")}
 
 Structured data:
 Positions: ${JSON.stringify(positions)}
@@ -903,17 +919,17 @@ Instructions:
 
 #### 6.4 Frontend Components
 
-| Component | Type | Purpose |
-|-----------|------|---------|
-| `app/page.tsx` | Server Component | Landing page with hero, highlights, CTA |
-| `app/chat/page.tsx` | Client Component | AI chat interface for recruiters |
-| `app/resume/page.tsx` | Client Component | Dynamic resume generator (input JD → get tailored resume) |
-| `app/admin/page.tsx` | Server Component (Auth-gated) | Career data management dashboard |
-| `components/chat.tsx` | Client Component | Chat UI using `useChat` hook |
-| `components/resume-viewer.tsx` | Client Component | Renders Markdown resume with print/PDF button |
-| `components/resume-form.tsx` | Client Component | Job description input form |
-| `lib/supabase/server.ts` | Utility | Server-side Supabase client with cookie-based auth |
-| `lib/supabase/client.ts` | Utility | Client-side Supabase client |
+| Component                      | Type                          | Purpose                                                   |
+| ------------------------------ | ----------------------------- | --------------------------------------------------------- |
+| `app/page.tsx`                 | Server Component              | Landing page with hero, highlights, CTA                   |
+| `app/chat/page.tsx`            | Client Component              | AI chat interface for recruiters                          |
+| `app/resume/page.tsx`          | Client Component              | Dynamic resume generator (input JD → get tailored resume) |
+| `app/admin/page.tsx`           | Server Component (Auth-gated) | Career data management dashboard                          |
+| `components/chat.tsx`          | Client Component              | Chat UI using `useChat` hook                              |
+| `components/resume-viewer.tsx` | Client Component              | Renders Markdown resume with print/PDF button             |
+| `components/resume-form.tsx`   | Client Component              | Job description input form                                |
+| `lib/supabase/server.ts`       | Utility                       | Server-side Supabase client with cookie-based auth        |
+| `lib/supabase/client.ts`       | Utility                       | Client-side Supabase client                               |
 
 #### 6.5 Embedding Pipeline
 
@@ -967,27 +983,27 @@ When a recruiter asks "Tell me about Paul's experience leading AI teams in healt
 #### 7.2 AI Agent with Tools (Vercel AI SDK 6)
 
 ```typescript
-import { Agent } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
+import { Agent } from "ai";
+import { anthropic } from "@ai-sdk/anthropic";
 
 const careerAgent = new Agent({
-  model: anthropic('claude-opus-4-6-20250414'),
+  model: anthropic("claude-opus-4-6-20250414"),
   tools: {
     queryCareerGraph: {
-      description: 'Query the Neo4j career knowledge graph using Cypher',
+      description: "Query the Neo4j career knowledge graph using Cypher",
       parameters: z.object({ cypher: z.string() }),
       execute: async ({ cypher }) => {
         const session = neo4jDriver.session();
         const result = await session.run(cypher);
-        return result.records.map(r => r.toObject());
+        return result.records.map((r) => r.toObject());
       },
     },
     searchCareerContent: {
-      description: 'Semantic search over career documents using pgvector',
+      description: "Semantic search over career documents using pgvector",
       parameters: z.object({ query: z.string(), limit: z.number().default(8) }),
       execute: async ({ query, limit }) => {
         const embedding = await generateEmbedding(query);
-        const { data } = await supabase.rpc('match_documents', {
+        const { data } = await supabase.rpc("match_documents", {
           query_embedding: embedding,
           match_count: limit,
         });
@@ -995,7 +1011,7 @@ const careerAgent = new Agent({
       },
     },
     researchCompany: {
-      description: 'Search the web for current information about a company',
+      description: "Search the web for current information about a company",
       parameters: z.object({ company: z.string(), topic: z.string() }),
       execute: async ({ company, topic }) => {
         // Web search integration for company research
@@ -1007,12 +1023,12 @@ const careerAgent = new Agent({
 
 #### 7.3 n8n Automation Workflows
 
-| Workflow | Trigger | Actions |
-|----------|---------|---------|
-| **LinkedIn Re-ingest** | New file uploaded to Supabase Storage `linkedin-exports` bucket | Unzip → parse CSVs → upsert to PostgreSQL → sync to Neo4j → regenerate embeddings → notify via email |
-| **Content Enrichment** | Scheduled (weekly) or manual trigger | For each target company in job search config: scrape recent news → extract key themes → update Neo4j graph nodes → generate talking points |
-| **Site Health Monitor** | Scheduled (every 6 hours) | Check site uptime → verify API endpoints → log Lighthouse scores → alert on degradation |
-| **Resume Version Tracker** | Webhook from resume generation endpoint | Store generated resume version → track which JDs generated which resumes → analytics on tailoring patterns |
+| Workflow                   | Trigger                                                         | Actions                                                                                                                                    |
+| -------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **LinkedIn Re-ingest**     | New file uploaded to Supabase Storage `linkedin-exports` bucket | Unzip → parse CSVs → upsert to PostgreSQL → sync to Neo4j → regenerate embeddings → notify via email                                       |
+| **Content Enrichment**     | Scheduled (weekly) or manual trigger                            | For each target company in job search config: scrape recent news → extract key themes → update Neo4j graph nodes → generate talking points |
+| **Site Health Monitor**    | Scheduled (every 6 hours)                                       | Check site uptime → verify API endpoints → log Lighthouse scores → alert on degradation                                                    |
+| **Resume Version Tracker** | Webhook from resume generation endpoint                         | Store generated resume version → track which JDs generated which resumes → analytics on tailoring patterns                                 |
 
 ---
 
@@ -1022,115 +1038,115 @@ const careerAgent = new Agent({
 
 #### Day 1: Project Setup & Data Pipeline
 
-| Task | Description | Tool |
-|------|-------------|------|
-| 1.1 | Initialize git repo with Next.js 16 boilerplate (see Section 9 for Claude Code prompt) | Claude Code |
-| 1.2 | Add LinkedIn CSV files to `data/sources/linkedin/` directory | Manual |
-| 1.3 | Add knowledge base JSONs to `data/sources/knowledge/` directory | Manual |
-| 1.4 | Build `scripts/ingest-linkedin.ts` — parse all CSVs with PapaParse, merge with knowledge base data, output unified `data/generated/career-data.json` | Claude Code |
-| 1.5 | Test ingestion: verify all 63 skills, 28 projects, 10 certifications, 2 publications parse correctly | Claude Code |
+| Task | Description                                                                                                                                          | Tool        |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| 1.1  | Initialize git repo with Next.js 16 boilerplate (see Section 9 for Claude Code prompt)                                                               | Claude Code |
+| 1.2  | Add LinkedIn CSV files to `data/sources/linkedin/` directory                                                                                         | Manual      |
+| 1.3  | Add knowledge base JSONs to `data/sources/knowledge/` directory                                                                                      | Manual      |
+| 1.4  | Build `scripts/ingest-linkedin.ts` — parse all CSVs with PapaParse, merge with knowledge base data, output unified `data/generated/career-data.json` | Claude Code |
+| 1.5  | Test ingestion: verify all 63 skills, 28 projects, 10 certifications, 2 publications parse correctly                                                 | Claude Code |
 
 #### Day 2: AI Resume Generation
 
-| Task | Description | Tool |
-|------|-------------|------|
-| 2.1 | Build `scripts/generate-resume.ts` — load career data, construct prompt, call Claude API, write resume markdown (filename derived from career data) | Claude Code |
-| 2.2 | Iterate on the prompt until resume quality meets bar: accurate data, strong narrative, professional tone, approximately 2-page length | Claude Code + Manual review |
-| 2.3 | Add environment variable handling for `ANTHROPIC_API_KEY` via `.env.local` | Claude Code |
+| Task | Description                                                                                                                                         | Tool                        |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| 2.1  | Build `scripts/generate-resume.ts` — load career data, construct prompt, call Claude API, write resume markdown (filename derived from career data) | Claude Code                 |
+| 2.2  | Iterate on the prompt until resume quality meets bar: accurate data, strong narrative, professional tone, approximately 2-page length               | Claude Code + Manual review |
+| 2.3  | Add environment variable handling for `ANTHROPIC_API_KEY` via `.env.local`                                                                          | Claude Code                 |
 
 #### Day 3: Static Site Build
 
-| Task | Description | Tool |
-|------|-------------|------|
-| 3.1 | Build `app/page.tsx` — server component that reads the generated resume via `PATHS.resumeOutput` and renders styled HTML | Claude Code |
-| 3.2 | Configure `react-markdown` with `remark-gfm` for Markdown rendering | Claude Code |
-| 3.3 | Style with Tailwind CSS: professional typography, responsive layout, print-friendly CSS | Claude Code |
-| 3.4 | Add Open Graph meta tags, favicon, page title | Claude Code |
-| 3.5 | Configure `next.config.ts` with `output: 'export'` for static generation | Claude Code |
-| 3.6 | Test locally: `npx next build && npx next start` — verify rendering on desktop and mobile viewports | Claude Code |
+| Task | Description                                                                                                              | Tool        |
+| ---- | ------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| 3.1  | Build `app/page.tsx` — server component that reads the generated resume via `PATHS.resumeOutput` and renders styled HTML | Claude Code |
+| 3.2  | Configure `react-markdown` with `remark-gfm` for Markdown rendering                                                      | Claude Code |
+| 3.3  | Style with Tailwind CSS: professional typography, responsive layout, print-friendly CSS                                  | Claude Code |
+| 3.4  | Add Open Graph meta tags, favicon, page title                                                                            | Claude Code |
+| 3.5  | Configure `next.config.ts` with `output: 'export'` for static generation                                                 | Claude Code |
+| 3.6  | Test locally: `npx next build && npx next start` — verify rendering on desktop and mobile viewports                      | Claude Code |
 
 #### Day 4: Deployment & Domain
 
-| Task | Description | Tool |
-|------|-------------|------|
-| 4.1 | Connect GitHub repo to Vercel (import project) | Manual (Vercel dashboard) |
-| 4.2 | Push to `main` — verify auto-deploy succeeds | Git + Vercel |
-| 4.3 | Test live site at `*.vercel.app` URL | Browser |
-| 4.4 | (Optional) Add custom domain `paulprae.com` in Vercel dashboard, configure DNS | Manual |
-| 4.5 | Verify Lighthouse scores: target 90+ across all categories | Browser DevTools |
+| Task | Description                                                                    | Tool                      |
+| ---- | ------------------------------------------------------------------------------ | ------------------------- |
+| 4.1  | Connect GitHub repo to Vercel (import project)                                 | Manual (Vercel dashboard) |
+| 4.2  | Push to `main` — verify auto-deploy succeeds                                   | Git + Vercel              |
+| 4.3  | Test live site at `*.vercel.app` URL                                           | Browser                   |
+| 4.4  | (Optional) Add custom domain `paulprae.com` in Vercel dashboard, configure DNS | Manual                    |
+| 4.5  | Verify Lighthouse scores: target 90+ across all categories                     | Browser DevTools          |
 
 #### Day 5: Polish & Pipeline Documentation
 
-| Task | Description | Tool |
-|------|-------------|------|
-| 5.1 | Write README.md documenting the full pipeline: data export → ingestion → generation → deploy | Claude Code |
-| 5.2 | Add npm scripts for the pipeline: `npm run ingest`, `npm run generate`, `npm run deploy` | Claude Code |
-| 5.3 | Final QA: cross-browser testing (Chrome, Safari, Firefox), mobile testing, link verification | Manual |
-| 5.4 | Create CLAUDE.md for Claude Code project context | Claude Code `/init` |
+| Task | Description                                                                                  | Tool                |
+| ---- | -------------------------------------------------------------------------------------------- | ------------------- |
+| 5.1  | Write README.md documenting the full pipeline: data export → ingestion → generation → deploy | Claude Code         |
+| 5.2  | Add npm scripts for the pipeline: `npm run ingest`, `npm run generate`, `npm run deploy`     | Claude Code         |
+| 5.3  | Final QA: cross-browser testing (Chrome, Safari, Firefox), mobile testing, link verification | Manual              |
+| 5.4  | Create CLAUDE.md for Claude Code project context                                             | Claude Code `/init` |
 
 ### Phase 2: Full-Stack Platform (Weeks 2–6)
 
 #### Week 2: Database & Data Migration
 
-| Task | Description |
-|------|-------------|
-| 2.1 | Create Supabase project, enable pgvector extension |
-| 2.2 | Apply database schema (all tables, RLS policies, match_documents function) |
-| 2.3 | Build migration script: `scripts/migrate-to-supabase.ts` — reads `career-data.json`, inserts into Supabase tables |
-| 2.4 | Build embedding pipeline: `scripts/generate-embeddings.ts` — chunks career content, generates embeddings, stores in `documents` table |
-| 2.5 | Verify: query `match_documents` with test queries, confirm relevant results returned |
+| Task | Description                                                                                                                           |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.1  | Create Supabase project, enable pgvector extension                                                                                    |
+| 2.2  | Apply database schema (all tables, RLS policies, match_documents function)                                                            |
+| 2.3  | Build migration script: `scripts/migrate-to-supabase.ts` — reads `career-data.json`, inserts into Supabase tables                     |
+| 2.4  | Build embedding pipeline: `scripts/generate-embeddings.ts` — chunks career content, generates embeddings, stores in `documents` table |
+| 2.5  | Verify: query `match_documents` with test queries, confirm relevant results returned                                                  |
 
 #### Week 3: AI Chat Backend
 
-| Task | Description |
-|------|-------------|
-| 3.1 | Remove `output: 'export'` from Next.js config (switch to server-rendered) |
-| 3.2 | Install Vercel AI SDK 6: `npm install ai @ai-sdk/anthropic @ai-sdk/react` |
-| 3.3 | Build `app/api/chat/route.ts` — RAG-powered chat endpoint with `streamText()` |
-| 3.4 | Build `components/chat.tsx` — chat UI with `useChat` hook, message list, input field, typing indicator |
-| 3.5 | Build `app/chat/page.tsx` — public chat page with suggested starter questions |
-| 3.6 | Test: verify streaming responses, relevant context retrieval, professional tone |
+| Task | Description                                                                                            |
+| ---- | ------------------------------------------------------------------------------------------------------ |
+| 3.1  | Remove `output: 'export'` from Next.js config (switch to server-rendered)                              |
+| 3.2  | Install Vercel AI SDK 6: `npm install ai @ai-sdk/anthropic @ai-sdk/react`                              |
+| 3.3  | Build `app/api/chat/route.ts` — RAG-powered chat endpoint with `streamText()`                          |
+| 3.4  | Build `components/chat.tsx` — chat UI with `useChat` hook, message list, input field, typing indicator |
+| 3.5  | Build `app/chat/page.tsx` — public chat page with suggested starter questions                          |
+| 3.6  | Test: verify streaming responses, relevant context retrieval, professional tone                        |
 
 #### Week 4: Dynamic Resume Generation
 
-| Task | Description |
-|------|-------------|
-| 4.1 | Build `app/api/generate-resume/route.ts` — accepts JD, returns tailored resume |
-| 4.2 | Build `components/resume-form.tsx` — job description input with company name field |
-| 4.3 | Build `components/resume-viewer.tsx` — renders generated Markdown resume with styled typography |
-| 4.4 | Add PDF export: client-side print-to-PDF or server-side via Puppeteer/`md-to-pdf` |
-| 4.5 | Build `app/resume/page.tsx` — public page combining form and viewer |
+| Task | Description                                                                                     |
+| ---- | ----------------------------------------------------------------------------------------------- |
+| 4.1  | Build `app/api/generate-resume/route.ts` — accepts JD, returns tailored resume                  |
+| 4.2  | Build `components/resume-form.tsx` — job description input with company name field              |
+| 4.3  | Build `components/resume-viewer.tsx` — renders generated Markdown resume with styled typography |
+| 4.4  | Add PDF export: client-side print-to-PDF or server-side via Puppeteer/`md-to-pdf`               |
+| 4.5  | Build `app/resume/page.tsx` — public page combining form and viewer                             |
 
 #### Week 5: Static Pages & Admin
 
-| Task | Description |
-|------|-------------|
-| 5.1 | Build static marketing pages: landing (`app/page.tsx`), about, highlights |
-| 5.2 | Configure Supabase Auth (email/password for admin only) |
-| 5.3 | Build `app/admin/page.tsx` — CRUD interface for career data (basic forms, not elaborate) |
-| 5.4 | SEO: sitemap.xml, robots.txt, structured data (JSON-LD for Person schema) |
-| 5.5 | Set Vercel environment variables for production: `ANTHROPIC_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` |
+| Task | Description                                                                                                                   |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------- |
+| 5.1  | Build static marketing pages: landing (`app/page.tsx`), about, highlights                                                     |
+| 5.2  | Configure Supabase Auth (email/password for admin only)                                                                       |
+| 5.3  | Build `app/admin/page.tsx` — CRUD interface for career data (basic forms, not elaborate)                                      |
+| 5.4  | SEO: sitemap.xml, robots.txt, structured data (JSON-LD for Person schema)                                                     |
+| 5.5  | Set Vercel environment variables for production: `ANTHROPIC_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` |
 
 #### Week 6: Frontend Review & Polish
 
-| Task | Description |
-|------|-------------|
-| 6.1 | Send to frontend developer for review (per Frontend Developer Guide) |
-| 6.2 | Address accessibility issues: ARIA labels, keyboard navigation, screen reader support, heading hierarchy |
-| 6.3 | Address visual distinctiveness: typography refinement, spacing, color system, visual hierarchy |
-| 6.4 | Streaming UX polish: auto-scroll behavior, Markdown rendering mid-stream, typing indicators |
-| 6.5 | Responsive testing: verify chat, resume viewer, and static pages on mobile |
-| 6.6 | Performance: Lighthouse 90+ target, optimize images, minimize client JS |
+| Task | Description                                                                                              |
+| ---- | -------------------------------------------------------------------------------------------------------- |
+| 6.1  | Send to frontend developer for review (per Frontend Developer Guide)                                     |
+| 6.2  | Address accessibility issues: ARIA labels, keyboard navigation, screen reader support, heading hierarchy |
+| 6.3  | Address visual distinctiveness: typography refinement, spacing, color system, visual hierarchy           |
+| 6.4  | Streaming UX polish: auto-scroll behavior, Markdown rendering mid-stream, typing indicators              |
+| 6.5  | Responsive testing: verify chat, resume viewer, and static pages on mobile                               |
+| 6.6  | Performance: Lighthouse 90+ target, optimize images, minimize client JS                                  |
 
 ### Phase 3: Knowledge Graph & Automation (Weeks 7–12+)
 
-| Week | Focus | Key Deliverables |
-|------|-------|-----------------|
-| 7–8 | Neo4j setup & data modeling | AuraDB instance, Cypher schema, migration script from PostgreSQL → graph, graph populated with career data |
-| 9 | Agent implementation | Vercel AI SDK 6 Agent with graph query + vector search + web search tools |
-| 10 | n8n workflows | LinkedIn re-ingest pipeline, content enrichment pipeline, health monitoring |
-| 11 | Enhanced frontend | Interactive career timeline, skill visualization, advanced chat with graph context |
-| 12+ | Iteration | Ollama integration for local dev, Rust microservices for batch processing, additional data source integrations |
+| Week | Focus                       | Key Deliverables                                                                                               |
+| ---- | --------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| 7–8  | Neo4j setup & data modeling | AuraDB instance, Cypher schema, migration script from PostgreSQL → graph, graph populated with career data     |
+| 9    | Agent implementation        | Vercel AI SDK 6 Agent with graph query + vector search + web search tools                                      |
+| 10   | n8n workflows               | LinkedIn re-ingest pipeline, content enrichment pipeline, health monitoring                                    |
+| 11   | Enhanced frontend           | Interactive career timeline, skill visualization, advanced chat with graph context                             |
+| 12+  | Iteration                   | Ollama integration for local dev, Rust microservices for batch processing, additional data source integrations |
 
 ---
 
@@ -1146,36 +1162,38 @@ I need you to scaffold a Next.js 16 project for my professional career website (
 Create the following directory structure:
 
 ```
+
 paulprae.com/
 ├── app/
-│   ├── layout.tsx          # Root layout with metadata, fonts, Tailwind
-│   ├── page.tsx            # Main page: reads generated resume via PATHS.resumeOutput, renders styled HTML
-│   ├── globals.css         # Tailwind imports + custom prose styles + print styles
-│   └── favicon.ico         # Placeholder
+│ ├── layout.tsx # Root layout with metadata, fonts, Tailwind
+│ ├── page.tsx # Main page: reads generated resume via PATHS.resumeOutput, renders styled HTML
+│ ├── globals.css # Tailwind imports + custom prose styles + print styles
+│ └── favicon.ico # Placeholder
 ├── components/
-│   └── resume-renderer.tsx # Server component: Markdown → styled HTML via react-markdown
+│ └── resume-renderer.tsx # Server component: Markdown → styled HTML via react-markdown
 ├── data/
-│   ├── sources/
-│   │   ├── linkedin/       # LinkedIn CSV exports (gitignored — raw exports may have extra columns)
-│   │   └── knowledge/      # Knowledge base JSONs (committed — recruiter-facing content)
-│   └── generated/          # Pipeline output: career-data.json + Paul-Prae-Resume.md (committed), PDF + DOCX (gitignored)
+│ ├── sources/
+│ │ ├── linkedin/ # LinkedIn CSV exports (gitignored — raw exports may have extra columns)
+│ │ └── knowledge/ # Knowledge base JSONs (committed — recruiter-facing content)
+│ └── generated/ # Pipeline output: career-data.json + Paul-Prae-Resume.md (committed), PDF + DOCX (gitignored)
 ├── scripts/
-│   ├── ingest-linkedin.ts  # Parse LinkedIn CSVs + knowledge JSONs → career-data.json
-│   └── generate-resume.ts  # Load career-data.json → call Claude API → write resume markdown
+│ ├── ingest-linkedin.ts # Parse LinkedIn CSVs + knowledge JSONs → career-data.json
+│ └── generate-resume.ts # Load career-data.json → call Claude API → write resume markdown
 ├── lib/
-│   └── types.ts            # CareerData TypeScript interface and related types
+│ └── types.ts # CareerData TypeScript interface and related types
 ├── public/
-│   └── og-image.png        # Placeholder Open Graph image
-├── .env.local.example      # Template: ANTHROPIC_API_KEY=your_key_here
-├── .gitignore              # Node, Next.js, .env.local, data/sources/linkedin/*.csv
-├── next.config.ts          # output: 'export' for static generation
+│ └── og-image.png # Placeholder Open Graph image
+├── .env.local.example # Template: ANTHROPIC_API_KEY=your_key_here
+├── .gitignore # Node, Next.js, .env.local, data/sources/linkedin/\*.csv
+├── next.config.ts # output: 'export' for static generation
 ├── package.json
 ├── tsconfig.json
 ├── tailwind.config.ts
 ├── postcss.config.mjs
 ├── README.md
 └── CLAUDE.md
-```
+
+````
 
 ## Technical Specifications
 
@@ -1227,11 +1245,12 @@ Add to package.json:
     "pipeline": "npm run ingest && npm run generate && npm run build"
   }
 }
-```
+````
 
 ## README.md
 
 Write a clear README explaining:
+
 1. What this project is (AI-generated professional resume site)
 2. The data pipeline: LinkedIn export → ingest → generate → deploy
 3. How to set up locally (clone, npm install, add .env.local, add data files)
@@ -1242,6 +1261,7 @@ Write a clear README explaining:
 ## CLAUDE.md
 
 Generate a CLAUDE.md with:
+
 - Project overview and current phase (Phase 1: static resume)
 - Tech stack: Next.js 16.1.x, TypeScript, Tailwind CSS, react-markdown, Anthropic Claude API
 - Key conventions: App Router, server components by default, TypeScript strict mode
@@ -1259,6 +1279,7 @@ Generate a CLAUDE.md with:
 - Use `next build` to verify the static export works before committing
 
 After scaffolding, run `npm install` and verify the project builds successfully with `npm run build`. Create an initial commit with the message "Phase 1: Initial project scaffold for AI-generated static resume site".
+
 ```
 
 ---
@@ -1298,3 +1319,4 @@ After scaffolding, run `npm install` and verify the project builds successfully 
 ---
 
 *End of Technical Design Document*
+```

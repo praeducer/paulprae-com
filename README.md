@@ -26,17 +26,18 @@ LinkedIn CSV Export → Ingestion Script → Claude API → Markdown Resume → 
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router, TypeScript, Turbopack) |
-| Styling | Tailwind CSS 4.x |
-| Markdown | react-markdown + remark-gfm |
-| AI Generation | Anthropic Claude API (Opus 4.6) |
-| Validation | Zod (schema validation) |
-| Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF) |
-| Testing | Vitest (150+ unit and integration tests) |
-| Deployment | Vercel (free tier, auto-deploy from GitHub) |
-| Dev Tooling | Claude Code CLI + Cursor |
+| Layer         | Technology                                     |
+| ------------- | ---------------------------------------------- |
+| Framework     | Next.js 16 (App Router, TypeScript, Turbopack) |
+| Styling       | Tailwind CSS 4.x                               |
+| Markdown      | react-markdown + remark-gfm                    |
+| AI Generation | Anthropic Claude API (Opus 4.6)                |
+| Validation    | Zod (schema validation)                        |
+| Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF)              |
+| Linting       | ESLint 9 + eslint-config-next + Prettier       |
+| Testing       | Vitest (150+ unit and integration tests)       |
+| Deployment    | Vercel (free tier, auto-deploy from GitHub)    |
+| Dev Tooling   | Claude Code CLI + Cursor                       |
 
 ## Getting Started
 
@@ -93,6 +94,15 @@ npm run test:unit     # Unit tests only (pure logic, no generated files needed)
 npm run test:pipeline # Pipeline integration tests (validates generated outputs)
 ```
 
+### Linting & Formatting
+
+```bash
+npm run lint          # ESLint check (cached)
+npm run lint:fix      # ESLint auto-fix
+npm run format        # Prettier format all files
+npm run format:check  # Prettier check (CI-friendly)
+```
+
 ### Local Development
 
 ```bash
@@ -131,6 +141,7 @@ paulprae-com/
 ## Roadmap
 
 ### Phase 2: Full-Stack Interactive Platform (Weeks 2-6)
+
 - Supabase PostgreSQL database with pgvector for career data and embeddings
 - AI chat interface where recruiters can ask questions about Paul's career
 - Dynamic resume generation tailored to specific job descriptions
@@ -138,6 +149,7 @@ paulprae-com/
 - Supabase Auth for admin access
 
 ### Phase 3: Knowledge-Graph-Augmented AI (Weeks 7-12+)
+
 - Neo4j knowledge graph capturing career relationships (skills → projects → roles → outcomes)
 - AI agent with tool-calling (graph queries, vector search, web research)
 - n8n automation workflows for data ingestion and content enrichment
@@ -145,13 +157,13 @@ paulprae-com/
 
 ## Documentation
 
-| Doc | Purpose |
-|---|---|
-| [`docs/technical-design-document.md`](docs/technical-design-document.md) | Full architecture, schema, and implementation plan |
-| [`docs/pipeline-setup-checklist.md`](docs/pipeline-setup-checklist.md) | Step-by-step pipeline setup: API keys, LinkedIn data, first run |
-| [`docs/linux-dev-environment-setup.md`](docs/linux-dev-environment-setup.md) | Linux/WSL setup: nvm, Claude Code CLI, Cursor, pipeline deps |
-| [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows-specific setup: Dev Drive, filesystem layout, cross-machine parity |
-| [`scripts/setup/`](scripts/setup/) | Automated setup scripts (Windows + Linux/WSL) for dev environment and pipeline deps |
+| Doc                                                                              | Purpose                                                                             |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| [`docs/technical-design-document.md`](docs/technical-design-document.md)         | Full architecture, schema, and implementation plan                                  |
+| [`docs/pipeline-setup-checklist.md`](docs/pipeline-setup-checklist.md)           | Step-by-step pipeline setup: API keys, LinkedIn data, first run                     |
+| [`docs/linux-dev-environment-setup.md`](docs/linux-dev-environment-setup.md)     | Linux/WSL setup: nvm, Claude Code CLI, Cursor, pipeline deps                        |
+| [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows-specific setup: Dev Drive, filesystem layout, cross-machine parity          |
+| [`scripts/setup/`](scripts/setup/)                                               | Automated setup scripts (Windows + Linux/WSL) for dev environment and pipeline deps |
 
 ## Resume Versioning
 

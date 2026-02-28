@@ -146,26 +146,32 @@ describe("validateResumeOutput", () => {
   });
 
   it("warns when resume is too short", () => {
-    const short = "# Paul Prae\n\n## Professional Summary\n\n## Professional Experience\n\n## Education\n\n## Technical Skills\n\nShort.";
+    const short =
+      "# Paul Prae\n\n## Professional Summary\n\n## Professional Experience\n\n## Education\n\n## Technical Skills\n\nShort.";
     const warnings = validateResumeOutput(short, SAMPLE_CAREER_DATA);
     expect(warnings.some((w) => w.includes("too short"))).toBe(true);
   });
 
   it("warns when resume is too long", () => {
-    const sections = "## Professional Summary\n\n## Professional Experience\n\n## Education\n\n## Technical Skills\n\n";
+    const sections =
+      "## Professional Summary\n\n## Professional Experience\n\n## Education\n\n## Technical Skills\n\n";
     const long = "# Paul Prae\n\n" + sections + "x".repeat(13000);
     const warnings = validateResumeOutput(long, SAMPLE_CAREER_DATA);
     expect(warnings.some((w) => w.includes("too long"))).toBe(true);
   });
 
   it("warns when recent employers are missing", () => {
-    const noCompanies = "# Paul Prae\n\n## Professional Summary\n\nSome text.\n\n## Professional Experience\n\nSome roles.\n\n## Education\n\nSchool.\n\n## Technical Skills\n\nSkills.\n\n" + "x".repeat(3000);
+    const noCompanies =
+      "# Paul Prae\n\n## Professional Summary\n\nSome text.\n\n## Professional Experience\n\nSome roles.\n\n## Education\n\nSchool.\n\n## Technical Skills\n\nSkills.\n\n" +
+      "x".repeat(3000);
     const warnings = validateResumeOutput(noCompanies, SAMPLE_CAREER_DATA);
     expect(warnings.some((w) => w.includes("Acme AI Corp"))).toBe(true);
   });
 
   it("warns when H1 heading is missing", () => {
-    const noH1 = "Some text without heading\n\n## Professional Summary\n\n## Professional Experience\n\n## Education\n\n## Technical Skills\n\n" + "x".repeat(3000);
+    const noH1 =
+      "Some text without heading\n\n## Professional Summary\n\n## Professional Experience\n\n## Education\n\n## Technical Skills\n\n" +
+      "x".repeat(3000);
     const warnings = validateResumeOutput(noH1, SAMPLE_CAREER_DATA);
     expect(warnings.some((w) => w.includes("H1 heading"))).toBe(true);
   });

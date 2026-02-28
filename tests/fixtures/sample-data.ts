@@ -32,26 +32,26 @@ import type {
 export const SAMPLE_POSITIONS: LinkedInPosition[] = [
   {
     "Company Name": "Acme AI Corp",
-    "Title": "Principal AI Engineer",
-    "Description": "Led AI platform development for enterprise clients.",
-    "Location": "San Francisco, CA",
+    Title: "Principal AI Engineer",
+    Description: "Led AI platform development for enterprise clients.",
+    Location: "San Francisco, CA",
     "Started On": "Jan 2023",
     "Finished On": "",
   },
   {
     "Company Name": "DataCo",
-    "Title": "Senior ML Engineer",
-    "Description": "Built and deployed ML pipelines at scale.",
-    "Location": "Austin, TX",
+    Title: "Senior ML Engineer",
+    Description: "Built and deployed ML pipelines at scale.",
+    Location: "Austin, TX",
     "Started On": "Mar 2020",
     "Finished On": "Dec 2022",
   },
   // Edge case: empty entry that should be filtered
   {
     "Company Name": "",
-    "Title": "",
-    "Description": "",
-    "Location": "",
+    Title: "",
+    Description: "",
+    Location: "",
     "Started On": "",
     "Finished On": "",
   },
@@ -61,10 +61,10 @@ export const SAMPLE_EDUCATION: LinkedInEducation[] = [
   {
     "School Name": "Georgia Institute of Technology",
     "Degree Name": "Bachelor of Science",
-    "Notes": "Computer Science",
+    Notes: "Computer Science",
     "Started On": "2012",
     "Finished On": "2016",
-    "Activities": "ACM, Hackathon Club",
+    Activities: "ACM, Hackathon Club",
   },
 ];
 
@@ -124,9 +124,7 @@ export const SAMPLE_EMAILS: LinkedInEmail[] = [
   { "Email Address": "unconfirmed@example.com", Confirmed: "No", Primary: "No" },
 ];
 
-export const SAMPLE_LANGUAGES: LinkedInLanguage[] = [
-  { Name: "English", Proficiency: "Native" },
-];
+export const SAMPLE_LANGUAGES: LinkedInLanguage[] = [{ Name: "English", Proficiency: "Native" }];
 
 export const SAMPLE_RECOMMENDATIONS: LinkedInRecommendation[] = [
   {
@@ -170,7 +168,8 @@ export const SAMPLE_COURSES: LinkedInCourse[] = [
 export const SAMPLE_KNOWLEDGE_ENTRY: KnowledgeEntry = {
   category: "achievement",
   title: "AI Platform Launch",
-  content: "Led the launch of an AI platform serving 500+ enterprise clients, reducing inference latency by 40%.",
+  content:
+    "Led the launch of an AI platform serving 500+ enterprise clients, reducing inference latency by 40%.",
   tags: ["ai", "leadership", "enterprise"],
   relatedPositions: ["Principal AI Engineer at Acme AI Corp"],
 };

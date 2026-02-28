@@ -10,11 +10,13 @@
 ## Prerequisites
 
 Before starting, ensure you have:
+
 - Node.js 22+ (LTS) installed ([nodejs.org](https://nodejs.org/en/download/) or via nvm)
 - Git configured and this repo cloned
 - A terminal in the project root directory
 
 If running from WSL with Claude Code, all `npm` commands should be run via:
+
 ```bash
 wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/dev/paulprae-com && <command>"
 ```
@@ -60,6 +62,7 @@ ANTHROPIC_API_KEY=sk-ant-api03-...your-actual-key...
 ```
 
 **Security notes:**
+
 - `.env.local` is in `.gitignore` — it will **never** be committed to git
 - Do not share this key or paste it in chat/issues/PRs
 - Store a backup in a password manager (1Password, Bitwarden, etc.)
@@ -88,21 +91,21 @@ data/sources/linkedin/
 
 The pipeline recognizes these files (case-insensitive):
 
-| File | Required? | What it contains |
-|------|-----------|-----------------|
-| `Positions.csv` | **Required** | Work experience |
-| `Education.csv` | Recommended | Degrees, schools |
-| `Skills.csv` | Recommended | LinkedIn skill endorsements |
-| `Profile.csv` | Recommended | Name, headline, summary |
-| `Email Addresses.csv` | Recommended | Contact email |
-| `Certifications.csv` | Optional | Professional certifications |
-| `Projects.csv` | Optional | Project portfolio |
-| `Publications.csv` | Optional | Published works |
-| `Languages.csv` | Optional | Language proficiencies |
-| `Recommendations_Received.csv` | Optional | Peer recommendations |
-| `Honors.csv` | Optional | Awards, honors |
-| `Volunteering.csv` | Optional | Volunteer experience |
-| `Courses.csv` | Optional | Course completions |
+| File                           | Required?    | What it contains            |
+| ------------------------------ | ------------ | --------------------------- |
+| `Positions.csv`                | **Required** | Work experience             |
+| `Education.csv`                | Recommended  | Degrees, schools            |
+| `Skills.csv`                   | Recommended  | LinkedIn skill endorsements |
+| `Profile.csv`                  | Recommended  | Name, headline, summary     |
+| `Email Addresses.csv`          | Recommended  | Contact email               |
+| `Certifications.csv`           | Optional     | Professional certifications |
+| `Projects.csv`                 | Optional     | Project portfolio           |
+| `Publications.csv`             | Optional     | Published works             |
+| `Languages.csv`                | Optional     | Language proficiencies      |
+| `Recommendations_Received.csv` | Optional     | Peer recommendations        |
+| `Honors.csv`                   | Optional     | Awards, honors              |
+| `Volunteering.csv`             | Optional     | Volunteer experience        |
+| `Courses.csv`                  | Optional     | Course completions          |
 
 At minimum, you need `Positions.csv` or `Education.csv` for the pipeline to succeed.
 
@@ -115,12 +118,14 @@ At minimum, you need `Positions.csv` or `Education.csv` for the pipeline to succ
 If you want PDF and DOCX exports (not just the web resume), install:
 
 **On Windows (PowerShell):**
+
 ```powershell
 winget install --id JohnMacFarlane.Pandoc --exact
 winget install --id Typst.Typst --exact
 ```
 
 **On Ubuntu/WSL:**
+
 ```bash
 sudo apt-get install -y pandoc
 # Typst: install via cargo or download binary
@@ -129,11 +134,13 @@ cargo install typst-cli
 ```
 
 **On macOS:**
+
 ```bash
 brew install pandoc typst
 ```
 
 Verify installation:
+
 ```bash
 pandoc --version
 typst --version
@@ -146,11 +153,13 @@ typst --version
 ### 7. Run the Pipeline
 
 **Full pipeline (ingest → generate → export → build):**
+
 ```bash
 npm run pipeline
 ```
 
 **Or run steps individually:**
+
 ```bash
 npm run ingest      # Parse LinkedIn CSVs + knowledge base → career-data.json
 npm run generate    # Call Claude API → Paul-Prae-Resume.md
@@ -159,6 +168,7 @@ npm run build       # Build static site → out/
 ```
 
 **Expected output:**
+
 - `data/generated/career-data.json` — Structured career data (committed to git)
 - `data/generated/Paul-Prae-Resume.md` — AI-generated resume (committed to git; filename derived from career data)
 - `data/generated/Paul-Prae-Resume.pdf` — PDF resume (gitignored)
@@ -202,12 +212,12 @@ The knowledge base (`data/sources/knowledge/`) is committed to git, so it transf
 
 ## Troubleshooting
 
-| Problem | Solution |
-|---------|----------|
-| `tsx not found` | Run `npm install` first, or use `npx tsx` |
-| `ANTHROPIC_API_KEY not found` | Create `.env.local` per step 3 |
-| `No CSV files found` | Place LinkedIn CSVs in `data/sources/linkedin/` per step 5 |
-| `API Error: 401` | Check your API key in `.env.local` |
-| `API Error: 429` | Rate limited — wait 60 seconds and retry |
-| `pandoc not found` | Install per step 6, or skip export step |
-| UNC path / CMD.EXE errors | Run via WSL: `wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/dev/paulprae-com && npm run pipeline"` |
+| Problem                       | Solution                                                                                        |
+| ----------------------------- | ----------------------------------------------------------------------------------------------- |
+| `tsx not found`               | Run `npm install` first, or use `npx tsx`                                                       |
+| `ANTHROPIC_API_KEY not found` | Create `.env.local` per step 3                                                                  |
+| `No CSV files found`          | Place LinkedIn CSVs in `data/sources/linkedin/` per step 5                                      |
+| `API Error: 401`              | Check your API key in `.env.local`                                                              |
+| `API Error: 429`              | Rate limited — wait 60 seconds and retry                                                        |
+| `pandoc not found`            | Install per step 6, or skip export step                                                         |
+| UNC path / CMD.EXE errors     | Run via WSL: `wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/dev/paulprae-com && npm run pipeline"` |

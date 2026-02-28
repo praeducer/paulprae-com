@@ -114,6 +114,7 @@ describe("career-data.json", () => {
       // Should be YYYY-MM or YYYY, not "Jan 2020"
       expect(pos.startDate).toMatch(/^\d{4}(-\d{2})?$/);
       if (pos.endDate) {
+        // eslint-disable-next-line vitest/no-conditional-expect
         expect(pos.endDate).toMatch(/^\d{4}(-\d{2})?$/);
       }
     }
@@ -139,7 +140,12 @@ describe("resume markdown", () => {
   });
 
   it.skipIf(!resume)("has all required sections", () => {
-    const required = ["Professional Summary", "Professional Experience", "Education", "Technical Skills"];
+    const required = [
+      "Professional Summary",
+      "Professional Experience",
+      "Education",
+      "Technical Skills",
+    ];
     for (const section of required) {
       expect(resume).toContain(`## ${section}`);
     }
@@ -169,9 +175,7 @@ describe("resume markdown", () => {
 
   it.skipIf(!resume)("includes ATS-relevant keywords for AI engineering roles", () => {
     const keywords = ["AI", "machine learning", "Python", "cloud"];
-    const found = keywords.filter((kw) =>
-      resume!.toLowerCase().includes(kw.toLowerCase())
-    );
+    const found = keywords.filter((kw) => resume!.toLowerCase().includes(kw.toLowerCase()));
     // Should match at least 3/4 keywords
     expect(found.length).toBeGreaterThanOrEqual(3);
   });
@@ -180,10 +184,25 @@ describe("resume markdown", () => {
 
   it.skipIf(!resume)("uses strong action verbs (not passive voice)", () => {
     const actionVerbs = [
-      "Led", "Architected", "Built", "Designed", "Delivered",
-      "Developed", "Implemented", "Managed", "Scaled", "Reduced",
-      "Automated", "Established", "Drove", "Launched", "Created",
-      "Spearheaded", "Engineered", "Orchestrated", "Pioneered",
+      "Led",
+      "Architected",
+      "Built",
+      "Designed",
+      "Delivered",
+      "Developed",
+      "Implemented",
+      "Managed",
+      "Scaled",
+      "Reduced",
+      "Automated",
+      "Established",
+      "Drove",
+      "Launched",
+      "Created",
+      "Spearheaded",
+      "Engineered",
+      "Orchestrated",
+      "Pioneered",
     ];
     const found = actionVerbs.filter((verb) => resume!.includes(verb));
     expect(found.length).toBeGreaterThanOrEqual(5);
@@ -234,6 +253,7 @@ describe("resume markdown", () => {
       if (roleBlocks.length >= 2) {
         const firstRoleBullets = (roleBlocks[0].match(/^- /gm) || []).length;
         const lastRoleBullets = (roleBlocks[roleBlocks.length - 1].match(/^- /gm) || []).length;
+        // eslint-disable-next-line vitest/no-conditional-expect
         expect(firstRoleBullets).toBeGreaterThanOrEqual(lastRoleBullets);
       }
     }

@@ -107,9 +107,13 @@ function exportDocx(markdown: string): void {
 
   try {
     try {
-      execFileSync("pandoc", [tempMd, "-o", PATHS.docxOutput, "--from", "markdown", "--to", "docx"], {
-        stdio: ["pipe", "pipe", "pipe"],
-      });
+      execFileSync(
+        "pandoc",
+        [tempMd, "-o", PATHS.docxOutput, "--from", "markdown", "--to", "docx"],
+        {
+          stdio: ["pipe", "pipe", "pipe"],
+        },
+      );
     } catch (err: unknown) {
       console.error(`      ❌ Pandoc DOCX conversion failed:\n      ${extractStderr(err)}`);
       process.exit(1);
@@ -120,9 +124,7 @@ function exportDocx(markdown: string): void {
       console.error("      ❌ DOCX output is empty (0 bytes)");
       process.exit(1);
     }
-    console.log(
-      `      ✅ DOCX: ${PATHS.docxOutput} (${(stats.size / 1024).toFixed(1)} KB)`
-    );
+    console.log(`      ✅ DOCX: ${PATHS.docxOutput} (${(stats.size / 1024).toFixed(1)} KB)`);
   } finally {
     if (fs.existsSync(tempMd)) fs.unlinkSync(tempMd);
   }
@@ -177,9 +179,7 @@ function exportPdf(markdown: string): void {
       console.error("      ❌ PDF output is empty (0 bytes)");
       process.exit(1);
     }
-    console.log(
-      `      ✅ PDF:  ${PATHS.pdfOutput} (${(stats.size / 1024).toFixed(1)} KB)`
-    );
+    console.log(`      ✅ PDF:  ${PATHS.pdfOutput} (${(stats.size / 1024).toFixed(1)} KB)`);
   } finally {
     if (fs.existsSync(tempMd)) fs.unlinkSync(tempMd);
     if (fs.existsSync(tempTyp)) fs.unlinkSync(tempTyp);
@@ -271,8 +271,8 @@ function updateManifest(format: ExportFormat): void {
       "",
       `- **Latest resume:** \`data/generated/${RESUME_FILE_BASE}.{md,pdf,docx}\``,
       "- **Archive:** `data/generated/versions/` (timestamped copies)",
-      "- **Tag a release:** `git tag -a resume/YYYY-MM-DD -m \"description\"`",
-      "- **List releases:** `git tag -l \"resume/*\"`",
+      '- **Tag a release:** `git tag -a resume/YYYY-MM-DD -m "description"`',
+      '- **List releases:** `git tag -l "resume/*"`',
       "",
       "## Sent To",
       "",
@@ -330,14 +330,11 @@ function main(): void {
   if (needsPandoc) {
     checkBinary(
       "pandoc",
-      "sudo apt-get install -y pandoc\n   Or: https://pandoc.org/installing.html"
+      "sudo apt-get install -y pandoc\n   Or: https://pandoc.org/installing.html",
     );
   }
   if (needsTypst) {
-    checkBinary(
-      "typst",
-      "cargo install typst-cli\n   Or: https://github.com/typst/typst/releases"
-    );
+    checkBinary("typst", "cargo install typst-cli\n   Or: https://github.com/typst/typst/releases");
   }
 
   const markdown = loadAndCleanMarkdown();
@@ -378,8 +375,9 @@ export const _testExports = {
 // ─── Execute ─────────────────────────────────────────────────────────────────
 // Only run when executed directly (not when imported for testing).
 
-const isDirectRun = ["export-resume.ts", "export-resume.js"]
-  .includes(path.basename(process.argv[1] ?? ""));
+const isDirectRun = ["export-resume.ts", "export-resume.js"].includes(
+  path.basename(process.argv[1] ?? ""),
+);
 
 if (isDirectRun) {
   main();

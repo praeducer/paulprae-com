@@ -193,9 +193,13 @@ function validateResumeOutput(markdown: string, careerData: CareerData): string[
   // Check reasonable length (~2 pages ≈ 4000-10000 chars of markdown)
   const charCount = markdown.length;
   if (charCount < 3000) {
-    warnings.push(`Resume appears too short (${charCount.toLocaleString()} chars, expected 4000-10000 for ~2 pages)`);
+    warnings.push(
+      `Resume appears too short (${charCount.toLocaleString()} chars, expected 4000-10000 for ~2 pages)`,
+    );
   } else if (charCount > 12000) {
-    warnings.push(`Resume appears too long (${charCount.toLocaleString()} chars, target is ~2 pages / 4000-10000 chars)`);
+    warnings.push(
+      `Resume appears too long (${charCount.toLocaleString()} chars, target is ~2 pages / 4000-10000 chars)`,
+    );
   }
 
   // Check that recent positions appear in the resume
@@ -221,7 +225,9 @@ function validateResumeOutput(markdown: string, careerData: CareerData): string[
 async function generate(): Promise<GenerationResult> {
   console.log("\n🤖 Resume Generation Pipeline\n");
   console.log(`   Model: ${CLAUDE.model}`);
-  console.log(`   Thinking: adaptive (effort: ${CLAUDE.effort} — Opus 4.6 exclusive, no constraints)`);
+  console.log(
+    `   Thinking: adaptive (effort: ${CLAUDE.effort} — Opus 4.6 exclusive, no constraints)`,
+  );
   console.log(`   Max tokens: ${CLAUDE.maxTokens}\n`);
 
   // Validate API key
@@ -244,7 +250,9 @@ async function generate(): Promise<GenerationResult> {
   const raw = fs.readFileSync(PATHS.careerDataOutput, "utf-8");
   const careerData: CareerData = JSON.parse(raw);
 
-  console.log(`   Career data loaded: ${careerData.positions.length} positions, ${careerData.skills.length} skills\n`);
+  console.log(
+    `   Career data loaded: ${careerData.positions.length} positions, ${careerData.skills.length} skills\n`,
+  );
   console.log("   ⏳ Calling Claude API (this may take 30-90 seconds with max effort)...\n");
 
   // Call Claude Opus 4.6 with adaptive thinking at max effort.
@@ -294,7 +302,9 @@ async function generate(): Promise<GenerationResult> {
   // Warn if output was truncated (thinking can consume the token budget)
   if (response.stop_reason === "max_tokens") {
     console.warn("   ⚠ WARNING: Output was truncated (hit max_tokens limit).");
-    console.warn("   The resume may be incomplete. Consider increasing CLAUDE.maxTokens in lib/config.ts.\n");
+    console.warn(
+      "   The resume may be incomplete. Consider increasing CLAUDE.maxTokens in lib/config.ts.\n",
+    );
   }
 
   // Extract text content and count thinking tokens
@@ -341,8 +351,10 @@ async function generate(): Promise<GenerationResult> {
 
   // Report cache performance if available
   const usage = response.usage as unknown as Record<string, unknown>;
-  const cacheRead = (typeof usage.cache_read_input_tokens === "number" ? usage.cache_read_input_tokens : 0);
-  const cacheCreation = (typeof usage.cache_creation_input_tokens === "number" ? usage.cache_creation_input_tokens : 0);
+  const cacheRead =
+    typeof usage.cache_read_input_tokens === "number" ? usage.cache_read_input_tokens : 0;
+  const cacheCreation =
+    typeof usage.cache_creation_input_tokens === "number" ? usage.cache_creation_input_tokens : 0;
 
   const result: GenerationResult = {
     success: true,
@@ -360,10 +372,14 @@ async function generate(): Promise<GenerationResult> {
   console.log(`      Input tokens: ${result.inputTokens.toLocaleString()}`);
   console.log(`      Output tokens: ${result.outputTokens.toLocaleString()}`);
   if (thinkingTokens > 0) {
-    console.log(`      Thinking: ~${Math.round(thinkingTokens / 4).toLocaleString()} tokens (estimated)`);
+    console.log(
+      `      Thinking: ~${Math.round(thinkingTokens / 4).toLocaleString()} tokens (estimated)`,
+    );
   }
   if (cacheRead > 0 || cacheCreation > 0) {
-    console.log(`      Cache: ${cacheRead.toLocaleString()} read, ${cacheCreation.toLocaleString()} created`);
+    console.log(
+      `      Cache: ${cacheRead.toLocaleString()} read, ${cacheCreation.toLocaleString()} created`,
+    );
   }
   console.log(`      Markdown length: ${result.markdownLength.toLocaleString()} chars`);
   console.log(`      Duration: ${(result.durationMs / 1000).toFixed(1)}s`);
@@ -387,26 +403,25 @@ export const _testExports = {
 // ─── Execute ─────────────────────────────────────────────────────────────────
 // Only run when executed directly (not when imported for testing).
 
-const isDirectRun = ["generate-resume.ts", "generate-resume.js"]
-  .includes(path.basename(process.argv[1] ?? ""));
+const isDirectRun = ["generate-resume.ts", "generate-resume.js"].includes(
+  path.basename(process.argv[1] ?? ""),
+);
 
 if (isDirectRun) {
-
-generate().catch((err) => {
-  console.error("\n❌ Generation failed:\n");
-  if (err instanceof Anthropic.APIError) {
-    console.error(`   API Error: ${err.status} ${err.message}`);
-    if (err.status === 401) {
-      console.error("   Check your ANTHROPIC_API_KEY in .env.local");
-    } else if (err.status === 429) {
-      console.error("   Rate limited. Wait a moment and try again.");
-    } else if (err.status === 529) {
-      console.error("   API overloaded. Wait a moment and try again.");
+  generate().catch((err) => {
+    console.error("\n❌ Generation failed:\n");
+    if (err instanceof Anthropic.APIError) {
+      console.error(`   API Error: ${err.status} ${err.message}`);
+      if (err.status === 401) {
+        console.error("   Check your ANTHROPIC_API_KEY in .env.local");
+      } else if (err.status === 429) {
+        console.error("   Rate limited. Wait a moment and try again.");
+      } else if (err.status === 529) {
+        console.error("   API overloaded. Wait a moment and try again.");
+      }
+    } else {
+      console.error(`   ${err instanceof Error ? err.message : String(err)}`);
     }
-  } else {
-    console.error(`   ${err instanceof Error ? err.message : String(err)}`);
-  }
-  process.exit(1);
-});
-
+    process.exit(1);
+  });
 } // end if (isDirectRun)
