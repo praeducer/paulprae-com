@@ -375,7 +375,22 @@ async function generate(): Promise<GenerationResult> {
   return result;
 }
 
+// ─── Exports for Testing ──────────────────────────────────────────────────────
+
+export const _testExports = {
+  SYSTEM_PROMPT,
+  buildUserMessage,
+  validateResumeOutput,
+  generate,
+};
+
 // ─── Execute ─────────────────────────────────────────────────────────────────
+// Only run when executed directly (not when imported for testing).
+
+const isDirectRun = process.argv[1]?.endsWith("generate-resume.ts") ||
+  process.argv[1]?.endsWith("generate-resume.js");
+
+if (isDirectRun) {
 
 generate().catch((err) => {
   console.error("\n❌ Generation failed:\n");
@@ -393,3 +408,5 @@ generate().catch((err) => {
   }
   process.exit(1);
 });
+
+} // end if (isDirectRun)

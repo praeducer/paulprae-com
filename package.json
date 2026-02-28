@@ -12,7 +12,11 @@
     "export": "tsx scripts/export-resume.ts",
     "export:pdf": "tsx scripts/export-resume.ts --format pdf",
     "export:docx": "tsx scripts/export-resume.ts --format docx",
-    "pipeline": "npm run ingest && npm run generate && npm run export && npm run build"
+    "pipeline": "npm run ingest && npm run generate && npm run export && npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:pipeline": "vitest run tests/pipeline.test.ts",
+    "test:unit": "vitest run tests/ingest.test.ts tests/generate.test.ts tests/export.test.ts tests/config.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
@@ -35,6 +39,7 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.2.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   }
 }

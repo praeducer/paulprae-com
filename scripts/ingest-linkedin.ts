@@ -791,7 +791,45 @@ function ingest(): IngestResult {
   return { success: true, careerData: data, errors, warnings, stats };
 }
 
+// ─── Exports for Testing ──────────────────────────────────────────────────────
+// Functions exported here are used by the test suite. They are not part of the
+// public API — the pipeline is invoked via `npm run ingest`.
+
+export const _testExports = {
+  normalizeDate,
+  normalizeDateOrNull,
+  safeString,
+  stripBOM,
+  normalizePositions,
+  normalizeEducation,
+  normalizeSkills,
+  normalizeCertifications,
+  normalizeProjects,
+  normalizePublications,
+  normalizeProfile,
+  extractEmail,
+  normalizeLanguages,
+  normalizeRecommendations,
+  normalizeHonors,
+  normalizeVolunteering,
+  normalizeCourses,
+  findJsonFiles,
+  isKnowledgeEntry,
+  wrapAsKnowledgeEntry,
+  loadKnowledgeBase,
+  enrichProfileFromKnowledge,
+  extractLinkedInZip,
+  CareerDataSchema,
+  ingest,
+};
+
 // ─── Execute ─────────────────────────────────────────────────────────────────
+// Only run when executed directly (not when imported for testing).
+
+const isDirectRun = process.argv[1]?.endsWith("ingest-linkedin.ts") ||
+  process.argv[1]?.endsWith("ingest-linkedin.js");
+
+if (isDirectRun) {
 
 const result = ingest();
 
@@ -802,3 +840,5 @@ if (!result.success) {
   }
   process.exit(1);
 }
+
+} // end if (isDirectRun)
