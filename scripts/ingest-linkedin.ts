@@ -1,9 +1,9 @@
 /**
  * ingest-linkedin.ts — LinkedIn Data Export → CareerData JSON
  *
- * Scans data/linkedin/ for CSV files, parses them with PapaParse,
+ * Scans data/sources/linkedin/ for CSV files, parses them with PapaParse,
  * normalizes to the CareerData interface, validates with Zod,
- * and writes data/career-data.json.
+ * and writes data/generated/career-data.json.
  *
  * Usage: npm run ingest
  *        npx tsx scripts/ingest-linkedin.ts
@@ -32,6 +32,7 @@ import type {
   CareerVolunteering,
   CareerCourse,
   CareerProfile,
+  KnowledgeEntry,
   LinkedInPosition,
   LinkedInEducation,
   LinkedInSkill,
@@ -293,6 +294,42 @@ function normalizeCourses(rows: LinkedInCourse[]): CareerCourse[] {
     }));
 }
 
+// ─── Knowledge Base Loading ─────────────────────────────────────────────────
+// Reads all .json files from data/sources/knowledge/ and merges them into
+// a flat array of KnowledgeEntry objects. Each file should contain a JSON
+// array of entries. Files named "example.json" are skipped.
+
+function loadKnowledgeBase(): KnowledgeEntry[] {
+  if (!fs.existsSync(PATHS.knowledgeDir)) {
+    return [];
+  }
+
+  const files = fs.readdirSync(PATHS.knowledgeDir)
+    .filter((f) => f.toLowerCase().endsWith(".json") && f.toLowerCase() !== "example.json");
+
+  if (files.length === 0) {
+    return [];
+  }
+
+  const entries: KnowledgeEntry[] = [];
+
+  for (const file of files) {
+    const filePath = path.join(PATHS.knowledgeDir, file);
+    try {
+      const raw = fs.readFileSync(filePath, "utf-8");
+      const parsed = JSON.parse(raw);
+      const items: KnowledgeEntry[] = Array.isArray(parsed) ? parsed : [parsed];
+      entries.push(...items);
+      console.log(`   📄 ${file} → ${items.length} knowledge entries`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`   ⚠ Failed to parse knowledge file ${file}: ${message}`);
+    }
+  }
+
+  return entries;
+}
+
 // ─── Zod Validation Schema ───────────────────────────────────────────────────
 
 const CareerDataSchema = z.object({
@@ -373,6 +410,13 @@ const CareerDataSchema = z.object({
     number: z.string(),
     associatedWith: z.string(),
   })),
+  knowledge: z.array(z.object({
+    category: z.string(),
+    title: z.string(),
+    content: z.string(),
+    tags: z.array(z.string()).optional(),
+    relatedPositions: z.array(z.string()).optional(),
+  })),
 });
 
 // ─── Main Ingestion Pipeline ─────────────────────────────────────────────────
@@ -401,7 +445,7 @@ function ingest(): IngestResult {
 
   if (csvFiles.length === 0) {
     errors.push(
-      "No CSV files found in data/linkedin/.\n   Export your data from LinkedIn → Settings → Data Privacy → Get a copy of your data\n   Select \"Download larger data archive\" and place CSV files in data/linkedin/"
+      "No CSV files found in data/sources/linkedin/.\n   Export your data from LinkedIn → Settings → Data Privacy → Get a copy of your data\n   Select \"Download larger data archive\" and place CSV files in data/sources/linkedin/"
     );
     return { success: false, careerData: null, errors, warnings, stats: { csvFilesFound: 0, csvFilesParsed: 0, positions: 0, education: 0, skills: 0, certifications: 0, projects: 0, publications: 0 } };
   }
@@ -420,6 +464,7 @@ function ingest(): IngestResult {
     honors: [],
     volunteering: [],
     courses: [],
+    knowledge: [],
   };
 
   let csvFilesParsed = 0;
@@ -492,6 +537,13 @@ function ingest(): IngestResult {
 
   console.log("");
 
+  // Load knowledge base
+  const knowledgeEntries = loadKnowledgeBase();
+  if (knowledgeEntries.length > 0) {
+    data.knowledge = knowledgeEntries;
+    console.log(`   📚 Loaded ${knowledgeEntries.length} knowledge base entries\n`);
+  }
+
   // Merge email into profile (after loop so Profile.csv can't overwrite)
   if (extractedEmail) {
     data.profile.email = extractedEmail;
@@ -500,7 +552,7 @@ function ingest(): IngestResult {
   // Check minimum data requirements
   if (data.positions.length === 0 && data.education.length === 0) {
     errors.push(
-      "Insufficient data: no positions and no education records found.\n   Ensure Positions.csv and/or Education.csv are in data/linkedin/\n   Make sure you selected \"Download larger data archive\" when exporting from LinkedIn."
+      "Insufficient data: no positions and no education records found.\n   Ensure Positions.csv and/or Education.csv are in data/sources/linkedin/\n   Make sure you selected \"Download larger data archive\" when exporting from LinkedIn."
     );
   }
 
@@ -559,6 +611,7 @@ function ingest(): IngestResult {
   if (data.honors.length > 0) console.log(`      ${data.honors.length} honors`);
   if (data.volunteering.length > 0) console.log(`      ${data.volunteering.length} volunteering entries`);
   if (data.courses.length > 0) console.log(`      ${data.courses.length} courses`);
+  if (data.knowledge.length > 0) console.log(`      ${data.knowledge.length} knowledge entries`);
   if (data.profile.email) console.log(`      email: ${data.profile.email}`);
   console.log(`\n   📝 Written to: ${PATHS.careerDataOutput}\n`);
 

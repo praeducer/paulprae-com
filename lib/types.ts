@@ -112,9 +112,28 @@ export interface LinkedInEmail {
   "Primary": string;
 }
 
+// ─── A2. Knowledge Base Entry ────────────────────────────────────────────────
+// Curated career context stored in data/sources/knowledge/*.json.
+// Supplements LinkedIn data with achievements, domain expertise, and
+// project details that LinkedIn CSVs don't capture.
+// Committed to git — all content is recruiter-facing (used by Phase 2 RAG).
+
+export interface KnowledgeEntry {
+  /** Category for grouping: "achievement", "project-detail", "domain-expertise", "metric", "leadership" */
+  category: string;
+  /** Short title for the entry */
+  title: string;
+  /** Detailed content — can include quantified impact, STAR-method narratives, etc. */
+  content: string;
+  /** Tags for filtering and RAG retrieval (e.g., ["ai", "healthcare", "leadership"]) */
+  tags?: string[];
+  /** Company or role names this entry relates to (for merging with positions) */
+  relatedPositions?: string[];
+}
+
 // ─── B. Normalized CareerData ────────────────────────────────────────────────
 // The canonical intermediate representation per TDD §5.1.
-// Written to data/career-data.json by ingest, consumed by generate.
+// Written to data/generated/career-data.json by ingest, consumed by generate.
 
 export interface CareerProfile {
   name: string;
@@ -216,6 +235,8 @@ export interface CareerData {
   honors: CareerHonor[];
   volunteering: CareerVolunteering[];
   courses: CareerCourse[];
+  /** Curated knowledge base entries from data/sources/knowledge/*.json */
+  knowledge: KnowledgeEntry[];
 }
 
 // ─── C. Pipeline Result Types ────────────────────────────────────────────────

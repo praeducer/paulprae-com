@@ -25,7 +25,7 @@ These items were identified during QA but deferred. Complete them before deploym
 **Status:** Pipeline code is complete and tested with synthetic data. Never run with real LinkedIn export.
 
 **Steps:**
-1. Confirm the user has placed their LinkedIn CSV export files in `data/linkedin/`. Expected files (all optional except `positions.csv` and `profile.csv`):
+1. Confirm the user has placed their LinkedIn CSV export files in `data/sources/linkedin/`. Expected files (all optional except `positions.csv` and `profile.csv`):
    - `Positions.csv`, `Education.csv`, `Skills.csv`, `Certifications.csv`
    - `Projects.csv`, `Publications.csv`, `Profile.csv`, `Languages.csv`
    - `Recommendations_Received.csv`, `Honors.csv`, `Volunteering.csv`
@@ -33,14 +33,14 @@ These items were identified during QA but deferred. Complete them before deploym
    - Note: LinkedIn exports use Title Case filenames; the ingestion script lowercases for matching via `LINKEDIN_CSV_FILES` in `lib/config.ts`
 2. Confirm the user has set `ANTHROPIC_API_KEY` in `.env.local`
 3. Run `npm run ingest` and verify:
-   - `data/career-data.json` is created with populated fields
+   - `data/generated/career-data.json` is created with populated fields
    - All CSV files are parsed without errors
    - Date normalization produces consistent "Mon YYYY" format
    - Email extraction picks the correct primary email
    - No warnings about unknown CSV files (or if there are, they're expected)
 4. Run `npm run generate` and verify:
    - Claude Opus 4.6 returns a complete resume (stop_reason: "end_turn", not "max_tokens")
-   - `content/resume.md` contains properly formatted markdown
+   - `data/generated/resume.md` contains properly formatted markdown
    - Generation metadata header is present (timestamp, model, token count)
    - Resume follows brand voice guidelines (confident, action-oriented, quantified impact)
    - Resume is approximately 2 pages when rendered
@@ -63,7 +63,7 @@ These items were identified during QA but deferred. Complete them before deploym
 
 ### 1.2 Knowledge Base Integration (Optional Enhancement)
 
-**Status:** The ingestion script references `data/knowledge/` but knowledge base JSON parsing is not yet implemented.
+**Status:** The ingestion script references `data/sources/knowledge/` but knowledge base JSON parsing is not yet implemented.
 
 **Decision needed:** Should knowledge base JSONs be integrated now (Phase 1.1) or deferred to Phase 2?
 
@@ -79,7 +79,7 @@ These items were identified during QA but deferred. Complete them before deploym
    }
    ```
 2. Add knowledge base loading to `scripts/ingest-linkedin.ts`:
-   - Read all `.json` files from `data/knowledge/`
+   - Read all `.json` files from `data/sources/knowledge/`
    - Validate against schema
    - Merge into `CareerData` (add a `knowledge` array field)
 3. Update the system prompt in `scripts/generate-resume.ts` to instruct Claude how to incorporate knowledge base entries (supplement LinkedIn data, don't duplicate)
@@ -139,7 +139,7 @@ The Phase 1 deployment workflow is:
 1. npm run pipeline
    (ingest → generate → build)
 
-2. git add content/resume.md
+2. git add data/generated/resume.md
    git commit
    git push origin main ──────────→ push event ──────────→ auto-build
                                                            npm run build
@@ -148,7 +148,7 @@ The Phase 1 deployment workflow is:
 3.                                                        paulprae.com ✅
 ```
 
-**Key point:** `npm run generate` (which calls the Claude API) runs LOCALLY, not on Vercel. The generated `content/resume.md` is committed to git. Vercel only runs `npm run build` which reads the pre-generated markdown. This means:
+**Key point:** `npm run generate` (which calls the Claude API) runs LOCALLY, not on Vercel. The generated `data/generated/resume.md` is committed to git. Vercel only runs `npm run build` which reads the pre-generated markdown. This means:
 - No `ANTHROPIC_API_KEY` needed on Vercel
 - No API costs on every deploy
 - Deterministic builds (same markdown → same HTML)
@@ -323,7 +323,7 @@ npm run build    # Confirm clean build
 
 ### Step 2: Data Readiness Check
 Ask the user:
-1. "Have you placed your LinkedIn CSV export files in `data/linkedin/`?"
+1. "Have you placed your LinkedIn CSV export files in `data/sources/linkedin/`?"
 2. "Have you set `ANTHROPIC_API_KEY` in `.env.local`?"
 3. "Do you want to include knowledge base JSON files, or proceed with LinkedIn data only?"
 
@@ -344,7 +344,7 @@ Open `http://localhost:3000` and verify:
 
 ### Step 5: Commit Generated Resume
 ```bash
-git add content/resume.md
+git add data/generated/resume.md
 git commit -m "feat: generate resume from real LinkedIn data via Claude Opus 4.6"
 ```
 

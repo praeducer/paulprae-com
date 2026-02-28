@@ -194,22 +194,6 @@ else
     ok "npm dependencies installed"
 fi
 
-# ─── Generate reference.docx (if missing) ────────────────────────────────────
-
-REFERENCE_DOCX="$PROJECT_ROOT/templates/reference.docx"
-if [[ -f "$REFERENCE_DOCX" ]]; then
-    skip "templates/reference.docx exists"
-else
-    if command -v pandoc &>/dev/null; then
-        info "Generating templates/reference.docx from pandoc defaults..."
-        mkdir -p "$PROJECT_ROOT/templates"
-        pandoc -o "$REFERENCE_DOCX" --print-default-data-file reference.docx
-        ok "templates/reference.docx created — customize in Word/LibreOffice for professional styling"
-    else
-        skip "pandoc not available — skipping reference.docx generation"
-    fi
-fi
-
 # ─── Summary ──────────────────────────────────────────────────────────────────
 
 echo ""

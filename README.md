@@ -64,8 +64,8 @@ cp .env.local.example .env.local
 # Edit .env.local and add your ANTHROPIC_API_KEY
 
 # Add your LinkedIn data exports
-# Drop CSV files into data/linkedin/
-# Drop knowledge base JSONs into data/knowledge/
+# Drop CSV files into data/sources/linkedin/
+# Drop knowledge base JSONs into data/sources/knowledge/
 ```
 
 ### Run the Pipeline
@@ -76,7 +76,7 @@ npm run pipeline
 
 # Or run steps individually:
 npm run ingest      # Parse LinkedIn CSVs + knowledge JSONs → career-data.json
-npm run generate    # Call Claude API → content/resume.md
+npm run generate    # Call Claude API → data/generated/resume.md
 npm run export      # Convert to PDF + DOCX (requires pandoc + typst)
 npm run export:pdf  # PDF only
 npm run export:docx # DOCX only
@@ -103,13 +103,13 @@ The site auto-deploys to Vercel on every push to `main`:
 paulprae-com/
 ├── app/                    # Next.js App Router pages and layouts
 ├── components/             # Reusable React components
-├── content/                # Generated content (resume.md)
 ├── data/
-│   ├── linkedin/           # LinkedIn CSV exports (gitignored)
-│   └── knowledge/          # Knowledge base JSONs (gitignored)
+│   ├── sources/
+│   │   ├── linkedin/       # LinkedIn CSV exports (gitignored — may contain unparsed columns)
+│   │   └── knowledge/      # Knowledge base JSONs (committed — recruiter-facing content)
+│   └── generated/          # Pipeline output: career-data.json + resume.md (committed), PDF + DOCX (gitignored)
 ├── docs/                   # Technical documentation and design docs
-├── scripts/                # Build pipeline scripts (ingest, generate, export)
-├── templates/              # Export templates (resume.typ, reference.docx)
+├── scripts/                # Build pipeline + export scripts + resume-pdf.typ stylesheet
 ├── lib/                    # Shared utilities and TypeScript types
 ├── public/                 # Static assets (favicon, OG image)
 ├── .env.local.example      # Environment variable template

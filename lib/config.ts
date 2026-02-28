@@ -13,13 +13,13 @@ import path from "path";
 const ROOT = process.cwd();
 
 export const PATHS = {
-  linkedinDir: path.join(ROOT, "data", "linkedin"),
-  knowledgeDir: path.join(ROOT, "data", "knowledge"),
-  careerDataOutput: path.join(ROOT, "data", "career-data.json"),
-  resumeOutput: path.join(ROOT, "content", "resume.md"),
-  pdfOutput: path.join(ROOT, "out", "resume.pdf"),
-  docxOutput: path.join(ROOT, "out", "resume.docx"),
-  templatesDir: path.join(ROOT, "templates"),
+  linkedinDir: path.join(ROOT, "data", "sources", "linkedin"),
+  knowledgeDir: path.join(ROOT, "data", "sources", "knowledge"),
+  careerDataOutput: path.join(ROOT, "data", "generated", "career-data.json"),
+  resumeOutput: path.join(ROOT, "data", "generated", "resume.md"),
+  pdfOutput: path.join(ROOT, "data", "generated", "resume.pdf"),
+  docxOutput: path.join(ROOT, "data", "generated", "resume.docx"),
+  pdfStylesheet: path.join(ROOT, "scripts", "resume-pdf.typ"),
   envFile: path.join(ROOT, ".env.local"),
 } as const;
 

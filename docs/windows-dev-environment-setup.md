@@ -52,11 +52,11 @@ Track all development machines here to maintain parity. See [Cross-Machine Parit
 | **Storage** | ~1.89 TB NVMe |
 | **OS** | Windows 11 Pro for Workstations |
 | **WSL** | WSL2, Ubuntu 24.04 LTS |
-| **Dev Drive** | D: — 250 GB VHDX (dynamically expanding), ReFS, labeled "DevDrive" — **pending creation** |
+| **Dev Drive** | D: — 250 GB VHDX (dynamically expanding), ReFS, labeled "DevDrive" |
 | **Additional software** | CUDA Toolkit, NVIDIA Container Toolkit, Docker Desktop, Neo4j Desktop, Ollama, Open WebUI |
 | **Related repo** | [my-local-ai-env](https://github.com/praeducer/my-local-ai-env) — local AI stack (separate from paulprae-com) |
 | **Setup date** | 2026-02-27 |
-| **Setup status** | In progress — Dev Drive pending, WSL configured, git config set |
+| **Setup status** | In progress — Dev Drive created, WSL configured, git config set |
 
 > **Machine-specific details** (hostnames, usernames, OS build numbers, exact versions) are stored locally in `machine-inventory.local.md` (gitignored). See [Cross-Machine Parity](#8-cross-machine-parity).
 

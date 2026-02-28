@@ -1,12 +1,13 @@
-// resume.typ — Professional Typst template for Pandoc-generated resume
+// resume-pdf.typ — Typst stylesheet for PDF resume export
 //
-// This template is applied when Pandoc converts Markdown → Typst.
-// Pandoc generates Typst markup from resume.md, and this template
-// controls the visual styling of the compiled PDF.
+// This stylesheet controls visual presentation (fonts, margins, heading
+// hierarchy, colors) when the Markdown resume is compiled to PDF.
+// Pandoc generates Typst markup from resume.md, this file is prepended
+// to style it, then Typst compiles the result to PDF.
 //
-// Usage (called automatically by scripts/export-resume.ts):
-//   pandoc content/resume.md -o /tmp/resume.typ --to typst
-//   typst compile /tmp/resume.typ out/resume.pdf --font-path templates/
+// Co-located with export-resume.ts which invokes it.
+// To change resume CONTENT or STRUCTURE, edit scripts/generate-resume.ts.
+// To change PDF VISUAL STYLE, edit this file.
 
 // ─── Page Setup ──────────────────────────────────────────────────────────────
 

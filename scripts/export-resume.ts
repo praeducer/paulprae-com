@@ -94,13 +94,8 @@ function exportDocx(markdown: string): void {
   fs.writeFileSync(tempMd, markdown, "utf-8");
 
   try {
-    const referenceDocx = path.join(PATHS.templatesDir, "reference.docx");
-    const referenceFlag = fs.existsSync(referenceDocx)
-      ? `--reference-doc="${referenceDocx}"`
-      : "";
-
     execSync(
-      `pandoc "${tempMd}" -o "${PATHS.docxOutput}" ${referenceFlag} --from markdown --to docx`,
+      `pandoc "${tempMd}" -o "${PATHS.docxOutput}" --from markdown --to docx`,
       { stdio: "pipe" }
     );
 
@@ -118,7 +113,7 @@ function exportPdf(markdown: string): void {
 
   const tempMd = path.join(path.dirname(PATHS.pdfOutput), "_resume_tmp.md");
   const tempTyp = path.join(path.dirname(PATHS.pdfOutput), "_resume_tmp.typ");
-  const templateTyp = path.join(PATHS.templatesDir, "resume.typ");
+  const templateTyp = PATHS.pdfStylesheet;
 
   fs.writeFileSync(tempMd, markdown, "utf-8");
 

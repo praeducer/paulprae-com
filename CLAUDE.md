@@ -33,21 +33,20 @@
 ## File Organization
 
 ```
-app/            → Next.js App Router pages and layouts
-components/     → Reusable React components (resume-renderer, etc.)
-content/        → Generated content (resume.md) — DO NOT EDIT DIRECTLY
-data/linkedin/  → LinkedIn CSV exports (gitignored, sensitive PII)
-data/knowledge/ → Knowledge base JSONs (gitignored, personal content)
-scripts/        → Build pipeline scripts (ingest-linkedin.ts, generate-resume.ts, export-resume.ts)
-templates/      → Export templates (resume.typ for PDF, reference.docx for DOCX)
-lib/            → Shared utilities, TypeScript interfaces (types.ts), pipeline config
-public/         → Static assets (favicon, OG image)
-docs/           → Technical documentation and architecture docs
+app/                   → Next.js App Router pages and layouts
+components/            → Reusable React components
+data/sources/linkedin/ → LinkedIn CSV exports (gitignored — raw exports may contain unparsed columns)
+data/sources/knowledge/→ Knowledge base JSONs (committed — recruiter-facing content for Phase 2 RAG)
+data/generated/        → Pipeline outputs: career-data.json + resume.md (committed), PDF + DOCX (gitignored)
+scripts/               → Pipeline scripts (ingest, generate, export) + resume-pdf.typ stylesheet
+lib/                   → Shared utilities, TypeScript interfaces, pipeline config
+public/                → Static assets (favicon, OG image)
+docs/                  → Technical documentation and architecture docs
 ```
 
 ## Critical Rules
 
-1. **content/resume.md is GENERATED** — To change resume output, edit `scripts/generate-resume.ts` (the prompt, formatting instructions, or data processing). Never edit resume.md directly — it gets overwritten by the pipeline.
+1. **data/generated/resume.md is GENERATED** — To change resume output, edit `scripts/generate-resume.ts` (the prompt, formatting instructions, or data processing). Never edit resume.md directly — it gets overwritten by the pipeline.
 
 2. **Static export mode** — Phase 1 uses `output: 'export'`. This means:
    - No API routes (`app/api/` will not work)
@@ -63,7 +62,7 @@ docs/           → Technical documentation and architecture docs
 
 4. **Environment variables** — `ANTHROPIC_API_KEY` in `.env.local` (never committed). Used only by build scripts, not by the Next.js runtime.
 
-5. **Data files are gitignored** — LinkedIn CSVs and knowledge base JSONs contain personal data. Only `.gitkeep` files are tracked. Users must add their own data files.
+5. **Data committal policy** — All pipeline data is recruiter-facing content, so most is committed to git for portability across machines. Only LinkedIn CSV raw exports are gitignored (may contain unparsed columns). Knowledge base JSONs, career-data.json, and resume.md are all committed. PDF/DOCX are gitignored as regenerable binary artifacts. **Principle:** if data can't be public, it shouldn't be in the data model — this pipeline generates content sent to strangers.
 
 ## Brand Voice Guidelines
 
@@ -86,9 +85,9 @@ When generating resume content or any copy for paulprae.com, follow these guidel
 The build pipeline transforms raw career data into a deployed site:
 
 ```
-1. npm run ingest    → Parse LinkedIn CSVs + knowledge JSONs → data/career-data.json
-2. npm run generate  → Load career data → Claude API (Opus 4.6) → content/resume.md
-3. npm run export    → Pandoc + Typst convert resume.md → out/resume.pdf + out/resume.docx
+1. npm run ingest    → Parse LinkedIn CSVs + knowledge JSONs → data/generated/career-data.json
+2. npm run generate  → Load career data → Claude API (Opus 4.6) → data/generated/resume.md
+3. npm run export    → Pandoc + Typst convert resume.md → data/generated/resume.pdf + .docx
 4. npm run build     → Next.js reads resume.md at build time → static HTML in out/
 5. git push          → Vercel auto-deploys from main branch
 ```

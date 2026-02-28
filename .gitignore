@@ -21,19 +21,22 @@ build/
 .env.test.local
 .env.production.local
 
-# Sensitive data — LinkedIn exports contain PII
-data/linkedin/*.csv
+# Pipeline: raw LinkedIn exports (may contain unparsed columns beyond our schema)
+data/sources/linkedin/*.csv
+
+# Pipeline: binary build artifacts (regenerable via npm run export)
+data/generated/resume.pdf
+data/generated/resume.docx
+
+# Pipeline files that ARE committed:
+#   data/sources/knowledge/*.json  — curated career knowledge (recruiter-facing, used by Phase 2 RAG)
+#   data/generated/career-data.json — canonical career data model (portable across machines)
+#   data/generated/resume.md       — AI-generated resume (consumed by Next.js build + Vercel deploy)
+
 # Machine-specific inventory (hostnames, usernames, build numbers)
 machine-inventory.local.md
 *.local.md
 !.env.local.example
-data/knowledge/*.json
-data/career-data.json
-data/**/*.pdf
-
-# Generated content (re-generate via pipeline)
-# Uncomment if you want to exclude generated resume from git:
-# content/resume.md
 
 # OS files
 .DS_Store

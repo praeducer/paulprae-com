@@ -19,15 +19,15 @@ Accept a job description URL or text as input, extract requirements, and generat
 - Add `--job-url <url>` flag to `scripts/generate-resume.ts`
 - Fetch and parse the JD (or accept `--job-text` for pasted content)
 - Pass JD requirements as additional context to the generation prompt
-- Output to `content/resume-tailored.md` (separate from the default resume)
-- Export tailored versions to `out/resume-tailored.pdf` and `out/resume-tailored.docx`
+- Output to `data/generated/resume-tailored.md` (separate from the default resume)
+- Export tailored versions to `data/generated/resume-tailored.pdf` and `data/generated/resume-tailored.docx`
 
 ### Pipeline Metrics & Observability
 Log each pipeline step's metrics to structured JSON for cost tracking and optimization.
 - Tokens used (input + output) and estimated cost per generation
 - Latency per step (ingest, generate, export, build)
 - File sizes of outputs
-- Write to `data/pipeline-metrics.json` (gitignored)
+- Write to `data/generated/pipeline-metrics.json` (gitignored)
 
 ---
 
@@ -80,9 +80,5 @@ Export `career-data.json` in [JSON Resume](https://jsonresume.org/) format for i
 ### Orchestration Tooling
 The pipeline (ingest → generate → export → build) is 4 linear steps. Dagster, Prefect, and n8n are overkill at this scale. A single TypeScript orchestrator script with error handling and retry logic is sufficient through Phase 2. Revisit in Phase 3 if the knowledge graph pipeline adds 10+ steps with branching dependencies.
 
-### Reference DOCX Template
-The `templates/reference.docx` file should be generated and customized once pandoc is installed:
-```bash
-pandoc -o templates/reference.docx --print-default-data-file reference.docx
-```
-Then open in Word/LibreOffice and customize heading styles, fonts (Inter or similar professional sans-serif), and spacing to match the Typst PDF output.
+### DOCX Styling
+Pandoc's default DOCX output is professional and ATS-friendly. If custom DOCX styling is ever needed, generate a reference doc with `pandoc -o reference.docx --print-default-data-file reference.docx`, customize in Word/LibreOffice, and pass via `--reference-doc` flag in `scripts/export-resume.ts`.

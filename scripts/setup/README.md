@@ -11,7 +11,7 @@ For project installation (npm install, env vars, running the app), see the [proj
 |---|---|---|---|
 | `install-dev-tools.ps1` | Windows | Installs Git, Node.js, VS Code, GitHub CLI, Pandoc, Typst, Vercel CLI, Claude Code via [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) and npm | Fresh Windows machine, before anything else |
 | `setup-dev-drive.ps1` | Windows | Creates `D:\dev` and `D:\packages\*` directories, redirects package caches, configures [Dev Drive filters](https://learn.microsoft.com/en-us/windows/dev-drive/#filters-for-common-scenarios) | After creating Dev Drive via Windows Settings |
-| `install-pipeline-deps.sh` | Linux/macOS/WSL | Installs pandoc, typst, Node.js (via nvm), npm dependencies, and generates reference.docx template. Prompts before running remote bootstrap script for nvm. | Fresh Linux/WSL machine, or after cloning |
+| `install-pipeline-deps.sh` | Linux/macOS/WSL | Installs pandoc, typst, Node.js (via nvm), and npm dependencies. Prompts before running remote bootstrap script for nvm. | Fresh Linux/WSL machine, or after cloning |
 
 ## Usage
 
