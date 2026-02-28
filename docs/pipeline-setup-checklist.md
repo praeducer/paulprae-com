@@ -16,7 +16,7 @@ Before starting, ensure you have:
 
 If running from WSL with Claude Code, all `npm` commands should be run via:
 ```bash
-wsl bash -lc "source ~/.nvm/nvm.sh && cd /home/praeducer/dev/paulprae-com && <command>"
+wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/dev/paulprae-com && <command>"
 ```
 
 ---
@@ -200,4 +200,4 @@ The knowledge base (`data/sources/knowledge/`) is committed to git, so it transf
 | `API Error: 401` | Check your API key in `.env.local` |
 | `API Error: 429` | Rate limited — wait 60 seconds and retry |
 | `pandoc not found` | Install per step 6, or skip export step |
-| UNC path / CMD.EXE errors | Run via WSL: `wsl bash -lc "source ~/.nvm/nvm.sh && cd /home/praeducer/dev/paulprae-com && npm run pipeline"` |
+| UNC path / CMD.EXE errors | Run via WSL: `wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/dev/paulprae-com && npm run pipeline"` |
