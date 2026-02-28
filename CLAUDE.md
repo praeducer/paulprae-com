@@ -40,7 +40,7 @@ app/                   → Next.js App Router pages and layouts
 components/            → Reusable React components
 data/sources/linkedin/ → LinkedIn CSV exports (gitignored — raw exports may contain unparsed columns)
 data/sources/knowledge/→ Knowledge base JSONs (committed — recruiter-facing content for Phase 2 RAG)
-data/generated/        → Pipeline outputs: career-data.json + resume.md (committed), PDF + DOCX (gitignored)
+data/generated/        → Pipeline outputs: career-data.json + Paul-Prae-Resume.md (committed), PDF + DOCX (gitignored)
 scripts/               → Pipeline scripts (ingest, generate, export) + resume-pdf.typ stylesheet
 lib/                   → Shared utilities: config.ts, types.ts, markdown.ts, knowledge-types.ts
 tests/                 → Unit and integration tests (Vitest)
@@ -50,7 +50,7 @@ docs/                  → Technical documentation and architecture docs
 
 ## Critical Rules
 
-1. **data/generated/resume.md is GENERATED** — To change resume output, edit `scripts/generate-resume.ts` (the prompt, formatting instructions, or data processing). Never edit resume.md directly — it gets overwritten by the pipeline.
+1. **data/generated/Paul-Prae-Resume.md is GENERATED** — To change resume output, edit `scripts/generate-resume.ts` (the prompt, formatting instructions, or data processing). Never edit the resume markdown directly — it gets overwritten by the pipeline. The filename is derived from `career-data.json` (profile.name → "Paul-Prae-Resume").
 
 2. **Static export mode** — Phase 1 uses `output: 'export'`. This means:
    - No API routes (`app/api/` will not work)
@@ -66,7 +66,7 @@ docs/                  → Technical documentation and architecture docs
 
 4. **Environment variables** — `ANTHROPIC_API_KEY` in `.env.local` (never committed). Used only by build scripts, not by the Next.js runtime.
 
-5. **Data committal policy** — All pipeline data is recruiter-facing content, so most is committed to git for portability across machines. Only LinkedIn CSV raw exports are gitignored (may contain unparsed columns). Knowledge base JSONs, career-data.json, and resume.md are all committed. PDF/DOCX are gitignored as regenerable binary artifacts. **Principle:** if data can't be public, it shouldn't be in the data model — this pipeline generates content sent to strangers.
+5. **Data committal policy** — All pipeline data is recruiter-facing content, so most is committed to git for portability across machines. Only LinkedIn CSV raw exports are gitignored (may contain unparsed columns). Knowledge base JSONs, career-data.json, and the resume markdown are all committed. PDF/DOCX are gitignored as regenerable binary artifacts. **Principle:** if data can't be public, it shouldn't be in the data model — this pipeline generates content sent to strangers.
 
 ## Brand Voice Guidelines
 
@@ -90,9 +90,9 @@ The build pipeline transforms raw career data into a deployed site:
 
 ```
 1. npm run ingest    → Parse LinkedIn CSVs + knowledge JSONs → data/generated/career-data.json
-2. npm run generate  → Load career data → Claude API (Opus 4.6) → data/generated/resume.md
-3. npm run export    → Pandoc + Typst convert resume.md → data/generated/resume.pdf + .docx
-4. npm run build     → Next.js reads resume.md at build time → static HTML in out/
+2. npm run generate  → Load career data → Claude API (Opus 4.6) → data/generated/Paul-Prae-Resume.md
+3. npm run export    → Pandoc + Typst convert → data/generated/Paul-Prae-Resume.pdf + .docx
+4. npm run build     → Next.js reads Paul-Prae-Resume.md at build time → static HTML in out/
 5. git push          → Vercel auto-deploys from main branch
 ```
 
@@ -107,7 +107,7 @@ npm run dev         # Local dev server with Turbopack (hot reload)
 npm run build       # Production build (static export to out/)
 npm run start       # Serve production build locally
 npm run ingest      # Parse LinkedIn data → career-data.json
-npm run generate    # Generate resume via Claude API → resume.md
+npm run generate    # Generate resume via Claude API → Paul-Prae-Resume.md
 npm run export      # Export resume to PDF + DOCX (requires pandoc + typst)
 npm run export:pdf  # Export PDF only
 npm run export:docx # Export DOCX only

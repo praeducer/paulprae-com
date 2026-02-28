@@ -13,7 +13,19 @@
 
 import { describe, it, expect } from "vitest";
 import path from "path";
-import { PATHS, KNOWLEDGE_PATHS, CLAUDE, LINKEDIN_CSV_FILES } from "../lib/config.js";
+import { PATHS, KNOWLEDGE_PATHS, CLAUDE, LINKEDIN_CSV_FILES, RESUME_FILE_BASE } from "../lib/config.js";
+
+describe("RESUME_FILE_BASE", () => {
+  it("is a non-empty string ending with 'Resume'", () => {
+    expect(RESUME_FILE_BASE).toBeTruthy();
+    expect(RESUME_FILE_BASE).toMatch(/Resume$/);
+  });
+
+  it("uses hyphen-separated name when career data exists", () => {
+    // In this repo, career-data.json exists with profile.name = "Paul Prae"
+    expect(RESUME_FILE_BASE).toBe("Paul-Prae-Resume");
+  });
+});
 
 describe("PATHS", () => {
   it("resolves all paths relative to cwd", () => {
@@ -21,13 +33,25 @@ describe("PATHS", () => {
     expect(PATHS.linkedinDir).toBe(path.join(root, "data", "sources", "linkedin"));
     expect(PATHS.knowledgeDir).toBe(path.join(root, "data", "sources", "knowledge"));
     expect(PATHS.careerDataOutput).toBe(path.join(root, "data", "generated", "career-data.json"));
-    expect(PATHS.resumeOutput).toBe(path.join(root, "data", "generated", "resume.md"));
-    expect(PATHS.pdfOutput).toBe(path.join(root, "data", "generated", "resume.pdf"));
-    expect(PATHS.docxOutput).toBe(path.join(root, "data", "generated", "resume.docx"));
     expect(PATHS.pdfStylesheet).toBe(path.join(root, "scripts", "resume-pdf.typ"));
     expect(PATHS.versionsDir).toBe(path.join(root, "data", "generated", "versions"));
     expect(PATHS.versionsManifest).toBe(path.join(root, "data", "generated", "VERSIONS.md"));
     expect(PATHS.envFile).toBe(path.join(root, ".env.local"));
+  });
+
+  it("uses recruiter-friendly naming convention for resume outputs", () => {
+    // Resume files follow the Name-Resume.{ext} convention
+    expect(path.basename(PATHS.resumeOutput)).toBe(`${RESUME_FILE_BASE}.md`);
+    expect(path.basename(PATHS.pdfOutput)).toBe(`${RESUME_FILE_BASE}.pdf`);
+    expect(path.basename(PATHS.docxOutput)).toBe(`${RESUME_FILE_BASE}.docx`);
+  });
+
+  it("places resume outputs in data/generated/", () => {
+    const root = process.cwd();
+    const generatedDir = path.join(root, "data", "generated");
+    expect(path.dirname(PATHS.resumeOutput)).toBe(generatedDir);
+    expect(path.dirname(PATHS.pdfOutput)).toBe(generatedDir);
+    expect(path.dirname(PATHS.docxOutput)).toBe(generatedDir);
   });
 });
 

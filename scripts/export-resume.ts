@@ -1,5 +1,5 @@
 /**
- * export-resume.ts — Convert resume.md to PDF and DOCX formats
+ * export-resume.ts — Convert resume markdown to PDF and DOCX formats
  *
  * Uses Pandoc (MD → DOCX) and Pandoc + Typst (MD → PDF) to produce
  * recruiter-friendly export formats from the AI-generated Markdown resume.
@@ -18,7 +18,7 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { execFileSync } from "child_process";
-import { PATHS } from "../lib/config.js";
+import { PATHS, RESUME_FILE_BASE } from "../lib/config.js";
 import { stripHtmlComments } from "../lib/markdown.js";
 
 // ─── CLI Argument Parsing ────────────────────────────────────────────────────
@@ -188,8 +188,8 @@ function exportPdf(markdown: string): void {
 
 // ─── Version Archival ──────────────────────────────────────────────────────
 // After exporting, archive timestamped copies to data/generated/versions/.
-// Filename format: resume-YYYY-MM-DD-<git-sha>.{ext}
-// This provides: chronological sorting, git traceability, and easy retrieval.
+// Filename format: Paul-Prae-Resume-YYYY-MM-DD-<git-sha>.{ext}
+// This provides: candidate identification, chronological sorting, git traceability.
 
 function getGitSha(): string {
   try {
@@ -206,7 +206,7 @@ function archiveVersions(format: ExportFormat): void {
 
   const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
   const sha = getGitSha();
-  const prefix = `resume-${date}-${sha}`;
+  const prefix = `${RESUME_FILE_BASE}-${date}-${sha}`;
 
   const filesToArchive: Array<{ src: string; ext: string }> = [];
 
@@ -237,7 +237,7 @@ function updateManifest(format: ExportFormat): void {
   const date = new Date().toISOString().slice(0, 10);
   const sha = getGitSha();
   const timestamp = new Date().toISOString();
-  const prefix = `resume-${date}-${sha}`;
+  const prefix = `${RESUME_FILE_BASE}-${date}-${sha}`;
 
   // Collect file sizes
   const sizes: string[] = [];
@@ -269,7 +269,7 @@ function updateManifest(format: ExportFormat): void {
       "",
       "## How to use",
       "",
-      "- **Latest resume:** `data/generated/resume.{md,pdf,docx}`",
+      `- **Latest resume:** \`data/generated/${RESUME_FILE_BASE}.{md,pdf,docx}\``,
       "- **Archive:** `data/generated/versions/` (timestamped copies)",
       "- **Tag a release:** `git tag -a resume/YYYY-MM-DD -m \"description\"`",
       "- **List releases:** `git tag -l \"resume/*\"`",

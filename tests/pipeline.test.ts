@@ -1,8 +1,8 @@
 /**
  * Pipeline integration & content quality tests.
  *
- * These tests validate REAL pipeline outputs (career-data.json, resume.md,
- * resume.pdf, resume.docx) when they exist on disk. They are designed to:
+ * These tests validate REAL pipeline outputs (career-data.json, resume markdown,
+ * resume PDF, resume DOCX) when they exist on disk. They are designed to:
  *
  * 1. Run fast — no API calls, just file reads and assertions
  * 2. Run after `npm run pipeline` to validate all outputs
@@ -17,12 +17,12 @@
  *
  * Lessons learned from pipeline development:
  * - career-data.json must have 16+ positions and 70+ skills (Paul's real data)
- * - resume.md must be 4000-10000 chars for ~2 page length
+ * - Resume markdown must be 4000-10000 chars for ~2 page length
  * - Resume must include recent employers (Arine, etc.) to be accurate
  * - PDF should be 40-200 KB; DOCX should be 10-100 KB
  * - Knowledge base should contribute 25+ entries
  * - Profile must have linkedin, website, email populated (from knowledge base)
- * - HTML comments in resume.md must be stripped for web rendering
+ * - HTML comments in resume markdown must be stripped for web rendering
  */
 
 import { describe, it, expect } from "vitest";
@@ -124,7 +124,7 @@ describe("career-data.json", () => {
 // Validates the AI-generated resume meets quality standards.
 // This is the most important test group — it catches resume quality regressions.
 
-describe("resume.md", () => {
+describe("resume markdown", () => {
   const raw = skipIfMissing(PATHS.resumeOutput) as string | null;
   const resume = raw ? stripHtmlComments(raw) : null;
 
@@ -253,7 +253,7 @@ describe("resume.md", () => {
 // ─── Export Output Validation ───────────────────────────────────────────────
 // Validates PDF and DOCX exist and are reasonably sized.
 
-describe("resume.pdf", () => {
+describe("resume PDF", () => {
   const exists = fileExists(PATHS.pdfOutput);
 
   it.skipIf(!exists)("exists and is not empty", () => {
@@ -269,7 +269,7 @@ describe("resume.pdf", () => {
   });
 });
 
-describe("resume.docx", () => {
+describe("resume DOCX", () => {
   const exists = fileExists(PATHS.docxOutput);
 
   it.skipIf(!exists)("exists and is not empty", () => {

@@ -2,7 +2,7 @@
 
 ## How to use
 
-- **Latest resume:** `data/generated/resume.{md,pdf,docx}`
+- **Latest resume:** `data/generated/Paul-Prae-Resume.{md,pdf,docx}`
 - **Archive:** `data/generated/versions/` (timestamped copies)
 - **Tag a release:** `git tag -a resume/YYYY-MM-DD -m "description"`
 - **List releases:** `git tag -l "resume/*"`
@@ -14,6 +14,13 @@
 |------|---------|------|---------|-------|
 
 ## Version Log
+
+### 2026-02-28
+- **Commit:** `93ddc38`
+- **Generated:** 2026-02-28T20:45:45.713Z
+- **Model:** claude-opus-4-6
+- **Files:** Paul-Prae-Resume-2026-02-28-93ddc38.{md,pdf,docx}
+- **Sizes:** MD 8,393 chars, PDF 63 KB, DOCX 14 KB
 
 ### 2026-02-28
 - **Commit:** `53280dd`

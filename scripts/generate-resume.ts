@@ -3,7 +3,7 @@
  *
  * Loads data/career-data.json, constructs a rich prompt with brand voice
  * guidelines and resume formatting rules, calls Claude Opus 4.6 with
- * adaptive thinking at max effort, and writes data/generated/resume.md.
+ * adaptive thinking at max effort, and writes the resume markdown output.
  *
  * Usage: npm run generate
  *        npx tsx scripts/generate-resume.ts

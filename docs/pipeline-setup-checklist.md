@@ -153,16 +153,16 @@ npm run pipeline
 **Or run steps individually:**
 ```bash
 npm run ingest      # Parse LinkedIn CSVs + knowledge base → career-data.json
-npm run generate    # Call Claude API → resume.md
+npm run generate    # Call Claude API → Paul-Prae-Resume.md
 npm run export      # Convert to PDF + DOCX (requires pandoc + typst)
 npm run build       # Build static site → out/
 ```
 
 **Expected output:**
 - `data/generated/career-data.json` — Structured career data (committed to git)
-- `data/generated/resume.md` — AI-generated resume (committed to git)
-- `data/generated/resume.pdf` — PDF resume (gitignored)
-- `data/generated/resume.docx` — DOCX resume (gitignored)
+- `data/generated/Paul-Prae-Resume.md` — AI-generated resume (committed to git; filename derived from career data)
+- `data/generated/Paul-Prae-Resume.pdf` — PDF resume (gitignored)
+- `data/generated/Paul-Prae-Resume.docx` — DOCX resume (gitignored)
 - `out/` — Static website (gitignored, deployed via Vercel)
 
 ---

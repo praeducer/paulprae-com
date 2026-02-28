@@ -7,18 +7,46 @@
  */
 
 import path from "path";
+import fs from "fs";
 
 // ─── File Paths ──────────────────────────────────────────────────────────────
 
 const ROOT = process.cwd();
 
+// ─── Resume Filename Convention ─────────────────────────────────────────────
+// Recruiter-friendly naming: "Paul-Prae-Resume.{md,pdf,docx}"
+// Derived from career-data.json (profile.name) with a static fallback.
+// Pipeline order (ingest → generate → export) ensures career-data.json exists
+// before resume files are created. Fallback "Resume" covers first-time setup.
+
+function getResumeFileBase(): string {
+  const careerDataPath = path.join(ROOT, "data", "generated", "career-data.json");
+  try {
+    if (fs.existsSync(careerDataPath)) {
+      const data = JSON.parse(fs.readFileSync(careerDataPath, "utf-8"));
+      const name: string | undefined = data?.profile?.name;
+      if (name) {
+        // "Paul Prae" → "Paul-Prae-Resume"
+        const slug = name.trim().replace(/\s+/g, "-");
+        return `${slug}-Resume`;
+      }
+    }
+  } catch {
+    // Fall through to default
+  }
+  return "Resume";
+}
+
+/** Filename base for resume outputs, e.g. "Paul-Prae-Resume" or "Resume" (fallback). */
+export const RESUME_FILE_BASE = getResumeFileBase();
+
 export const PATHS = {
   linkedinDir: path.join(ROOT, "data", "sources", "linkedin"),
   knowledgeDir: path.join(ROOT, "data", "sources", "knowledge"),
   careerDataOutput: path.join(ROOT, "data", "generated", "career-data.json"),
-  resumeOutput: path.join(ROOT, "data", "generated", "resume.md"),
-  pdfOutput: path.join(ROOT, "data", "generated", "resume.pdf"),
-  docxOutput: path.join(ROOT, "data", "generated", "resume.docx"),
+  resumeOutput: path.join(ROOT, "data", "generated", `${RESUME_FILE_BASE}.md`),
+  pdfOutput: path.join(ROOT, "data", "generated", `${RESUME_FILE_BASE}.pdf`),
+  docxOutput: path.join(ROOT, "data", "generated", `${RESUME_FILE_BASE}.docx`),
   pdfStylesheet: path.join(ROOT, "scripts", "resume-pdf.typ"),
   versionsDir: path.join(ROOT, "data", "generated", "versions"),
   versionsManifest: path.join(ROOT, "data", "generated", "VERSIONS.md"),

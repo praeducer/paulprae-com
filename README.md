@@ -78,7 +78,7 @@ npm run pipeline
 
 # Or run steps individually:
 npm run ingest      # Parse LinkedIn CSVs + knowledge JSONs → career-data.json
-npm run generate    # Call Claude API → data/generated/resume.md
+npm run generate    # Call Claude API → data/generated/Paul-Prae-Resume.md
 npm run export      # Convert to PDF + DOCX (requires pandoc + typst)
 npm run export:pdf  # PDF only
 npm run export:docx # DOCX only
@@ -117,7 +117,7 @@ paulprae-com/
 │   ├── sources/
 │   │   ├── linkedin/       # LinkedIn CSV exports (gitignored — may contain unparsed columns)
 │   │   └── knowledge/      # Knowledge base JSONs (committed — recruiter-facing content)
-│   └── generated/          # Pipeline output: career-data.json + resume.md (committed), PDF + DOCX (gitignored)
+│   └── generated/          # Pipeline output: career-data.json + Paul-Prae-Resume.md (committed), PDF + DOCX (gitignored)
 ├── tests/                  # Unit tests (Vitest) + pipeline integration tests
 ├── docs/                   # Technical documentation and design docs
 ├── scripts/                # Build pipeline + export scripts + resume-pdf.typ stylesheet

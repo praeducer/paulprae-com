@@ -163,7 +163,7 @@ graph TB
         INGEST["Ingestion Script<br/>(TypeScript/Node.js)<br/>Parse CSVs → JSON"]
         PROMPT["Prompt Assembly<br/>Structured data +<br/>brand guidelines +<br/>resume template"]
         CLAUDE_GEN["Claude API<br/>(Opus 4.6)<br/>Generate Markdown Resume"]
-        MD["resume.md<br/>(Generated Output)"]
+        MD["Paul-Prae-Resume.md<br/>(Generated Output)"]
         NEXT_BUILD["Next.js Static Export<br/>next build → out/"]
     end
 
@@ -489,7 +489,7 @@ A TypeScript script (`scripts/generate-resume.ts`) that:
 1. Loads `data/generated/career-data.json`
 2. Constructs a structured prompt with resume formatting instructions, brand voice guidelines, and all career data
 3. Calls the Anthropic API (Claude Opus 4.6) via `@anthropic-ai/sdk` to generate a Markdown resume
-4. Writes the output to `data/generated/resume.md`
+4. Writes the output to `data/generated/Paul-Prae-Resume.md` (filename derived from career data)
 5. Is idempotent and re-runnable — update data, re-run script, get new resume
 
 The prompt will instruct Claude to:
@@ -504,7 +504,7 @@ The prompt will instruct Claude to:
 
 A minimal Next.js 16 application with:
 
-- **Single page** (`app/page.tsx`): Server component that reads `data/generated/resume.md` at build time and renders it as styled HTML
+- **Single page** (`app/page.tsx`): Server component that reads the generated resume markdown (via `PATHS.resumeOutput` from `lib/config.ts`) at build time and renders it as styled HTML
 - **Markdown rendering**: `react-markdown` with `remark-gfm` for GitHub-flavored Markdown support
 - **Styling**: Tailwind CSS with a professional, clean typography system. Custom `prose` class overrides for resume-appropriate spacing, font sizing, and section hierarchy. No shadcn/ui in Phase 1 — it's not needed for a single page.
 - **Responsive**: Renders well from 320px mobile to 1440px desktop
@@ -534,7 +534,7 @@ The entire flow from data to deployed site:
 2. Run: npx tsx scripts/ingest-linkedin.ts
 3. Run: npx tsx scripts/generate-resume.ts
 4. Run: npx tsx scripts/export-resume.ts  (PDF + DOCX)
-5. Review data/generated/resume.md, make any manual edits
+5. Review data/generated/Paul-Prae-Resume.md, make any manual edits
 6. git add . && git commit -m "Update resume" && git push
 7. Vercel auto-deploys within ~60 seconds
 ```
@@ -552,12 +552,12 @@ The export layer converts the AI-generated Markdown resume into recruiter-friend
 
 ```
 Pipeline flow:
-  data/generated/resume.md
+  data/generated/Paul-Prae-Resume.md
        |
-       +──→ pandoc (MD → DOCX) ──→ data/generated/resume.docx
+       +──→ pandoc (MD → DOCX) ──→ data/generated/Paul-Prae-Resume.docx
        |         (Pandoc default styles — ATS-friendly, no custom template)
        |
-       +──→ pandoc (MD → Typst) → typst compile ──→ data/generated/resume.pdf
+       +──→ pandoc (MD → Typst) → typst compile ──→ data/generated/Paul-Prae-Resume.pdf
                 uses scripts/resume-pdf.typ for visual styling
 ```
 
@@ -1034,7 +1034,7 @@ const careerAgent = new Agent({
 
 | Task | Description | Tool |
 |------|-------------|------|
-| 2.1 | Build `scripts/generate-resume.ts` — load career data, construct prompt, call Claude API, write `data/generated/resume.md` | Claude Code |
+| 2.1 | Build `scripts/generate-resume.ts` — load career data, construct prompt, call Claude API, write resume markdown (filename derived from career data) | Claude Code |
 | 2.2 | Iterate on the prompt until resume quality meets bar: accurate data, strong narrative, professional tone, approximately 2-page length | Claude Code + Manual review |
 | 2.3 | Add environment variable handling for `ANTHROPIC_API_KEY` via `.env.local` | Claude Code |
 
@@ -1042,7 +1042,7 @@ const careerAgent = new Agent({
 
 | Task | Description | Tool |
 |------|-------------|------|
-| 3.1 | Build `app/page.tsx` — server component that reads `data/generated/resume.md` and renders styled HTML | Claude Code |
+| 3.1 | Build `app/page.tsx` — server component that reads the generated resume via `PATHS.resumeOutput` and renders styled HTML | Claude Code |
 | 3.2 | Configure `react-markdown` with `remark-gfm` for Markdown rendering | Claude Code |
 | 3.3 | Style with Tailwind CSS: professional typography, responsive layout, print-friendly CSS | Claude Code |
 | 3.4 | Add Open Graph meta tags, favicon, page title | Claude Code |
@@ -1149,7 +1149,7 @@ Create the following directory structure:
 paulprae.com/
 ├── app/
 │   ├── layout.tsx          # Root layout with metadata, fonts, Tailwind
-│   ├── page.tsx            # Main page: reads data/generated/resume.md, renders styled HTML
+│   ├── page.tsx            # Main page: reads generated resume via PATHS.resumeOutput, renders styled HTML
 │   ├── globals.css         # Tailwind imports + custom prose styles + print styles
 │   └── favicon.ico         # Placeholder
 ├── components/
@@ -1158,10 +1158,10 @@ paulprae.com/
 │   ├── sources/
 │   │   ├── linkedin/       # LinkedIn CSV exports (gitignored — raw exports may have extra columns)
 │   │   └── knowledge/      # Knowledge base JSONs (committed — recruiter-facing content)
-│   └── generated/          # Pipeline output: career-data.json + resume.md (committed), PDF + DOCX (gitignored)
+│   └── generated/          # Pipeline output: career-data.json + Paul-Prae-Resume.md (committed), PDF + DOCX (gitignored)
 ├── scripts/
 │   ├── ingest-linkedin.ts  # Parse LinkedIn CSVs + knowledge JSONs → career-data.json
-│   └── generate-resume.ts  # Load career-data.json → call Claude API → write resume.md
+│   └── generate-resume.ts  # Load career-data.json → call Claude API → write resume markdown
 ├── lib/
 │   └── types.ts            # CareerData TypeScript interface and related types
 ├── public/
@@ -1210,7 +1210,7 @@ paulprae.com/
 - Construct a detailed prompt that instructs Claude to generate a professional Markdown resume
 - The prompt should include: all career data as structured context, instructions for resume structure (Summary, Experience, Education, Skills, Certifications, Projects, Publications), tone guidelines (confident, technically precise, action-oriented), target role context (Principal AI Engineer, Solutions Architect, Senior Engineering Manager), and a 2-page length target
 - Call Anthropic API with model "claude-opus-4-6-20250414", max_tokens 4096
-- Write output to data/generated/resume.md
+- Write output to data/generated/Paul-Prae-Resume.md (filename derived from career-data.json profile.name)
 - If ANTHROPIC_API_KEY is not set, log an error and exit
 
 ## Package Scripts
@@ -1246,7 +1246,7 @@ Generate a CLAUDE.md with:
 - Tech stack: Next.js 16.1.x, TypeScript, Tailwind CSS, react-markdown, Anthropic Claude API
 - Key conventions: App Router, server components by default, TypeScript strict mode
 - File organization: app/ for routes, components/ for reusable UI, scripts/ for build pipeline, lib/ for shared utilities, data/sources/ for raw input, data/generated/ for pipeline output
-- Important: data/generated/resume.md is GENERATED — edit scripts/generate-resume.ts to change resume output, not the markdown file directly
+- Important: data/generated/Paul-Prae-Resume.md is GENERATED — edit scripts/generate-resume.ts to change resume output, not the markdown file directly. The filename is derived from career-data.json (profile.name → "Paul-Prae-Resume").
 - Important: static export mode (output: 'export') — no API routes, no server-side rendering in Phase 1
 - Phase 2 will add: Supabase, Vercel AI SDK 6, API routes, chat interface, dynamic resume generation
 
