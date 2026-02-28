@@ -7,7 +7,8 @@
       "Bash(ls:*)",
       "Bash(cd:*)",
       "Bash(where npm:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(test:*)"
     ]
   }
 }
