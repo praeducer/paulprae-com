@@ -161,6 +161,123 @@ function exportPdf(markdown: string): void {
   }
 }
 
+// ─── Version Archival ──────────────────────────────────────────────────────
+// After exporting, archive timestamped copies to data/generated/versions/.
+// Filename format: resume-YYYY-MM-DD-<git-sha>.{ext}
+// This provides: chronological sorting, git traceability, and easy retrieval.
+
+function getGitSha(): string {
+  try {
+    return execSync("git rev-parse --short HEAD", { encoding: "utf-8" }).trim();
+  } catch {
+    return "unknown";
+  }
+}
+
+function archiveVersions(format: ExportFormat): void {
+  if (!fs.existsSync(PATHS.versionsDir)) {
+    fs.mkdirSync(PATHS.versionsDir, { recursive: true });
+  }
+
+  const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const sha = getGitSha();
+  const prefix = `resume-${date}-${sha}`;
+
+  const filesToArchive: Array<{ src: string; ext: string }> = [];
+
+  // Always archive the markdown source
+  if (fs.existsSync(PATHS.resumeOutput)) {
+    filesToArchive.push({ src: PATHS.resumeOutput, ext: ".md" });
+  }
+
+  if ((format === "all" || format === "pdf") && fs.existsSync(PATHS.pdfOutput)) {
+    filesToArchive.push({ src: PATHS.pdfOutput, ext: ".pdf" });
+  }
+  if ((format === "all" || format === "docx") && fs.existsSync(PATHS.docxOutput)) {
+    filesToArchive.push({ src: PATHS.docxOutput, ext: ".docx" });
+  }
+
+  if (filesToArchive.length === 0) return;
+
+  console.log(`\n   📁 Archiving to versions/${prefix}.*`);
+  for (const { src, ext } of filesToArchive) {
+    const dest = path.join(PATHS.versionsDir, `${prefix}${ext}`);
+    fs.copyFileSync(src, dest);
+    const kb = (fs.statSync(dest).size / 1024).toFixed(1);
+    console.log(`      ${path.basename(dest)} (${kb} KB)`);
+  }
+}
+
+function updateManifest(format: ExportFormat): void {
+  const date = new Date().toISOString().slice(0, 10);
+  const sha = getGitSha();
+  const timestamp = new Date().toISOString();
+  const prefix = `resume-${date}-${sha}`;
+
+  // Collect file sizes
+  const sizes: string[] = [];
+  if (fs.existsSync(PATHS.resumeOutput)) {
+    const chars = fs.readFileSync(PATHS.resumeOutput, "utf-8").length;
+    sizes.push(`MD ${chars.toLocaleString()} chars`);
+  }
+  if ((format === "all" || format === "pdf") && fs.existsSync(PATHS.pdfOutput)) {
+    sizes.push(`PDF ${(fs.statSync(PATHS.pdfOutput).size / 1024).toFixed(0)} KB`);
+  }
+  if ((format === "all" || format === "docx") && fs.existsSync(PATHS.docxOutput)) {
+    sizes.push(`DOCX ${(fs.statSync(PATHS.docxOutput).size / 1024).toFixed(0)} KB`);
+  }
+
+  const entry = [
+    `### ${date}`,
+    `- **Commit:** \`${sha}\``,
+    `- **Generated:** ${timestamp}`,
+    `- **Model:** claude-opus-4-6`,
+    `- **Files:** ${prefix}.{md,pdf,docx}`,
+    `- **Sizes:** ${sizes.join(", ")}`,
+    "",
+  ].join("\n");
+
+  if (!fs.existsSync(PATHS.versionsManifest)) {
+    // Create manifest with template
+    const template = [
+      "# Resume Version History",
+      "",
+      "## How to use",
+      "",
+      "- **Latest resume:** `data/generated/resume.{md,pdf,docx}`",
+      "- **Archive:** `data/generated/versions/` (timestamped copies)",
+      "- **Tag a release:** `git tag -a resume/YYYY-MM-DD -m \"description\"`",
+      "- **List releases:** `git tag -l \"resume/*\"`",
+      "",
+      "## Sent To",
+      "",
+      "<!-- Track which version you sent to each company -->",
+      "| Date | Company | Role | Version | Notes |",
+      "|------|---------|------|---------|-------|",
+      "",
+      "## Version Log",
+      "",
+      entry,
+    ].join("\n");
+    fs.writeFileSync(PATHS.versionsManifest, template, "utf-8");
+  } else {
+    // Append entry after "## Version Log" header
+    const existing = fs.readFileSync(PATHS.versionsManifest, "utf-8");
+    const marker = "## Version Log";
+    const idx = existing.indexOf(marker);
+    if (idx !== -1) {
+      const insertAt = idx + marker.length;
+      const updated = existing.slice(0, insertAt) + "\n\n" + entry + existing.slice(insertAt);
+      fs.writeFileSync(PATHS.versionsManifest, updated, "utf-8");
+    } else {
+      // Fallback: append to end
+      fs.writeFileSync(PATHS.versionsManifest, existing + "\n" + entry, "utf-8");
+    }
+  }
+
+  console.log(`   📋 Updated ${path.basename(PATHS.versionsManifest)}`);
+}
+
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 function main(): void {
@@ -196,6 +313,10 @@ function main(): void {
   if (format === "all" || format === "pdf") {
     exportPdf(markdown);
   }
+
+  // Archive timestamped copies and update manifest
+  archiveVersions(format);
+  updateManifest(format);
 
   const durationMs = Date.now() - startTime;
   console.log(`\n   Done in ${(durationMs / 1000).toFixed(1)}s\n`);

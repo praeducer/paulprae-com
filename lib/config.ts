@@ -20,6 +20,8 @@ export const PATHS = {
   pdfOutput: path.join(ROOT, "data", "generated", "resume.pdf"),
   docxOutput: path.join(ROOT, "data", "generated", "resume.docx"),
   pdfStylesheet: path.join(ROOT, "scripts", "resume-pdf.typ"),
+  versionsDir: path.join(ROOT, "data", "generated", "versions"),
+  versionsManifest: path.join(ROOT, "data", "generated", "VERSIONS.md"),
   envFile: path.join(ROOT, ".env.local"),
 } as const;
 

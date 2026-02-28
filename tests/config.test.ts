@@ -25,6 +25,8 @@ describe("PATHS", () => {
     expect(PATHS.pdfOutput).toBe(path.join(root, "data", "generated", "resume.pdf"));
     expect(PATHS.docxOutput).toBe(path.join(root, "data", "generated", "resume.docx"));
     expect(PATHS.pdfStylesheet).toBe(path.join(root, "scripts", "resume-pdf.typ"));
+    expect(PATHS.versionsDir).toBe(path.join(root, "data", "generated", "versions"));
+    expect(PATHS.versionsManifest).toBe(path.join(root, "data", "generated", "VERSIONS.md"));
     expect(PATHS.envFile).toBe(path.join(root, ".env.local"));
   });
 });

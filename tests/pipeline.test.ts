@@ -328,3 +328,31 @@ describe("Next.js static build", () => {
     expect(html).toContain("Paul Prae");
   });
 });
+
+// ─── Version Manifest ──────────────────────────────────────────────────────
+
+describe("VERSIONS.md", () => {
+  const exists = fileExists(PATHS.versionsManifest);
+
+  it.skipIf(!exists)("exists after export", () => {
+    expect(fileExists(PATHS.versionsManifest)).toBe(true);
+  });
+
+  it.skipIf(!exists)("has required sections", () => {
+    const content = fs.readFileSync(PATHS.versionsManifest, "utf-8");
+    expect(content).toContain("# Resume Version History");
+    expect(content).toContain("## Sent To");
+    expect(content).toContain("## Version Log");
+  });
+
+  it.skipIf(!exists)("has at least one version entry", () => {
+    const content = fs.readFileSync(PATHS.versionsManifest, "utf-8");
+    // Version entries start with ### YYYY-MM-DD
+    expect(content).toMatch(/### \d{4}-\d{2}-\d{2}/);
+  });
+
+  it.skipIf(!exists)("version entries include commit SHA", () => {
+    const content = fs.readFileSync(PATHS.versionsManifest, "utf-8");
+    expect(content).toMatch(/\*\*Commit:\*\* `[a-f0-9]+`/);
+  });
+});
