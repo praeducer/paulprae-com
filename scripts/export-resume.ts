@@ -87,6 +87,19 @@ function ensureOutputDir(): void {
   }
 }
 
+/** Run a shell command, capturing stderr for diagnostic output. */
+function runWithStderr(command: string): void {
+  try {
+    execSync(command, { stdio: ["pipe", "pipe", "pipe"] });
+  } catch (err) {
+    const stderr = (err as { stderr?: Buffer })?.stderr?.toString().trim();
+    if (stderr) {
+      console.error(`      stderr: ${stderr}`);
+    }
+    throw err;
+  }
+}
+
 function exportDocx(markdown: string): void {
   console.log("   📄 Generating DOCX...");
 
@@ -94,12 +107,15 @@ function exportDocx(markdown: string): void {
   fs.writeFileSync(tempMd, markdown, "utf-8");
 
   try {
-    execSync(
-      `pandoc "${tempMd}" -o "${PATHS.docxOutput}" --from markdown --to docx`,
-      { stdio: "pipe" }
+    runWithStderr(
+      `pandoc "${tempMd}" -o "${PATHS.docxOutput}" --from markdown --to docx`
     );
 
     const stats = fs.statSync(PATHS.docxOutput);
+    if (stats.size === 0) {
+      console.error("      ❌ DOCX output is empty (0 bytes)");
+      process.exit(1);
+    }
     console.log(
       `      ✅ DOCX: ${PATHS.docxOutput} (${(stats.size / 1024).toFixed(1)} KB)`
     );
@@ -119,9 +135,8 @@ function exportPdf(markdown: string): void {
 
   try {
     // Step 1: Pandoc MD → Typst markup
-    execSync(
-      `pandoc "${tempMd}" -o "${tempTyp}" --from markdown --to typst`,
-      { stdio: "pipe" }
+    runWithStderr(
+      `pandoc "${tempMd}" -o "${tempTyp}" --from markdown --to typst`
     );
 
     // Step 2: Prepend our template to the Pandoc-generated Typst content
@@ -130,11 +145,13 @@ function exportPdf(markdown: string): void {
     fs.writeFileSync(tempTyp, templateContent + "\n" + pandocTypst, "utf-8");
 
     // Step 3: Typst compile → PDF
-    execSync(`typst compile "${tempTyp}" "${PATHS.pdfOutput}"`, {
-      stdio: "pipe",
-    });
+    runWithStderr(`typst compile "${tempTyp}" "${PATHS.pdfOutput}"`);
 
     const stats = fs.statSync(PATHS.pdfOutput);
+    if (stats.size === 0) {
+      console.error("      ❌ PDF output is empty (0 bytes)");
+      process.exit(1);
+    }
     console.log(
       `      ✅ PDF:  ${PATHS.pdfOutput} (${(stats.size / 1024).toFixed(1)} KB)`
     );

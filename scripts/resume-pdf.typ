@@ -61,16 +61,11 @@
 }
 
 // ─── Horizontal Rules ────────────────────────────────────────────────────────
-// Pandoc emits --- as horizontal rules; hide them since H2 has its own line
+// Pandoc converts --- to #horizontalrule in Typst output.
+// We suppress them since H2 headings already have their own underline.
+// Using a custom command avoids interfering with line() elements in headings.
 
-#show line: it => {
-  // Only suppress full-width horizontal rules (section dividers from ---)
-  if it.length == 100% {
-    v(0.1em)
-  } else {
-    it
-  }
-}
+#let horizontalrule = v(0.3em)
 
 // ─── Lists ───────────────────────────────────────────────────────────────────
 

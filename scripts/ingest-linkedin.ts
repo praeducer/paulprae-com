@@ -294,18 +294,115 @@ function normalizeCourses(rows: LinkedInCourse[]): CareerCourse[] {
     }));
 }
 
+// ─── Knowledge Base Profile Enrichment ──────────────────────────────────────
+// career/profile.json has richer data than LinkedIn CSV (URLs, years of
+// experience, etc.). Merge it into the CareerProfile to fill gaps.
+
+function enrichProfileFromKnowledge(data: CareerData, knowledgeDir: string): void {
+  const profilePath = path.join(knowledgeDir, "career", "profile.json");
+  if (!fs.existsSync(profilePath)) return;
+
+  try {
+    const raw = fs.readFileSync(profilePath, "utf-8");
+    const kbProfile = JSON.parse(raw);
+
+    // Fill empty profile fields from knowledge base
+    if (!data.profile.name && kbProfile.name) {
+      data.profile.name = kbProfile.name;
+    }
+    if (!data.profile.headline && kbProfile.headline) {
+      data.profile.headline = kbProfile.headline;
+    }
+    if (!data.profile.summary && kbProfile.summary) {
+      data.profile.summary = kbProfile.summary;
+    }
+    if (!data.profile.location) {
+      const loc = kbProfile.location;
+      if (typeof loc === "string") {
+        data.profile.location = loc;
+      } else if (loc?.primary) {
+        data.profile.location = loc.primary;
+      }
+    }
+    if (!data.profile.linkedin && kbProfile.linkedin) {
+      data.profile.linkedin = kbProfile.linkedin;
+    }
+    if (!data.profile.website && kbProfile.website) {
+      data.profile.website = kbProfile.website;
+    }
+
+    console.log("   🔗 Enriched profile from knowledge base (career/profile.json)");
+  } catch {
+    // Non-fatal — knowledge base profile is supplementary
+  }
+}
+
 // ─── Knowledge Base Loading ─────────────────────────────────────────────────
-// Reads all .json files from data/sources/knowledge/ and merges them into
-// a flat array of KnowledgeEntry objects. Each file should contain a JSON
-// array of entries. Files named "example.json" are skipped.
+// Recursively reads all .json files from data/sources/knowledge/ and its
+// subdirectories (career/, brand/, strategy/, agents/, content/).
+// Files named "example.json" are skipped.
+//
+// Knowledge files have heterogeneous schemas — career data, brand narratives,
+// strategy objects, etc. Files that already match KnowledgeEntry format are
+// loaded directly. Others are wrapped as KnowledgeEntry with the subdirectory
+// as category and file content as structured context for Claude.
+
+/** Recursively find all .json files under a directory. */
+function findJsonFiles(dir: string): string[] {
+  if (!fs.existsSync(dir)) return [];
+  const results: string[] = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...findJsonFiles(fullPath));
+    } else if (
+      entry.name.toLowerCase().endsWith(".json") &&
+      entry.name.toLowerCase() !== "example.json"
+    ) {
+      results.push(fullPath);
+    }
+  }
+  return results;
+}
+
+/** Check if an object matches the KnowledgeEntry schema. */
+function isKnowledgeEntry(obj: unknown): obj is KnowledgeEntry {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    "category" in obj &&
+    "title" in obj &&
+    "content" in obj &&
+    typeof (obj as KnowledgeEntry).category === "string" &&
+    typeof (obj as KnowledgeEntry).title === "string" &&
+    typeof (obj as KnowledgeEntry).content === "string"
+  );
+}
+
+/** Wrap arbitrary JSON data as a KnowledgeEntry for Claude context. */
+function wrapAsKnowledgeEntry(
+  filePath: string,
+  data: unknown,
+): KnowledgeEntry {
+  const relPath = path.relative(PATHS.knowledgeDir, filePath);
+  const parts = relPath.split(path.sep);
+  const category = parts.length > 1 ? parts[0] : "general";
+  const fileName = path.basename(filePath, ".json");
+
+  return {
+    category,
+    title: fileName.replace(/-/g, " "),
+    content: typeof data === "string" ? data : JSON.stringify(data, null, 2),
+    tags: [category, fileName],
+  };
+}
 
 function loadKnowledgeBase(): KnowledgeEntry[] {
   if (!fs.existsSync(PATHS.knowledgeDir)) {
     return [];
   }
 
-  const files = fs.readdirSync(PATHS.knowledgeDir)
-    .filter((f) => f.toLowerCase().endsWith(".json") && f.toLowerCase() !== "example.json");
+  const files = findJsonFiles(PATHS.knowledgeDir);
 
   if (files.length === 0) {
     return [];
@@ -313,17 +410,28 @@ function loadKnowledgeBase(): KnowledgeEntry[] {
 
   const entries: KnowledgeEntry[] = [];
 
-  for (const file of files) {
-    const filePath = path.join(PATHS.knowledgeDir, file);
+  for (const filePath of files) {
+    const relPath = path.relative(PATHS.knowledgeDir, filePath);
     try {
       const raw = fs.readFileSync(filePath, "utf-8");
       const parsed = JSON.parse(raw);
-      const items: KnowledgeEntry[] = Array.isArray(parsed) ? parsed : [parsed];
-      entries.push(...items);
-      console.log(`   📄 ${file} → ${items.length} knowledge entries`);
+
+      // If the file contains KnowledgeEntry objects, load them directly
+      if (Array.isArray(parsed) && parsed.length > 0 && isKnowledgeEntry(parsed[0])) {
+        const items = parsed.filter(isKnowledgeEntry);
+        entries.push(...items);
+        console.log(`   📄 ${relPath} → ${items.length} knowledge entries`);
+      } else if (isKnowledgeEntry(parsed)) {
+        entries.push(parsed);
+        console.log(`   📄 ${relPath} → 1 knowledge entry`);
+      } else {
+        // Wrap non-KnowledgeEntry JSON as contextual data for Claude
+        entries.push(wrapAsKnowledgeEntry(filePath, parsed));
+        console.log(`   📄 ${relPath} → 1 contextual entry (wrapped)`);
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      console.warn(`   ⚠ Failed to parse knowledge file ${file}: ${message}`);
+      console.warn(`   ⚠ Failed to parse knowledge file ${relPath}: ${message}`);
     }
   }
 
@@ -334,7 +442,7 @@ function loadKnowledgeBase(): KnowledgeEntry[] {
 
 const CareerDataSchema = z.object({
   profile: z.object({
-    name: z.string(),
+    name: z.string().min(1, "Profile name is required"),
     headline: z.string(),
     summary: z.string(),
     location: z.string(),
@@ -343,16 +451,16 @@ const CareerDataSchema = z.object({
     website: z.string(),
   }),
   positions: z.array(z.object({
-    title: z.string(),
-    company: z.string(),
+    title: z.string().min(1, "Position title is required"),
+    company: z.string().min(1, "Company name is required"),
     location: z.string(),
-    startDate: z.string(),
+    startDate: z.string().min(1, "Start date is required"),
     endDate: z.string().nullable(),
     description: z.string(),
     highlights: z.array(z.string()),
   })),
   education: z.array(z.object({
-    school: z.string(),
+    school: z.string().min(1, "School name is required"),
     degree: z.string(),
     field: z.string(),
     startDate: z.string(),
@@ -429,12 +537,14 @@ function ingest(): IngestResult {
   console.log(`   Source: ${PATHS.linkedinDir}`);
   console.log(`   Output: ${PATHS.careerDataOutput}\n`);
 
+  const emptyStats = { csvFilesFound: 0, csvFilesParsed: 0, positions: 0, education: 0, skills: 0, certifications: 0, projects: 0, publications: 0 };
+
   // Check source directory exists
   if (!fs.existsSync(PATHS.linkedinDir)) {
     errors.push(
       `Directory not found: ${PATHS.linkedinDir}\n   Create it and add your LinkedIn CSV exports.`
     );
-    return { success: false, careerData: null, errors, warnings, stats: { csvFilesFound: 0, csvFilesParsed: 0, positions: 0, education: 0, skills: 0, certifications: 0, projects: 0, publications: 0 } };
+    return { success: false, careerData: null, errors, warnings, stats: emptyStats };
   }
 
   // Discover CSV files
@@ -447,7 +557,7 @@ function ingest(): IngestResult {
     errors.push(
       "No CSV files found in data/sources/linkedin/.\n   Export your data from LinkedIn → Settings → Data Privacy → Get a copy of your data\n   Select \"Download larger data archive\" and place CSV files in data/sources/linkedin/"
     );
-    return { success: false, careerData: null, errors, warnings, stats: { csvFilesFound: 0, csvFilesParsed: 0, positions: 0, education: 0, skills: 0, certifications: 0, projects: 0, publications: 0 } };
+    return { success: false, careerData: null, errors, warnings, stats: emptyStats };
   }
 
   // Initialize empty CareerData
@@ -544,6 +654,9 @@ function ingest(): IngestResult {
     console.log(`   📚 Loaded ${knowledgeEntries.length} knowledge base entries\n`);
   }
 
+  // Enrich profile from knowledge base (career/profile.json has linkedin, website, github, etc.)
+  enrichProfileFromKnowledge(data, PATHS.knowledgeDir);
+
   // Merge email into profile (after loop so Profile.csv can't overwrite)
   if (extractedEmail) {
     data.profile.email = extractedEmail;
@@ -556,14 +669,20 @@ function ingest(): IngestResult {
     );
   }
 
+  // Build stats once, reuse for all return paths
+  const buildStats = () => ({
+    csvFilesFound: csvFiles.length,
+    csvFilesParsed,
+    positions: data.positions.length,
+    education: data.education.length,
+    skills: data.skills.length,
+    certifications: data.certifications.length,
+    projects: data.projects.length,
+    publications: data.publications.length,
+  });
+
   if (errors.length > 0) {
-    return {
-      success: false,
-      careerData: null,
-      errors,
-      warnings,
-      stats: { csvFilesFound: csvFiles.length, csvFilesParsed, positions: data.positions.length, education: data.education.length, skills: data.skills.length, certifications: data.certifications.length, projects: data.projects.length, publications: data.publications.length },
-    };
+    return { success: false, careerData: null, errors, warnings, stats: buildStats() };
   }
 
   // Validate with Zod
@@ -572,13 +691,7 @@ function ingest(): IngestResult {
     for (const issue of validation.error.issues) {
       errors.push(`Validation error at ${issue.path.join(".")}: ${issue.message}`);
     }
-    return {
-      success: false,
-      careerData: null,
-      errors,
-      warnings,
-      stats: { csvFilesFound: csvFiles.length, csvFilesParsed, positions: data.positions.length, education: data.education.length, skills: data.skills.length, certifications: data.certifications.length, projects: data.projects.length, publications: data.publications.length },
-    };
+    return { success: false, careerData: null, errors, warnings, stats: buildStats() };
   }
 
   // Write output
@@ -588,16 +701,7 @@ function ingest(): IngestResult {
   }
   fs.writeFileSync(PATHS.careerDataOutput, JSON.stringify(data, null, 2), "utf-8");
 
-  const stats = {
-    csvFilesFound: csvFiles.length,
-    csvFilesParsed,
-    positions: data.positions.length,
-    education: data.education.length,
-    skills: data.skills.length,
-    certifications: data.certifications.length,
-    projects: data.projects.length,
-    publications: data.publications.length,
-  };
+  const stats = buildStats();
 
   console.log("   ✅ Ingestion complete:\n");
   console.log(`      ${stats.positions} positions`);

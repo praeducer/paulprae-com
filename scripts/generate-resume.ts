@@ -139,13 +139,81 @@ Output the resume using this exact structure:
 - For current positions, use "Present" as the end date`;
 
 // ─── Build User Message ──────────────────────────────────────────────────────
+// Structures career data into labeled sections so Claude can reason about
+// each dimension (career history, supplementary context, skills) separately.
 
 function buildUserMessage(careerData: CareerData): string {
-  return `Generate a professional resume from this career data. Apply all formatting rules and quality criteria from your instructions.
+  // Separate knowledge entries from core career data for clearer context
+  const { knowledge, ...coreData } = careerData;
 
-## Career Data
+  const sections: string[] = [
+    "Generate a professional resume from this career data. Apply all formatting rules and quality criteria from your instructions.",
+    "",
+    "## Core Career Data",
+    "",
+    "This is the structured career history — positions, education, profile, certifications, projects, and publications. Use this as the primary factual source.",
+    "",
+    JSON.stringify(coreData, null, 2),
+  ];
 
-${JSON.stringify(careerData, null, 2)}`;
+  if (knowledge.length > 0) {
+    sections.push(
+      "",
+      "## Supplementary Knowledge Base",
+      "",
+      "These are curated context entries providing additional detail — achievements with quantified metrics, domain expertise narratives, brand voice guidelines, and strategic positioning context. Use these to enrich position bullet points with specific impacts, metrics, and STAR-method narratives. When knowledge entries reference specific positions (via relatedPositions), integrate that context into those roles' bullets. Do not fabricate — only use data provided here.",
+      "",
+      JSON.stringify(knowledge, null, 2),
+    );
+  }
+
+  return sections.join("\n");
+}
+
+// ─── Post-Generation Validation ─────────────────────────────────────────────
+// Checks that the generated resume meets basic structural requirements.
+// Returns warnings (non-fatal) — the resume is still written to disk.
+
+function validateResumeOutput(markdown: string, careerData: CareerData): string[] {
+  const warnings: string[] = [];
+
+  // Check expected H2 sections exist
+  const expectedSections = [
+    "Professional Summary",
+    "Professional Experience",
+    "Education",
+    "Technical Skills",
+  ];
+  for (const section of expectedSections) {
+    if (!markdown.includes(`## ${section}`)) {
+      warnings.push(`Missing expected section: "## ${section}"`);
+    }
+  }
+
+  // Check reasonable length (~2 pages ≈ 4000-10000 chars of markdown)
+  const charCount = markdown.length;
+  if (charCount < 3000) {
+    warnings.push(`Resume appears too short (${charCount.toLocaleString()} chars, expected 4000-10000 for ~2 pages)`);
+  } else if (charCount > 12000) {
+    warnings.push(`Resume appears too long (${charCount.toLocaleString()} chars, target is ~2 pages / 4000-10000 chars)`);
+  }
+
+  // Check that recent positions appear in the resume
+  const recentPositions = careerData.positions
+    .filter((p) => !p.endDate || p.endDate >= "2020")
+    .slice(0, 5);
+  for (const pos of recentPositions) {
+    if (pos.company && !markdown.includes(pos.company)) {
+      warnings.push(`Recent employer "${pos.company}" not found in generated resume`);
+    }
+  }
+
+  // Check H1 heading exists (candidate name)
+  if (!markdown.startsWith("# ")) {
+    warnings.push("Resume does not start with H1 heading (# Name)");
+  }
+
+  return warnings;
 }
 
 // ─── Main Generation Pipeline ────────────────────────────────────────────────
@@ -184,8 +252,14 @@ async function generate(): Promise<GenerationResult> {
   // how much to reason based on task complexity. Effort "max" is exclusive to
   // Opus 4.6 and provides "absolute maximum capability with no constraints on
   // token spending" — the highest quality setting available.
+  //
+  // Prompt caching: The system prompt (~2000 tokens) is marked with
+  // cache_control so repeated generations reuse the cached prompt,
+  // reducing latency and cost on iterative runs.
+  //
   // Ref: https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking
   // Ref: https://platform.claude.com/docs/en/build-with-claude/effort
+  // Ref: https://platform.claude.com/docs/en/build-with-claude/prompt-caching
   const client = new Anthropic();
   const startTime = Date.now();
 
@@ -194,7 +268,13 @@ async function generate(): Promise<GenerationResult> {
     max_tokens: CLAUDE.maxTokens,
     thinking: CLAUDE.thinking,
     output_config: { effort: CLAUDE.effort },
-    system: SYSTEM_PROMPT,
+    system: [
+      {
+        type: "text" as const,
+        text: SYSTEM_PROMPT,
+        cache_control: { type: "ephemeral" as const },
+      },
+    ],
     messages: [
       {
         role: "user",
@@ -211,11 +291,14 @@ async function generate(): Promise<GenerationResult> {
     console.warn("   The resume may be incomplete. Consider increasing CLAUDE.maxTokens in lib/config.ts.\n");
   }
 
-  // Extract text content (skip thinking blocks)
+  // Extract text content and count thinking tokens
   let markdown = "";
+  let thinkingTokens = 0;
   for (const block of response.content) {
     if (block.type === "text") {
       markdown += block.text;
+    } else if (block.type === "thinking") {
+      thinkingTokens += block.thinking.length; // Approximate via char length
     }
   }
 
@@ -224,6 +307,12 @@ async function generate(): Promise<GenerationResult> {
     console.error("   Response stop reason:", response.stop_reason);
     console.error("   Content blocks:", response.content.map((b) => b.type).join(", "));
     process.exit(1);
+  }
+
+  // Post-generation quality validation
+  const validationWarnings = validateResumeOutput(markdown, careerData);
+  for (const warning of validationWarnings) {
+    console.warn(`   ⚠ ${warning}`);
   }
 
   // Prepend generation header
@@ -244,6 +333,11 @@ async function generate(): Promise<GenerationResult> {
   }
   fs.writeFileSync(PATHS.resumeOutput, finalContent, "utf-8");
 
+  // Report cache performance if available
+  const usage = response.usage as unknown as Record<string, unknown>;
+  const cacheRead = (typeof usage.cache_read_input_tokens === "number" ? usage.cache_read_input_tokens : 0);
+  const cacheCreation = (typeof usage.cache_creation_input_tokens === "number" ? usage.cache_creation_input_tokens : 0);
+
   const result: GenerationResult = {
     success: true,
     markdownLength: finalContent.length,
@@ -259,8 +353,17 @@ async function generate(): Promise<GenerationResult> {
   console.log(`      Stop reason: ${result.stopReason}`);
   console.log(`      Input tokens: ${result.inputTokens.toLocaleString()}`);
   console.log(`      Output tokens: ${result.outputTokens.toLocaleString()}`);
+  if (thinkingTokens > 0) {
+    console.log(`      Thinking: ~${Math.round(thinkingTokens / 4).toLocaleString()} tokens (estimated)`);
+  }
+  if (cacheRead > 0 || cacheCreation > 0) {
+    console.log(`      Cache: ${cacheRead.toLocaleString()} read, ${cacheCreation.toLocaleString()} created`);
+  }
   console.log(`      Markdown length: ${result.markdownLength.toLocaleString()} chars`);
   console.log(`      Duration: ${(result.durationMs / 1000).toFixed(1)}s`);
+  if (validationWarnings.length > 0) {
+    console.log(`      Warnings: ${validationWarnings.length} quality check(s) flagged`);
+  }
   console.log(`\n   📝 Written to: ${PATHS.resumeOutput}\n`);
 
   return result;
