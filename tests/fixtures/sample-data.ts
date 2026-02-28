@@ -8,6 +8,7 @@
  * - CareerData fixture is a valid, Zod-passing object for integration tests.
  */
 
+import { stripHtmlComments } from "../../lib/markdown.js";
 import type {
   CareerData,
   KnowledgeEntry,
@@ -361,6 +362,4 @@ Generates resumes from career data using Claude AI. Built with TypeScript, Next.
 `;
 
 /** Resume markdown stripped of HTML comments (as page.tsx renders it). */
-export const SAMPLE_RESUME_CLEAN = SAMPLE_RESUME_MD
-  .replace(/<!--[\s\S]*?-->\n*/g, "")
-  .trim();
+export const SAMPLE_RESUME_CLEAN = stripHtmlComments(SAMPLE_RESUME_MD);

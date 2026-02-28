@@ -114,9 +114,13 @@ describe("buildUserMessage", () => {
 
   it("separates knowledge from core data (not duplicated)", () => {
     const msg = buildUserMessage(SAMPLE_CAREER_DATA);
-    // Core data JSON should not contain knowledge entries
+    // Core data JSON should not contain knowledge entries as a top-level key
     const coreSection = msg.split("## Supplementary Knowledge Base")[0];
-    expect(coreSection).not.toContain('"knowledge"');
+    // Find the JSON block in the core section and parse it
+    const jsonMatch = coreSection.match(/\{[\s\S]*\}/);
+    expect(jsonMatch).toBeTruthy();
+    const coreJson = JSON.parse(jsonMatch![0]);
+    expect(coreJson).not.toHaveProperty("knowledge");
   });
 });
 

@@ -585,6 +585,19 @@ const CareerDataSchema = z.object({
   })),
 });
 
+function buildStats(csvFilesFound: number, csvFilesParsed: number, data: CareerData) {
+  return {
+    csvFilesFound,
+    csvFilesParsed,
+    positions: data.positions.length,
+    education: data.education.length,
+    skills: data.skills.length,
+    certifications: data.certifications.length,
+    projects: data.projects.length,
+    publications: data.publications.length,
+  };
+}
+
 // ─── Main Ingestion Pipeline ─────────────────────────────────────────────────
 
 function ingest(): IngestResult {
@@ -595,33 +608,7 @@ function ingest(): IngestResult {
   console.log(`   Source: ${PATHS.linkedinDir}`);
   console.log(`   Output: ${PATHS.careerDataOutput}\n`);
 
-  const emptyStats = { csvFilesFound: 0, csvFilesParsed: 0, positions: 0, education: 0, skills: 0, certifications: 0, projects: 0, publications: 0 };
-
-  // Check source directory exists
-  if (!fs.existsSync(PATHS.linkedinDir)) {
-    errors.push(
-      `Directory not found: ${PATHS.linkedinDir}\n   Create it and add your LinkedIn CSV exports.`
-    );
-    return { success: false, careerData: null, errors, warnings, stats: emptyStats };
-  }
-
-  // Auto-extract LinkedIn zip if CSVs don't exist yet
-  extractLinkedInZip(PATHS.linkedinDir);
-
-  // Discover CSV files
-  const allFiles = fs.readdirSync(PATHS.linkedinDir);
-  const csvFiles = allFiles.filter((f) => f.toLowerCase().endsWith(".csv"));
-
-  console.log(`   Found ${csvFiles.length} CSV file(s):\n`);
-
-  if (csvFiles.length === 0) {
-    errors.push(
-      "No CSV files found in data/sources/linkedin/.\n   Export your data from LinkedIn → Settings → Data Privacy → Get a copy of your data\n   Select \"Download larger data archive\" and place CSV files in data/sources/linkedin/"
-    );
-    return { success: false, careerData: null, errors, warnings, stats: emptyStats };
-  }
-
-  // Initialize empty CareerData
+  // Initialize empty CareerData (defined early so buildStats can reference it in error paths)
   const data: CareerData = {
     profile: { name: "", headline: "", summary: "", location: "", email: "", linkedin: "", website: "" },
     positions: [],
@@ -637,6 +624,30 @@ function ingest(): IngestResult {
     courses: [],
     knowledge: [],
   };
+
+  // Check source directory exists
+  if (!fs.existsSync(PATHS.linkedinDir)) {
+    errors.push(
+      `Directory not found: ${PATHS.linkedinDir}\n   Create it and add your LinkedIn CSV exports.`
+    );
+    return { success: false, careerData: null, errors, warnings, stats: buildStats(0, 0, data) };
+  }
+
+  // Auto-extract LinkedIn zip if CSVs don't exist yet
+  extractLinkedInZip(PATHS.linkedinDir);
+
+  // Discover CSV files
+  const allFiles = fs.readdirSync(PATHS.linkedinDir);
+  const csvFiles = allFiles.filter((f) => f.toLowerCase().endsWith(".csv"));
+
+  console.log(`   Found ${csvFiles.length} CSV file(s):\n`);
+
+  if (csvFiles.length === 0) {
+    errors.push(
+      "No CSV files found in data/sources/linkedin/.\n   Export your data from LinkedIn → Settings → Data Privacy → Get a copy of your data\n   Select \"Download larger data archive\" and place CSV files in data/sources/linkedin/"
+    );
+    return { success: false, careerData: null, errors, warnings, stats: buildStats(0, 0, data) };
+  }
 
   let csvFilesParsed = 0;
   // Email is extracted separately and merged after the loop so that
@@ -730,20 +741,8 @@ function ingest(): IngestResult {
     );
   }
 
-  // Build stats once, reuse for all return paths
-  const buildStats = () => ({
-    csvFilesFound: csvFiles.length,
-    csvFilesParsed,
-    positions: data.positions.length,
-    education: data.education.length,
-    skills: data.skills.length,
-    certifications: data.certifications.length,
-    projects: data.projects.length,
-    publications: data.publications.length,
-  });
-
   if (errors.length > 0) {
-    return { success: false, careerData: null, errors, warnings, stats: buildStats() };
+    return { success: false, careerData: null, errors, warnings, stats: buildStats(csvFiles.length, csvFilesParsed, data) };
   }
 
   // Validate with Zod
@@ -752,7 +751,7 @@ function ingest(): IngestResult {
     for (const issue of validation.error.issues) {
       errors.push(`Validation error at ${issue.path.join(".")}: ${issue.message}`);
     }
-    return { success: false, careerData: null, errors, warnings, stats: buildStats() };
+    return { success: false, careerData: null, errors, warnings, stats: buildStats(csvFiles.length, csvFilesParsed, data) };
   }
 
   // Write output
@@ -762,7 +761,7 @@ function ingest(): IngestResult {
   }
   fs.writeFileSync(PATHS.careerDataOutput, JSON.stringify(data, null, 2), "utf-8");
 
-  const stats = buildStats();
+  const stats = buildStats(csvFiles.length, csvFilesParsed, data);
 
   console.log("   ✅ Ingestion complete:\n");
   console.log(`      ${stats.positions} positions`);
@@ -826,8 +825,8 @@ export const _testExports = {
 // ─── Execute ─────────────────────────────────────────────────────────────────
 // Only run when executed directly (not when imported for testing).
 
-const isDirectRun = process.argv[1]?.endsWith("ingest-linkedin.ts") ||
-  process.argv[1]?.endsWith("ingest-linkedin.js");
+const isDirectRun = ["ingest-linkedin.ts", "ingest-linkedin.js"]
+  .includes(path.basename(process.argv[1] ?? ""));
 
 if (isDirectRun) {
 

@@ -387,8 +387,8 @@ export const _testExports = {
 // ─── Execute ─────────────────────────────────────────────────────────────────
 // Only run when executed directly (not when imported for testing).
 
-const isDirectRun = process.argv[1]?.endsWith("generate-resume.ts") ||
-  process.argv[1]?.endsWith("generate-resume.js");
+const isDirectRun = ["generate-resume.ts", "generate-resume.js"]
+  .includes(path.basename(process.argv[1] ?? ""));
 
 if (isDirectRun) {
 

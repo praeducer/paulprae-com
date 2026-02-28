@@ -29,6 +29,7 @@ import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
 import { PATHS } from "../lib/config.js";
+import { stripHtmlComments } from "../lib/markdown.js";
 import type { CareerData } from "../lib/types.js";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -125,7 +126,7 @@ describe("career-data.json", () => {
 
 describe("resume.md", () => {
   const raw = skipIfMissing(PATHS.resumeOutput) as string | null;
-  const resume = raw?.replace(/<!--[\s\S]*?-->\n*/g, "").trim() ?? null;
+  const resume = raw ? stripHtmlComments(raw) : null;
 
   it.skipIf(!resume)("file exists and has content", () => {
     expect(resume!.length).toBeGreaterThan(0);

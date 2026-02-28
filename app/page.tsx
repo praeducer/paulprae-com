@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { stripHtmlComments } from "../lib/markdown";
 
 /**
  * Home page — renders the AI-generated resume from data/generated/resume.md.
@@ -36,7 +37,7 @@ export default function Home() {
   }
 
   // Strip HTML comments (generation metadata) from display
-  const cleanMarkdown = resumeMarkdown.replace(/<!--[\s\S]*?-->\n*/g, "");
+  const cleanMarkdown = stripHtmlComments(resumeMarkdown);
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 print:py-4 print:px-0 print:max-w-none">

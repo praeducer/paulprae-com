@@ -15,6 +15,7 @@
  */
 
 import { describe, it, expect } from "vitest";
+import { stripHtmlComments } from "../lib/markdown.js";
 import { SAMPLE_RESUME_MD, SAMPLE_RESUME_CLEAN } from "./fixtures/sample-data.js";
 
 // ─── Markdown Comment Stripping ─────────────────────────────────────────────
@@ -22,35 +23,31 @@ import { SAMPLE_RESUME_MD, SAMPLE_RESUME_CLEAN } from "./fixtures/sample-data.js
 // This logic is duplicated in export-resume.ts and page.tsx, so test both patterns.
 
 describe("HTML comment stripping", () => {
-  // This is the pattern used in export-resume.ts
-  const stripComments = (raw: string) =>
-    raw.replace(/^<!--[\s\S]*?-->\n*/gm, "").trim();
-
   it("strips generation metadata comments", () => {
-    const result = stripComments(SAMPLE_RESUME_MD);
+    const result = stripHtmlComments(SAMPLE_RESUME_MD);
     expect(result).not.toContain("<!-- This file is GENERATED");
     expect(result).not.toContain("<!-- Generated:");
   });
 
   it("preserves all content after comments", () => {
-    const result = stripComments(SAMPLE_RESUME_MD);
+    const result = stripHtmlComments(SAMPLE_RESUME_MD);
     expect(result).toContain("# Paul Prae");
     expect(result).toContain("## Professional Summary");
     expect(result).toContain("## Professional Experience");
   });
 
   it("starts with H1 heading after stripping", () => {
-    const result = stripComments(SAMPLE_RESUME_MD);
+    const result = stripHtmlComments(SAMPLE_RESUME_MD);
     expect(result).toMatch(/^# Paul Prae/);
   });
 
   it("handles content without comments", () => {
     const noComments = "# Paul Prae\n\nSome content.";
-    expect(stripComments(noComments)).toBe(noComments);
+    expect(stripHtmlComments(noComments)).toBe(noComments);
   });
 
   it("handles empty input", () => {
-    expect(stripComments("")).toBe("");
+    expect(stripHtmlComments("")).toBe("");
   });
 });
 

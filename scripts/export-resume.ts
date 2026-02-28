@@ -16,8 +16,9 @@
 
 import fs from "fs";
 import path from "path";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import { PATHS } from "../lib/config.js";
+import { stripHtmlComments } from "../lib/markdown.js";
 
 // ─── CLI Argument Parsing ────────────────────────────────────────────────────
 
@@ -45,9 +46,9 @@ function parseFormat(): ExportFormat {
 // ─── Dependency Checks ──────────────────────────────────────────────────────
 
 function checkBinary(name: string, installHint: string): void {
-  const cmd = process.platform === "win32" ? `where ${name}` : `which ${name}`;
+  const which = process.platform === "win32" ? "where" : "which";
   try {
-    execSync(cmd, { stdio: "ignore" });
+    execFileSync(which, [name], { stdio: "ignore" });
   } catch {
     console.error(`❌ "${name}" not found in PATH.\n`);
     console.error(`   Install it:\n   ${installHint}\n`);
@@ -68,7 +69,7 @@ function loadAndCleanMarkdown(): string {
   const raw = fs.readFileSync(PATHS.resumeOutput, "utf-8");
 
   // Strip HTML comment header (lines 1-4 are <!-- ... --> generation metadata)
-  const cleaned = raw.replace(/^<!--[\s\S]*?-->\n*/gm, "").trim();
+  const cleaned = stripHtmlComments(raw);
 
   if (!cleaned) {
     console.error("❌ Resume file is empty after stripping comments.\n");
@@ -87,19 +88,6 @@ function ensureOutputDir(): void {
   }
 }
 
-/** Run a shell command, capturing stderr for diagnostic output. */
-function runWithStderr(command: string): void {
-  try {
-    execSync(command, { stdio: ["pipe", "pipe", "pipe"] });
-  } catch (err) {
-    const stderr = (err as { stderr?: Buffer })?.stderr?.toString().trim();
-    if (stderr) {
-      console.error(`      stderr: ${stderr}`);
-    }
-    throw err;
-  }
-}
-
 function exportDocx(markdown: string): void {
   console.log("   📄 Generating DOCX...");
 
@@ -107,9 +95,9 @@ function exportDocx(markdown: string): void {
   fs.writeFileSync(tempMd, markdown, "utf-8");
 
   try {
-    runWithStderr(
-      `pandoc "${tempMd}" -o "${PATHS.docxOutput}" --from markdown --to docx`
-    );
+    execFileSync("pandoc", [tempMd, "-o", PATHS.docxOutput, "--from", "markdown", "--to", "docx"], {
+      stdio: ["pipe", "pipe", "pipe"],
+    });
 
     const stats = fs.statSync(PATHS.docxOutput);
     if (stats.size === 0) {
@@ -135,9 +123,9 @@ function exportPdf(markdown: string): void {
 
   try {
     // Step 1: Pandoc MD → Typst markup
-    runWithStderr(
-      `pandoc "${tempMd}" -o "${tempTyp}" --from markdown --to typst`
-    );
+    execFileSync("pandoc", [tempMd, "-o", tempTyp, "--from", "markdown", "--to", "typst"], {
+      stdio: ["pipe", "pipe", "pipe"],
+    });
 
     // Step 2: Prepend our template to the Pandoc-generated Typst content
     const templateContent = fs.readFileSync(templateTyp, "utf-8");
@@ -145,7 +133,9 @@ function exportPdf(markdown: string): void {
     fs.writeFileSync(tempTyp, templateContent + "\n" + pandocTypst, "utf-8");
 
     // Step 3: Typst compile → PDF
-    runWithStderr(`typst compile "${tempTyp}" "${PATHS.pdfOutput}"`);
+    execFileSync("typst", ["compile", tempTyp, PATHS.pdfOutput], {
+      stdio: ["pipe", "pipe", "pipe"],
+    });
 
     const stats = fs.statSync(PATHS.pdfOutput);
     if (stats.size === 0) {
@@ -168,7 +158,7 @@ function exportPdf(markdown: string): void {
 
 function getGitSha(): string {
   try {
-    return execSync("git rev-parse --short HEAD", { encoding: "utf-8" }).trim();
+    return execFileSync("git", ["rev-parse", "--short", "HEAD"], { encoding: "utf-8" }).trim();
   } catch {
     return "unknown";
   }
@@ -322,4 +312,27 @@ function main(): void {
   console.log(`\n   Done in ${(durationMs / 1000).toFixed(1)}s\n`);
 }
 
-main();
+// ─── Exports for Testing ──────────────────────────────────────────────────────
+
+export const _testExports = {
+  parseFormat,
+  loadAndCleanMarkdown,
+  exportDocx,
+  exportPdf,
+  ensureOutputDir,
+  archiveVersions,
+  updateManifest,
+  getGitSha,
+  checkBinary,
+  main,
+};
+
+// ─── Execute ─────────────────────────────────────────────────────────────────
+// Only run when executed directly (not when imported for testing).
+
+const isDirectRun = ["export-resume.ts", "export-resume.js"]
+  .includes(path.basename(process.argv[1] ?? ""));
+
+if (isDirectRun) {
+  main();
+}
