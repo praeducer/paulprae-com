@@ -1,0 +1,389 @@
+[
+  {
+    "id": "csci-1301-intro-computing-java",
+    "name": "Introduction to Computing and Programming in Java",
+    "code": "CSCI 1301-1301L",
+    "category": "Programming Fundamentals",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "csci-1302-software-dev-java",
+    "name": "Software Development in Java",
+    "code": "CSCI 1302",
+    "category": "Programming Fundamentals",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "csci-1730-systems-programming-c",
+    "name": "Systems Programming in C/C++",
+    "code": "CSCI 1730",
+    "category": "Systems Programming",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "csci-2610-discrete-math",
+    "name": "Discrete Mathematics for Computer Science",
+    "code": "CSCI(MATH) 2610",
+    "category": "Mathematics",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "csci-2670-theory-of-computing",
+    "name": "Theory of Computing",
+    "code": "CSCI 2670",
+    "category": "Theoretical Computer Science",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "csci-2720-data-structures",
+    "name": "Data Structures",
+    "code": "CSCI 2720",
+    "category": "Data Structures and Algorithms",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "csci-4300-web-programming-jsp",
+    "name": "Web Programming with JSP and Java",
+    "code": "CSCI 4300",
+    "category": "Web Development",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "csci-4370-database-management",
+    "name": "Database Management in Java",
+    "code": "CSCI 4370/6370",
+    "category": "Database Systems",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "csci-4540-symbolic-programming",
+    "name": "Symbolic Programming with Prolog and Lisp",
+    "code": "CSCI(ARTI) 4540/6540",
+    "category": "Artificial Intelligence",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "csci-4550-intro-ai",
+    "name": "Introduction to Artificial Intelligence",
+    "code": "CSCI(PHIL) 4550/6550",
+    "category": "Artificial Intelligence",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "csci-4560-evolutionary-computation",
+    "name": "Evolutionary Computation and Its Applications",
+    "code": "CSCI 4560/6560",
+    "category": "Artificial Intelligence",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "csci-4800-hci",
+    "name": "Human-Computer Interaction",
+    "code": "CSCI 4800/6800",
+    "category": "User Experience",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "csci-4720-computer-architecture",
+    "name": "Computer Architecture and Organization",
+    "code": "CSCI 4720",
+    "category": "Computer Architecture",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "csci-4760-computer-networks",
+    "name": "Computer Networks",
+    "code": "CSCI 4760",
+    "category": "Networking",
+    "discipline": "computer_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "cs-7637-kbai-cognitive-systems",
+    "name": "Knowledge-Based Artificial Intelligence: Cognitive Systems",
+    "code": "CS 7637",
+    "category": "Advanced AI",
+    "discipline": "artificial_intelligence",
+    "institution": "Georgia Institute of Technology",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "cs-6601-artificial-intelligence",
+    "name": "Artificial Intelligence",
+    "code": "CS 6601",
+    "category": "Advanced AI",
+    "discipline": "artificial_intelligence",
+    "institution": "Georgia Institute of Technology",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "arti-35-cognitive-science",
+    "name": "Cognitive Science",
+    "code": "ARTI(PSYC)(EPSY)(PHIL) 35",
+    "category": "Interdisciplinary",
+    "discipline": "cognitive_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "psyc-4100-cognitive-psychology",
+    "name": "Cognitive Psychology",
+    "code": "PSYC 4100",
+    "category": "Psychology",
+    "discipline": "cognitive_science",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "phil-2010-intro-philosophy",
+    "name": "Introduction to Philosophy",
+    "code": "PHIL 2010",
+    "category": "General Philosophy",
+    "discipline": "philosophy",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "phil-2500-symbolic-logic",
+    "name": "Symbolic Logic",
+    "code": "PHIL 2500",
+    "category": "Logic",
+    "discipline": "philosophy",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "phil-3610-theory-of-knowledge",
+    "name": "Theory of Knowledge",
+    "code": "PHIL 3610",
+    "category": "Epistemology",
+    "discipline": "philosophy",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "phil-4510-deductive-systems",
+    "name": "Deductive Systems",
+    "code": "PHIL(LING) 4510/6510",
+    "category": "Logic",
+    "discipline": "philosophy",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "ling-2100-study-of-language",
+    "name": "The Study of Language",
+    "code": "LING 2100",
+    "category": "General Linguistics",
+    "discipline": "linguistics",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "math-2200-calculus-i",
+    "name": "Calculus I for Scientists and Engineers",
+    "code": "MATH 2200",
+    "category": "Calculus",
+    "discipline": "mathematics",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "math-2250-calculus-ii",
+    "name": "Calculus II for Scientists and Engineers",
+    "code": "MATH 2250",
+    "category": "Calculus",
+    "discipline": "mathematics",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "phys-1211-mechanics",
+    "name": "Physics for Science and Engineering Students-Mechanics, Waves, Thermodynamics",
+    "code": "PHYS 1211-1211L",
+    "category": "General Physics",
+    "discipline": "physics",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "phys-1212-electricity-magnetism",
+    "name": "Physics for Science and Engineering Students-Electricity and Magnetism, Optics, Modern Physics",
+    "code": "PHYS 1212-1212L",
+    "category": "General Physics",
+    "discipline": "physics",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "acct-2101-accounting-i",
+    "name": "Principles of Accounting I",
+    "code": "ACCT 2101",
+    "category": "Accounting",
+    "discipline": "business",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "acct-2102-accounting-ii",
+    "name": "Principles of Accounting II",
+    "code": "ACCT 2102",
+    "category": "Accounting",
+    "discipline": "business",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "econ-2105-macroeconomics",
+    "name": "Principles of Macroeconomics",
+    "code": "ECON 2105",
+    "category": "Economics",
+    "discipline": "business",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "econ-2106-microeconomics",
+    "name": "Principles of Microeconomics",
+    "code": "ECON 2106",
+    "category": "Economics",
+    "discipline": "business",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "busa-2106-environment-of-business",
+    "name": "The Environment of Business",
+    "code": "BUSA 2106",
+    "category": "Business Environment",
+    "discipline": "business",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "bism-2601-business-info-systems",
+    "name": "Business Information Systems",
+    "code": "BISM 2601",
+    "category": "Information Systems",
+    "discipline": "business",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "dsba-6100-big-data-analytics",
+    "name": "Big Data Analytics for Competitive Advantage",
+    "code": "DSBA 6100",
+    "category": "Data Analytics",
+    "discipline": "business",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "nmix-4110-new-media-production",
+    "name": "New Media Production",
+    "code": "NMIX 4110",
+    "category": "Media Production",
+    "discipline": "new_media",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "nmix-4510-new-media-capstone",
+    "name": "New Media Capstone",
+    "code": "NMIX 4510",
+    "category": "Capstone Project",
+    "discipline": "new_media",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "mbus-4100-music-business-i",
+    "name": "Music Business I",
+    "code": "MBUS 4100",
+    "category": "Music Industry",
+    "discipline": "music",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "mbus-5100-music-business-ii",
+    "name": "Music Business II",
+    "code": "MBUS 5100",
+    "category": "Music Industry",
+    "discipline": "music",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "musc-1301-music-appreciation",
+    "name": "Music Appreciation",
+    "code": "MUSC 1301",
+    "category": "Music Theory",
+    "discipline": "music",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "psyc-1101-intro-psychology",
+    "name": "Introduction to General Psychology",
+    "code": "PSYC 1101",
+    "category": "General Psychology",
+    "discipline": "psychology",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "biol-1103-biology",
+    "name": "Biology",
+    "code": "BIOL 1103",
+    "category": "General Biology",
+    "discipline": "biology",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-bs-computer-science"
+  },
+  {
+    "id": "engl-2111-world-literature",
+    "name": "World Literature",
+    "code": "ENGL 2111",
+    "category": "Literature",
+    "discipline": "english",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  },
+  {
+    "id": "comm-1201-public-speaking",
+    "name": "Public Speaking",
+    "code": "COMM 1201",
+    "category": "Oral Communication",
+    "discipline": "communication",
+    "institution": "University of Georgia",
+    "associated_education_id": "uga-ba-cognitive-science"
+  }
+]

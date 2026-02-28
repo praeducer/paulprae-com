@@ -1,0 +1,84 @@
+{
+  "stages": [
+    {
+      "stage": 1,
+      "name": "Career Coach Assistant",
+      "purpose": "Gather career objectives and requirements",
+      "outputs": [
+        "career_objectives",
+        "user_profile.basic_info"
+      ],
+      "prerequisites": [],
+      "file": "AI_assistants/career_coach_assistant.system.prompt.md"
+    },
+    {
+      "stage": 2,
+      "name": "Personal Brand Development Assistant",
+      "purpose": "Develop mission, vision, values, and brand narratives",
+      "outputs": [
+        "personal_brand",
+        "user_personality"
+      ],
+      "prerequisites": [
+        1
+      ],
+      "file": "AI_assistants/personal_brand_development_assistant.system.prompt.md"
+    },
+    {
+      "stage": 3,
+      "name": "Job Market Positioning Assistant",
+      "purpose": "Create go-to-market strategy and competitive positioning",
+      "outputs": [
+        "go_to_market_strategy"
+      ],
+      "prerequisites": [
+        1,
+        2
+      ],
+      "file": "AI_assistants/job_market_positioning.system.prompt.md"
+    },
+    {
+      "stage": "4A",
+      "name": "Professional Website Generator",
+      "purpose": "Transform GTM strategy into high-impact portfolio websites",
+      "outputs": [
+        "website_content"
+      ],
+      "prerequisites": [
+        1,
+        2,
+        3
+      ],
+      "file": "AI_assistants/professional_website_generator.system.prompt.md"
+    },
+    {
+      "stage": "4B",
+      "name": "Job Application & Interview Assistant",
+      "purpose": "Create resumes, cover letters, and application materials",
+      "outputs": [
+        "application_materials"
+      ],
+      "prerequisites": [
+        1,
+        2,
+        3
+      ],
+      "file": "AI_assistants/job_application_interview_assistant.system.prompt.md"
+    },
+    {
+      "stage": "4C",
+      "name": "Professional Networking Assistant",
+      "purpose": "Build strategic relationships through social media outreach",
+      "outputs": [
+        "networking_content"
+      ],
+      "prerequisites": [
+        1,
+        2,
+        3
+      ],
+      "file": "AI_assistants/professional_networking_assistant.system.prompt.md"
+    }
+  ],
+  "execution_notes": "Stages 1-3 sequential, then 4A/4B/4C parallel"
+}

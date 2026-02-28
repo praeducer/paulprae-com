@@ -1,0 +1,641 @@
+[
+  {
+    "id": "artificial-intelligence",
+    "name": "Artificial Intelligence (AI)",
+    "category": "ai_ml",
+    "proficiency": "expert",
+    "years_experience": 13,
+    "is_featured": true,
+    "related_skills": ["machine-learning", "generative-ai", "large-language-models", "multi-agent-systems"]
+  },
+  {
+    "id": "machine-learning",
+    "name": "Machine Learning",
+    "category": "ai_ml",
+    "proficiency": "expert",
+    "years_experience": 13,
+    "is_featured": true,
+    "related_skills": ["artificial-intelligence", "mlops", "predictive-analytics", "natural-language-processing"]
+  },
+  {
+    "id": "generative-ai",
+    "name": "Generative AI",
+    "category": "ai_ml",
+    "proficiency": "expert",
+    "years_experience": 4,
+    "is_featured": false,
+    "related_skills": ["large-language-models", "artificial-intelligence"]
+  },
+  {
+    "id": "large-language-models",
+    "name": "Large Language Models (LLM)",
+    "category": "ai_ml",
+    "proficiency": "expert",
+    "years_experience": 4,
+    "is_featured": false,
+    "related_skills": ["generative-ai", "natural-language-processing", "multi-agent-systems"]
+  },
+  {
+    "id": "mlops",
+    "name": "MLOps",
+    "category": "ai_ml",
+    "proficiency": "expert",
+    "years_experience": 5,
+    "is_featured": false,
+    "related_skills": ["machine-learning", "cloud-computing", "data-engineering"]
+  },
+  {
+    "id": "multi-agent-systems",
+    "name": "Multi-agent Systems",
+    "category": "ai_ml",
+    "proficiency": "expert",
+    "years_experience": 3,
+    "is_featured": false,
+    "related_skills": ["large-language-models", "artificial-intelligence"]
+  },
+  {
+    "id": "natural-language-processing",
+    "name": "Natural Language Processing",
+    "category": "ai_ml",
+    "proficiency": "expert",
+    "years_experience": 10,
+    "is_featured": false,
+    "related_skills": ["machine-learning", "cognitive-computing", "large-language-models"]
+  },
+  {
+    "id": "cognitive-computing",
+    "name": "Cognitive Computing",
+    "category": "ai_ml",
+    "proficiency": "advanced",
+    "years_experience": 8,
+    "is_featured": false,
+    "related_skills": ["artificial-intelligence", "natural-language-processing"]
+  },
+  {
+    "id": "predictive-analytics",
+    "name": "Predictive Analytics",
+    "category": "ai_ml",
+    "proficiency": "expert",
+    "years_experience": 10,
+    "is_featured": false,
+    "related_skills": ["machine-learning", "data-science"]
+  },
+  {
+    "id": "conversational-user-interfaces",
+    "name": "Conversational User Interfaces (CUI)",
+    "category": "ai_ml",
+    "proficiency": "advanced",
+    "years_experience": 7,
+    "is_featured": false,
+    "related_skills": ["natural-language-processing", "large-language-models"]
+  },
+  {
+    "id": "interactive-intelligence",
+    "name": "Interactive Intelligence",
+    "category": "ai_ml",
+    "proficiency": "advanced",
+    "years_experience": 5,
+    "is_featured": false,
+    "related_skills": ["artificial-intelligence", "conversational-user-interfaces"]
+  },
+  {
+    "id": "aws-sagemaker",
+    "name": "AWS SageMaker",
+    "category": "cloud_platforms",
+    "proficiency": "expert",
+    "years_experience": 6,
+    "is_featured": false,
+    "related_skills": ["cloud-computing", "machine-learning", "amazon-bedrock"]
+  },
+  {
+    "id": "amazon-bedrock",
+    "name": "Amazon Bedrock",
+    "category": "cloud_platforms",
+    "proficiency": "expert",
+    "years_experience": 3,
+    "is_featured": false,
+    "related_skills": ["aws-sagemaker", "cloud-computing", "generative-ai"]
+  },
+  {
+    "id": "ecs-eks",
+    "name": "ECS/EKS",
+    "category": "cloud_platforms",
+    "proficiency": "advanced",
+    "years_experience": 5,
+    "is_featured": false,
+    "related_skills": ["cloud-computing", "distributed-systems"]
+  },
+  {
+    "id": "azure-machine-learning",
+    "name": "Azure Machine Learning",
+    "category": "cloud_platforms",
+    "proficiency": "advanced",
+    "years_experience": 4,
+    "is_featured": false,
+    "related_skills": ["machine-learning", "cloud-computing", "microsoft-cognitive-services"]
+  },
+  {
+    "id": "microsoft-cognitive-services",
+    "name": "Microsoft Cognitive Services",
+    "category": "cloud_platforms",
+    "proficiency": "advanced",
+    "years_experience": 4,
+    "is_featured": false,
+    "related_skills": ["azure-machine-learning", "natural-language-processing"]
+  },
+  {
+    "id": "cloud-computing",
+    "name": "Cloud Computing",
+    "category": "cloud_platforms",
+    "proficiency": "expert",
+    "years_experience": 10,
+    "is_featured": false,
+    "related_skills": ["aws-sagemaker", "azure-machine-learning", "distributed-systems"]
+  },
+  {
+    "id": "python",
+    "name": "Python",
+    "category": "programming",
+    "proficiency": "expert",
+    "years_experience": 10,
+    "is_featured": false,
+    "related_skills": ["machine-learning", "data-science"]
+  },
+  {
+    "id": "javascript",
+    "name": "JavaScript",
+    "category": "programming",
+    "proficiency": "expert",
+    "years_experience": 13,
+    "is_featured": false,
+    "related_skills": ["web-development", "html", "css"]
+  },
+  {
+    "id": "csharp",
+    "name": "C#",
+    "category": "programming",
+    "proficiency": "advanced",
+    "years_experience": 6,
+    "is_featured": false,
+    "related_skills": ["dotnet", "powershell"]
+  },
+  {
+    "id": "cplusplus",
+    "name": "C++",
+    "category": "programming",
+    "proficiency": "intermediate",
+    "years_experience": 4,
+    "is_featured": false,
+    "related_skills": ["c", "system-architecture"]
+  },
+  {
+    "id": "c",
+    "name": "C",
+    "category": "programming",
+    "proficiency": "intermediate",
+    "years_experience": 4,
+    "is_featured": false,
+    "related_skills": ["cplusplus", "unix"]
+  },
+  {
+    "id": "java",
+    "name": "Java",
+    "category": "programming",
+    "proficiency": "intermediate",
+    "years_experience": 4,
+    "is_featured": false,
+    "related_skills": ["web-development", "software-engineering"]
+  },
+  {
+    "id": "php",
+    "name": "PHP",
+    "category": "programming",
+    "proficiency": "intermediate",
+    "years_experience": 3,
+    "is_featured": false,
+    "related_skills": ["web-development", "mysql"]
+  },
+  {
+    "id": "sql",
+    "name": "SQL",
+    "category": "programming",
+    "proficiency": "expert",
+    "years_experience": 13,
+    "is_featured": false,
+    "related_skills": ["microsoft-sql-server", "mysql", "postgresql"]
+  },
+  {
+    "id": "prolog",
+    "name": "Prolog",
+    "category": "programming",
+    "proficiency": "intermediate",
+    "years_experience": 2,
+    "is_featured": false,
+    "related_skills": ["artificial-intelligence", "cognitive-computing"]
+  },
+  {
+    "id": "dotnet",
+    "name": ".NET",
+    "category": "programming",
+    "proficiency": "advanced",
+    "years_experience": 6,
+    "is_featured": false,
+    "related_skills": ["csharp", "azure-machine-learning"]
+  },
+  {
+    "id": "microsoft-sql-server",
+    "name": "Microsoft SQL Server",
+    "category": "databases",
+    "proficiency": "advanced",
+    "years_experience": 6,
+    "is_featured": false,
+    "related_skills": ["sql", "dotnet"]
+  },
+  {
+    "id": "mysql",
+    "name": "MySQL",
+    "category": "databases",
+    "proficiency": "advanced",
+    "years_experience": 5,
+    "is_featured": false,
+    "related_skills": ["sql", "php"]
+  },
+  {
+    "id": "postgresql",
+    "name": "PostgreSQL",
+    "category": "databases",
+    "proficiency": "expert",
+    "years_experience": 4,
+    "is_featured": false,
+    "related_skills": ["sql", "data-engineering"]
+  },
+  {
+    "id": "neo4j",
+    "name": "Neo4j",
+    "category": "databases",
+    "proficiency": "advanced",
+    "years_experience": 2,
+    "is_featured": false,
+    "related_skills": ["postgresql", "data-engineering"]
+  },
+  {
+    "id": "distributed-systems",
+    "name": "Distributed Systems",
+    "category": "technologies",
+    "proficiency": "expert",
+    "years_experience": 8,
+    "is_featured": false,
+    "related_skills": ["cloud-computing", "system-architecture"]
+  },
+  {
+    "id": "system-architecture",
+    "name": "System Architecture",
+    "category": "technologies",
+    "proficiency": "expert",
+    "years_experience": 10,
+    "is_featured": false,
+    "related_skills": ["cloud-computing", "distributed-systems"]
+  },
+  {
+    "id": "edge-computing",
+    "name": "Edge Computing",
+    "category": "technologies",
+    "proficiency": "advanced",
+    "years_experience": 3,
+    "is_featured": false,
+    "related_skills": ["distributed-systems", "cloud-computing"]
+  },
+  {
+    "id": "web3",
+    "name": "Web3",
+    "category": "technologies",
+    "proficiency": "advanced",
+    "years_experience": 3,
+    "is_featured": false,
+    "related_skills": ["distributed-systems", "edge-computing"]
+  },
+  {
+    "id": "apache-kafka",
+    "name": "Apache Kafka",
+    "category": "technologies",
+    "proficiency": "advanced",
+    "years_experience": 4,
+    "is_featured": false,
+    "related_skills": ["distributed-systems", "data-engineering"]
+  },
+  {
+    "id": "powershell",
+    "name": "PowerShell",
+    "category": "technologies",
+    "proficiency": "advanced",
+    "years_experience": 4,
+    "is_featured": false,
+    "related_skills": ["csharp", "windows-server"]
+  },
+  {
+    "id": "unix",
+    "name": "Unix",
+    "category": "technologies",
+    "proficiency": "advanced",
+    "years_experience": 10,
+    "is_featured": false,
+    "related_skills": ["python", "cloud-computing"]
+  },
+  {
+    "id": "windows-server",
+    "name": "Windows Server",
+    "category": "technologies",
+    "proficiency": "advanced",
+    "years_experience": 4,
+    "is_featured": false,
+    "related_skills": ["powershell", "sharepoint"]
+  },
+  {
+    "id": "microsoft-office",
+    "name": "Microsoft Office",
+    "category": "technologies",
+    "proficiency": "advanced",
+    "years_experience": 10,
+    "is_featured": false,
+    "related_skills": ["sharepoint"]
+  },
+  {
+    "id": "html",
+    "name": "HTML",
+    "category": "web_development",
+    "proficiency": "expert",
+    "years_experience": 13,
+    "is_featured": false,
+    "related_skills": ["css", "javascript", "web-development"]
+  },
+  {
+    "id": "css",
+    "name": "CSS",
+    "category": "web_development",
+    "proficiency": "expert",
+    "years_experience": 13,
+    "is_featured": false,
+    "related_skills": ["html", "javascript", "web-development"]
+  },
+  {
+    "id": "web-development",
+    "name": "Web Development",
+    "category": "web_development",
+    "proficiency": "expert",
+    "years_experience": 13,
+    "is_featured": false,
+    "related_skills": ["html", "css", "javascript"]
+  },
+  {
+    "id": "wordpress",
+    "name": "WordPress",
+    "category": "web_development",
+    "proficiency": "advanced",
+    "years_experience": 8,
+    "is_featured": false,
+    "related_skills": ["php", "web-development"]
+  },
+  {
+    "id": "sharepoint",
+    "name": "SharePoint",
+    "category": "web_development",
+    "proficiency": "advanced",
+    "years_experience": 4,
+    "is_featured": false,
+    "related_skills": ["dotnet", "powershell", "windows-server"]
+  },
+  {
+    "id": "web-analytics",
+    "name": "Web Analytics",
+    "category": "web_development",
+    "proficiency": "advanced",
+    "years_experience": 8,
+    "is_featured": false,
+    "related_skills": ["seo", "web-development"]
+  },
+  {
+    "id": "seo",
+    "name": "SEO",
+    "category": "web_development",
+    "proficiency": "advanced",
+    "years_experience": 8,
+    "is_featured": false,
+    "related_skills": ["web-analytics", "web-development", "marketing"]
+  },
+  {
+    "id": "healthcare",
+    "name": "Healthcare",
+    "category": "domain_healthcare",
+    "proficiency": "expert",
+    "years_experience": 10,
+    "is_featured": true,
+    "related_skills": ["electronic-health-records", "clinical-decision-support", "hipaa"]
+  },
+  {
+    "id": "electronic-health-records",
+    "name": "Electronic Health Records (EHR)",
+    "category": "domain_healthcare",
+    "proficiency": "expert",
+    "years_experience": 5,
+    "is_featured": false,
+    "related_skills": ["healthcare", "hipaa"]
+  },
+  {
+    "id": "clinical-decision-support",
+    "name": "Clinical Decision Support",
+    "category": "domain_healthcare",
+    "proficiency": "expert",
+    "years_experience": 5,
+    "is_featured": false,
+    "related_skills": ["healthcare", "electronic-health-records"]
+  },
+  {
+    "id": "hipaa",
+    "name": "U.S. Health Insurance Portability and Accountability Act (HIPAA)",
+    "category": "domain_healthcare",
+    "proficiency": "expert",
+    "years_experience": 8,
+    "is_featured": false,
+    "related_skills": ["healthcare", "data-privacy", "data-protection"]
+  },
+  {
+    "id": "mental-health",
+    "name": "Mental Health",
+    "category": "domain_healthcare",
+    "proficiency": "advanced",
+    "years_experience": 6,
+    "is_featured": false,
+    "related_skills": ["neuroscience", "healthcare"]
+  },
+  {
+    "id": "neuroscience",
+    "name": "Neuroscience",
+    "category": "domain_healthcare",
+    "proficiency": "advanced",
+    "years_experience": 6,
+    "is_featured": false,
+    "related_skills": ["neuroinformatics", "mental-health"]
+  },
+  {
+    "id": "neuroinformatics",
+    "name": "Neuroinformatics",
+    "category": "domain_healthcare",
+    "proficiency": "advanced",
+    "years_experience": 3,
+    "is_featured": false,
+    "related_skills": ["neuroscience", "genomics"]
+  },
+  {
+    "id": "genomics",
+    "name": "Genomics",
+    "category": "domain_healthcare",
+    "proficiency": "advanced",
+    "years_experience": 3,
+    "is_featured": false,
+    "related_skills": ["neuroinformatics", "healthcare"]
+  },
+  {
+    "id": "entrepreneurship",
+    "name": "Entrepreneurship",
+    "category": "domain_business",
+    "proficiency": "expert",
+    "years_experience": 13,
+    "is_featured": false,
+    "related_skills": ["strategic-planning", "team-building"]
+  },
+  {
+    "id": "team-building",
+    "name": "Team Building",
+    "category": "domain_business",
+    "proficiency": "expert",
+    "years_experience": 10,
+    "is_featured": false,
+    "related_skills": ["entrepreneurship", "strategic-planning"]
+  },
+  {
+    "id": "strategic-planning",
+    "name": "Strategic Planning",
+    "category": "domain_business",
+    "proficiency": "expert",
+    "years_experience": 10,
+    "is_featured": false,
+    "related_skills": ["entrepreneurship", "team-building"]
+  },
+  {
+    "id": "financial-analysis",
+    "name": "Financial Analysis",
+    "category": "domain_business",
+    "proficiency": "advanced",
+    "years_experience": 5,
+    "is_featured": false,
+    "related_skills": ["strategic-planning", "entrepreneurship"]
+  },
+  {
+    "id": "marketing",
+    "name": "Marketing",
+    "category": "domain_business",
+    "proficiency": "advanced",
+    "years_experience": 8,
+    "is_featured": false,
+    "related_skills": ["seo", "web-analytics"]
+  },
+  {
+    "id": "career-development-coaching",
+    "name": "Career Development Coaching",
+    "category": "domain_business",
+    "proficiency": "expert",
+    "years_experience": 3,
+    "is_featured": false,
+    "related_skills": ["team-building", "entrepreneurship"]
+  },
+  {
+    "id": "data-science",
+    "name": "Data Science",
+    "category": "domain_data",
+    "proficiency": "expert",
+    "years_experience": 10,
+    "is_featured": false,
+    "related_skills": ["machine-learning", "predictive-analytics", "data-governance"]
+  },
+  {
+    "id": "data-engineering",
+    "name": "Data Engineering",
+    "category": "domain_data",
+    "proficiency": "expert",
+    "years_experience": 10,
+    "is_featured": true,
+    "related_skills": ["data-science", "sql", "cloud-computing"]
+  },
+  {
+    "id": "data-governance",
+    "name": "Data Governance",
+    "category": "domain_data",
+    "proficiency": "expert",
+    "years_experience": 8,
+    "is_featured": false,
+    "related_skills": ["data-privacy", "data-protection", "hipaa"]
+  },
+  {
+    "id": "data-privacy",
+    "name": "Data Privacy",
+    "category": "domain_data",
+    "proficiency": "expert",
+    "years_experience": 8,
+    "is_featured": false,
+    "related_skills": ["data-governance", "data-protection", "hipaa"]
+  },
+  {
+    "id": "data-protection",
+    "name": "Data Protection",
+    "category": "domain_data",
+    "proficiency": "expert",
+    "years_experience": 8,
+    "is_featured": false,
+    "related_skills": ["data-privacy", "data-governance", "cybersecurity"]
+  },
+  {
+    "id": "open-source-development",
+    "name": "Open-Source Development",
+    "category": "domain_data",
+    "proficiency": "expert",
+    "years_experience": 5,
+    "is_featured": false,
+    "related_skills": ["software-engineering", "open-source-software"]
+  },
+  {
+    "id": "open-source-software",
+    "name": "Open-Source Software",
+    "category": "domain_data",
+    "proficiency": "expert",
+    "years_experience": 5,
+    "is_featured": false,
+    "related_skills": ["open-source-development", "software-engineering"]
+  },
+  {
+    "id": "cybersecurity",
+    "name": "Cybersecurity",
+    "category": "domain_data",
+    "proficiency": "advanced",
+    "years_experience": 6,
+    "is_featured": false,
+    "related_skills": ["data-protection", "data-privacy"]
+  },
+  {
+    "id": "software-engineering",
+    "name": "Software Engineering",
+    "category": "technologies",
+    "proficiency": "expert",
+    "years_experience": 13,
+    "is_featured": false,
+    "related_skills": ["web-development", "system-architecture", "distributed-systems"]
+  },
+  {
+    "id": "leadership",
+    "name": "Leadership",
+    "category": "leadership",
+    "proficiency": "expert",
+    "years_experience": 10,
+    "is_featured": false,
+    "related_skills": ["team-building", "strategic-planning", "career-development-coaching"]
+  }
+]

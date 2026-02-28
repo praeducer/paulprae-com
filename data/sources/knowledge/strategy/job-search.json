@@ -1,0 +1,102 @@
+{
+  "target_roles": {
+    "primary": [
+      "Director of AI",
+      "Head of AI",
+      "AI Engineering Manager",
+      "Principal AI Engineer",
+      "Staff AI Engineer",
+      "Solutions Architect",
+      "Chief Architect",
+      "Senior Cloud Architect",
+      "Senior Pre-Sales Engineer",
+      "Lead Open Source Software Developer"
+    ],
+    "note": "Open to other roles that align with skills and experience"
+  },
+  "target_industries": {
+    "primary": [
+      "Healthcare",
+      "Mental Health",
+      "HealthTech",
+      "Life Sciences",
+      "Neuroscience",
+      "Biotech",
+      "Financial Services",
+      "Decentralized Finance (DeFi)",
+      "FinTech",
+      "Energy"
+    ]
+  },
+  "target_audience": {
+    "titles": [
+      "Executives",
+      "CEOs",
+      "CTOs",
+      "CISOs",
+      "CIOs",
+      "CFOs",
+      "COOs",
+      "Presidents",
+      "Vice Presidents",
+      "Directors",
+      "Managers",
+      "Chief Architects",
+      "Senior Data Scientists",
+      "Founders",
+      "Executive Recruiters"
+    ]
+  },
+  "job_preferences": {
+    "compensation": {
+      "annual_salary": 200000,
+      "bonus": 25000,
+      "total_compensation": 225000,
+      "currency": "USD"
+    },
+    "employment_type": "Full-time",
+    "location_preferences": "within 25 miles of Buford, GA or Atlanta, GA, United States",
+    "work_arrangements": [
+      "On Site",
+      "Hybrid"
+    ]
+  },
+  "core_skills_by_category": {
+    "ai_and_ml": [
+      "AI",
+      "AI infrastructure",
+      "AI governance",
+      "machine learning",
+      "MLOps",
+      "natural language processing",
+      "generative AI",
+      "conversational interface design"
+    ],
+    "data_and_analytics": [
+      "data science",
+      "data engineering",
+      "data governance",
+      "data protection",
+      "data privacy"
+    ],
+    "infrastructure_and_cloud": [
+      "cloud computing",
+      "edge computing",
+      "IT operations"
+    ],
+    "emerging_technologies": [
+      "Web3",
+      "blockchain"
+    ],
+    "software_development": [
+      "open source software development",
+      "software and data architecture"
+    ],
+    "leadership_and_management": [
+      "leadership",
+      "technical project management",
+      "partnership development",
+      "pre-sales engineering"
+    ]
+  }
+}

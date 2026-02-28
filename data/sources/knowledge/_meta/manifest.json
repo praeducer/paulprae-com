@@ -1,0 +1,372 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-02-28",
+  "files": [
+    {
+      "path": "career/certifications.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp"
+      ],
+      "record_count": 10,
+      "privacy_level": "career-public",
+      "phase2_table": "certifications",
+      "phase3_nodes": [
+        "Certification"
+      ],
+      "description": "Professional certifications with authorities and dates"
+    },
+    {
+      "path": "career/companies.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp"
+      ],
+      "record_count": 16,
+      "privacy_level": "career-public",
+      "phase2_table": "companies",
+      "phase3_nodes": [
+        "Company",
+        "Industry"
+      ],
+      "description": "Companies worked at or owned with industry and type metadata"
+    },
+    {
+      "path": "career/courses.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp"
+      ],
+      "record_count": 43,
+      "privacy_level": "career-public",
+      "phase2_table": "courses",
+      "phase3_nodes": [
+        "Course"
+      ],
+      "description": "Academic coursework across all disciplines"
+    },
+    {
+      "path": "career/education.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp"
+      ],
+      "record_count": 3,
+      "privacy_level": "career-public",
+      "phase2_table": "education",
+      "phase3_nodes": [
+        "Education",
+        "School"
+      ],
+      "description": "Education history with degrees, honors, and activities"
+    },
+    {
+      "path": "career/honors.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp"
+      ],
+      "record_count": 4,
+      "privacy_level": "career-public",
+      "phase2_table": "honors",
+      "phase3_nodes": [
+        "Honor"
+      ],
+      "description": "Awards, honors, and competition wins"
+    },
+    {
+      "path": "career/positions.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp"
+      ],
+      "record_count": 16,
+      "privacy_level": "career-public",
+      "phase2_table": "positions",
+      "phase3_nodes": [
+        "Role"
+      ],
+      "description": "Complete work history with highlights, technologies, and industries"
+    },
+    {
+      "path": "career/profile.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp"
+      ],
+      "record_count": null,
+      "privacy_level": "career-public",
+      "phase2_table": "profiles",
+      "phase3_nodes": [
+        "Person"
+      ],
+      "description": "Professional profile with contact info, headline, and summary"
+    },
+    {
+      "path": "career/projects.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp"
+      ],
+      "record_count": 30,
+      "privacy_level": "career-public",
+      "phase2_table": "projects",
+      "phase3_nodes": [
+        "Project"
+      ],
+      "description": "Personal, professional, and open-source projects with outcomes"
+    },
+    {
+      "path": "career/publications.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp"
+      ],
+      "record_count": 2,
+      "privacy_level": "career-public",
+      "phase2_table": "publications",
+      "phase3_nodes": [
+        "Publication"
+      ],
+      "description": "Academic and professional publications"
+    },
+    {
+      "path": "career/recommendations.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp"
+      ],
+      "record_count": 7,
+      "privacy_level": "career-public",
+      "phase2_table": "recommendations",
+      "phase3_nodes": [
+        "Recommendation"
+      ],
+      "description": "Professional recommendations with themes"
+    },
+    {
+      "path": "career/skills.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp"
+      ],
+      "record_count": 71,
+      "privacy_level": "career-public",
+      "phase2_table": "skills",
+      "phase3_nodes": [
+        "Skill"
+      ],
+      "description": "Technical and domain skills with categories and proficiency levels"
+    },
+    {
+      "path": "career/volunteering.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp"
+      ],
+      "record_count": 6,
+      "privacy_level": "career-public",
+      "phase2_table": "volunteering",
+      "phase3_nodes": [
+        "VolunteerRole"
+      ],
+      "description": "Volunteer roles and community involvement"
+    },
+    {
+      "path": "content/message-templates.json",
+      "version": "1.0",
+      "source_repos": [
+        "job-finding-assistant"
+      ],
+      "record_count": null,
+      "privacy_level": "internal",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Message openings, closings, and response templates"
+    },
+    {
+      "path": "content/platform-constraints.json",
+      "version": "1.0",
+      "source_repos": [
+        "job-finding-assistant"
+      ],
+      "record_count": null,
+      "privacy_level": "internal",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Character limits and best practices per platform"
+    },
+    {
+      "path": "content/writing-formulas.json",
+      "version": "1.0",
+      "source_repos": [
+        "job-finding-assistant"
+      ],
+      "record_count": 4,
+      "privacy_level": "internal",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Writing formulas (STAR, PAS, AIDA, BAB)"
+    },
+    {
+      "path": "strategy/audience-frameworks.json",
+      "version": "1.0",
+      "source_repos": [
+        "job-finding-assistant"
+      ],
+      "record_count": 5,
+      "privacy_level": "internal",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Messaging frameworks per audience type"
+    },
+    {
+      "path": "strategy/career-objectives.json",
+      "version": "1.0",
+      "source_repos": [
+        "job-finding-assistant"
+      ],
+      "record_count": null,
+      "privacy_level": "internal",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Career objectives by category with short and long term goals"
+    },
+    {
+      "path": "strategy/job-search.json",
+      "version": "1.0",
+      "source_repos": [
+        "job-finding-assistant"
+      ],
+      "record_count": null,
+      "privacy_level": "internal",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Target roles, industries, compensation, and preferences"
+    },
+    {
+      "path": "strategy/target-market.json",
+      "version": "1.0",
+      "source_repos": [
+        "job-finding-assistant"
+      ],
+      "record_count": null,
+      "privacy_level": "internal",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Target companies, industries, and positioning"
+    },
+    {
+      "path": "brand/brand-narratives.json",
+      "version": "1.0",
+      "source_repos": [
+        "job-finding-assistant"
+      ],
+      "record_count": 9,
+      "privacy_level": "public",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Brand positioning statements and narratives"
+    },
+    {
+      "path": "brand/communication-styles.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp",
+        "job-finding-assistant"
+      ],
+      "record_count": null,
+      "privacy_level": "public",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Context-specific communication styles and guidelines"
+    },
+    {
+      "path": "brand/identity.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp",
+        "job-finding-assistant"
+      ],
+      "record_count": null,
+      "privacy_level": "public",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Mission, vision, causes, and life philosophy"
+    },
+    {
+      "path": "brand/personality.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp",
+        "job-finding-assistant"
+      ],
+      "record_count": null,
+      "privacy_level": "public",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Writing style, tone, humor, and personality traits"
+    },
+    {
+      "path": "brand/values.json",
+      "version": "1.0",
+      "source_repos": [
+        "pgp",
+        "job-finding-assistant"
+      ],
+      "record_count": null,
+      "privacy_level": "public",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Core values with ethical principles and priorities"
+    },
+    {
+      "path": "agents/agent-definitions.json",
+      "version": "1.0",
+      "source_repos": [
+        "job-finding-assistant"
+      ],
+      "record_count": 6,
+      "privacy_level": "internal",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Structured metadata for each AI agent"
+    },
+    {
+      "path": "agents/permissions-matrix.json",
+      "version": "1.0",
+      "source_repos": [
+        "job-finding-assistant"
+      ],
+      "record_count": 6,
+      "privacy_level": "internal",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Knowledge base read/write permissions per agent"
+    },
+    {
+      "path": "agents/quality-standards.json",
+      "version": "1.0",
+      "source_repos": [
+        "job-finding-assistant"
+      ],
+      "record_count": null,
+      "privacy_level": "internal",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "Quality checklists and validation rules"
+    },
+    {
+      "path": "agents/workflow-architecture.json",
+      "version": "1.0",
+      "source_repos": [
+        "job-finding-assistant"
+      ],
+      "record_count": null,
+      "privacy_level": "internal",
+      "phase2_table": null,
+      "phase3_nodes": [],
+      "description": "6-stage AI agent workflow pipeline definition"
+    }
+  ]
+}

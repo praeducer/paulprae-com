@@ -1,0 +1,75 @@
+[
+  {
+    "agent": "career_coach",
+    "read": [
+      "user_profile",
+      "career_objectives"
+    ],
+    "write": [
+      "user_profile.basic_info",
+      "career_objectives"
+    ]
+  },
+  {
+    "agent": "personal_brand",
+    "read": [
+      "career_objectives",
+      "user_profile",
+      "personal_brand",
+      "user_personality"
+    ],
+    "write": [
+      "personal_brand",
+      "user_personality"
+    ]
+  },
+  {
+    "agent": "market_positioning",
+    "read": [
+      "career_objectives",
+      "personal_brand",
+      "user_profile",
+      "user_personality",
+      "go_to_market_strategy"
+    ],
+    "write": [
+      "go_to_market_strategy"
+    ]
+  },
+  {
+    "agent": "website_generator",
+    "read": [
+      "go_to_market_strategy",
+      "personal_brand",
+      "career_objectives",
+      "user_profile",
+      "user_personality",
+      "website_configuration"
+    ],
+    "write": [
+      "website_configuration"
+    ]
+  },
+  {
+    "agent": "application_assistant",
+    "read": [
+      "user_profile",
+      "career_objectives",
+      "personal_brand",
+      "go_to_market_strategy",
+      "user_personality"
+    ],
+    "write": []
+  },
+  {
+    "agent": "networking_assistant",
+    "read": [
+      "user_profile",
+      "career_objectives",
+      "personal_brand",
+      "go_to_market_strategy",
+      "user_personality"
+    ],
+    "write": []
+  }
+]

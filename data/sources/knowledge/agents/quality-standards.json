@@ -1,0 +1,50 @@
+{
+  "pre_send_validation": [
+    "Recipient name spelled correctly",
+    "Company name accurate",
+    "No typos or grammatical errors",
+    "Links work properly",
+    "Formatting displays correctly",
+    "Tone appropriate for audience",
+    "Clear call-to-action included",
+    "Value proposition evident",
+    "Length within platform limits",
+    "Personal details accurate"
+  ],
+  "content_requirements": [
+    "Specific to recipient's context",
+    "References recent or relevant information",
+    "Demonstrates research and preparation",
+    "Aligns with candidate's brand and goals",
+    "Professional yet personable tone",
+    "Mobile-friendly formatting",
+    "Scannable structure",
+    "Avoids cliches and buzzwords",
+    "Shows genuine interest",
+    "Respects recipient's time"
+  ],
+  "personalization_framework": {
+    "research_checklist": [
+      "Recent posts or articles by recipient",
+      "Company news or announcements",
+      "Mutual connections or interests",
+      "Industry trends affecting them",
+      "Their professional background",
+      "Shared alumni or group connections",
+      "Recent achievements or recognition",
+      "Current projects or initiatives"
+    ],
+    "personalization_levels": {
+      "basic": "Company and role reference",
+      "intermediate": "Recent company news or recipient's post",
+      "advanced": "Specific insight about their challenges or goals",
+      "expert": "Thoughtful solution to their stated problem"
+    }
+  },
+  "follow_up_cadence": {
+    "application_submitted": "1 week",
+    "post_interview": "24-48 hours thank you, 1 week follow-up",
+    "networking_outreach": "Initial, then 1 week, then 2 weeks, then monthly",
+    "no_response": "After 2 attempts, wait 3 months"
+  }
+}

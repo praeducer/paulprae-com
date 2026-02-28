@@ -1,0 +1,77 @@
+[
+  {
+    "audience_type": "hiring_managers",
+    "primary_concerns": [
+      "Can they do the job?",
+      "Will they fit our culture?",
+      "How quickly can they contribute?"
+    ],
+    "messaging_focus": "Specific achievements, relevant experience, immediate value",
+    "preferred_length": "150-300 words for initial outreach",
+    "key_elements": [
+      "Quantified achievements",
+      "Industry knowledge",
+      "Problem-solving examples"
+    ]
+  },
+  {
+    "audience_type": "recruiters",
+    "primary_concerns": [
+      "Do they match the requirements?",
+      "Are they actively looking?",
+      "Will they accept our range?"
+    ],
+    "messaging_focus": "Clear qualifications, availability, flexibility",
+    "preferred_length": "100-200 words for initial contact",
+    "key_elements": [
+      "Keyword alignment",
+      "Availability timeline",
+      "Location flexibility"
+    ]
+  },
+  {
+    "audience_type": "hr_representatives",
+    "primary_concerns": [
+      "Do they meet basic requirements?",
+      "Are they professional?",
+      "Will they complete the process?"
+    ],
+    "messaging_focus": "Professionalism, compliance, responsiveness",
+    "preferred_length": "Follow their specified formats exactly",
+    "key_elements": [
+      "Complete information",
+      "Timely responses",
+      "Professional formatting"
+    ]
+  },
+  {
+    "audience_type": "potential_colleagues",
+    "primary_concerns": [
+      "Would I want to work with them?",
+      "What can I learn from them?",
+      "How can we help each other?"
+    ],
+    "messaging_focus": "Shared interests, mutual value, collaborative spirit",
+    "preferred_length": "100-250 words for networking",
+    "key_elements": [
+      "Common ground",
+      "Genuine interest",
+      "Value exchange"
+    ]
+  },
+  {
+    "audience_type": "alumni_connections",
+    "primary_concerns": [
+      "How can I help a fellow alum?",
+      "Is this worth my time?",
+      "What's our connection?"
+    ],
+    "messaging_focus": "Shared experience, specific ask, gratitude",
+    "preferred_length": "150-200 words",
+    "key_elements": [
+      "School connection",
+      "Specific question",
+      "Respectful request"
+    ]
+  }
+]

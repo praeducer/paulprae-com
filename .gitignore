@@ -29,7 +29,7 @@ data/generated/resume.pdf
 data/generated/resume.docx
 
 # Pipeline files that ARE committed:
-#   data/sources/knowledge/*.json  — curated career knowledge (recruiter-facing, used by Phase 2 RAG)
+#   data/sources/knowledge/**/*.json — curated career knowledge (recruiter-facing, used by Phase 2 RAG)
 #   data/generated/career-data.json — canonical career data model (portable across machines)
 #   data/generated/resume.md       — AI-generated resume (consumed by Next.js build + Vercel deploy)
 

@@ -1,0 +1,51 @@
+{
+  "target_companies": [
+    "NVIDIA",
+    "Microsoft",
+    "Amazon Web Services",
+    "Google",
+    "Anthropic",
+    "Perplexity",
+    "Cursor",
+    "Mistral",
+    "Arine",
+    "Booz Allen Hamilton",
+    "Slalom Consulting",
+    "Humana",
+    "BlueCross BlueShield",
+    "Equifax",
+    "Cox Enterprises",
+    "NCR",
+    "Accenture",
+    "Deloitte"
+  ],
+  "target_industries": [
+    "Healthcare",
+    "Mental Health",
+    "HealthTech",
+    "Life Sciences",
+    "Neuroscience",
+    "Biotech",
+    "Financial Services",
+    "Decentralized Finance (DeFi)",
+    "FinTech",
+    "Energy",
+    "Cloud Computing",
+    "AI Infrastructure",
+    "Enterprise Software",
+    "Open Source Technology",
+    "Consulting and Professional Services"
+  ],
+  "positioning_statement": "Principal AI Engineer and Architect with 13+ years delivering enterprise AI, ML, and data solutions across healthcare, life sciences, and financial services for Fortune 500 companies. Combines deep technical expertise in AI infrastructure and cloud architecture with a proven track record of building scalable systems that drive measurable business outcomes.",
+  "competitive_advantages": [
+    "Drives innovation that serves human flourishing",
+    "Combines deep technical expertise in AI/ML with healthcare domain knowledge",
+    "Proven track record of building AI infrastructure that scales from startup to enterprise level",
+    "Balances technical depth with business acumen and human empathy",
+    "Fortune 500 and enterprise delivery track record at AWS, Microsoft, and Slalom",
+    "Full-stack capability spanning data engineering, ML systems, and cloud infrastructure",
+    "Healthcare domain expertise across Arine, BCBS, Humana, and Booz Allen Hamilton",
+    "Advocates for responsible AI development that prioritizes data privacy, human welfare, and equity",
+    "Democratizes access to wealth-building opportunities through open source technology and mentorship"
+  ]
+}

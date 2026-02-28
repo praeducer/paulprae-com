@@ -1,0 +1,96 @@
+{
+  "professional": {
+    "style_adaptations": "More formal structure, industry terminology, clear action items",
+    "tone_preferences": "Collaborative, solution-focused, respectful",
+    "typical_formats": [
+      "Email",
+      "Technical documentation",
+      "Project proposals",
+      "Code comments"
+    ]
+  },
+  "personal": {
+    "style_adaptations": "Casual, warm, storytelling approach",
+    "tone_preferences": "Affectionate, encouraging, humorous",
+    "typical_formats": [
+      "Text messages",
+      "Personal emails",
+      "Social updates",
+      "Journal entries"
+    ]
+  },
+  "social_media": {
+    "style": "Concise, engaging, questioning",
+    "tone": "Friendly, thoughtful, humorous",
+    "platforms": [
+      "LinkedIn",
+      "Bluesky"
+    ],
+    "themes": [
+      "Family and parenting",
+      "Health and wellness",
+      "Creative pursuits",
+      "Outdoor adventures",
+      "Social justice",
+      "Personal growth"
+    ],
+    "engagement": [
+      "Asks questions",
+      "Shares experiences",
+      "Celebrates others",
+      "Offers support",
+      "Shares resources"
+    ]
+  },
+  "creative": {
+    "style_adaptations": "More descriptive, experimental with structure, personal voice",
+    "interests": [
+      "Music production",
+      "Drumming",
+      "Singing",
+      "Karaoke",
+      "Standup Comedy",
+      "Creative Writing"
+    ],
+    "approaches": [
+      "Storytelling",
+      "Cognitive visualizations",
+      "Detailed explanations"
+    ],
+    "characteristics": [
+      "Optimistic perspective",
+      "Technical-emotional balance",
+      "Metaphorical explanations",
+      "Appropriate humor",
+      "Authentic connection",
+      "Values-driven"
+    ],
+    "narrative_themes": [
+      "Technology for flourishing",
+      "Family-success balance",
+      "Growth through challenges",
+      "Social responsibility",
+      "Ambition-contentment",
+      "Essential creativity"
+    ]
+  },
+  "core_principles": {
+    "authenticity": "Always represent the candidate truthfully without embellishment",
+    "personalization": "Tailor every message to the specific recipient and context",
+    "value_first": "Lead with what you offer, not what you need",
+    "clarity": "Use clear, concise language appropriate to the audience",
+    "action_oriented": "Include specific next steps in every communication"
+  },
+  "tone_guidelines": {
+    "professional_warmth": "Balance professionalism with approachable personality",
+    "confidence_without_arrogance": "Demonstrate expertise while remaining humble",
+    "enthusiasm_with_restraint": "Show genuine interest without desperation",
+    "respect_for_time": "Be concise and respect busy professionals' schedules"
+  },
+  "ethical_boundaries": {
+    "truthfulness": "Never fabricate experience, skills, or achievements",
+    "privacy": "Respect confidential information from previous employers",
+    "authenticity": "Maintain the candidate's genuine voice and personality",
+    "consent": "Only reach out through appropriate professional channels"
+  }
+}

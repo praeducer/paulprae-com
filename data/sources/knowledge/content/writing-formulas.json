@@ -1,0 +1,30 @@
+[
+  {
+    "id": "star_method",
+    "name": "STAR Method",
+    "structure": "Situation \u2192 Task \u2192 Action \u2192 Result",
+    "usage": "Interview responses, cover letters, achievement descriptions",
+    "example": "When [situation], I was tasked with [task]. I [action], which resulted in [quantified outcome]."
+  },
+  {
+    "id": "problem_agitate_solve",
+    "name": "Problem Agitate Solve",
+    "structure": "Identify Problem \u2192 Explain Impact \u2192 Present Solution",
+    "usage": "Cover letters, value propositions, LinkedIn messages",
+    "example": "I understand [company] is facing [challenge]. This can impact [consequences]. My experience in [relevant area] can help by [solution]."
+  },
+  {
+    "id": "aida_model",
+    "name": "AIDA Model",
+    "structure": "Attention \u2192 Interest \u2192 Desire \u2192 Action",
+    "usage": "All outreach messages, email subjects, connection requests",
+    "example": "[Attention-grabbing opening]. [Interesting detail]. [Why they should care]. [Specific next step]."
+  },
+  {
+    "id": "before_after_bridge",
+    "name": "Before After Bridge",
+    "structure": "Current State \u2192 Desired State \u2192 How to Get There",
+    "usage": "Networking messages, interview answers, cover letters",
+    "example": "Currently, [problem]. Imagine instead [ideal scenario]. With my background in [expertise], I can help bridge that gap by [specific approach]."
+  }
+]

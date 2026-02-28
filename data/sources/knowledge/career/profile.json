@@ -1,0 +1,19 @@
+{
+  "name": "Paul Prae",
+  "headline": "AI Solutions Architect, AI Engineering Team Lead | Healthcare, Life Science, and Financial Services Industry Expert | Making Health and Wealth Accessible to Working Class Entrepreneurs",
+  "summary": "Hi, I'm Paul, an AI solutions architect and AI engineering leader focused on solving challenges in privacy-sensitive industries such as healthcare, life science, and finance. My 13+ years of experience includes roles at Amazon Web Services, Microsoft, Red Ventures, Booz Allen Hamilton, and Slalom Consulting delivering world-class software to Fortune 500 companies. I'm also an active social entrepreneur on a mission to make health and wealth accessible to working-class entrepreneurs and their families.\n\nMy superpowers include AI, Machine Learning, and Data:\n- Engineering Team Management — I manage technical people and projects from ideation to production.\n- Platform Architecture — I design and build software infrastructure on-premises and in the cloud.\n- Governance — I mitigate risk by protecting data and ensuring data privacy.\n- Operations — I address operational inefficiencies by improving data accessibility and infrastructure reliability.\n\nMy portfolio includes the following applications:\n- A machine learning platform for detecting mental health disorders using audio data.\n- A data platform for detecting brain diseases using neuroimaging data.\n- A data lake and high-performance computing environment for managing and processing genomics data.\n- Data pipelines and multiple full-stack web applications for visualizing and predicting patient needs and healthcare facility capacity.\n\nMy current open-source AI stack includes Ollama, Open WebUI, LangChain, n8n, Neo4j, PostgreSQL, and various LLMs (including the Mistral, Qwen, Llama, and DeepSeek families of models). I'm using this stack to build decentralized Web 3.0 apps and AI agents that help working-class entrepreneurs generate wealth.\n\nMy latest cloud computing stack includes the Amazon Sagemaker AI, Bedrock, Elastic Container/Kubernetes Service (ECS/EKS), and Deep Learning AMI services from Amazon Web Services (AWS). I'm also well-versed in building conversational interfaces and generative AI applications on AWS (utilizing Amazon Nova, Lex, and Comprehend services) and Microsoft Azure (utilizing Copilot, Bot, Search, and Machine Learning services). I most often leverage these stacks for larger enterprises.\n\nLet's connect and explore how we can innovate together.",
+  "location": {
+    "primary": "Buford, GA, United States",
+    "secondary": "Atlanta, GA, United States"
+  },
+  "email": "",
+  "linkedin": "https://www.linkedin.com/in/paulprae",
+  "website": "https://www.paulprae.com",
+  "github": "https://github.com/praeducer",
+  "blog": "https://blog.paulprae.com/",
+  "presentations": "https://www.slideshare.net/PaulPrae",
+  "academic": "https://uga.academia.edu/PaulPrae",
+  "years_experience": 13,
+  "current_role": "Staff Data Operations Engineer",
+  "current_company": "Arine"
+}

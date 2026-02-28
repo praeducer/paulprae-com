@@ -1,0 +1,92 @@
+[
+  {
+    "id": "aws-certified-machine-learning-specialty",
+    "name": "AWS Certified Machine Learning - Specialty",
+    "authority": "Amazon Web Services (AWS)",
+    "issue_date": "2020-01",
+    "expiry_date": null,
+    "license_number": "6N7DP4SKN1141CC3",
+    "url": "http://aws.amazon.com/verification"
+  },
+  {
+    "id": "amazon-sagemaker-simplifying-ml",
+    "name": "OTP-AWSD4: Amazon SageMaker: Simplifying Machine Learning Application Development",
+    "authority": "edX",
+    "issue_date": "2019-06",
+    "expiry_date": null,
+    "license_number": "5a0d472a95a84ab387d4f722514f711a",
+    "url": "https://courses.edx.org/certificates/5a0d472a95a84ab387d4f722514f711a"
+  },
+  {
+    "id": "aws-certified-solutions-architect",
+    "name": "AWS Certified Solutions Architect",
+    "authority": "Amazon Web Services",
+    "issue_date": "2018-07",
+    "expiry_date": null,
+    "license_number": "CFHY5QB2D2E41TWX",
+    "url": "https://www.certmetrics.com/amazon/public/transcript.aspx?transcript=BZK8S5SKKFV4Q5WJ"
+  },
+  {
+    "id": "aws-certified-cloud-practitioner",
+    "name": "AWS Certified Cloud Practitioner",
+    "authority": "Amazon Web Services",
+    "issue_date": "2018-07",
+    "expiry_date": null,
+    "license_number": "6XPV2LD2J2R11HGB",
+    "url": "https://www.certmetrics.com/amazon/public/transcript.aspx?transcript=VRS9DLC1KJ1EQQW8"
+  },
+  {
+    "id": "edx-data-science-ml-essentials",
+    "name": "edX Verified Certificate for Data Science and Machine Learning Essentials",
+    "authority": "edX",
+    "issue_date": "2015-11",
+    "expiry_date": null,
+    "license_number": null,
+    "url": "https://courses.edx.org/certificates/user/1535101/course/course-v1:Microsoft+DAT203x+1T2016"
+  },
+  {
+    "id": "edx-intro-xaml-app-development",
+    "name": "edX Honor Code Certificate for Introduction to XAML and Application Development",
+    "authority": "edX",
+    "issue_date": "2015-11",
+    "expiry_date": null,
+    "license_number": null,
+    "url": "https://courses.edx.org/certificates/user/1535101/course/course-v1:Microsoft+DEV206.1x+3T2015"
+  },
+  {
+    "id": "coursera-intro-data-science",
+    "name": "Introduction to Data Science",
+    "authority": "Coursera",
+    "issue_date": "2014-09",
+    "expiry_date": null,
+    "license_number": null,
+    "url": "https://www.coursera.org/course/datasci"
+  },
+  {
+    "id": "microsoft-mach-program",
+    "name": "Certificate of Completion from the Microsoft Academy for College Hires",
+    "authority": "Microsoft",
+    "issue_date": "2014-01",
+    "expiry_date": null,
+    "license_number": null,
+    "url": "https://www.instagram.com/p/jSU_zju0Hn/"
+  },
+  {
+    "id": "uga-music-business-certificate",
+    "name": "Interdisciplinary Certificate in Music Business",
+    "authority": "The University of Georgia",
+    "issue_date": "2012-05",
+    "expiry_date": null,
+    "license_number": null,
+    "url": "http://www.terry.uga.edu/academics/certificates/music-business"
+  },
+  {
+    "id": "uga-new-media-certificate",
+    "name": "Interdisciplinary Certificate in New Media",
+    "authority": "The University of Georgia",
+    "issue_date": "2012-05",
+    "expiry_date": null,
+    "license_number": null,
+    "url": "http://mynmi.net/certificate/"
+  }
+]

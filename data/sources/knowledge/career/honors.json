@@ -1,0 +1,34 @@
+[
+  {
+    "id": "hackathon-clt-first-place",
+    "title": "First place in the Code category for HACKATHON clt",
+    "organization": "HACKATHON clt",
+    "date": "2015-03",
+    "description": "The goal was to predict, model, plan and present the best, most attractive and creative ways to deliver groceries to customers. Our team name was HT CoDelivery and we were out to \"Deliver Groceries Together.\" We found a simple approach that easily integrated with Harris Teeter's way of doing things. Our idea was relatively easy to implement and aligned with Harris Teeter's mission. Check out our winning project on GitHub: https://github.com/praeducer/htcodelivery",
+    "category": "Competition"
+  },
+  {
+    "id": "microsoft-entrepreneur-of-the-year-nomination",
+    "title": "Nominated for Global Business Support's \"Entrepreneur of the Year\"",
+    "organization": "Microsoft",
+    "date": "2013",
+    "description": "",
+    "category": "Professional Recognition"
+  },
+  {
+    "id": "uga-cum-laude",
+    "title": "Graduated Cum Laude",
+    "organization": "University of Georgia",
+    "date": "2012-05",
+    "description": "",
+    "category": "Academic Achievement"
+  },
+  {
+    "id": "gpc-high-honors",
+    "title": "Graduated High Honors",
+    "organization": "Georgia Perimeter College",
+    "date": "2007-12",
+    "description": "",
+    "category": "Academic Achievement"
+  }
+]

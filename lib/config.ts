@@ -23,6 +23,17 @@ export const PATHS = {
   envFile: path.join(ROOT, ".env.local"),
 } as const;
 
+// ─── Knowledge Base Paths ────────────────────────────────────────────────────
+
+export const KNOWLEDGE_PATHS = {
+  career: path.join(ROOT, "data", "sources", "knowledge", "career"),
+  brand: path.join(ROOT, "data", "sources", "knowledge", "brand"),
+  strategy: path.join(ROOT, "data", "sources", "knowledge", "strategy"),
+  agents: path.join(ROOT, "data", "sources", "knowledge", "agents"),
+  content: path.join(ROOT, "data", "sources", "knowledge", "content"),
+  meta: path.join(ROOT, "data", "sources", "knowledge", "_meta"),
+} as const;
+
 // ─── Claude API Configuration ────────────────────────────────────────────────
 
 export const CLAUDE = {

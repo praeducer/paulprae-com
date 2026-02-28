@@ -1,0 +1,65 @@
+{
+  "linkedin": {
+    "connection_request": {
+      "character_limit": 300,
+      "best_practices": [
+        "Personalize with specific detail",
+        "Mention mutual connection or interest",
+        "Clear value proposition"
+      ]
+    },
+    "message": {
+      "character_limit": 1300,
+      "best_practices": [
+        "Hook in first sentence",
+        "Break up text with paragraphs",
+        "Include clear CTA"
+      ]
+    },
+    "inmail": {
+      "character_limit": 1900,
+      "subject_limit": 200,
+      "best_practices": [
+        "Compelling subject line",
+        "Establish credibility early",
+        "Specific request"
+      ]
+    }
+  },
+  "email": {
+    "subject_line": {
+      "character_limit": 50,
+      "best_practices": [
+        "Action-oriented",
+        "Specific benefit",
+        "Avoid spam triggers"
+      ]
+    },
+    "body": {
+      "recommended_length": "150-300 words",
+      "best_practices": [
+        "Mobile-optimized formatting",
+        "Scannable structure",
+        "Single clear CTA"
+      ]
+    }
+  },
+  "application_forms": {
+    "text_fields": {
+      "typical_limit": "150-500 words",
+      "best_practices": [
+        "Answer the exact question",
+        "Use keywords from job description",
+        "Quantify when possible"
+      ]
+    },
+    "cover_letter_upload": {
+      "typical_limit": "1 page",
+      "best_practices": [
+        "PDF format",
+        "Professional formatting",
+        "Match resume style"
+      ]
+    }
+  }
+}

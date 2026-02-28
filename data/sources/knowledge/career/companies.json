@@ -1,0 +1,146 @@
+[
+  {
+    "id": "arine",
+    "name": "Arine",
+    "industry": "Healthcare Technology",
+    "size": "startup",
+    "type": "employer",
+    "website": "https://www.arine.io",
+    "description": "Healthcare technology platform focused on medication management and clinical decision support."
+  },
+  {
+    "id": "booz-allen-hamilton",
+    "name": "Booz Allen Hamilton",
+    "industry": "Management Consulting / Government Services",
+    "size": "enterprise",
+    "type": "employer",
+    "website": "https://www.boozallen.com",
+    "description": "Global management consulting, technology, and engineering firm providing services to government and commercial clients."
+  },
+  {
+    "id": "modular-earth",
+    "name": "Modular Earth",
+    "industry": "Technology / Social Impact",
+    "size": "startup",
+    "type": "nonprofit",
+    "website": "https://github.com/Modular-Earth-LLC",
+    "description": "Not-for-profit organization supporting free and open-source development of AI-driven applications for social good."
+  },
+  {
+    "id": "hyperbloom",
+    "name": "Hyperbloom",
+    "industry": "IT Services and Consulting",
+    "size": "startup",
+    "type": "own-business",
+    "website": "https://www.hyperbloom.ai/",
+    "description": "IT services and consulting business focused on AI and data solutions for healthcare, life science, and financial services."
+  },
+  {
+    "id": "mento",
+    "name": "Mento",
+    "industry": "Professional Development / Coaching",
+    "size": "startup",
+    "type": "employer",
+    "website": "https://www.mento.co",
+    "description": "Executive coaching platform delivering science-backed coaching to the modern workforce."
+  },
+  {
+    "id": "trends-center",
+    "name": "TReNDS Center",
+    "industry": "Neuroscience Research",
+    "size": "startup",
+    "type": "employer",
+    "website": "https://trendscenter.org",
+    "description": "Research center developing advanced neuroinformatics tools leveraging brain imaging and omics data for brain health and disease."
+  },
+  {
+    "id": "amazon-web-services",
+    "name": "Amazon Web Services",
+    "industry": "Cloud Computing",
+    "size": "enterprise",
+    "type": "employer",
+    "website": "https://aws.amazon.com",
+    "description": "World's leading cloud computing platform providing infrastructure, AI/ML, and enterprise services."
+  },
+  {
+    "id": "neurolex-labs",
+    "name": "NeuroLex Labs",
+    "industry": "Healthcare AI / Voice Computing",
+    "size": "startup",
+    "type": "employer",
+    "website": "https://www.neurolex.ai",
+    "description": "Voice computing company building software for the prediction and prevention of neurodegenerative diseases."
+  },
+  {
+    "id": "decooda",
+    "name": "Decooda",
+    "industry": "AI / Customer Experience Analytics",
+    "size": "startup",
+    "type": "employer",
+    "website": null,
+    "description": "AI company designing next-generation data science tools for the customer experience industry."
+  },
+  {
+    "id": "slalom-consulting",
+    "name": "Slalom Consulting",
+    "industry": "Technology Consulting",
+    "size": "enterprise",
+    "type": "employer",
+    "website": "https://www.slalom.com",
+    "description": "Modern consulting firm focused on strategy, technology, and business transformation."
+  },
+  {
+    "id": "red-ventures",
+    "name": "Red Ventures",
+    "industry": "Digital Marketing / Technology",
+    "size": "mid-market",
+    "type": "employer",
+    "website": "https://www.redventures.com",
+    "description": "Technology-driven marketing company optimizing customer acquisition for large brands in high-growth industries."
+  },
+  {
+    "id": "microsoft",
+    "name": "Microsoft",
+    "industry": "Technology",
+    "size": "enterprise",
+    "type": "employer",
+    "website": "https://www.microsoft.com",
+    "description": "Global technology company providing software, cloud computing, and enterprise services."
+  },
+  {
+    "id": "paul-prae-consulting",
+    "name": "Paul Prae",
+    "industry": "Digital Marketing / Web Development",
+    "size": "startup",
+    "type": "own-business",
+    "website": "https://www.paulprae.com",
+    "description": "Independent digital strategy consulting and web development practice."
+  },
+  {
+    "id": "paul-prae-music",
+    "name": "Paul Prae",
+    "industry": "Music Production / Audio Engineering",
+    "size": "startup",
+    "type": "own-business",
+    "website": null,
+    "description": "Music production and audio engineering practice including live sound, studio production, and stage management."
+  },
+  {
+    "id": "john-keane-studios",
+    "name": "John Keane Studios",
+    "industry": "Music / Recording Studio",
+    "size": "startup",
+    "type": "employer",
+    "website": null,
+    "description": "Grammy-nominated recording studio operated by producer John Keane in Athens, Georgia."
+  },
+  {
+    "id": "damon-moon-and-the-whispering-drifters",
+    "name": "Damon Moon and the Whispering Drifters",
+    "industry": "Music / Performing Arts",
+    "size": "startup",
+    "type": "employer",
+    "website": null,
+    "description": "Music band based in the southeastern United States."
+  }
+]

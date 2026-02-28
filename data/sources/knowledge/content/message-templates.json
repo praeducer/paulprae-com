@@ -1,0 +1,51 @@
+{
+  "effective_openings": {
+    "research_based": "I noticed your recent [article/post/achievement] about [specific topic]...",
+    "mutual_connection": "[Name] suggested I reach out regarding...",
+    "value_proposition": "With my experience in [specific area], I can help [company] achieve...",
+    "timely_relevance": "Given [company's] recent [announcement/initiative], my background in...",
+    "alumni_connection": "As a fellow [school] alum now in [industry], I..."
+  },
+  "compelling_closings": {
+    "specific_ask": "Would you be open to a brief 15-minute call next week to discuss...",
+    "value_offer": "I'd be happy to share insights on [specific topic] if helpful...",
+    "next_step": "I'll follow up next [day] unless I hear otherwise...",
+    "gratitude": "Thank you for considering my request. I look forward to...",
+    "availability": "I'm available [specific times] if you'd like to connect..."
+  },
+  "credibility_builders": {
+    "quantified_achievement": "Led a team that increased [metric] by [percentage]...",
+    "relevant_experience": "In my role at [similar company], I successfully...",
+    "industry_knowledge": "Having worked in [industry] for [years], I understand...",
+    "specific_skills": "My expertise in [technical skill] enabled me to...",
+    "recognition": "Recognized for [achievement] by [organization]..."
+  },
+  "response_templates": {
+    "interview_thank_you": {
+      "timing": "Within 24-48 hours",
+      "structure": [
+        "Gratitude",
+        "Specific reference from conversation",
+        "Reiterate interest and fit",
+        "Next steps"
+      ],
+      "length": "150-250 words"
+    },
+    "rejection_response": {
+      "timing": "Within 48 hours",
+      "structure": [
+        "Gratitude",
+        "Request for feedback",
+        "Express continued interest",
+        "Connection request"
+      ],
+      "length": "100-150 words"
+    },
+    "follow_up_cadence": {
+      "application_submitted": "1 week",
+      "post_interview": "24-48 hours thank you, 1 week follow-up",
+      "networking_outreach": "Initial \u2192 1 week \u2192 2 weeks \u2192 monthly",
+      "no_response": "After 2 attempts, wait 3 months"
+    }
+  }
+}

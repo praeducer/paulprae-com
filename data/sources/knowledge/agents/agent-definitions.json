@@ -1,0 +1,201 @@
+[
+  {
+    "id": "career_coach",
+    "name": "Career Coach Assistant",
+    "stage": "1",
+    "role": "A Career Coach who conducts initial consultations with job seekers to gather essential information about career objectives, current situation, and constraints.",
+    "purpose": "Gather career objectives and requirements",
+    "prerequisites": [],
+    "outputs": [
+      "career_objectives",
+      "user_profile.basic_info"
+    ],
+    "read_permissions": [
+      "user_profile",
+      "career_objectives"
+    ],
+    "write_permissions": [
+      "user_profile.basic_info",
+      "career_objectives"
+    ],
+    "success_criteria": [
+      "Three clear objectives documented",
+      "Timeline constraints understood",
+      "Geographic preferences captured",
+      "Compensation requirements noted",
+      "Knowledge base updated (if available)",
+      "Summary provided to job seeker",
+      "Handoff ready for brand assistant"
+    ],
+    "source_prompt_file": "AI_assistants/career_coach_assistant.system.prompt.md"
+  },
+  {
+    "id": "personal_brand",
+    "name": "Personal Brand Development Assistant",
+    "stage": "2",
+    "role": "An expert personal brand strategist who guides professionals through discovering and articulating their authentic personal brand.",
+    "purpose": "Develop mission, vision, values, and brand narratives",
+    "prerequisites": [
+      "1"
+    ],
+    "outputs": [
+      "personal_brand",
+      "user_personality"
+    ],
+    "read_permissions": [
+      "career_objectives",
+      "user_profile",
+      "personal_brand",
+      "user_personality"
+    ],
+    "write_permissions": [
+      "personal_brand",
+      "user_personality"
+    ],
+    "success_criteria": [
+      "Participant gains clarity on brand elements",
+      "Each workshop produces actionable insights",
+      "Knowledge base updated systematically",
+      "Brand elements feel authentic and energizing",
+      "Structured data ready for content creation",
+      "Clear connections between brand elements",
+      "Alignment with career objectives",
+      "Practical application potential"
+    ],
+    "source_prompt_file": "AI_assistants/personal_brand_development_assistant.system.prompt.md"
+  },
+  {
+    "id": "market_positioning",
+    "name": "Job Market Positioning Strategy Assistant",
+    "stage": "3",
+    "role": "A strategic business consultant specializing in developing go-to-market strategies for professionals looking for high-value work.",
+    "purpose": "Create go-to-market strategy and competitive positioning",
+    "prerequisites": [
+      "1",
+      "2"
+    ],
+    "outputs": [
+      "go_to_market_strategy"
+    ],
+    "read_permissions": [
+      "career_objectives",
+      "personal_brand",
+      "user_profile",
+      "user_personality",
+      "go_to_market_strategy"
+    ],
+    "write_permissions": [
+      "go_to_market_strategy"
+    ],
+    "success_criteria": [
+      "Clear primary target market identified with supporting data",
+      "Competitive positioning established with specific differentiators",
+      "Timeline-appropriate execution plan with measurable milestones",
+      "Industry-specific messaging frameworks developed",
+      "Geographic strategy aligns with preferences and opportunities",
+      "Success metrics defined with tracking and optimization protocols",
+      "Integration with personal brand and career objectives validated",
+      "Ready-to-execute roadmap with specific next steps provided"
+    ],
+    "source_prompt_file": "AI_assistants/job_market_positioning.system.prompt.md"
+  },
+  {
+    "id": "website_generator",
+    "name": "Professional Website Generator",
+    "stage": "4A",
+    "role": "An elite website content strategist specializing in translating go-to-market positioning into high-impact professional portfolio websites that convert hiring manager visits into interview invitations.",
+    "purpose": "Transform GTM strategy into high-impact portfolio websites",
+    "prerequisites": [
+      "1",
+      "2",
+      "3"
+    ],
+    "outputs": [
+      "website_content"
+    ],
+    "read_permissions": [
+      "go_to_market_strategy",
+      "personal_brand",
+      "career_objectives",
+      "user_profile",
+      "user_personality",
+      "website_configuration"
+    ],
+    "write_permissions": [
+      "website_configuration"
+    ],
+    "success_criteria": [
+      "GTM strategy messaging accurately translated",
+      "Competitive differentiation clearly communicated",
+      "Quantified achievements prominently featured",
+      "Target audience messaging (executives, technical, recruiters) present",
+      "Personal brand (mission, vision, values) integrated authentically",
+      "Contact information and CTAs strategically placed",
+      "Platform-specific Markdown syntax validated",
+      "Mobile-responsive structure verified",
+      "Accessibility considerations addressed",
+      "Conversion paths clearly defined"
+    ],
+    "source_prompt_file": "AI_assistants/professional_website_generator.system.prompt.md"
+  },
+  {
+    "id": "application_assistant",
+    "name": "Job Application & Interview Assistant",
+    "stage": "4B",
+    "role": "An expert job application specialist and interview communication strategist who transforms career objectives and personal branding into compelling application materials.",
+    "purpose": "Create resumes, cover letters, and application materials",
+    "prerequisites": [
+      "1",
+      "2",
+      "3"
+    ],
+    "outputs": [
+      "application_materials"
+    ],
+    "read_permissions": [
+      "user_profile",
+      "career_objectives",
+      "personal_brand",
+      "go_to_market_strategy",
+      "user_personality"
+    ],
+    "write_permissions": [],
+    "success_criteria": [
+      "ATS pass rate target 95%+ keyword match",
+      "Response rate tracked to determine which versions generate interviews",
+      "Time-to-complete optimized for 30-minute application completion",
+      "Zero tolerance for typos or formatting issues"
+    ],
+    "source_prompt_file": "AI_assistants/job_application_interview_assistant.system.prompt.md"
+  },
+  {
+    "id": "networking_assistant",
+    "name": "Professional Networking Assistant",
+    "stage": "4C",
+    "role": "An expert professional networking strategist and social media content creator who builds strategic relationships that accelerate job searches.",
+    "purpose": "Build strategic relationships through social media outreach",
+    "prerequisites": [
+      "1",
+      "2",
+      "3"
+    ],
+    "outputs": [
+      "networking_content"
+    ],
+    "read_permissions": [
+      "user_profile",
+      "career_objectives",
+      "personal_brand",
+      "go_to_market_strategy",
+      "user_personality"
+    ],
+    "write_permissions": [],
+    "success_criteria": [
+      "Connection accept rate target 60%+",
+      "Response rate target 40%+",
+      "Engagement rate 10%+ on thought leadership",
+      "Referral generation 1-2 per week minimum"
+    ],
+    "source_prompt_file": "AI_assistants/professional_networking_assistant.system.prompt.md"
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "uga-bs-computer-science",
+    "school": "University of Georgia",
+    "degree": "Bachelor of Science",
+    "field": "Computer Science",
+    "specialization": "Area of Emphasis in Artificial Intelligence",
+    "start_date": "2008",
+    "end_date": "2012",
+    "activities": "Nuci's Space Student Organization, UGA's Music Business Program Alumni, New Media Institute Alumni, WUOG Campus Radio Station",
+    "honors": [
+      "Graduated Cum Laude",
+      "Dean's List four semesters",
+      "HOPE Scholarship recipient"
+    ],
+    "certificates": [],
+    "description": "Bachelor of Science in Computer Science with an Area of Emphasis in Artificial Intelligence"
+  },
+  {
+    "id": "uga-ba-cognitive-science",
+    "school": "University of Georgia",
+    "degree": "Bachelor of Arts",
+    "field": "Cognitive Science",
+    "specialization": "Focused Foundation in Artificial Intelligence",
+    "start_date": "2008",
+    "end_date": "2012",
+    "activities": "Nuci's Space Student Organization, UGA's Music Business Program Alumni, New Media Institute Alumni, WUOG Campus Radio Station",
+    "honors": [
+      "Graduated Cum Laude",
+      "Dean's List four semesters",
+      "HOPE Scholarship recipient"
+    ],
+    "certificates": [
+      "Interdisciplinary Certificate in Music Business (May 2010)",
+      "Interdisciplinary Certificate in New Media (December 2009)"
+    ],
+    "description": "Bachelor of Arts in Cognitive Science with a Focused Foundation in Artificial Intelligence"
+  },
+  {
+    "id": "gpc-as-music-production",
+    "school": "Georgia Perimeter College",
+    "degree": "Associate of Science",
+    "field": "Music Production",
+    "specialization": null,
+    "start_date": "2005",
+    "end_date": "2007",
+    "activities": "Music Production",
+    "honors": [
+      "Graduated High Honors",
+      "Dean's List four semesters",
+      "HOPE Scholarship recipient"
+    ],
+    "certificates": [],
+    "description": "Associate of Science degree with focus on Music Production"
+  }
+]

@@ -1,0 +1,83 @@
+{
+  "mission": {
+    "description": "Leverage AI and emerging technology to create meaningful impact by making health and wealth accessible to working-class entrepreneurs and their families while prioritizing human welfare, data privacy, and ethical considerations.",
+    "core_areas": {
+      "ai_for_good": [
+        "Develop AI systems that prioritize human welfare, data privacy, and ethical considerations",
+        "Bridge the gap between cutting-edge AI capabilities and responsible implementation"
+      ],
+      "democratizing_technology": [
+        "Make advanced AI and cloud technologies accessible to organizations of all sizes",
+        "Empower smaller companies to compete with enterprise-level AI capabilities"
+      ],
+      "sustainable_innovation": [
+        "Build scalable AI infrastructure that drives business growth while serving the general public",
+        "Create technology solutions that generate sustainable competitive advantages"
+      ],
+      "wealth_accessibility": [
+        "Serve collective prosperity rather than concentrated power",
+        "Empower working-class entrepreneurs to maintain creative control and achieve economic freedom",
+        "Help entrepreneurs secure capital and build profitable, socially responsible businesses",
+        "Reduce risk for entrepreneurs with families starting businesses"
+      ],
+      "health_accessibility": [
+        "Build innovations that help all life flourish",
+        "Challenge economic systems that fail to serve the public good",
+        "Improve and extend quality of human life by eradicating neurodegenerative disease and eliminating generational trauma"
+      ]
+    }
+  },
+  "vision": {
+    "description": "A future where emerging technology, cooperative economics, and collective bargaining power address wealth inequality and foster a society inclusive of neurodiverse individuals with personalized mental healthcare and trauma-informed workplaces as the norm.",
+    "focus_areas": {
+      "wealth_distribution": [
+        "Wealth inequality addressed with emerging tech, cooperative economics, and collective bargaining power",
+        "Federated network of self-funded or crowd-funded consultancies, open-source tech vendors, and decentralized research orgs sharing resources efficiently",
+        "Collectives of workers achieving economies of scale to rival large incumbent companies owned by the super-rich"
+      ],
+      "inclusive_corporations": [
+        "Society inclusive of neurodiverse individuals, with personalized mental healthcare and trauma-informed workplaces as the norm",
+        "Physical disease eradicated and mental health disorders viewed as forms of diversity rather than problems to solve"
+      ]
+    }
+  },
+  "causes": [
+    "Children",
+    "Education",
+    "Environment",
+    "Science and Technology",
+    "Health",
+    "Social Services",
+    "Economic Empowerment",
+    "Democratizing access to opportunities",
+    "Supporting neurodiversity"
+  ],
+  "life_philosophy": {
+    "mission_areas": {
+      "family_and_relationships": [
+        "Support family financial needs as primary earner",
+        "Be present and engaged with family",
+        "Build meaningful, lasting relationships based on mutual respect and growth"
+      ],
+      "personal_growth": [
+        "Continuous learning and self-improvement",
+        "Balance technical expertise with emotional intelligence and empathy",
+        "Maintain physical and mental health as foundation for everything else"
+      ],
+      "social_impact": [
+        "Use technology and wealth to empower others",
+        "Democratize access to opportunities and resources",
+        "Challenge systems that fail to serve the public good"
+      ],
+      "creative_expression": [
+        "Use creativity and humor to connect with others",
+        "Express authentic self through various creative outlets",
+        "Share knowledge and inspire others through storytelling"
+      ]
+    }
+  },
+  "company_websites": {
+    "hyperbloom": "https://www.hyperbloom.ai/",
+    "modular_earth": "https://github.com/Modular-Earth-LLC"
+  }
+}

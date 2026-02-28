@@ -1,0 +1,65 @@
+{
+  "current_focus": {
+    "projects": [
+      "Hyperbloom",
+      "Modular Earth",
+      "Open Source Software"
+    ],
+    "career_objectives": [
+      "Build financial security",
+      "Community impact",
+      "Continuous learning"
+    ],
+    "learning_objectives": [
+      "Improve presentation skills",
+      "Learn sustainable living practices",
+      "Develop emotional intelligence alongside technical skills",
+      "Learn to lead with empathy and inclusivity"
+    ]
+  },
+  "objectives_by_category": {
+    "financial": [
+      "Achieve financial freedom",
+      "Achieve debt freedom within 2-3 years",
+      "Build substantial retirement savings by mid-40s"
+    ],
+    "career": [
+      "Accelerate career growth and ensure job security",
+      "Secure employment aligned with career goals",
+      "Build local professional networks"
+    ],
+    "family": [
+      "Support family financial needs as primary earner",
+      "Maintain strong family relationships",
+      "Plan for children's education expenses"
+    ],
+    "entrepreneurship": [
+      "Position for starting own businesses by age 45 (2031)",
+      "Own multiple profitable businesses",
+      "Generate multiple passive income streams"
+    ],
+    "lifestyle": [
+      "Travel and attend more cultural events"
+    ]
+  },
+  "short_term": [
+    "Make money",
+    "Learn drums"
+  ],
+  "long_term": [
+    "Raise confident children",
+    "Empower others",
+    "Social change through tech",
+    "Leave positive legacy",
+    "Family travel",
+    "Creative satisfaction",
+    "Community connections",
+    "Inspire through content"
+  ],
+  "legacy": [
+    "Mentorship impact",
+    "Confident children",
+    "Empowerment through resources",
+    "Democratized opportunities"
+  ]
+}

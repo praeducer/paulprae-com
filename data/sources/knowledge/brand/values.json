@@ -1,0 +1,57 @@
+{
+  "values": [
+    {
+      "name": "Equitable",
+      "description": "Use power and wealth to empower and enrich others",
+      "ethical_principle": "Empower others with resources"
+    },
+    {
+      "name": "Healthy",
+      "description": "Prioritize physical and mental health. Optimize for human health over profit",
+      "ethical_principle": "Health over profit"
+    },
+    {
+      "name": "Empirical",
+      "description": "Rely on scientific evidence and expert research. Stay humble",
+      "ethical_principle": "Evidence-based decisions"
+    },
+    {
+      "name": "Transparent",
+      "description": "Truth is essential for success and leads to improvements",
+      "ethical_principle": "Truth and transparency"
+    },
+    {
+      "name": "Consensual",
+      "description": "Seek consent everywhere. Collaborate toward mutually beneficial outcomes",
+      "ethical_principle": "Consent and collaboration"
+    },
+    {
+      "name": "Inclusive",
+      "description": "Support neurodiversity and independence. Foster safe spaces for dissent, creativity, and emotional processing",
+      "ethical_principle": "Support neurodiversity"
+    },
+    {
+      "name": "Future-proof",
+      "description": "Think long-term. Adapt to change while protecting marginalized groups",
+      "ethical_principle": "Long-term thinking"
+    },
+    {
+      "name": "Focused",
+      "description": "Stay committed to meaningful goals. Pivot only when a clearly better path emerges",
+      "ethical_principle": "Goal commitment with flexibility"
+    }
+  ],
+  "priorities": [
+    "Family wellbeing",
+    "Professional development",
+    "Community contribution",
+    "Personal health"
+  ],
+  "non_negotiables": [
+    "Honesty in all communications",
+    "Respect for all people",
+    "Quality in work output",
+    "Consent and mutual benefit"
+  ],
+  "worldview": "Optimistic but realistic; believes in human potential and continuous improvement"
+}

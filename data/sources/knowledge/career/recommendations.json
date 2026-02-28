@@ -1,0 +1,65 @@
+[
+  {
+    "id": "rec-rainsound-ai-2023",
+    "recommender_name": "XXX XXX",
+    "recommender_company": "rainsound.ai",
+    "recommender_title": "Machine Learning Engineer / Senior Software Engineer",
+    "text": "Paul is an incredible individual both professionally and personally. Working alongside them is not just productive but also genuinely enjoyable. I wholeheartedly recommend them for any team or project; you won't be disappointed.",
+    "date": "2023-10",
+    "themes": ["character", "collaboration", "team-player"]
+  },
+  {
+    "id": "rec-milliman-intelliscript-2023",
+    "recommender_name": "XXX XXX",
+    "recommender_company": "Milliman IntelliScript",
+    "recommender_title": "Software Engineer",
+    "text": "I have worked with Paul on many projects over the years. He is an excellent engineer, technical project manager, and business leader. His expertise in the domains of AI, healthcare, and life sciences is second to none. Paul is an asset to any team he's a part of and I can't recommend him enough!",
+    "date": "2023-09",
+    "themes": ["technical-expertise", "leadership", "domain-expertise"]
+  },
+  {
+    "id": "rec-hyperbloom-ai-2021",
+    "recommender_name": "XXX XXX",
+    "recommender_company": "hyperbloom AI",
+    "recommender_title": "Software Engineer / Enterprise Solutions Architect",
+    "text": "Paul is the kind of guy who inspires people. He's made his career in Cloud Architecture and Tech-stack consulting at the same time as integrating mental health and neuroscience into his career with the desire to help people. As a boss he's laid-back, funny, and a great mentor. Paul is fantastic at keeping us on track and makes sure he checks in on everyone regularly to make sure they know how great they're doing. Paul is not only the ideal boss but the best boss.",
+    "date": "2021-06",
+    "themes": ["mentorship", "leadership", "character"]
+  },
+  {
+    "id": "rec-microsoft-2015",
+    "recommender_name": "XXX XXX",
+    "recommender_company": "Microsoft",
+    "recommender_title": "Sr. Cloud Solution Architect - Engineering",
+    "text": "Paul is an extremely intelligent and positive person to be around. His openness helps cultivate a low stress environment, which allows brainstorming to flow very freely and naturally during collaboration. Paul is never afraid to ask questions; he drills down into the details to make sure he really understands something inside and out. That, combined with his technical abilities, allows him to learn and perform at an exceptional level. He has the utmost concern with providing high quality deliverables and getting exactly the results needed for customers or any other task at hand. Paul was a great co-worker and is a great friend. I have no doubt that he will change the world wherever he goes.",
+    "date": "2015-10",
+    "themes": ["collaboration", "technical-expertise", "character"]
+  },
+  {
+    "id": "rec-solo-io-2014",
+    "recommender_name": "XXX XXX",
+    "recommender_company": "solo.io",
+    "recommender_title": "Director WW RevOps",
+    "text": "Working with Paul is essentially working with your brightest friend every time you collaborate. He is an excellent leader able to communicate with diverse groups in order to deliver exceptional work. He is driven by an unlimited capacity for knowledge that, in turn, pushes those working with him to strive for greater understanding and professional growth. Aside from this, Paul is profoundly adept in the technical sense. He architects solutions with what seems like no barrier to entry regardless of sector. Moreover, he incorporates his skill-set into working behavior that permeates within the groups working with him. Paul is undoubtably one of the greatest professionals I have, or will ever know; I am pleased to have worked with him on Projects as a colleague and a friend.",
+    "date": "2014-09",
+    "themes": ["leadership", "technical-expertise", "collaboration"]
+  },
+  {
+    "id": "rec-phox-and-phoe-2014",
+    "recommender_name": "XXX XXX",
+    "recommender_company": "Phox and Phoe Agency",
+    "recommender_title": "Principal Designer",
+    "text": "Paul is the perfect example of an individual striving to learn and grow professionally, and who is always willing to share his knowledge and experiences for the greater good of the project he is working on or team he is working with. At his core, Paul is someone who wants to leverage his skill set into ideas that have the power to change people's lives for the better. He is a giver, and will help out a friend or colleague without hesitation. I highly recommend Paul for any endeavor he pursues.",
+    "date": "2014-03",
+    "themes": ["mentorship", "character", "collaboration"]
+  },
+  {
+    "id": "rec-ghost-marketing-2009",
+    "recommender_name": "XXX XXX",
+    "recommender_company": "Ghost Marketing",
+    "recommender_title": "Business Owner",
+    "text": "I have known Paul Prae in a variety of capacities for 2 almost 3 years. In addition, He is and has been a friend. He has always been someone I could share my goals with and someone I aspire to work more like. Paul is organized, efficient, extremely competent, and has an excellent rapport with people of all ages. His communication skills, both written and verbal, are excellent. In summary, I highly recommend Paul for any position or endeavor that he may seek to pursue especially in the music industry for that is his true passion. He will be a valuable asset for any organization. If you have any questions, please do not hesitate to contact me. Sincerely, Sean Simmons",
+    "date": "2009-04",
+    "themes": ["character", "communication", "collaboration"]
+  }
+]
