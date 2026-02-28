@@ -16,6 +16,7 @@
 
 import fs from "fs";
 import path from "path";
+import { execFileSync } from "child_process";
 import Papa from "papaparse";
 import { z } from "zod";
 import { PATHS, LINKEDIN_CSV_FILES } from "../lib/config.js";
@@ -93,6 +94,63 @@ function normalizeDateOrNull(raw: string | undefined | null): string | null {
 
 function safeString(val: string | undefined | null): string {
   return val?.trim() ?? "";
+}
+
+// ─── LinkedIn Zip Extraction ────────────────────────────────────────────────
+// Automatically extracts CSV files from LinkedIn data export zip archives.
+// When the linkedin directory contains a .zip file but no .csv files,
+// extracts top-level CSVs from the zip (skips subdirectories like Jobs/,
+// Articles/, etc. which contain non-career data).
+//
+// Uses Python3's stdlib zipfile module (universally available on Linux/macOS/WSL)
+// to avoid adding an npm dependency for a build-time-only operation.
+
+function extractLinkedInZip(linkedinDir: string): { extracted: number; zipName: string } | null {
+  if (!fs.existsSync(linkedinDir)) return null;
+
+  const entries = fs.readdirSync(linkedinDir);
+  const csvFiles = entries.filter((f) => f.toLowerCase().endsWith(".csv"));
+  const zipFiles = entries.filter((f) => f.toLowerCase().endsWith(".zip"));
+
+  // Skip extraction if CSVs already exist or no zips found
+  if (csvFiles.length > 0 || zipFiles.length === 0) return null;
+
+  // Use the most recent zip file (by name, which includes date for LinkedIn exports)
+  const zipFile = zipFiles.sort().reverse()[0];
+  const zipPath = path.join(linkedinDir, zipFile);
+
+  console.log(`   📦 Found LinkedIn export: ${zipFile}`);
+  console.log("   📦 Extracting top-level CSV files...\n");
+
+  // Extract top-level CSVs using Python3's zipfile (stdlib, no install needed)
+  const pythonScript = `
+import zipfile, json, sys
+z = zipfile.ZipFile(sys.argv[1])
+extracted = []
+for f in z.infolist():
+    if '/' not in f.filename and f.filename.lower().endswith('.csv'):
+        z.extract(f, sys.argv[2])
+        extracted.append(f.filename)
+print(json.dumps(extracted))
+`;
+
+  try {
+    const result = execFileSync("python3", ["-c", pythonScript, zipPath, linkedinDir], {
+      encoding: "utf-8",
+      timeout: 30000,
+    });
+    const extracted: string[] = JSON.parse(result.trim());
+    for (const name of extracted) {
+      console.log(`      ${name}`);
+    }
+    console.log(`\n   📦 Extracted ${extracted.length} CSV files from ${zipFile}\n`);
+    return { extracted: extracted.length, zipName: zipFile };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn(`   ⚠ Zip extraction failed: ${message}`);
+    console.warn("   You can manually extract the zip: unzip <file>.zip -d data/sources/linkedin/\n");
+    return null;
+  }
 }
 
 // ─── CSV Parsing ─────────────────────────────────────────────────────────────
@@ -546,6 +604,9 @@ function ingest(): IngestResult {
     );
     return { success: false, careerData: null, errors, warnings, stats: emptyStats };
   }
+
+  // Auto-extract LinkedIn zip if CSVs don't exist yet
+  extractLinkedInZip(PATHS.linkedinDir);
 
   // Discover CSV files
   const allFiles = fs.readdirSync(PATHS.linkedinDir);

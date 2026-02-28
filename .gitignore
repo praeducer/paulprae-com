@@ -21,8 +21,10 @@ build/
 .env.test.local
 .env.production.local
 
-# Pipeline: raw LinkedIn exports (may contain unparsed columns beyond our schema)
+# Pipeline: raw LinkedIn exports (may contain PII, unparsed columns beyond our schema)
 data/sources/linkedin/*.csv
+data/sources/linkedin/*.zip
+data/sources/linkedin/*.zip:Zone.Identifier
 
 # Pipeline: binary build artifacts (regenerable via npm run export)
 data/generated/resume.pdf

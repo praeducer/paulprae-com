@@ -263,7 +263,10 @@ async function generate(): Promise<GenerationResult> {
   const client = new Anthropic();
   const startTime = Date.now();
 
-  const response = await client.messages.create({
+  // Use streaming to avoid HTTP timeout on long-running Opus 4.6 requests.
+  // The SDK requires streaming for operations that may take >10 minutes.
+  // Ref: https://github.com/anthropics/anthropic-sdk-typescript#long-requests
+  const stream = client.messages.stream({
     model: CLAUDE.model,
     max_tokens: CLAUDE.maxTokens,
     thinking: CLAUDE.thinking,
@@ -282,6 +285,9 @@ async function generate(): Promise<GenerationResult> {
       },
     ],
   });
+
+  // Collect the final message (same shape as client.messages.create() response)
+  const response = await stream.finalMessage();
 
   const durationMs = Date.now() - startTime;
 
