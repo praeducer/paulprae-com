@@ -2,7 +2,7 @@
 
 > **Purpose:** Windows-specific environment setup for developing paulprae.com and related projects. Covers Dev Drive, filesystem layout, security guardrails, and cross-machine parity. For project installation, dependencies, and running the app, see the [project README](../README.md).
 >
-> **Last updated:** 2026-02-27
+> **Last updated:** 2026-02-28
 > **Applies to:** All development machines (laptop + desktop)
 
 ---
@@ -215,7 +215,9 @@ Mount-VHD -Path "C:\Users\<username>\DevDrive.vhdx"
 
 > **Reference:** [Install WSL](https://learn.microsoft.com/en-us/windows/wsl/install)
 
-paulprae-com does **not** require WSL (pure Node.js/TypeScript, Vercel deploy). WSL is for other projects (Docker, Python ML, etc.). The desktop's AI/ML stack is documented in [my-local-ai-env](https://github.com/praeducer/my-local-ai-env).
+paulprae-com does **not** require WSL (pure Node.js/TypeScript, Vercel deploy). However, WSL is strongly recommended for using Claude Code CLI (which uses Linux sandboxing) and for other projects (Docker, Python ML, etc.). The desktop's AI/ML stack is documented in [my-local-ai-env](https://github.com/praeducer/my-local-ai-env).
+
+### 5.1 Install / Update WSL
 
 ```powershell
 # Install (if needed)
@@ -230,7 +232,23 @@ wsl --version
 mkdir -p ~/dev
 ```
 
-### WSL Performance Tuning (.wslconfig)
+#### Update the WSL Kernel
+
+Claude Code's sandbox requires kernel ≥ 6.2 for [Landlock v3](https://docs.kernel.org/userspace-api/landlock.html) support. WSL's default kernel (5.15) is too old. Update from an **Admin PowerShell**:
+
+```powershell
+wsl --update
+wsl --shutdown
+```
+
+Then reopen Ubuntu and verify:
+
+```bash
+uname -r
+# Expected: 6.x.x or higher
+```
+
+### 5.2 Performance Tuning (.wslconfig)
 
 Create `C:\Users\<username>\.wslconfig` to [control WSL2 resource limits](https://learn.microsoft.com/en-us/windows/wsl/wsl-config). Without this, WSL defaults to 50% of RAM and all processors.
 
@@ -252,13 +270,43 @@ sparseVhd=true              # Reclaim disk space from deleted WSL files
 
 > After changes: `wsl --shutdown`, wait ~8 seconds, then relaunch. See [MS docs: .wslconfig settings](https://learn.microsoft.com/en-us/windows/wsl/wsl-config#wslconfig).
 
-### When to Use WSL vs Windows (Dev Drive)
+### 5.3 Linux Environment Setup
+
+For shell configuration, Node.js, Claude Code CLI, Cursor, and pipeline dependencies **inside WSL**, follow the **[Linux Dev Environment Setup Guide](linux-dev-environment-setup.md)**.
+
+That guide covers:
+- Shell health checks (PATH corruption, nvm loading, cargo env guards)
+- Node.js installation via nvm
+- Pipeline dependencies (pandoc, typst)
+- Claude Code CLI installation and settings
+- Cursor wrapper script for WSL
+- Verification checklist and troubleshooting
+
+Or run the automated setup script from inside WSL:
+
+```bash
+bash scripts/setup/install-pipeline-deps.sh
+```
+
+### 5.4 Claude Code Settings Sync
+
+Windows and WSL maintain **separate** Claude Code settings files:
+
+| Platform | Settings Path |
+|---|---|
+| Windows | `C:\Users\<username>\.claude\settings.json` |
+| WSL | `~/.claude/settings.json` |
+
+Keep both in sync manually. The WSL copy should omit Windows-specific entries like `additionalDirectories` (which use Windows paths). See the [Linux guide's Claude Code section](linux-dev-environment-setup.md#6-claude-code-cli) for the canonical permission set.
+
+### 5.5 When to Use WSL vs Windows (Dev Drive)
 
 | Use WSL (`~/dev`) | Use Windows (`D:\dev`) |
 |---|---|
 | Docker-based projects | Node.js / Next.js (e.g., paulprae-com) |
 | Python ML/AI (CUDA, PyTorch) | .NET / C# projects |
 | Linux-specific toolchains | Vercel-deployed projects |
+| Claude Code CLI (sandboxed) | Quick edits via Cursor on Windows |
 
 ---
 
@@ -418,6 +466,12 @@ VHD file path (varies by Windows username), computer name, hardware specs, addit
 
 **Rationale:** Without `.wslconfig`, WSL defaults to 50% RAM and all CPUs with no memory reclamation. Mirrored networking simplifies localhost access between Windows and WSL. `autoMemoryReclaim=gradual` prevents the Vmmem process from hogging memory after WSL workloads complete. See [MS docs: .wslconfig](https://learn.microsoft.com/en-us/windows/wsl/wsl-config).
 
+### 2026-02-28: WSL Kernel ≥ 6.2 Required for Claude Code Sandbox
+
+**Decision:** Require WSL kernel ≥ 6.2 and document the `wsl --update` step in the setup guide.
+
+**Rationale:** Claude Code's sandbox relies on Linux [Landlock v3](https://docs.kernel.org/userspace-api/landlock.html), available from kernel 6.2+. WSL's default kernel (5.15) is too old — Claude Code falls back to unsandboxed execution with a warning. Running `wsl --update` from an Admin PowerShell upgrades the kernel (e.g., to 6.6.x). This is a one-time step per machine.
+
 ### 2026-02-27: Git Repos Must Not Live in Cloud-Synced Folders
 
 **Decision:** Never store git repositories in OneDrive, iCloudDrive, or other cloud-synced directories.
@@ -465,3 +519,43 @@ Mount-VHD -Path "C:\Users\<username>\DevDrive.vhdx"
 ```
 
 > See [MS docs: Manage virtual hard disks](https://learn.microsoft.com/en-us/windows-server/storage/disk-management/manage-virtual-hard-disks)
+
+### Claude Code sandbox warning in WSL
+
+**Symptom:** Claude Code prints "Sandbox is available on macOS (>v2.0) and Linux (>= v6.2)."
+
+**Cause:** WSL kernel is below 6.2 (default is 5.15).
+
+**Fix:** From Admin PowerShell: `wsl --update` then `wsl --shutdown`. See [section 5.1](#51-install--update-wsl).
+
+### `claude` in WSL resolves to wrong binary
+
+**Symptom:** `which claude` shows `/mnt/c/Users/.../npm/claude` instead of `~/.nvm/.../bin/claude`.
+
+**Cause:** A hardcoded `export PATH=` line in `~/.bashrc` (often with Windows/MINGW paths) overwrites PATH after nvm loads.
+
+**Fix:** Find and remove the offending line: `grep -n 'export PATH=' ~/.bashrc`. See [Linux guide troubleshooting](linux-dev-environment-setup.md#10-troubleshooting).
+
+### `cursor: command not found` in Ubuntu terminal
+
+**Symptom:** `cursor` works in the Cursor integrated terminal but not in the native Ubuntu terminal app.
+
+**Cause:** Native Ubuntu terminal doesn't inherit Windows PATH interop as reliably.
+
+**Fix:** Create a wrapper script at `~/.local/bin/cursor`. See the [Linux guide's Cursor section](linux-dev-environment-setup.md#7-cursor-ide).
+
+### `node`/`nvm` not found after opening new WSL terminal
+
+**Symptom:** `node --version` works in one terminal but not after opening a new one.
+
+**Cause:** A `export PATH=` line in `~/.bashrc` after the nvm block is overwriting the nvm-managed PATH.
+
+**Fix:** Remove hardcoded PATH exports. See [Linux guide: shell health check](linux-dev-environment-setup.md#3-shell-configuration-health-check).
+
+### `.cargo/env: No such file or directory` on shell startup
+
+**Symptom:** Error when opening a new terminal: `. "$HOME/.cargo/env": No such file or directory`.
+
+**Cause:** `~/.bashrc` unconditionally sources cargo's env file, but Rust/cargo isn't installed.
+
+**Fix:** Replace `. "$HOME/.cargo/env"` with `[ -s "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"` in `~/.bashrc`.

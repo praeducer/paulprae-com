@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 #
-# install-pipeline-deps.sh — Install system dependencies for the resume export pipeline
+# install-pipeline-deps.sh — Install system dependencies for the resume pipeline
 #
-# Installs pandoc and typst, which are required by scripts/export-resume.ts
-# to convert the AI-generated resume.md into PDF and DOCX formats.
+# Installs pandoc, typst, Node.js (via nvm), npm dependencies, Claude Code CLI,
+# and (on WSL) creates a Cursor wrapper script. Also runs a shell health check.
 #
 # Supports: Ubuntu/Debian (including WSL), macOS (via Homebrew)
 #
 # References:
-#   - Pandoc: https://pandoc.org/installing.html
-#   - Typst:  https://github.com/typst/typst/releases
-#   - Pipeline docs: docs/technical-design-document.md §5.6
+#   - Pandoc:      https://pandoc.org/installing.html
+#   - Typst:       https://github.com/typst/typst/releases
+#   - Claude Code: https://docs.anthropic.com/en/docs/claude-code
+#   - Pipeline:    docs/technical-design-document.md §5.6
+#   - Full guide:  docs/linux-dev-environment-setup.md
 #
 # Usage:
 #   bash scripts/setup/install-pipeline-deps.sh
@@ -61,6 +63,14 @@ if [[ "$OS" == "unknown" ]]; then
     echo "    winget install JohnMacFarlane.Pandoc"
     echo "    winget install Typst.Typst"
     exit 1
+fi
+
+# ─── Detect WSL ──────────────────────────────────────────────────────────────
+
+IS_WSL=false
+if grep -qi microsoft /proc/version 2>/dev/null; then
+    IS_WSL=true
+    info "Running inside WSL"
 fi
 
 # ─── Install Pandoc ───────────────────────────────────────────────────────────
@@ -194,6 +204,174 @@ else
     ok "npm dependencies installed"
 fi
 
+# ─── Claude Code CLI ─────────────────────────────────────────────────────────
+
+if command -v claude &>/dev/null; then
+    skip "claude already installed: $(claude --version 2>/dev/null || echo 'unknown version')"
+else
+    info "Installing Claude Code CLI..."
+    npm install -g @anthropic-ai/claude-code
+    if command -v claude &>/dev/null; then
+        ok "claude installed: $(claude --version 2>/dev/null)"
+    else
+        fail "Claude Code installation failed"
+        echo "  Install manually: npm install -g @anthropic-ai/claude-code"
+    fi
+fi
+
+# ─── Claude Code Settings ────────────────────────────────────────────────────
+
+CLAUDE_DIR="$HOME/.claude"
+CLAUDE_SETTINGS="$CLAUDE_DIR/settings.json"
+
+if [[ -f "$CLAUDE_SETTINGS" ]]; then
+    skip "Claude Code settings already exist: $CLAUDE_SETTINGS"
+else
+    info "Creating Claude Code settings..."
+    mkdir -p "$CLAUDE_DIR"
+    cat > "$CLAUDE_SETTINGS" << 'SETTINGS_EOF'
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(pnpm:*)",
+      "Bash(gh:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(which:*)",
+      "Bash(echo:*)",
+      "Bash(pwd:*)",
+      "Bash(cd:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(touch:*)",
+      "Bash(chmod:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pip:*)",
+      "Bash(pip3:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(pandoc:*)",
+      "Bash(typst:*)",
+      "Bash(vercel:*)",
+      "Bash(code:*)",
+      "Bash(cursor:*)",
+      "Bash(whoami:*)",
+      "Bash(hostname:*)",
+      "Bash(uname:*)",
+      "Bash(df:*)",
+      "Bash(du:*)",
+      "Bash(env:*)",
+      "Bash(printenv:*)",
+      "Bash(diff:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(wc:*)",
+      "Bash(sed:*)",
+      "Bash(awk:*)",
+      "Bash(tar:*)",
+      "Bash(zip:*)",
+      "Bash(unzip:*)",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "WebFetch"
+    ],
+    "deny": []
+  }
+}
+SETTINGS_EOF
+    ok "Created $CLAUDE_SETTINGS"
+fi
+
+# ─── Cursor Wrapper (WSL only) ───────────────────────────────────────────────
+
+if $IS_WSL; then
+    CURSOR_WRAPPER="$HOME/.local/bin/cursor"
+    if [[ -f "$CURSOR_WRAPPER" ]]; then
+        skip "Cursor wrapper already exists: $CURSOR_WRAPPER"
+    else
+        info "Creating Cursor wrapper for WSL..."
+        mkdir -p "$HOME/.local/bin"
+        cat > "$CURSOR_WRAPPER" << 'CURSOR_EOF'
+#!/bin/bash
+# Cursor CLI wrapper — calls the Windows Cursor binary via WSL interop.
+# This lets "cursor ." open the current WSL directory in Cursor on Windows.
+CURSOR_WIN="/mnt/c/Users/$(cmd.exe /C "echo %USERNAME%" 2>/dev/null | tr -d '\r')/AppData/Local/Programs/cursor/resources/app/bin/cursor"
+if [ -x "$CURSOR_WIN" ]; then
+    exec "$CURSOR_WIN" "$@"
+else
+    echo "Error: Cursor not found at $CURSOR_WIN" >&2
+    echo "Install Cursor on Windows from https://cursor.com" >&2
+    exit 1
+fi
+CURSOR_EOF
+        chmod +x "$CURSOR_WRAPPER"
+        ok "Created Cursor wrapper at $CURSOR_WRAPPER"
+        info "Prerequisite: Cursor must be installed on the Windows host (https://cursor.com)"
+    fi
+fi
+
+# ─── Shell Health Check ──────────────────────────────────────────────────────
+
+echo ""
+echo "=== Shell Health Check ==="
+echo ""
+
+# Check for PATH corruption patterns in .bashrc
+if grep -qE '^export PATH=.*(mingw|MINGW|/c/Users)' "$HOME/.bashrc" 2>/dev/null; then
+    fail "Found hardcoded PATH export in ~/.bashrc that may overwrite nvm"
+    echo "  This can cause node, npm, and claude to resolve to wrong binaries."
+    echo "  See: docs/linux-dev-environment-setup.md#3-shell-configuration-health-check"
+fi
+
+# Check cargo env is guarded
+if grep -q '^\. "\$HOME/.cargo/env"' "$HOME/.bashrc" 2>/dev/null; then
+    if ! grep -q '\[ -s "\$HOME/.cargo/env" \]' "$HOME/.bashrc" 2>/dev/null; then
+        fail "~/.bashrc sources cargo env without existence guard"
+        echo "  Replace:  . \"\$HOME/.cargo/env\""
+        echo "  With:     [ -s \"\$HOME/.cargo/env\" ] && . \"\$HOME/.cargo/env\""
+    fi
+fi
+
+# Check WSL kernel version
+if $IS_WSL; then
+    KERNEL_VERSION=$(uname -r | cut -d. -f1-2)
+    KERNEL_MAJOR=$(echo "$KERNEL_VERSION" | cut -d. -f1)
+    KERNEL_MINOR=$(echo "$KERNEL_VERSION" | cut -d. -f2)
+    if [[ "$KERNEL_MAJOR" -lt 6 ]] || { [[ "$KERNEL_MAJOR" -eq 6 ]] && [[ "$KERNEL_MINOR" -lt 2 ]]; }; then
+        fail "WSL kernel $KERNEL_VERSION is below 6.2 — Claude Code sandbox requires >= 6.2"
+        echo "  Fix from Admin PowerShell: wsl --update && wsl --shutdown"
+    else
+        ok "WSL kernel $(uname -r) — meets sandbox requirement (>= 6.2)"
+    fi
+fi
+
+# Verify key tools resolve correctly
+for cmd in node npm claude pandoc typst cursor; do
+    if command -v "$cmd" &>/dev/null; then
+        ok "$cmd → $(which "$cmd")"
+    else
+        skip "$cmd not found (optional for some workflows)"
+    fi
+done
+
 # ─── Summary ──────────────────────────────────────────────────────────────────
 
 echo ""
@@ -203,9 +381,12 @@ echo "  pandoc: $(command -v pandoc &>/dev/null && pandoc --version | head -1 ||
 echo "  typst:  $(command -v typst &>/dev/null && typst --version || echo 'NOT INSTALLED')"
 echo "  node:   $(command -v node &>/dev/null && node --version || echo 'NOT INSTALLED')"
 echo "  npm:    $(command -v npm &>/dev/null && npm --version || echo 'NOT INSTALLED')"
+echo "  claude: $(command -v claude &>/dev/null && claude --version 2>/dev/null || echo 'NOT INSTALLED')"
+echo "  cursor: $(command -v cursor &>/dev/null && echo 'AVAILABLE' || echo 'NOT INSTALLED')"
 echo ""
 echo "  Next steps:"
 echo "    1. Add your data files (see README.md)"
 echo "    2. Create .env.local with ANTHROPIC_API_KEY"
 echo "    3. Run: npm run pipeline"
+echo "    4. See docs/linux-dev-environment-setup.md for full guide"
 echo ""

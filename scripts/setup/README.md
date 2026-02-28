@@ -2,7 +2,10 @@
 
 Automation scripts for setting up the development environment. These are thin convenience wrappers around standard tools — see each script's header comments for links to the authoritative documentation.
 
-For the full setup guide, see [`docs/windows-dev-environment-setup.md`](../../docs/windows-dev-environment-setup.md).
+For the full setup guides, see:
+- **Windows:** [`docs/windows-dev-environment-setup.md`](../../docs/windows-dev-environment-setup.md)
+- **Linux / WSL:** [`docs/linux-dev-environment-setup.md`](../../docs/linux-dev-environment-setup.md)
+
 For project installation (npm install, env vars, running the app), see the [project README](../../README.md).
 
 ## Scripts
@@ -11,7 +14,7 @@ For project installation (npm install, env vars, running the app), see the [proj
 |---|---|---|---|
 | `install-dev-tools.ps1` | Windows | Installs Git, Node.js, VS Code, GitHub CLI, Pandoc, Typst, Vercel CLI, Claude Code via [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) and npm | Fresh Windows machine, before anything else |
 | `setup-dev-drive.ps1` | Windows | Creates `D:\dev` and `D:\packages\*` directories, redirects package caches, configures [Dev Drive filters](https://learn.microsoft.com/en-us/windows/dev-drive/#filters-for-common-scenarios) | After creating Dev Drive via Windows Settings |
-| `install-pipeline-deps.sh` | Linux/macOS/WSL | Installs pandoc, typst, Node.js (via nvm), and npm dependencies. Prompts before running remote bootstrap script for nvm. | Fresh Linux/WSL machine, or after cloning |
+| `install-pipeline-deps.sh` | Linux/macOS/WSL | Installs pandoc, typst, Node.js (via nvm), npm dependencies, Claude Code CLI, Claude Code settings, and (on WSL) Cursor wrapper. Runs shell health checks. Prompts before running remote bootstrap script for nvm. | Fresh Linux/WSL machine, or after cloning |
 
 ## Usage
 
