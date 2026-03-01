@@ -1,4 +1,3 @@
-#!/usr/bin/env npx tsx
 /**
  * generate-brand-assets.ts — Creates OG image, favicon SVG, favicon ICO, and apple-touch-icon.
  *
@@ -14,7 +13,10 @@ import sharp from "sharp";
 import { PATHS } from "../lib/config.js";
 
 const PUBLIC_DIR = PATHS.publicDir;
-const FORCE = process.argv.includes("--force");
+
+function hasForceFlag(): boolean {
+  return process.argv.includes("--force");
+}
 
 // ─── Design tokens (matching site's Tailwind slate palette) ───────────────────
 
@@ -97,7 +99,11 @@ function faviconSvg(): string {
 </svg>`;
 }
 
-// ─── ICO file builder (minimal spec: single 32x32 PNG entry) ──────────────────
+// ─── ICO file builder ────────────────────────────────────────────────────────
+// Minimal ICO spec: ICONDIR (6 bytes) + ICONDIRENTRY (16 bytes) + PNG payload.
+// Single 32x32 entry with 32-bit color depth (RGBA PNG).
+// ICO spec: width/height 0 means 256px; we write 32 explicitly for 32x32.
+// See: https://en.wikipedia.org/wiki/ICO_(file_format)
 
 function buildIco(pngBuffer: Buffer): Buffer {
   const iconDir = Buffer.alloc(6);
@@ -106,12 +112,12 @@ function buildIco(pngBuffer: Buffer): Buffer {
   iconDir.writeUInt16LE(1, 4); // count: 1 image
 
   const entry = Buffer.alloc(16);
-  entry.writeUInt8(32, 0); // width
-  entry.writeUInt8(32, 1); // height
-  entry.writeUInt8(0, 2); // color palette
+  entry.writeUInt8(32, 0); // width (32px; 0 would mean 256px per ICO spec)
+  entry.writeUInt8(32, 1); // height (32px)
+  entry.writeUInt8(0, 2); // color palette (0 = no palette)
   entry.writeUInt8(0, 3); // reserved
   entry.writeUInt16LE(1, 4); // color planes
-  entry.writeUInt16LE(32, 6); // bits per pixel
+  entry.writeUInt16LE(32, 6); // bits per pixel (32-bit RGBA)
   entry.writeUInt32LE(pngBuffer.length, 8); // size of image data
   entry.writeUInt32LE(6 + 16, 12); // offset to image data
 
@@ -121,56 +127,70 @@ function buildIco(pngBuffer: Buffer): Buffer {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log("Generating brand assets...\n");
+  const startTime = Date.now();
+  const force = hasForceFlag();
+  console.log(`Generating brand assets...${force ? " (--force)" : ""}\n`);
+
+  // Ensure output directory exists
+  fs.mkdirSync(PUBLIC_DIR, { recursive: true });
+
+  let generated = 0;
+  let skipped = 0;
 
   // 1. OG Image
   const ogPath = path.join(PUBLIC_DIR, "og-image.png");
-  if (!FORCE && fs.existsSync(ogPath)) {
+  if (!force && fs.existsSync(ogPath)) {
     console.log("  [skip] og-image.png already exists (use --force to regenerate)");
+    skipped++;
   } else {
     const svg = ogImageSvg();
-    const pngBuffer = await sharp(Buffer.from(svg))
-      .resize(1200, 630)
-      .png({ quality: 90 })
-      .toBuffer();
+    const pngBuffer = await sharp(Buffer.from(svg)).resize(1200, 630).png().toBuffer();
     fs.writeFileSync(ogPath, pngBuffer);
     console.log(`  [done] og-image.png (${(pngBuffer.length / 1024).toFixed(1)} KB)`);
+    generated++;
   }
 
   // 2. Favicon SVG
   const svgPath = path.join(PUBLIC_DIR, "favicon.svg");
-  if (!FORCE && fs.existsSync(svgPath)) {
+  if (!force && fs.existsSync(svgPath)) {
     console.log("  [skip] favicon.svg already exists (use --force to regenerate)");
+    skipped++;
   } else {
     const svg = faviconSvg();
     fs.writeFileSync(svgPath, svg);
     console.log(`  [done] favicon.svg (${Buffer.byteLength(svg)} bytes)`);
+    generated++;
   }
 
   // 3. Favicon ICO (32x32 PNG in ICO container)
   const icoPath = path.join(PUBLIC_DIR, "favicon.ico");
-  if (!FORCE && fs.existsSync(icoPath)) {
+  if (!force && fs.existsSync(icoPath)) {
     console.log("  [skip] favicon.ico already exists (use --force to regenerate)");
+    skipped++;
   } else {
     const svg = faviconSvg();
     const png32 = await sharp(Buffer.from(svg)).resize(32, 32).png().toBuffer();
     const ico = buildIco(png32);
     fs.writeFileSync(icoPath, ico);
     console.log(`  [done] favicon.ico (${(ico.length / 1024).toFixed(1)} KB)`);
+    generated++;
   }
 
   // 4. Apple Touch Icon (180x180 PNG)
   const applePath = path.join(PUBLIC_DIR, "apple-touch-icon.png");
-  if (!FORCE && fs.existsSync(applePath)) {
+  if (!force && fs.existsSync(applePath)) {
     console.log("  [skip] apple-touch-icon.png already exists (use --force to regenerate)");
+    skipped++;
   } else {
     const svg = faviconSvg();
     const png180 = await sharp(Buffer.from(svg)).resize(180, 180).png().toBuffer();
     fs.writeFileSync(applePath, png180);
     console.log(`  [done] apple-touch-icon.png (${(png180.length / 1024).toFixed(1)} KB)`);
+    generated++;
   }
 
-  console.log("\nBrand assets generated in public/");
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+  console.log(`\nBrand assets complete: ${generated} generated, ${skipped} skipped (${elapsed}s)`);
 }
 
 // Only run when executed directly (not when imported for testing).
@@ -185,5 +205,4 @@ if (isDirectRun) {
   });
 }
 
-export { ogImageSvg, faviconSvg, buildIco };
-export const _testExports = { ogImageSvg, faviconSvg, buildIco, COLORS };
+export const _testExports = { ogImageSvg, faviconSvg, buildIco, main, hasForceFlag, COLORS };

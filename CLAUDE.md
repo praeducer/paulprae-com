@@ -28,11 +28,11 @@ app/                   → Next.js App Router pages and layouts
 data/sources/linkedin/ → LinkedIn CSV exports (gitignored — raw exports may contain unparsed columns)
 data/sources/knowledge/→ Knowledge base JSONs (committed — recruiter-facing content for Phase 2 RAG)
 data/generated/        → Pipeline outputs: career-data.json + Paul-Prae-Resume.md (committed), PDF + DOCX (gitignored)
-scripts/               → Pipeline scripts (ingest, generate, export) + resume-pdf.typ stylesheet
+scripts/               → Pipeline scripts (ingest, generate, export, brand) + resume-pdf.typ stylesheet
 lib/                   → Shared utilities: config.ts, types.ts, markdown.ts
 tests/                 → Unit and integration tests (Vitest)
-public/                → Static assets + resume downloads (PDF, DOCX, MD committed for Vercel)
-docs/                  → Technical documentation (TDD, dev environment setup, MCP)
+public/                → Static assets (OG image, favicons, resume downloads) committed for Vercel
+docs/                  → Technical documentation (TDD, dev environment, MCP, browser prompts)
 .mcp.json              → MCP config for Claude Code (project root; see docs/mcp-setup.md)
 .cursor/mcp.json       → MCP config for Cursor (same sources as .mcp.json)
 ```
@@ -98,6 +98,7 @@ The build pipeline transforms raw career data into a deployed site:
 See [README.md](README.md#5-run-the-pipeline) for the full command reference. Quick shortcuts:
 
 - `npm run pipeline` — full pipeline: ingest → generate → export → build
+- `npm run brand` — generate brand assets (OG image, favicons) if missing
 - `npm test` — run all 160+ tests
 - `npm run lint && npm run format:check` — verify code quality
 

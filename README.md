@@ -151,6 +151,10 @@ npm run pipeline:deploy   # full pipeline + stage generated files for git
 # Force variants (skip freshness checks):
 npm run ingest:force      # Re-ingest even if inputs unchanged
 npm run generate:force    # Regenerate even if resume is fresh
+
+# Brand assets (OG image, favicon, apple-touch-icon):
+npm run brand             # Generate if missing (skips existing)
+npm run brand:force       # Regenerate all brand assets
 ```
 
 Pipeline steps skip automatically when their outputs are newer than their inputs. The ingest step uses SHA-256 content hashing; generate and export use file modification times. Use `--force` to override (e.g., `npm run generate:force`).
@@ -230,10 +234,10 @@ paulprae-com/
 │   │   └── knowledge/      # Knowledge base JSONs (committed — recruiter-facing content)
 │   └── generated/          # Pipeline output: career-data.json + Paul-Prae-Resume.md (committed), PDF + DOCX (gitignored)
 ├── tests/                  # Unit tests (Vitest) + pipeline integration tests
-├── docs/                   # Technical documentation and design docs
-├── scripts/                # Build pipeline + export scripts + resume-pdf.typ stylesheet
+├── docs/                   # Technical documentation, design docs, and browser automation prompts
+├── scripts/                # Build pipeline + export + brand asset scripts + resume-pdf.typ stylesheet
 ├── lib/                    # Shared utilities (config, types, markdown helpers)
-├── public/                 # Static assets (robots.txt, sitemap.xml)
+├── public/                 # Static assets (OG image, favicons, robots.txt, sitemap.xml)
 ├── .env.local.example      # Environment variable template
 ├── CLAUDE.md               # Claude Code project memory
 └── next.config.ts          # Next.js configuration
@@ -265,6 +269,7 @@ paulprae-com/
 | [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows-specific setup: Dev Drive, filesystem layout, cross-machine parity          |
 | [`docs/mcp-setup.md`](docs/mcp-setup.md)                                         | MCP config for Claude Code and Cursor (Vercel, GitHub, Filesystem, Fetch)           |
 | [`scripts/setup/`](scripts/setup/)                                               | Automated setup scripts (Windows + Linux/WSL) for dev environment and pipeline deps |
+| [`docs/browser-prompts/`](docs/browser-prompts/)                                 | Prompts for Claude in Chrome to automate remaining manual tasks                     |
 
 ## Resume Versioning
 
