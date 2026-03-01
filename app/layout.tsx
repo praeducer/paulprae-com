@@ -7,6 +7,13 @@ export const metadata: Metadata = {
   title: "Paul Prae — Principal AI Engineer & Architect",
   description:
     "AI and data engineering leader with 15 years at AWS, Microsoft, and Fortune 500 companies. Healthcare AI, ML platforms, and engineering leadership.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
     title: "Paul Prae — Principal AI Engineer & Architect",
     description:

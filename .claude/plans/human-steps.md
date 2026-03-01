@@ -200,34 +200,25 @@ This restores the pre-migration state. The deleted test/cdn/portfolio records ar
 
 ---
 
-## 4. OG Image
+## 4. OG Image (COMPLETE ✅)
 
-Create a 1200x630 PNG for social media link previews (Slack, LinkedIn, Twitter).
-
-**Options:**
-
-- AI-generated via DALL-E, Midjourney, or Ideogram
-- Text-on-gradient using Figma, Canva, or a simple HTML-to-image tool
-- Minimalist: name + title + subtle tech pattern on dark background
-
-**Requirements:**
-
-- Save to `public/og-image.png`
-- Already wired in `app/layout.tsx` metadata (openGraph.images and twitter.images)
-- Test with: https://www.opengraph.xyz/ after deploying
+- [x] 4.1 Created `scripts/generate-brand-assets.ts` — deterministic SVG → PNG generation using sharp
+- [x] 4.2 Design: dark slate-900 gradient background, subtle dot grid, geometric accents,
+  bold "Paul Prae" name, "Principal AI Engineer & Architect" subtitle, "paulprae.com" URL
+- [x] 4.3 Generated `public/og-image.png` (1200x630, ~22 KB)
+- [x] 4.4 Already wired in `app/layout.tsx` (openGraph.images + twitter.images)
+- [ ] 4.5 **Human action:** Test with https://www.opengraph.xyz/ after deploying
 
 ---
 
-## 5. Favicon
+## 5. Favicon (COMPLETE ✅)
 
-Add a favicon for browser tabs and bookmarks.
-
-**Options:**
-
-- "PP" monogram or initials design
-- SVG favicon (`public/favicon.svg`) for modern browsers
-- ICO fallback (`public/favicon.ico`) for legacy browsers
-- Generate from text at https://favicon.io/favicon-generator/
+- [x] 5.1 "PP" monogram design on slate-900 rounded rectangle
+- [x] 5.2 Generated `public/favicon.svg` (SVG for modern browsers)
+- [x] 5.3 Generated `public/favicon.ico` (32x32 ICO for legacy browsers)
+- [x] 5.4 Generated `public/apple-touch-icon.png` (180x180 for iOS)
+- [x] 5.5 Wired in `app/layout.tsx` metadata (icons.icon + icons.apple)
+- [x] 5.6 `npm run brand` / `npm run brand:force` commands added to package.json
 
 ---
 

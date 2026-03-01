@@ -7,13 +7,13 @@
 
 ## Phase 1 Polish (Requires Human Action)
 
-### Favicon & OG Image
+### ~~Favicon & OG Image~~ (DONE)
 
-`app/layout.tsx` already has metadata wired for OG image and Twitter card. Just need the assets:
-
-1. **Favicon:** Add `favicon.ico` or `favicon.svg` to `public/`. A "PP" monogram or initials-based design.
-2. **OG Image:** Create `public/og-image.png` (1200x630px) for social media link previews. Metadata already configured — just drop the file in.
-3. **Apple Touch Icon:** Optional for iOS bookmarks.
+All brand assets generated via `npm run brand` (`scripts/generate-brand-assets.ts`):
+- `public/og-image.png` (1200x630) — dark slate design with name, title, URL
+- `public/favicon.svg` + `public/favicon.ico` — "PP" monogram
+- `public/apple-touch-icon.png` (180x180) — iOS bookmark icon
+- All wired in `app/layout.tsx` metadata
 
 ### Analytics
 
