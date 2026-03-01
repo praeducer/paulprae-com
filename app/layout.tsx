@@ -4,7 +4,7 @@ import careerData from "../data/generated/career-data.json";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://paulprae.com"),
-  title: "Paul Prae — Principal AI Engineer & Architect",
+  title: "Paul Prae — Principal AI Engineer & Solutions Architect",
   description:
     "AI and data engineering leader with 15 years at AWS, Microsoft, and Fortune 500 companies. Healthcare AI, ML platforms, and engineering leadership.",
   icons: {
@@ -15,9 +15,9 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "Paul Prae — Principal AI Engineer & Architect",
+    title: "Paul Prae — Principal AI Engineer & Solutions Architect",
     description:
-      "AI and data engineering leader specializing in healthcare AI, ML platforms, and engineering team leadership.",
+      "AI and data engineering leader with 15 years at AWS, Microsoft, and Fortune 500 companies. Healthcare AI, ML platforms, and engineering leadership.",
     type: "website",
     url: "https://paulprae.com",
     siteName: "Paul Prae",
@@ -27,15 +27,15 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Paul Prae — Principal AI Engineer & Architect",
+        alt: "Paul Prae — Principal AI Engineer & Solutions Architect",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Paul Prae — Principal AI Engineer & Architect",
+    title: "Paul Prae — Principal AI Engineer & Solutions Architect",
     description:
-      "AI and data engineering leader specializing in healthcare AI, ML platforms, and engineering team leadership.",
+      "AI and data engineering leader with 15 years at AWS, Microsoft, and Fortune 500 companies. Healthcare AI, ML platforms, and engineering leadership.",
     images: ["/og-image.png"],
   },
   alternates: {

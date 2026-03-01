@@ -47,7 +47,7 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="text-xl font-bold text-slate-900">{profile.name}</h1>
-            <p className="text-sm text-slate-500">Principal AI Engineer & Architect</p>
+            <p className="text-sm text-slate-500">Principal AI Engineer & Solutions Architect</p>
           </div>
           <div className="flex flex-wrap items-center gap-3 text-sm">
             <a
