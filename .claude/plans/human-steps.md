@@ -1,13 +1,13 @@
 # Human-Only Steps — paulprae.com Deployment
 
 > **Updated:** 2026-03-01
-> **Status:** Site deployed at https://paulprae-com-one.vercel.app/ — custom domain DNS pending
+> **Status:** Live at https://paulprae.com — custom domain DNS active and propagated
 
 These steps require human action (browser logins, DNS panels, design decisions). They cannot be automated by Claude Code.
 
 ---
 
-## 1. Custom Domain DNS Configuration (IN PROGRESS — DO THIS FIRST)
+## 1. Custom Domain DNS Configuration (COMPLETE ✅)
 
 The Vercel deployment is live and waiting on DreamHost DNS. This section walks through
 every change needed in DreamHost, explains what to keep and why, and what to verify after.
@@ -181,18 +181,67 @@ This restores the pre-migration state. The deleted test/cdn/portfolio records ar
 
 ---
 
-## 2. Post-DNS: Update Repo References
+## 2. Vercel Domain Configuration (ACTION NEEDED)
 
-Once `paulprae.com` resolves correctly and Vercel shows "Valid Configuration":
+### 2.1 Verify Domain Status on Vercel
 
-1. Update `CLAUDE.md` line mentioning "DNS pending" — remove that note
-2. Update `README.md` deployment section — change URL to `https://paulprae.com`
-3. Update `.claude/plans/backlog.md` status line
-4. Test all download links at the custom domain
+Go to: https://vercel.com/praeducers-projects/paulprae-com/settings/domains
+
+Both `paulprae.com` and `www.paulprae.com` should now show **"Valid Configuration"**
+(green checkmark). If they still show "Invalid Configuration", click **Refresh** and wait
+a few minutes — DNS propagation was confirmed via Google DNS at 8.8.8.8.
+
+### 2.2 Check Redirect Direction
+
+Vercel currently redirects `paulprae.com` → `www.paulprae.com` (307). This means:
+- `www.paulprae.com` is the **primary** domain
+- `paulprae.com` redirects to it
+
+**If you prefer apex as primary** (paulprae.com, no www):
+1. In Vercel Domains settings, click **Edit** on `paulprae.com`
+2. Set it as the primary domain
+3. This will flip the redirect: `www.paulprae.com` → `paulprae.com`
+
+Either direction works; it's a preference. Most modern sites use the apex (no www).
+
+### 2.3 Trigger a Fresh Deploy (fixes PDF/DOCX 404s)
+
+Resume download links (PDF, DOCX, MD) currently return 404. The files are committed to
+`public/` in git, but Vercel's `ignoreCommand` may have skipped the build when only
+`.claude/plans/` files changed in the latest push.
+
+**Fix — trigger a redeploy using one of these methods:**
+
+**Option A (easiest):** In Vercel Dashboard > Deployments > click the "..." menu on the
+latest deployment > "Redeploy"
+
+**Option B (from CLI):** Push any commit that touches a monitored path:
+```bash
+# A no-op touch to trigger Vercel rebuild
+git commit --allow-empty -m "Trigger Vercel redeploy"
+git push origin main
+```
+
+**After redeploying, verify downloads work:**
+```bash
+curl -I https://paulprae.com/Paul-Prae-Resume.pdf
+# Expected: 200 OK, content-type: application/pdf
+```
 
 ---
 
-## 3. OG Image
+## 3. Post-DNS: Update Repo References (COMPLETE ✅)
+
+DNS "pending" references have been updated:
+
+- [x] `CLAUDE.md` — Live URL updated to https://paulprae.com
+- [x] `README.md` — Deployment section updated
+- [x] `.claude/plans/backlog.md` — Status updated
+- [ ] Test all download links at the custom domain (blocked by section 2.3 redeploy)
+
+---
+
+## 4. OG Image
 
 Create a 1200x630 PNG for social media link previews (Slack, LinkedIn, Twitter).
 
@@ -210,7 +259,7 @@ Create a 1200x630 PNG for social media link previews (Slack, LinkedIn, Twitter).
 
 ---
 
-## 4. Favicon
+## 5. Favicon
 
 Add a favicon for browser tabs and bookmarks.
 
@@ -223,7 +272,7 @@ Add a favicon for browser tabs and bookmarks.
 
 ---
 
-## 5. Cross-Platform Profile Links
+## 6. Cross-Platform Profile Links
 
 Update external profiles to point to the live site:
 
@@ -233,7 +282,7 @@ Update external profiles to point to the live site:
 
 ---
 
-## 6. Vercel Project Settings (Already Done)
+## 7. Vercel Project Settings (Already Done)
 
 These were completed during initial setup:
 
@@ -245,7 +294,7 @@ These were completed during initial setup:
 
 ---
 
-## 7. GitHub Actions Secret (Phase 2 -- Not Needed Now)
+## 8. GitHub Actions Secret (Phase 2 -- Not Needed Now)
 
 When automated CI/CD regeneration is added in Phase 2:
 

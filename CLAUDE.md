@@ -6,7 +6,7 @@
 
 **Current Phase:** Phase 1 — AI-Generated Static Resume
 **Repository:** github.com/praeducer/paulprae-com
-**Live URL:** paulprae-com-one.vercel.app (custom domain: paulprae.com — DNS pending)
+**Live URL:** https://paulprae.com (also: paulprae-com-one.vercel.app)
 
 ## Tech Stack (Phase 1)
 

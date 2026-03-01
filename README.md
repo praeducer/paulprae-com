@@ -215,7 +215,7 @@ Vercel: npm ci → next build → serves out/ directory via CDN
 2. Commit generated files: `git add data/generated/ public/Paul-Prae-Resume.* && git commit`
 3. Push to deploy: `git push origin main`
 4. Vercel auto-builds within ~60 seconds
-5. Live at [paulprae-com-one.vercel.app](https://paulprae-com-one.vercel.app/) (custom domain: [paulprae.com](https://paulprae.com) — DNS pending)
+5. Live at [paulprae.com](https://paulprae.com) (also: [paulprae-com-one.vercel.app](https://paulprae-com-one.vercel.app/))
 
 Vercel skips rebuilds when only docs or tooling files change (configured via `ignoreCommand` in `vercel.json`). The project uses `framework: null` in `vercel.json` because `output: 'export'` produces a plain static site that Vercel's Next.js adapter cannot serve directly.
 

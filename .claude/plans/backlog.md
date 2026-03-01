@@ -1,7 +1,7 @@
 # Backlog — paulprae.com
 
 > **Updated:** 2026-03-01
-> **Status:** Phase 1 complete and live at https://paulprae-com-one.vercel.app/. Custom domain DNS pending. All items below are optional enhancements or Phase 2+ work. None block the current site.
+> **Status:** Phase 1 complete and live at https://paulprae.com (custom domain active). All items below are optional enhancements or Phase 2+ work. None block the current site.
 
 ---
 
