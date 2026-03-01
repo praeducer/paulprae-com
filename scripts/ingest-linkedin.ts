@@ -16,6 +16,7 @@
 
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 import { execFileSync } from "child_process";
 import Papa from "papaparse";
 import { z } from "zod";
@@ -499,6 +500,54 @@ function loadKnowledgeBase(): KnowledgeEntry[] {
   return entries;
 }
 
+// ─── Skip Logic ──────────────────────────────────────────────────────────────
+// Hash all input files (LinkedIn CSVs + knowledge JSONs) and compare to a
+// stored hash. Skip ingestion if inputs haven't changed.
+
+function hasForceFlag(): boolean {
+  return process.argv.includes("--force");
+}
+
+/** Recursively collect all file paths under a directory. */
+function collectFiles(dir: string): string[] {
+  if (!fs.existsSync(dir)) return [];
+  const results: string[] = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...collectFiles(fullPath));
+    } else {
+      results.push(fullPath);
+    }
+  }
+  return results.sort();
+}
+
+function computeInputHash(): string {
+  const hash = crypto.createHash("sha256");
+  const dirs = [PATHS.linkedinDir, PATHS.knowledgeDir];
+  for (const dir of dirs) {
+    for (const filePath of collectFiles(dir)) {
+      hash.update(filePath);
+      hash.update(fs.readFileSync(filePath));
+    }
+  }
+  return hash.digest("hex");
+}
+
+function shouldSkipIngest(): boolean {
+  if (!fs.existsSync(PATHS.ingestHash)) return false;
+  if (!fs.existsSync(PATHS.careerDataOutput)) return false;
+  const storedHash = fs.readFileSync(PATHS.ingestHash, "utf-8").trim();
+  const currentHash = computeInputHash();
+  return storedHash === currentHash;
+}
+
+function writeIngestHash(): void {
+  const hash = computeInputHash();
+  fs.writeFileSync(PATHS.ingestHash, hash, "utf-8");
+}
+
 // ─── Zod Validation Schema ───────────────────────────────────────────────────
 
 const CareerDataSchema = z.object({
@@ -630,6 +679,22 @@ function ingest(): IngestResult {
   const warnings: string[] = [];
 
   console.log("\n📂 LinkedIn Data Ingestion Pipeline\n");
+
+  // Skip if inputs haven't changed
+  if (!hasForceFlag() && shouldSkipIngest()) {
+    console.log("   ✅ Inputs unchanged (hash match). Skipping ingestion.");
+    console.log("   Use --force to override.\n");
+    const raw = fs.readFileSync(PATHS.careerDataOutput, "utf-8");
+    const data: CareerData = JSON.parse(raw);
+    return {
+      success: true,
+      careerData: data,
+      errors: [],
+      warnings: [],
+      stats: buildStats(0, 0, data),
+    };
+  }
+
   console.log(`   Source: ${PATHS.linkedinDir}`);
   console.log(`   Output: ${PATHS.careerDataOutput}\n`);
 
@@ -836,6 +901,9 @@ function ingest(): IngestResult {
     console.log("");
   }
 
+  // Write input hash for future skip detection
+  writeIngestHash();
+
   return { success: true, careerData: data, errors, warnings, stats };
 }
 
@@ -867,6 +935,10 @@ export const _testExports = {
   loadKnowledgeBase,
   enrichProfileFromKnowledge,
   extractLinkedInZip,
+  computeInputHash,
+  shouldSkipIngest,
+  writeIngestHash,
+  hasForceFlag,
   CareerDataSchema,
   ingest,
 };

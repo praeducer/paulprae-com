@@ -36,6 +36,9 @@ data/generated/Resume.docx
 data/generated/resume.pdf
 data/generated/resume.docx
 
+# Pipeline: skip-logic hash (machine-local, regenerated each run)
+data/generated/.ingest-hash
+
 # Pipeline: version archive (timestamped copies of each export, regenerable)
 data/generated/versions/
 

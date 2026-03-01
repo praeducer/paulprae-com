@@ -19,6 +19,12 @@ import path from "path";
 import crypto from "crypto";
 import { execFileSync } from "child_process";
 import { PATHS, RESUME_FILE_BASE } from "../lib/config.js";
+
+// ─── CLI Flag Parsing ────────────────────────────────────────────────────────
+
+function hasForceFlag(): boolean {
+  return process.argv.includes("--force");
+}
 import { stripHtmlComments } from "../lib/markdown.js";
 
 // ─── CLI Argument Parsing ────────────────────────────────────────────────────
@@ -316,12 +322,64 @@ function updateManifest(format: ExportFormat): void {
   console.log(`   📋 Updated ${path.basename(PATHS.versionsManifest)}`);
 }
 
+// ─── Copy to Public ──────────────────────────────────────────────────────────
+// Copy PDF/DOCX to public/ so Next.js static export serves them as downloads.
+
+function copyToPublic(format: ExportFormat): void {
+  const copies: Array<{ src: string; dest: string }> = [];
+
+  if ((format === "all" || format === "pdf") && fs.existsSync(PATHS.pdfOutput)) {
+    copies.push({ src: PATHS.pdfOutput, dest: PATHS.publicPdf });
+  }
+  if ((format === "all" || format === "docx") && fs.existsSync(PATHS.docxOutput)) {
+    copies.push({ src: PATHS.docxOutput, dest: PATHS.publicDocx });
+  }
+
+  if (copies.length === 0) return;
+
+  console.log("\n   📋 Copying to public/ for web download:");
+  for (const { src, dest } of copies) {
+    fs.copyFileSync(src, dest);
+    const kb = (fs.statSync(dest).size / 1024).toFixed(1);
+    console.log(`      ${path.basename(dest)} (${kb} KB)`);
+  }
+}
+
+// ─── Skip Logic ──────────────────────────────────────────────────────────────
+// Skip export if outputs are newer than the resume markdown input.
+
+function shouldSkipExport(format: ExportFormat): boolean {
+  if (!fs.existsSync(PATHS.resumeOutput)) return false;
+
+  const inputMtime = fs.statSync(PATHS.resumeOutput).mtimeMs;
+  const outputs: string[] = [];
+
+  if (format === "all" || format === "pdf") outputs.push(PATHS.pdfOutput);
+  if (format === "all" || format === "docx") outputs.push(PATHS.docxOutput);
+
+  if (outputs.length === 0) return false;
+
+  return outputs.every((out) => {
+    if (!fs.existsSync(out)) return false;
+    return fs.statSync(out).mtimeMs > inputMtime;
+  });
+}
+
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 function main(): void {
   const format = parseFormat();
 
   console.log("\n📦 Resume Export Pipeline\n");
+
+  // Skip if outputs are up to date
+  if (!hasForceFlag() && shouldSkipExport(format)) {
+    console.log("   ✅ Exports are up to date (resume markdown unchanged). Skipping.");
+    console.log("   Use --force to override.\n");
+    // Still copy to public/ in case they're missing there
+    copyToPublic(format);
+    return;
+  }
 
   // Check required binaries
   const needsPandoc = format === "all" || format === "pdf" || format === "docx";
@@ -353,6 +411,9 @@ function main(): void {
   archiveVersions(format);
   updateManifest(format);
 
+  // Copy to public/ for web downloads
+  copyToPublic(format);
+
   const durationMs = Date.now() - startTime;
   console.log(`\n   Done in ${(durationMs / 1000).toFixed(1)}s\n`);
 }
@@ -369,6 +430,9 @@ export const _testExports = {
   updateManifest,
   getGitSha,
   checkBinary,
+  copyToPublic,
+  shouldSkipExport,
+  hasForceFlag,
   main,
 };
 

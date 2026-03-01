@@ -58,6 +58,10 @@ export const PATHS = {
   versionsDir: path.join(ROOT, "data", "generated", "versions"),
   versionsManifest: path.join(ROOT, "data", "generated", "VERSIONS.md"),
   envFile: path.join(ROOT, ".env.local"),
+  publicDir: path.join(ROOT, "public"),
+  publicPdf: path.join(ROOT, "public", `${RESUME_FILE_BASE}.pdf`),
+  publicDocx: path.join(ROOT, "public", `${RESUME_FILE_BASE}.docx`),
+  ingestHash: path.join(ROOT, "data", "generated", ".ingest-hash"),
 } as const;
 
 // ─── Claude API Configuration ────────────────────────────────────────────────

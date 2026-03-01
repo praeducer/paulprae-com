@@ -2,7 +2,8 @@ import fs from "fs";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { stripHtmlComments } from "../lib/markdown";
-import { PATHS } from "../lib/config";
+import { PATHS, RESUME_FILE_BASE } from "../lib/config";
+import careerData from "../data/generated/career-data.json";
 
 /**
  * Home page — renders the AI-generated resume from the pipeline output.
@@ -35,11 +36,83 @@ export default function Home() {
   // Strip HTML comments (generation metadata) from display
   const cleanMarkdown = stripHtmlComments(resumeMarkdown);
 
+  const profile = careerData.profile;
+  const pdfPath = `/${RESUME_FILE_BASE}.pdf`;
+  const docxPath = `/${RESUME_FILE_BASE}.docx`;
+  const githubResumeUrl = `https://github.com/praeducer/paulprae-com/blob/main/data/generated/${RESUME_FILE_BASE}.md`;
+
   return (
-    <main className="max-w-3xl mx-auto px-6 py-12 print:py-4 print:px-0 print:max-w-none">
-      <article className="resume-prose prose prose-slate max-w-none">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanMarkdown}</ReactMarkdown>
-      </article>
-    </main>
+    <>
+      <header className="no-print max-w-3xl mx-auto px-6 pt-8 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-bold text-slate-900">{profile.name}</h1>
+            <p className="text-sm text-slate-500">Principal AI Engineer & Architect</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3 text-sm">
+            <a
+              href={pdfPath}
+              download
+              className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-3 py-1.5 text-white hover:bg-slate-700 transition-colors"
+            >
+              Download PDF
+            </a>
+            <a
+              href={docxPath}
+              download
+              className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              DOCX
+            </a>
+            {profile.email && (
+              <a
+                href={`mailto:${profile.email}`}
+                className="text-slate-500 hover:text-slate-900 transition-colors"
+              >
+                Email
+              </a>
+            )}
+            {profile.linkedin && (
+              <a
+                href={profile.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-slate-500 hover:text-slate-900 transition-colors"
+              >
+                LinkedIn
+              </a>
+            )}
+            <a
+              href={githubResumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-500 hover:text-slate-900 transition-colors"
+            >
+              GitHub
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-3xl mx-auto px-6 py-8 print:py-4 print:px-0 print:max-w-none">
+        <article className="resume-prose prose prose-slate max-w-none">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{cleanMarkdown}</ReactMarkdown>
+        </article>
+      </main>
+
+      <footer className="no-print max-w-3xl mx-auto px-6 pb-8 pt-4 border-t border-slate-200">
+        <p className="text-xs text-slate-400">
+          This resume is AI-generated &mdash;{" "}
+          <a
+            href="https://github.com/praeducer/paulprae-com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-slate-400 hover:text-slate-600 underline"
+          >
+            view the pipeline on GitHub
+          </a>
+        </p>
+      </footer>
+    </>
   );
 }

@@ -142,7 +142,18 @@ npm run export      # Convert to PDF + DOCX (requires pandoc + typst)
 npm run export:pdf  # PDF only
 npm run export:docx # DOCX only
 npm run build       # Next.js static export → out/
+
+# Composable sub-pipelines:
+npm run pipeline:content  # ingest → generate (AI steps only)
+npm run pipeline:render   # export → build (from existing markdown)
+npm run pipeline:deploy   # full pipeline + stage generated files for git
+
+# Force variants (skip freshness checks):
+npm run ingest:force      # Re-ingest even if inputs unchanged
+npm run generate:force    # Regenerate even if resume is fresh
 ```
+
+Pipeline steps skip automatically when their outputs are newer than their inputs. The ingest step uses SHA-256 content hashing; generate and export use file modification times. Use `--force` to override (e.g., `npm run generate:force`).
 
 ### Testing
 
@@ -192,11 +203,21 @@ The knowledge base (`data/sources/knowledge/`) is committed to git and transfers
 
 ## Deployment
 
-The site auto-deploys to Vercel on every push to `main`:
+The site auto-deploys to Vercel on every push to `main`. AI generation happens locally — Vercel only runs `next build` against committed files (no API keys needed on the server).
 
-1. Push changes: `git push origin main`
-2. Vercel builds and deploys within ~60 seconds
-3. Live at `paulprae.vercel.app` (custom domain: `paulprae.com`)
+```
+Local: npm run pipeline → ingest → generate → export → build
+       git push origin main
+Vercel: npm ci → next build → serves out/ directory via CDN
+```
+
+1. Run the pipeline locally: `npm run pipeline`
+2. Commit generated files: `git add data/generated/ public/Paul-Prae-Resume.* && git commit`
+3. Push to deploy: `git push origin main`
+4. Vercel auto-builds within ~60 seconds
+5. Live at [paulprae.com](https://paulprae.com)
+
+Vercel skips rebuilds when only docs or tooling files change (configured via `ignoreCommand` in `vercel.json`).
 
 ## Project Structure
 
@@ -241,7 +262,7 @@ paulprae-com/
 | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | [`docs/technical-design-document.md`](docs/technical-design-document.md)         | Full architecture, schema, and implementation plan                                  |
 | [`docs/linux-dev-environment-setup.md`](docs/linux-dev-environment-setup.md)     | Linux/WSL setup: nvm, Claude Code CLI, Cursor, pipeline deps                        |
-| [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows-specific setup: Dev Drive, filesystem layout, cross-machine parity           |
+| [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows-specific setup: Dev Drive, filesystem layout, cross-machine parity          |
 | [`docs/mcp-setup.md`](docs/mcp-setup.md)                                         | MCP config for Claude Code and Cursor (Vercel, GitHub, Filesystem, Fetch)           |
 | [`scripts/setup/`](scripts/setup/)                                               | Automated setup scripts (Windows + Linux/WSL) for dev environment and pipeline deps |
 

@@ -28,6 +28,22 @@ import type { CareerData, GenerationResult } from "../lib/types.js";
 // Load environment variables from .env.local
 config({ path: PATHS.envFile });
 
+// ─── Skip Logic ──────────────────────────────────────────────────────────────
+// Skip generation if the resume markdown is newer than career-data.json.
+
+function hasForceFlag(): boolean {
+  return process.argv.includes("--force");
+}
+
+function shouldSkipGenerate(): boolean {
+  if (!fs.existsSync(PATHS.careerDataOutput)) return false;
+  if (!fs.existsSync(PATHS.resumeOutput)) return false;
+
+  const inputMtime = fs.statSync(PATHS.careerDataOutput).mtimeMs;
+  const outputMtime = fs.statSync(PATHS.resumeOutput).mtimeMs;
+  return outputMtime > inputMtime;
+}
+
 // ─── System Prompt ───────────────────────────────────────────────────────────
 // Encodes brand voice, formatting rules, quality criteria, and target context.
 // Kept separate from career data so it's stable across regenerations.
@@ -224,6 +240,23 @@ function validateResumeOutput(markdown: string, careerData: CareerData): string[
 
 async function generate(): Promise<GenerationResult> {
   console.log("\n🤖 Resume Generation Pipeline\n");
+
+  // Skip if resume is already newer than career data
+  if (!hasForceFlag() && shouldSkipGenerate()) {
+    console.log("   ✅ Resume is up to date (career data unchanged). Skipping generation.");
+    console.log("   Use --force to override.\n");
+    const existingMarkdown = fs.readFileSync(PATHS.resumeOutput, "utf-8");
+    return {
+      success: true,
+      markdownLength: existingMarkdown.length,
+      model: CLAUDE.model,
+      stopReason: "skip",
+      inputTokens: 0,
+      outputTokens: 0,
+      durationMs: 0,
+    };
+  }
+
   console.log(`   Model: ${CLAUDE.model}`);
   console.log(
     `   Thinking: adaptive (effort: ${CLAUDE.effort} — Opus 4.6 exclusive, no constraints)`,
@@ -397,6 +430,8 @@ export const _testExports = {
   SYSTEM_PROMPT,
   buildUserMessage,
   validateResumeOutput,
+  shouldSkipGenerate,
+  hasForceFlag,
   generate,
 };
 
