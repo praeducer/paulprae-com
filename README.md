@@ -221,6 +221,8 @@ Vercel: npm ci → next build → serves out/ directory via CDN
 4. Vercel auto-builds within ~60 seconds
 5. Live at [paulprae.com](https://paulprae.com) (also: [paulprae-com-one.vercel.app](https://paulprae-com-one.vercel.app/))
 
+Custom-domain DNS operations are documented in [docs/domain-dns-runbook.md](docs/domain-dns-runbook.md).
+
 Vercel skips rebuilds when only docs or tooling files change (configured via `ignoreCommand` in `vercel.json`). The `ignoreCommand` uses `VERCEL_GIT_PREVIOUS_SHA` to compare against the last successful deployment, not just the previous commit — this prevents skipped builds when multi-commit pushes include both code and docs changes. The project uses `framework: null` in `vercel.json` because `output: 'export'` produces a plain static site that Vercel's Next.js adapter cannot serve directly.
 
 ## Project Structure
@@ -264,12 +266,13 @@ paulprae-com/
 
 | Doc                                                                              | Purpose                                                                             |
 | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| [`docs/technical-design-document.md`](docs/technical-design-document.md)         | Full architecture, schema, and implementation plan                                  |
+| [`docs/README.md`](docs/README.md)                                               | Documentation map and ownership by concern                                          |
+| [`docs/technical-design-document.md`](docs/technical-design-document.md)         | Current architecture and phased technical roadmap                                   |
+| [`docs/domain-dns-runbook.md`](docs/domain-dns-runbook.md)                       | Custom-domain DNS operations, validation, troubleshooting, rollback                 |
 | [`docs/linux-dev-environment-setup.md`](docs/linux-dev-environment-setup.md)     | Linux/WSL setup: nvm, Claude Code CLI, Cursor, pipeline deps                        |
-| [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows-specific setup: Dev Drive, filesystem layout, cross-machine parity          |
+| [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows host setup: Dev Drive, tooling, and validation                              |
 | [`docs/mcp-setup.md`](docs/mcp-setup.md)                                         | MCP config for Claude Code and Cursor (Vercel, GitHub, Filesystem, Fetch)           |
 | [`scripts/setup/`](scripts/setup/)                                               | Automated setup scripts (Windows + Linux/WSL) for dev environment and pipeline deps |
-| [`docs/browser-prompts/`](docs/browser-prompts/)                                 | Prompts for Claude in Chrome to automate remaining manual tasks                     |
 
 ## Resume Versioning
 

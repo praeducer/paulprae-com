@@ -4,21 +4,21 @@ This project configures [Model Context Protocol (MCP)](https://modelcontextproto
 
 ## Config locations
 
-| Consumer     | File                | Purpose                          |
-| ------------ | -------------------- | -------------------------------- |
-| Claude Code  | **`.mcp.json`** (project root) | Project-scoped MCP (official docs) |
-| Cursor       | **`.cursor/mcp.json`**         | Project-level MCP                |
+| Consumer    | File                           | Purpose                            |
+| ----------- | ------------------------------ | ---------------------------------- |
+| Claude Code | **`.mcp.json`** (project root) | Project-scoped MCP (official docs) |
+| Cursor      | **`.cursor/mcp.json`**         | Project-level MCP                  |
 
 Both files are generated from the canonical template **`scripts/setup/mcp-servers.json`** so they stay in sync.
 
 ## Servers included
 
-| Server      | Transport | Purpose |
-| ----------- | --------- | ------- |
-| **Vercel**  | HTTP (OAuth) | List deployments, get build/runtime logs, manage projects, search Vercel docs. Use to verify deployment or debug production. |
-| **GitHub**  | HTTP (OAuth) | PRs, issues, repo context. Authenticate via `/mcp` in Claude or Cursor MCP UI. |
-| **Filesystem** | stdio (npx) | Read/write under project directory (`.`). Scoped to repo. |
-| **Fetch**   | stdio (npx) | Fetch web content for docs or links. |
+| Server         | Transport    | Purpose                                                                                                                      |
+| -------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Vercel**     | HTTP (OAuth) | List deployments, get build/runtime logs, manage projects, search Vercel docs. Use to verify deployment or debug production. |
+| **GitHub**     | HTTP (OAuth) | PRs, issues, repo context. Authenticate via `/mcp` in Claude or Cursor MCP UI.                                               |
+| **Filesystem** | stdio (npx)  | Read/write under project directory (`.`). Scoped to repo.                                                                    |
+| **Fetch**      | stdio (npx)  | Fetch web content for docs or links.                                                                                         |
 
 Vercel and GitHub use OAuth; no API keys in the config. Filesystem and Fetch run locally via `npx`.
 
@@ -43,6 +43,4 @@ Vercel and GitHub use OAuth; no API keys in the config. Filesystem and Fetch run
 - **Vercel / GitHub "Needs login":** Use `/mcp` in Claude Code or the MCP authentication flow in Cursor to sign in.
 - **stdio servers (filesystem, fetch):** Require Node.js and `npx` on PATH. On Windows, local stdio servers using `npx` may need `cmd /c` in some clients; the config here is the standard form.
 
-## Phase 2/3 (later)
-
-Sentry, PostgreSQL, Supabase, or Neo4j MCPs can be added when those stacks are in use. See [.claude/plans/backlog.md](../.claude/plans/backlog.md) for the roadmap.
+Future MCP additions (Sentry/PostgreSQL/Supabase/Neo4j) are tracked as actionable items in `.claude/plans/backlog.md`.
