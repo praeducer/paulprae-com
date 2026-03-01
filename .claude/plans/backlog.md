@@ -1,7 +1,7 @@
 # Backlog — paulprae.com
 
 > **Updated:** 2026-02-28
-> **Status:** Phase 1 complete and deployed. All items below are optional enhancements or Phase 2+ work. None block the current site.
+> **Status:** Phase 1 in progress and ready to deploy. All items below are optional enhancements or Phase 2+ work. None block the current site.
 
 ---
 
@@ -34,31 +34,15 @@ Add privacy-respecting analytics to track recruiter engagement:
 
 All steps require physical machine access and human decisions.
 
-### 1. Apply .wslconfig
-
-Requires WSL shutdown (interrupts all running WSL sessions):
-
-```powershell
-wsl --shutdown
-```
-
-Then relaunch and verify: `free -h` (should show ~32 GB), `nproc` (should show 12).
-
-### 2. Move paloist-core to Dev Drive
-
-```powershell
-robocopy C:\dev\paloist-core D:\dev\paloist-core /E /MOVE
-```
-
-### 3. Clone active repos to Dev Drive
+### Clone active Windows repos (e.g. C:\dev) to Dev Drive
 
 Human decision needed on which repos to clone to `D:\dev\`.
 
-### 4. Consolidate WSL repos
+### Consolidate WSL repos
 
 Move repos from `~/workspace/` to `~/dev/`, then remove `~/workspace`.
 
-### 5. Clean up cloud drive repos
+### Clean up cloud drive repos
 
 Delete duplicate git repos from OneDrive/iCloudDrive (verify all pushed to GitHub first). Keep old company repos in iCloud as-is.
 
