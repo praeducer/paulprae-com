@@ -217,7 +217,7 @@ Vercel: npm ci → next build → serves out/ directory via CDN
 4. Vercel auto-builds within ~60 seconds
 5. Live at [paulprae.com](https://paulprae.com) (also: [paulprae-com-one.vercel.app](https://paulprae-com-one.vercel.app/))
 
-Vercel skips rebuilds when only docs or tooling files change (configured via `ignoreCommand` in `vercel.json`). The project uses `framework: null` in `vercel.json` because `output: 'export'` produces a plain static site that Vercel's Next.js adapter cannot serve directly.
+Vercel skips rebuilds when only docs or tooling files change (configured via `ignoreCommand` in `vercel.json`). The `ignoreCommand` uses `VERCEL_GIT_PREVIOUS_SHA` to compare against the last successful deployment, not just the previous commit — this prevents skipped builds when multi-commit pushes include both code and docs changes. The project uses `framework: null` in `vercel.json` because `output: 'export'` produces a plain static site that Vercel's Next.js adapter cannot serve directly.
 
 ## Project Structure
 

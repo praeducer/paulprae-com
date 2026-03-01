@@ -181,63 +181,22 @@ This restores the pre-migration state. The deleted test/cdn/portfolio records ar
 
 ---
 
-## 2. Vercel Domain Configuration (ACTION NEEDED)
+## 2. Vercel Domain Configuration (COMPLETE ✅)
 
-### 2.1 Verify Domain Status on Vercel
-
-Go to: https://vercel.com/praeducers-projects/paulprae-com/settings/domains
-
-Both `paulprae.com` and `www.paulprae.com` should now show **"Valid Configuration"**
-(green checkmark). If they still show "Invalid Configuration", click **Refresh** and wait
-a few minutes — DNS propagation was confirmed via Google DNS at 8.8.8.8.
-
-### 2.2 Check Redirect Direction
-
-Vercel currently redirects `paulprae.com` → `www.paulprae.com` (307). This means:
-- `www.paulprae.com` is the **primary** domain
-- `paulprae.com` redirects to it
-
-**If you prefer apex as primary** (paulprae.com, no www):
-1. In Vercel Domains settings, click **Edit** on `paulprae.com`
-2. Set it as the primary domain
-3. This will flip the redirect: `www.paulprae.com` → `paulprae.com`
-
-Either direction works; it's a preference. Most modern sites use the apex (no www).
-
-### 2.3 Trigger a Fresh Deploy (fixes PDF/DOCX 404s)
-
-Resume download links (PDF, DOCX, MD) currently return 404. The files are committed to
-`public/` in git, but Vercel's `ignoreCommand` may have skipped the build when only
-`.claude/plans/` files changed in the latest push.
-
-**Fix — trigger a redeploy using one of these methods:**
-
-**Option A (easiest):** In Vercel Dashboard > Deployments > click the "..." menu on the
-latest deployment > "Redeploy"
-
-**Option B (from CLI):** Push any commit that touches a monitored path:
-```bash
-# A no-op touch to trigger Vercel rebuild
-git commit --allow-empty -m "Trigger Vercel redeploy"
-git push origin main
-```
-
-**After redeploying, verify downloads work:**
-```bash
-curl -I https://paulprae.com/Paul-Prae-Resume.pdf
-# Expected: 200 OK, content-type: application/pdf
-```
+- [x] 2.1 Both domains show "Valid Configuration" on Vercel
+- [x] 2.2 Apex set as primary domain (paulprae.com); both apex and www serve 200
+- [x] 2.3 PDF/DOCX/MD download 404s fixed — root cause was `ignoreCommand` using `HEAD^`
+  instead of `VERCEL_GIT_PREVIOUS_SHA`, causing multi-commit pushes to skip builds.
+  Fixed in commit `533469c`.
 
 ---
 
 ## 3. Post-DNS: Update Repo References (COMPLETE ✅)
 
-DNS "pending" references have been updated:
-
 - [x] `CLAUDE.md` — Live URL updated to https://paulprae.com
 - [x] `README.md` — Deployment section updated
 - [x] `.claude/plans/backlog.md` — Status updated
-- [ ] Test all download links at the custom domain (blocked by section 2.3 redeploy)
+- [x] All download links verified working at custom domain (PDF, DOCX, MD)
 
 ---
 
