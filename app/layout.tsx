@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://paulprae.com"),
   title: "Paul Prae — Principal AI Engineer & Solutions Architect",
   description:
-    "AI and data engineering leader with 15 years at AWS, Microsoft, and Fortune 500 companies. Healthcare AI, ML platforms, and engineering leadership.",
+    "Building AI agents that ship AI products. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "32x32" },
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Paul Prae — Principal AI Engineer & Solutions Architect",
     description:
-      "AI and data engineering leader with 15 years at AWS, Microsoft, and Fortune 500 companies. Healthcare AI, ML platforms, and engineering leadership.",
+      "Building AI agents that ship AI products. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
     type: "website",
     url: "https://paulprae.com",
     siteName: "Paul Prae",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Paul Prae — Principal AI Engineer & Solutions Architect",
     description:
-      "AI and data engineering leader with 15 years at AWS, Microsoft, and Fortune 500 companies. Healthcare AI, ML platforms, and engineering leadership.",
+      "Building AI agents that ship AI products. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
     images: ["/og-image.png"],
   },
   alternates: {

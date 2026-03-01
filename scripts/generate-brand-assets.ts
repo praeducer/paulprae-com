@@ -83,11 +83,14 @@ function ogImageSvg(): string {
   <text x="80" y="270" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="72" font-weight="700" fill="${COLORS.text}" letter-spacing="-1">Paul Prae</text>
 
   <!-- Title -->
-  <text x="80" y="360" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="400" fill="${COLORS.textMuted}">Principal AI Engineer &amp; Solutions Architect</text>
+  <text x="80" y="355" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="400" fill="${COLORS.textMuted}">Principal AI Engineer &amp; Solutions Architect</text>
+
+  <!-- Tagline -->
+  <text x="80" y="400" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="500" fill="${COLORS.border}">Building AI Agents That Ship AI Products</text>
 
   <!-- Call-to-action -->
-  <rect x="80" y="420" width="200" height="44" rx="6" fill="${COLORS.accent}"/>
-  <text x="180" y="449" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="600" fill="${COLORS.text}">View Resume →</text>
+  <rect x="80" y="440" width="200" height="44" rx="6" fill="${COLORS.accent}"/>
+  <text x="180" y="469" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="600" fill="${COLORS.text}">View Resume →</text>
 
   <!-- URL -->
   <text x="80" y="560" font-family="ui-monospace, 'Cascadia Code', 'Fira Code', monospace" font-size="18" fill="${COLORS.border}">paulprae.com</text>
