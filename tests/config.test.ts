@@ -15,7 +15,6 @@ import { describe, it, expect } from "vitest";
 import path from "path";
 import {
   PATHS,
-  KNOWLEDGE_PATHS,
   CLAUDE,
   LINKEDIN_CSV_FILES,
   RESUME_FILE_BASE,
@@ -106,23 +105,6 @@ describe("PATHS", () => {
     expect(path.dirname(PATHS.resumeOutput)).toBe(generatedDir);
     expect(path.dirname(PATHS.pdfOutput)).toBe(generatedDir);
     expect(path.dirname(PATHS.docxOutput)).toBe(generatedDir);
-  });
-});
-
-describe("KNOWLEDGE_PATHS", () => {
-  it("defines all expected subdirectories", () => {
-    expect(KNOWLEDGE_PATHS.career).toContain("knowledge/career");
-    expect(KNOWLEDGE_PATHS.brand).toContain("knowledge/brand");
-    expect(KNOWLEDGE_PATHS.strategy).toContain("knowledge/strategy");
-    expect(KNOWLEDGE_PATHS.agents).toContain("knowledge/agents");
-    expect(KNOWLEDGE_PATHS.content).toContain("knowledge/content");
-    expect(KNOWLEDGE_PATHS.meta).toContain("knowledge/_meta");
-  });
-
-  it("all paths are under knowledgeDir", () => {
-    for (const subdir of Object.values(KNOWLEDGE_PATHS)) {
-      expect(subdir.startsWith(PATHS.knowledgeDir)).toBe(true);
-    }
   });
 });
 

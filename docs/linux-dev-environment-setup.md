@@ -387,7 +387,7 @@ cp .env.local.example .env.local
 # Edit .env.local and add your ANTHROPIC_API_KEY
 ```
 
-For full pipeline setup (API keys, LinkedIn data, running the pipeline), see the [Pipeline Setup Checklist](pipeline-setup-checklist.md).
+For full pipeline setup (API keys, LinkedIn data, running the pipeline), see the [Getting Started](../README.md#getting-started) section in README.
 
 ### Quick Smoke Test
 

@@ -54,6 +54,7 @@ machine-inventory.local.md
 .DS_Store
 Thumbs.db
 desktop.ini
+NUL
 *.swp
 *.swo
 *~
@@ -63,6 +64,9 @@ desktop.ini
 .idea/
 .cursor/
 *.code-workspace
+
+# Claude Code transient files
+.claude/prompts/
 
 # Debug logs
 npm-debug.log*

@@ -1,7 +1,7 @@
 # Backlog — paulprae.com
 
-> **Updated:** 2026-02-28
-> **Status:** Phase 1 in progress and ready to deploy. All items below are optional enhancements or Phase 2+ work. None block the current site.
+> **Updated:** 2026-03-01
+> **Status:** Phase 1 complete and deployed. All items below are optional enhancements or Phase 2+ work. None block the current site.
 
 ---
 
@@ -69,6 +69,18 @@ Generate variants (AI/ML leadership, solutions architecture, engineering managem
 ### JSON Resume Schema Compatibility
 
 Export `career-data.json` in [JSON Resume](https://jsonresume.org/) format for interoperability.
+
+---
+
+## Phase 2/3 Restoration (When Starting Phase 2)
+
+Items removed during Phase 1 cleanup (2026-03-01) that should be recreated for Phase 2/3:
+
+- **Recreate `lib/knowledge-types.ts`** — structured KB types for Supabase schema and Neo4j graph mapping (generate from knowledge JSON schemas)
+- **Recreate `data/sources/knowledge/_meta/manifest.json`** — auto-generate from knowledge directory listing (not manually maintained)
+- **Add knowledge base audit tests** — port Python audit checks to Vitest (validate JSON schemas, detect missing fields, count coverage)
+- **Create `components/` directory** — shared UI components for chat interface, resume viewer, etc.
+- **Add `KNOWLEDGE_PATHS` to `lib/config.ts`** — only if structured KB access patterns emerge (Phase 2 RAG may need per-category paths)
 
 ---
 

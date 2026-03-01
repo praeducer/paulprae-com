@@ -17,8 +17,7 @@
 6. [Phase 2: Full-Stack Interactive Career Platform](#6-phase-2-full-stack-interactive-career-platform)
 7. [Phase 3: Knowledge-Graph-Augmented AI Platform](#7-phase-3-knowledge-graph-augmented-ai-platform)
 8. [Technical Project Plan](#8-technical-project-plan)
-9. [Claude Code Initialization Prompt](#9-claude-code-initialization-prompt)
-10. [References](#10-references)
+9. [References](#9-references)
 
 ---
 
@@ -1150,173 +1149,38 @@ const careerAgent = new Agent({
 
 ---
 
-## 9. Claude Code Initialization Prompt
-
-Copy and paste the following prompt into Claude Code CLI to initialize the project. This assumes you have an empty git repo with no README yet.
-
-```
-I need you to scaffold a Next.js 16 project for my professional career website (paulprae.com). This is Phase 1: an AI-generated static resume site. Here is what to set up:
-
-## Project Structure
-
-Create the following directory structure:
-
-```
-
-paulprae.com/
-├── app/
-│ ├── layout.tsx # Root layout with metadata, fonts, Tailwind
-│ ├── page.tsx # Main page: reads generated resume via PATHS.resumeOutput, renders styled HTML
-│ ├── globals.css # Tailwind imports + custom prose styles + print styles
-│ └── favicon.ico # Placeholder
-├── components/
-│ └── resume-renderer.tsx # Server component: Markdown → styled HTML via react-markdown
-├── data/
-│ ├── sources/
-│ │ ├── linkedin/ # LinkedIn CSV exports (gitignored — raw exports may have extra columns)
-│ │ └── knowledge/ # Knowledge base JSONs (committed — recruiter-facing content)
-│ └── generated/ # Pipeline output: career-data.json + Paul-Prae-Resume.md (committed), PDF + DOCX (gitignored)
-├── scripts/
-│ ├── ingest-linkedin.ts # Parse LinkedIn CSVs + knowledge JSONs → career-data.json
-│ └── generate-resume.ts # Load career-data.json → call Claude API → write resume markdown
-├── lib/
-│ └── types.ts # CareerData TypeScript interface and related types
-├── public/
-│ └── og-image.png # Placeholder Open Graph image
-├── .env.local.example # Template: ANTHROPIC_API_KEY=your_key_here
-├── .gitignore # Node, Next.js, .env.local, data/sources/linkedin/\*.csv
-├── next.config.ts # output: 'export' for static generation
-├── package.json
-├── tsconfig.json
-├── tailwind.config.ts
-├── postcss.config.mjs
-├── README.md
-└── CLAUDE.md
-
-````
-
-## Technical Specifications
-
-1. **Next.js 16.1.x** with App Router, TypeScript strict mode, Turbopack
-2. **Tailwind CSS** for styling — configure a professional typography system in globals.css with custom prose overrides suitable for a senior engineering leader's resume. Use a restrained, confident design: dark text on white background, clear heading hierarchy, generous whitespace.
-3. **react-markdown** + **remark-gfm** for Markdown rendering
-4. **papaparse** for CSV parsing in the ingestion script
-5. **@anthropic-ai/sdk** for Claude API calls in the generation script
-6. **tsx** as the TypeScript script runner (for scripts/)
-7. Static export: `output: 'export'` in next.config.ts
-
-## Content & Metadata
-
-- Page title: "Paul Prae — Principal AI Engineer & Architect"
-- Meta description: "AI and data engineering leader with 15 years of experience at AWS, Microsoft, and Fortune 500 companies. Specializing in healthcare AI, ML platforms, and engineering team leadership."
-- Open Graph tags for professional link sharing
-- Responsive from 320px to 1440px
-- Print-friendly CSS (@media print) so recruiters can Cmd+P to PDF
-
-## Scripts
-
-### scripts/ingest-linkedin.ts
-- Read all CSV files from data/sources/linkedin/ using papaparse
-- Read all JSON files from data/sources/knowledge/
-- Merge into a unified CareerData object (define the interface in lib/types.ts)
-- Write to data/generated/career-data.json
-- Handle missing files gracefully (some CSVs may not exist yet)
-- Log what was parsed: "Parsed 63 skills, 28 projects, 10 certifications, 2 publications"
-
-### scripts/generate-resume.ts
-- Load data/generated/career-data.json
-- Construct a detailed prompt that instructs Claude to generate a professional Markdown resume
-- The prompt should include: all career data as structured context, instructions for resume structure (Summary, Experience, Education, Skills, Certifications, Projects, Publications), tone guidelines (confident, technically precise, action-oriented), target role context (Principal AI Engineer, Solutions Architect, Senior Engineering Manager), and a 2-page length target
-- Call Anthropic API with model "claude-opus-4-6-20250414", max_tokens 4096
-- Write output to data/generated/Paul-Prae-Resume.md (filename derived from career-data.json profile.name)
-- If ANTHROPIC_API_KEY is not set, log an error and exit
-
-## Package Scripts
-
-Add to package.json:
-```json
-{
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "ingest": "tsx scripts/ingest-linkedin.ts",
-    "generate": "tsx scripts/generate-resume.ts",
-    "pipeline": "npm run ingest && npm run generate && npm run build"
-  }
-}
-````
-
-## README.md
-
-Write a clear README explaining:
-
-1. What this project is (AI-generated professional resume site)
-2. The data pipeline: LinkedIn export → ingest → generate → deploy
-3. How to set up locally (clone, npm install, add .env.local, add data files)
-4. How to run the pipeline (npm run pipeline)
-5. How to deploy (push to main, Vercel auto-deploys)
-6. Phase 2 and Phase 3 roadmap summary (database, chat, dynamic resume, knowledge graph)
-
-## CLAUDE.md
-
-Generate a CLAUDE.md with:
-
-- Project overview and current phase (Phase 1: static resume)
-- Tech stack: Next.js 16.1.x, TypeScript, Tailwind CSS, react-markdown, Anthropic Claude API
-- Key conventions: App Router, server components by default, TypeScript strict mode
-- File organization: app/ for routes, components/ for reusable UI, scripts/ for build pipeline, lib/ for shared utilities, data/sources/ for raw input, data/generated/ for pipeline output
-- Important: data/generated/Paul-Prae-Resume.md is GENERATED — edit scripts/generate-resume.ts to change resume output, not the markdown file directly. The filename is derived from career-data.json (profile.name → "Paul-Prae-Resume").
-- Important: static export mode (output: 'export') — no API routes, no server-side rendering in Phase 1
-- Phase 2 will add: Supabase, Vercel AI SDK 6, API routes, chat interface, dynamic resume generation
-
-## Important Notes
-
-- Do NOT install shadcn/ui yet — it's not needed for Phase 1 (single static page)
-- Do NOT set up Supabase yet — Phase 1 is purely static
-- Do NOT install Vercel AI SDK yet — Phase 1 calls Anthropic directly from build scripts only
-- Keep dependencies minimal for Phase 1
-- Use `next build` to verify the static export works before committing
-
-After scaffolding, run `npm install` and verify the project builds successfully with `npm run build`. Create an initial commit with the message "Phase 1: Initial project scaffold for AI-generated static resume site".
-
-```
-
----
-
-## 10. References
+## 9. References
 
 ### Official Documentation (verified February 24, 2026)
 
-| Technology | Documentation URL | Version |
-|------------|------------------|---------|
-| Next.js 16 | https://nextjs.org/docs | 16.1.6 |
-| Vercel AI SDK 6 | https://ai-sdk.dev/docs/introduction | 6.0.97 |
-| AI SDK Migration Guide (5→6) | https://ai-sdk.dev/docs/migration-guides/migration-guide-6-0 | — |
-| Supabase pgvector | https://supabase.com/docs/guides/database/extensions/pgvector | Latest |
-| Supabase Semantic Search | https://supabase.com/docs/guides/ai/semantic-search | Latest |
-| Supabase Vector Columns | https://supabase.com/docs/guides/ai/vector-columns | Latest |
-| Supabase Auth (SSR) | https://supabase.com/docs/guides/auth/server-side/nextjs | Latest |
-| shadcn/ui | https://ui.shadcn.com/docs | CLI 3.0+ |
-| Tailwind CSS | https://tailwindcss.com/docs | 4.x |
-| Anthropic Claude API | https://docs.anthropic.com/en/api | Current |
-| Claude Code CLI | https://code.claude.com/docs/en/overview | Latest |
-| Neo4j Getting Started | https://neo4j.com/docs/getting-started/ | 2026.01 |
-| n8n Supabase Integration | https://n8n.io/integrations/supabase/ | Latest |
-| react-markdown | https://github.com/remarkjs/react-markdown | Latest |
-| PapaParse | https://www.papaparse.com/docs | Latest |
+| Technology                   | Documentation URL                                             | Version  |
+| ---------------------------- | ------------------------------------------------------------- | -------- |
+| Next.js 16                   | https://nextjs.org/docs                                       | 16.1.6   |
+| Vercel AI SDK 6              | https://ai-sdk.dev/docs/introduction                          | 6.0.97   |
+| AI SDK Migration Guide (5→6) | https://ai-sdk.dev/docs/migration-guides/migration-guide-6-0  | —        |
+| Supabase pgvector            | https://supabase.com/docs/guides/database/extensions/pgvector | Latest   |
+| Supabase Semantic Search     | https://supabase.com/docs/guides/ai/semantic-search           | Latest   |
+| Supabase Vector Columns      | https://supabase.com/docs/guides/ai/vector-columns            | Latest   |
+| Supabase Auth (SSR)          | https://supabase.com/docs/guides/auth/server-side/nextjs      | Latest   |
+| shadcn/ui                    | https://ui.shadcn.com/docs                                    | CLI 3.0+ |
+| Tailwind CSS                 | https://tailwindcss.com/docs                                  | 4.x      |
+| Anthropic Claude API         | https://docs.anthropic.com/en/api                             | Current  |
+| Claude Code CLI              | https://code.claude.com/docs/en/overview                      | Latest   |
+| Neo4j Getting Started        | https://neo4j.com/docs/getting-started/                       | 2026.01  |
+| n8n Supabase Integration     | https://n8n.io/integrations/supabase/                         | Latest   |
+| react-markdown               | https://github.com/remarkjs/react-markdown                    | Latest   |
+| PapaParse                    | https://www.papaparse.com/docs                                | Latest   |
 
 ### Architecture Decisions
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| Static export for Phase 1 | `output: 'export'` | Fastest path to production; no server needed; free Vercel hosting; can Cmd+P to PDF |
-| Anthropic SDK direct (Phase 1) vs Vercel AI SDK (Phase 2) | Phase 1: `@anthropic-ai/sdk`; Phase 2: `ai` + `@ai-sdk/anthropic` | Phase 1 needs only single API calls in build scripts. Phase 2 needs streaming, useChat hooks, agent abstractions that AI SDK 6 provides. |
-| pgvector over separate vector DB | Supabase pgvector | Keeps vectors in same database as relational data. Enables SQL JOINs between career data and embeddings. Eliminates separate service cost and complexity. Sufficient for career-scale data (~1K documents). |
-| Neo4j in Phase 3 (not Phase 2) | Deferred | Phase 2's RAG with pgvector is sufficient for MVP chat quality. Neo4j adds value when relationship traversal matters (e.g., "which skills did Paul use across healthcare projects?"). Adding it early would slow Phase 2 delivery. |
-| Embedding model choice | OpenAI `text-embedding-3-small` (1536d) or Supabase `gte-small` (384d) | Decision deferred to Phase 2 implementation. `gte-small` is free (runs in Edge Functions) but lower quality. `text-embedding-3-small` costs ~$0.02/1M tokens but higher quality. For career-scale data, cost is negligible either way. |
+| Decision                                                  | Choice                                                                 | Rationale                                                                                                                                                                                                                              |
+| --------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Static export for Phase 1                                 | `output: 'export'`                                                     | Fastest path to production; no server needed; free Vercel hosting; can Cmd+P to PDF                                                                                                                                                    |
+| Anthropic SDK direct (Phase 1) vs Vercel AI SDK (Phase 2) | Phase 1: `@anthropic-ai/sdk`; Phase 2: `ai` + `@ai-sdk/anthropic`      | Phase 1 needs only single API calls in build scripts. Phase 2 needs streaming, useChat hooks, agent abstractions that AI SDK 6 provides.                                                                                               |
+| pgvector over separate vector DB                          | Supabase pgvector                                                      | Keeps vectors in same database as relational data. Enables SQL JOINs between career data and embeddings. Eliminates separate service cost and complexity. Sufficient for career-scale data (~1K documents).                            |
+| Neo4j in Phase 3 (not Phase 2)                            | Deferred                                                               | Phase 2's RAG with pgvector is sufficient for MVP chat quality. Neo4j adds value when relationship traversal matters (e.g., "which skills did Paul use across healthcare projects?"). Adding it early would slow Phase 2 delivery.     |
+| Embedding model choice                                    | OpenAI `text-embedding-3-small` (1536d) or Supabase `gte-small` (384d) | Decision deferred to Phase 2 implementation. `gte-small` is free (runs in Edge Functions) but lower quality. `text-embedding-3-small` costs ~$0.02/1M tokens but higher quality. For career-scale data, cost is negligible either way. |
 
 ---
 
-*End of Technical Design Document*
-```
+_End of Technical Design Document_

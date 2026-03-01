@@ -35,7 +35,7 @@ LinkedIn CSV Export → Ingestion Script → Claude API → Markdown Resume → 
 | Validation    | Zod (schema validation)                        |
 | Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF)              |
 | Linting       | ESLint 9 + eslint-config-next + Prettier       |
-| Testing       | Vitest (150+ unit and integration tests)       |
+| Testing       | Vitest (160+ unit and integration tests)       |
 | Deployment    | Vercel (free tier, auto-deploy from GitHub)    |
 | Dev Tooling   | Claude Code CLI + Cursor                       |
 
@@ -49,7 +49,7 @@ LinkedIn CSV Export → Ingestion Script → Claude API → Markdown Resume → 
 - Pandoc ([pandoc.org](https://pandoc.org/installing.html)) — for resume export
 - Typst ([typst.app](https://github.com/typst/typst)) — for PDF export
 
-### Setup
+### 1. Clone and Install
 
 ```bash
 git clone https://github.com/praeducer/paulprae-com.git
@@ -61,17 +61,73 @@ bash scripts/setup/install-pipeline-deps.sh
 # Windows: powershell -NoProfile -File scripts\setup\install-dev-tools.ps1
 
 npm install
-
-# Configure environment
-cp .env.local.example .env.local
-# Edit .env.local and add your ANTHROPIC_API_KEY
-
-# Add your LinkedIn data exports
-# Drop CSV files into data/sources/linkedin/
-# Drop knowledge base JSONs into data/sources/knowledge/
 ```
 
-### Run the Pipeline
+### 2. Configure API Key
+
+```bash
+cp .env.local.example .env.local
+# Edit .env.local and add your ANTHROPIC_API_KEY (get one at console.anthropic.com/settings/keys)
+```
+
+> **Billing:** The pipeline uses Claude Opus 4.6. A single resume generation costs ~$0.50-$2.00 in API credits. Ensure your account has credits at [console.anthropic.com/settings/billing](https://console.anthropic.com/settings/billing).
+
+### 3. Add LinkedIn Data
+
+1. Go to [linkedin.com/mypreferences/d/download-my-data](https://www.linkedin.com/mypreferences/d/download-my-data)
+2. Select **"Download larger data archive"** (the smaller export doesn't include full position descriptions)
+3. Wait for LinkedIn's email (10 minutes to 24 hours), then download and unzip
+4. Copy CSVs into `data/sources/linkedin/`
+
+The pipeline recognizes these files (case-insensitive):
+
+| File                           | Required?    | What it contains            |
+| ------------------------------ | ------------ | --------------------------- |
+| `Positions.csv`                | **Required** | Work experience             |
+| `Education.csv`                | Recommended  | Degrees, schools            |
+| `Skills.csv`                   | Recommended  | LinkedIn skill endorsements |
+| `Profile.csv`                  | Recommended  | Name, headline, summary     |
+| `Email Addresses.csv`          | Recommended  | Contact email               |
+| `Certifications.csv`           | Optional     | Professional certifications |
+| `Projects.csv`                 | Optional     | Project portfolio           |
+| `Publications.csv`             | Optional     | Published works             |
+| `Languages.csv`                | Optional     | Language proficiencies      |
+| `Recommendations_Received.csv` | Optional     | Peer recommendations        |
+| `Honors.csv`                   | Optional     | Awards, honors              |
+| `Volunteering.csv`             | Optional     | Volunteer experience        |
+| `Courses.csv`                  | Optional     | Course completions          |
+
+At minimum, you need `Positions.csv` or `Education.csv` for the pipeline to succeed. LinkedIn CSVs are gitignored and stay local to your machine.
+
+### 4. Install Export Dependencies (Optional — for PDF/DOCX)
+
+If you want PDF and DOCX exports (not just the web resume):
+
+**Ubuntu/WSL:**
+
+```bash
+sudo apt-get install -y pandoc
+cargo install typst-cli  # or download from https://github.com/typst/typst/releases
+```
+
+**macOS:**
+
+```bash
+brew install pandoc typst
+```
+
+**Windows (PowerShell):**
+
+```powershell
+winget install --id JohnMacFarlane.Pandoc --exact
+winget install --id Typst.Typst --exact
+```
+
+Verify: `pandoc --version && typst --version`
+
+> The `npm run export` step will **fail** if pandoc/typst are missing. If you only need the web resume, skip the export step and run `npm run ingest && npm run generate && npm run build` instead.
+
+### 5. Run the Pipeline
 
 ```bash
 # Full pipeline: ingest → generate → export → build
@@ -109,6 +165,29 @@ npm run format:check  # Prettier check (CI-friendly)
 npm run dev         # Start dev server with Turbopack
 ```
 
+### Repeating on a Fresh Machine
+
+1. Clone the repo
+2. `npm install`
+3. Copy `.env.local` from your password manager (or create a new key)
+4. Place LinkedIn CSVs in `data/sources/linkedin/` (re-export if needed)
+5. Install pandoc + typst (see step 4)
+6. `npm run pipeline`
+
+The knowledge base (`data/sources/knowledge/`) is committed to git and transfers automatically with the repo.
+
+### Troubleshooting
+
+| Problem                       | Solution                                                                                        |
+| ----------------------------- | ----------------------------------------------------------------------------------------------- |
+| `tsx not found`               | Run `npm install` first, or use `npx tsx`                                                       |
+| `ANTHROPIC_API_KEY not found` | Create `.env.local` per step 2                                                                  |
+| `No CSV files found`          | Place LinkedIn CSVs in `data/sources/linkedin/` per step 3                                      |
+| `API Error: 401`              | Check your API key in `.env.local`                                                              |
+| `API Error: 429`              | Rate limited — wait 60 seconds and retry                                                        |
+| `pandoc not found`            | Install per step 4, or skip export step                                                         |
+| UNC path / CMD.EXE errors     | Run via WSL: `wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/dev/paulprae-com && npm run pipeline"` |
+
 ## Deployment
 
 The site auto-deploys to Vercel on every push to `main`:
@@ -122,7 +201,6 @@ The site auto-deploys to Vercel on every push to `main`:
 ```
 paulprae-com/
 ├── app/                    # Next.js App Router pages and layouts
-├── components/             # Reusable React components
 ├── data/
 │   ├── sources/
 │   │   ├── linkedin/       # LinkedIn CSV exports (gitignored — may contain unparsed columns)
@@ -132,7 +210,7 @@ paulprae-com/
 ├── docs/                   # Technical documentation and design docs
 ├── scripts/                # Build pipeline + export scripts + resume-pdf.typ stylesheet
 ├── lib/                    # Shared utilities (config, types, markdown helpers)
-├── public/                 # Static assets
+├── public/                 # Static assets (robots.txt, sitemap.xml)
 ├── .env.local.example      # Environment variable template
 ├── CLAUDE.md               # Claude Code project memory
 └── next.config.ts          # Next.js configuration
@@ -160,7 +238,6 @@ paulprae-com/
 | Doc                                                                              | Purpose                                                                             |
 | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | [`docs/technical-design-document.md`](docs/technical-design-document.md)         | Full architecture, schema, and implementation plan                                  |
-| [`docs/pipeline-setup-checklist.md`](docs/pipeline-setup-checklist.md)           | Step-by-step pipeline setup: API keys, LinkedIn data, first run                     |
 | [`docs/linux-dev-environment-setup.md`](docs/linux-dev-environment-setup.md)     | Linux/WSL setup: nvm, Claude Code CLI, Cursor, pipeline deps                        |
 | [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows-specific setup: Dev Drive, filesystem layout, cross-machine parity          |
 | [`scripts/setup/`](scripts/setup/)                                               | Automated setup scripts (Windows + Linux/WSL) for dev environment and pipeline deps |

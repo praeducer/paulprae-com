@@ -10,21 +10,7 @@
 
 ## Tech Stack (Phase 1)
 
-| Layer         | Technology                                         | Version         |
-| ------------- | -------------------------------------------------- | --------------- |
-| Framework     | Next.js (App Router, TypeScript strict, Turbopack) | 16.1.x          |
-| Styling       | Tailwind CSS                                       | 4.x             |
-| Markdown      | react-markdown + remark-gfm                        | Latest          |
-| AI            | Anthropic Claude API via @anthropic-ai/sdk         | Latest          |
-| CSV Parsing   | PapaParse                                          | Latest          |
-| Validation    | Zod                                                | Latest          |
-| Env Loading   | dotenv                                             | Latest          |
-| Script Runner | tsx                                                | Latest          |
-| Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF)                  | System binaries |
-| Linting       | ESLint 9 (flat config) + eslint-config-next        | Latest          |
-| Formatting    | Prettier                                           | 3.x             |
-| Testing       | Vitest                                             | 4.x             |
-| Deployment    | Vercel (static export, free tier)                  | Latest          |
+See [README.md](README.md#tech-stack) for the full tech stack. Key versions: Next.js 16.1.x, Tailwind CSS 4.x, Vitest 4.x, ESLint 9, Prettier 3.x. AI generation via `@anthropic-ai/sdk` (Claude Opus 4.6). Resume export via Pandoc + Typst (system binaries).
 
 ## Key Conventions
 
@@ -39,15 +25,14 @@
 
 ```
 app/                   → Next.js App Router pages and layouts
-components/            → Reusable React components
 data/sources/linkedin/ → LinkedIn CSV exports (gitignored — raw exports may contain unparsed columns)
 data/sources/knowledge/→ Knowledge base JSONs (committed — recruiter-facing content for Phase 2 RAG)
 data/generated/        → Pipeline outputs: career-data.json + Paul-Prae-Resume.md (committed), PDF + DOCX (gitignored)
 scripts/               → Pipeline scripts (ingest, generate, export) + resume-pdf.typ stylesheet
-lib/                   → Shared utilities: config.ts, types.ts, markdown.ts, knowledge-types.ts
+lib/                   → Shared utilities: config.ts, types.ts, markdown.ts
 tests/                 → Unit and integration tests (Vitest)
-public/                → Static assets
-docs/                  → Technical documentation and architecture docs
+public/                → Static assets (robots.txt, sitemap.xml)
+docs/                  → Technical documentation (TDD, dev environment setup guides)
 ```
 
 ## Critical Rules
@@ -104,24 +89,11 @@ The build pipeline transforms raw career data into a deployed site:
 
 ## Common Commands
 
-```bash
-npm run dev         # Local dev server with Turbopack (hot reload)
-npm run build       # Production build (static export to out/)
-npm run start       # Serve production build locally
-npm run ingest      # Parse LinkedIn data → career-data.json
-npm run generate    # Generate resume via Claude API → Paul-Prae-Resume.md
-npm run export      # Export resume to PDF + DOCX (requires pandoc + typst)
-npm run export:pdf  # Export PDF only
-npm run export:docx # Export DOCX only
-npm run pipeline    # Full pipeline: ingest → generate → export → build
-npm test            # Run all tests (Vitest)
-npm run test:unit   # Unit tests only (pure logic)
-npm run test:pipeline # Pipeline integration tests (validates generated outputs)
-npm run lint        # ESLint check (cached)
-npm run lint:fix    # ESLint auto-fix
-npm run format      # Prettier format all files
-npm run format:check # Prettier check (CI-friendly)
-```
+See [README.md](README.md#5-run-the-pipeline) for the full command reference. Quick shortcuts:
+
+- `npm run pipeline` — full pipeline: ingest → generate → export → build
+- `npm test` — run all 160+ tests
+- `npm run lint && npm run format:check` — verify code quality
 
 ## Phase 2 Preview (Do Not Implement Yet)
 
