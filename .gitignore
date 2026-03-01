@@ -62,11 +62,13 @@ NUL
 # IDE / Editor
 .vscode/
 .idea/
-.cursor/
+.cursor/*
+!.cursor/mcp.json
 *.code-workspace
 
-# Claude Code transient files
+# Claude Code transient/local files
 .claude/prompts/
+.claude/settings.local.json
 
 # Debug logs
 npm-debug.log*

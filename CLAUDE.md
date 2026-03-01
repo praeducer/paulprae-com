@@ -32,7 +32,9 @@ scripts/               → Pipeline scripts (ingest, generate, export) + resume-
 lib/                   → Shared utilities: config.ts, types.ts, markdown.ts
 tests/                 → Unit and integration tests (Vitest)
 public/                → Static assets (robots.txt, sitemap.xml)
-docs/                  → Technical documentation (TDD, dev environment setup guides)
+docs/                  → Technical documentation (TDD, dev environment setup, MCP)
+.mcp.json              → MCP config for Claude Code (project root; see docs/mcp-setup.md)
+.cursor/mcp.json       → MCP config for Cursor (same sources as .mcp.json)
 ```
 
 ## Critical Rules

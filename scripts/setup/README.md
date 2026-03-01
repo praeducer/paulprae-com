@@ -16,6 +16,8 @@ For project installation (npm install, env vars, running the app), see the [proj
 | `install-dev-tools.ps1`    | Windows         | Installs Git, Node.js, VS Code, GitHub CLI, Pandoc, Typst, Vercel CLI, Claude Code via [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) and npm                                         | Fresh Windows machine, before anything else   |
 | `setup-dev-drive.ps1`      | Windows         | Creates `D:\dev` and `D:\packages\*` directories, redirects package caches, configures [Dev Drive filters](https://learn.microsoft.com/en-us/windows/dev-drive/#filters-for-common-scenarios)                      | After creating Dev Drive via Windows Settings |
 | `install-pipeline-deps.sh` | Linux/macOS/WSL | Installs pandoc, typst, Node.js (via nvm), npm dependencies, Claude Code CLI, Claude Code settings, and (on WSL) Cursor wrapper. Runs shell health checks. Prompts before running remote bootstrap script for nvm. | Fresh Linux/WSL machine, or after cloning     |
+| `install-mcp.sh`           | Linux/macOS/WSL | Writes `.mcp.json` (Claude Code) and `.cursor/mcp.json` (Cursor) from `mcp-servers.json`. Idempotent.                                                                                                               | After clone; repeat to refresh MCP config     |
+| `install-mcp.ps1`          | Windows         | Same as `install-mcp.sh` for Windows (PowerShell).                                                                                                                                                                 | After clone; repeat to refresh MCP config     |
 
 ## Usage
 
@@ -48,5 +50,25 @@ powershell -NoProfile -File scripts\setup\install-dev-tools.ps1
 ### Linux / WSL / macOS (Bash)
 
 ```bash
+# Pipeline and dev tools (if install-pipeline-deps.sh is present)
 bash scripts/setup/install-pipeline-deps.sh
+
+# MCP config for Claude Code and Cursor
+bash scripts/setup/install-mcp.sh
 ```
+
+### MCP only (any platform)
+
+After cloning, to install or refresh MCP config (Vercel, GitHub, Filesystem, Fetch):
+
+```bash
+# Linux / WSL / macOS
+bash scripts/setup/install-mcp.sh
+```
+
+```powershell
+# Windows
+powershell -NoProfile -File scripts\setup\install-mcp.ps1
+```
+
+See [docs/mcp-setup.md](../../docs/mcp-setup.md) for details.

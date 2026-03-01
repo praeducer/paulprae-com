@@ -63,6 +63,8 @@ bash scripts/setup/install-pipeline-deps.sh
 npm install
 ```
 
+**Optional — MCP (Claude Code & Cursor):** To install shared MCP config (Vercel, GitHub, Filesystem, Fetch), run `bash scripts/setup/install-mcp.sh` (Linux/WSL/macOS) or `powershell -NoProfile -File scripts\setup\install-mcp.ps1` (Windows). See [docs/mcp-setup.md](docs/mcp-setup.md).
+
 ### 2. Configure API Key
 
 ```bash
@@ -239,7 +241,8 @@ paulprae-com/
 | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | [`docs/technical-design-document.md`](docs/technical-design-document.md)         | Full architecture, schema, and implementation plan                                  |
 | [`docs/linux-dev-environment-setup.md`](docs/linux-dev-environment-setup.md)     | Linux/WSL setup: nvm, Claude Code CLI, Cursor, pipeline deps                        |
-| [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows-specific setup: Dev Drive, filesystem layout, cross-machine parity          |
+| [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows-specific setup: Dev Drive, filesystem layout, cross-machine parity           |
+| [`docs/mcp-setup.md`](docs/mcp-setup.md)                                         | MCP config for Claude Code and Cursor (Vercel, GitHub, Filesystem, Fetch)           |
 | [`scripts/setup/`](scripts/setup/)                                               | Automated setup scripts (Windows + Linux/WSL) for dev environment and pipeline deps |
 
 ## Resume Versioning

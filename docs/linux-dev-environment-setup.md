@@ -2,7 +2,7 @@
 
 > **Purpose:** Linux-specific environment setup for developing paulprae.com and related projects. Covers shell configuration, Node.js, Claude Code CLI, Cursor IDE, and pipeline dependencies. Works for both native Linux and Windows Subsystem for Linux (WSL2).
 >
-> **Last updated:** 2026-02-28
+> **Last updated:** 2026-03-01
 > **Applies to:** Ubuntu 22.04+, WSL2 with Ubuntu
 
 ---
@@ -223,6 +223,14 @@ typst --version
 npm install -g @anthropic-ai/claude-code
 ```
 
+### Authenticate
+
+```bash
+claude /login
+```
+
+Follow the browser prompts to complete OAuth authentication. Each environment (Windows and WSL) requires its own login.
+
 ### Verify
 
 ```bash
@@ -241,80 +249,107 @@ Claude Code reads permissions from `~/.claude/settings.json`. Create it if it do
 mkdir -p ~/.claude
 ```
 
-The canonical settings for this project are:
+### Permissions Philosophy
+
+This project uses a **maximum autonomy** configuration. The goal is for Claude Code to operate with minimal human intervention — no approval prompts for file edits, bash commands, or MCP tool calls within the project scope.
+
+**Why `Bash(*)`:** Per-command allowlists (e.g., `Bash(ls *)`, `Bash(git *)`) cannot cover piped commands, subshells, chained commands, or less common utilities — causing constant approval prompts. The `Bash(*)` wildcard allows all bash commands. Combined with the Claude Code sandbox (which uses Linux Landlock to restrict file access), this provides both autonomy and safety.
+
+**Why not per-command allowlists:** The previous approach of listing 50+ individual commands used the deprecated `Bash(command:*)` colon syntax (current syntax uses a space: `Bash(command *)`). It also could not handle piped/chained commands and triggered false positives like "Command contains quoted characters in flag names" on commands Claude itself generated.
+
+### Canonical Settings (Linux / WSL)
 
 ```json
 {
   "permissions": {
     "allow": [
-      "Bash(git:*)",
-      "Bash(npm:*)",
-      "Bash(npx:*)",
-      "Bash(node:*)",
-      "Bash(pnpm:*)",
-      "Bash(gh:*)",
-      "Bash(ls:*)",
-      "Bash(cat:*)",
-      "Bash(head:*)",
-      "Bash(tail:*)",
-      "Bash(find:*)",
-      "Bash(grep:*)",
-      "Bash(rg:*)",
-      "Bash(which:*)",
-      "Bash(echo:*)",
-      "Bash(pwd:*)",
-      "Bash(cd:*)",
-      "Bash(mkdir:*)",
-      "Bash(cp:*)",
-      "Bash(mv:*)",
-      "Bash(rm:*)",
-      "Bash(touch:*)",
-      "Bash(chmod:*)",
-      "Bash(curl:*)",
-      "Bash(wget:*)",
-      "Bash(python:*)",
-      "Bash(python3:*)",
-      "Bash(pip:*)",
-      "Bash(pip3:*)",
-      "Bash(docker:*)",
-      "Bash(docker-compose:*)",
-      "Bash(pandoc:*)",
-      "Bash(typst:*)",
-      "Bash(vercel:*)",
-      "Bash(code:*)",
-      "Bash(cursor:*)",
-      "Bash(whoami:*)",
-      "Bash(hostname:*)",
-      "Bash(uname:*)",
-      "Bash(df:*)",
-      "Bash(du:*)",
-      "Bash(env:*)",
-      "Bash(printenv:*)",
-      "Bash(diff:*)",
-      "Bash(sort:*)",
-      "Bash(uniq:*)",
-      "Bash(wc:*)",
-      "Bash(sed:*)",
-      "Bash(awk:*)",
-      "Bash(tar:*)",
-      "Bash(zip:*)",
-      "Bash(unzip:*)",
+      "Bash(*)",
       "Read",
       "Edit",
       "Write",
       "Glob",
       "Grep",
       "WebSearch",
-      "WebFetch"
+      "WebFetch",
+      "mcp__*"
     ],
-    "deny": []
+    "deny": [],
+    "additionalDirectories": [
+      "/mnt/d/dev"
+    ]
   }
 }
 ```
 
 Save this to `~/.claude/settings.json`. The setup script (`install-pipeline-deps.sh`) can create this automatically.
 
-> **WSL note:** Windows (`C:\Users\<user>\.claude\settings.json`) and WSL (`~/.claude/settings.json`) have **separate** settings files. Keep them in sync manually. The WSL copy should omit Windows-specific entries like `additionalDirectories`.
+| Entry | Purpose |
+| --- | --- |
+| `Bash(*)` | Allow all bash commands without prompts (piped, chained, any utility) |
+| `Read`, `Edit`, `Write` | Auto-allow all file operations in project scope |
+| `Glob`, `Grep` | Auto-allow file search and content search |
+| `WebSearch`, `WebFetch` | Auto-allow web research during development |
+| `mcp__*` | Auto-allow all MCP server tool calls (Vercel, GitHub, etc.) |
+| `additionalDirectories` | Grant access to Windows Dev Drive from WSL |
+
+> **Security note:** The `deny` list is available for blocking specific dangerous patterns if needed (e.g., `"Bash(rm -rf /)"`) but is left empty by default. The Landlock sandbox (kernel ≥ 6.2) provides filesystem-level isolation. For open source contributors who prefer tighter controls, see [Restricted Permissions Alternative](#restricted-permissions-alternative).
+
+### Restricted Permissions Alternative
+
+If you prefer explicit per-command allowlisting over the wildcard approach, use this configuration instead. Note that piped and chained commands may still trigger approval prompts:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)", "Bash(npm *)", "Bash(npx *)", "Bash(node *)",
+      "Bash(gh *)", "Bash(ls *)", "Bash(cat *)", "Bash(head *)",
+      "Bash(tail *)", "Bash(find *)", "Bash(grep *)", "Bash(rg *)",
+      "Bash(which *)", "Bash(echo *)", "Bash(pwd *)", "Bash(mkdir *)",
+      "Bash(cp *)", "Bash(mv *)", "Bash(rm *)", "Bash(touch *)",
+      "Bash(chmod *)", "Bash(curl *)", "Bash(wget *)",
+      "Bash(python *)", "Bash(python3 *)", "Bash(pip *)", "Bash(pip3 *)",
+      "Bash(docker *)", "Bash(docker-compose *)",
+      "Bash(pandoc *)", "Bash(typst *)", "Bash(vercel *)",
+      "Bash(wc *)", "Bash(sed *)", "Bash(awk *)", "Bash(sort *)",
+      "Bash(uniq *)", "Bash(diff *)", "Bash(tar *)", "Bash(zip *)",
+      "Bash(unzip *)", "Bash(uname *)", "Bash(df *)", "Bash(du *)",
+      "Read", "Edit", "Write", "Glob", "Grep"
+    ],
+    "deny": []
+  }
+}
+```
+
+> **Important:** Use space syntax (`Bash(command *)`) not colon syntax (`Bash(command:*)`). The colon syntax is deprecated and may cause commands to be blocked.
+
+### WSL and Windows Settings Sync
+
+Windows and WSL maintain **separate** Claude Code settings files:
+
+| Platform | Settings Path |
+| --- | --- |
+| Windows | `C:\Users\<username>\.claude\settings.json` |
+| WSL | `~/.claude/settings.json` |
+
+Both should use the same permission rules. The only difference is `additionalDirectories`:
+
+- **Windows** includes `"\\\\wsl.localhost\\Ubuntu\\home\\<username>\\dev"` and `"D:\\dev"` (for cross-filesystem access)
+- **WSL** includes `"/mnt/d/dev"` (for Dev Drive access from Linux)
+
+### Sandbox Mode (Recommended)
+
+For maximum security alongside maximum autonomy, use Claude Code's sandbox mode. It uses [Landlock v3](https://docs.kernel.org/userspace-api/landlock.html) to restrict filesystem access at the kernel level:
+
+```bash
+# Install sandbox dependencies
+sudo apt install -y bubblewrap socat
+
+# Run with sandbox enabled
+claude --sandbox
+```
+
+The sandbox isolates Claude Code's file access to the project directory, providing defense-in-depth even with `Bash(*)` enabled.
 
 ---
 
@@ -388,6 +423,16 @@ cp .env.local.example .env.local
 ```
 
 For full pipeline setup (API keys, LinkedIn data, running the pipeline), see the [Getting Started](../README.md#getting-started) section in README.
+
+### MCP config (Claude Code and Cursor)
+
+Install the project MCP config so both Claude Code and Cursor use the same tools (Vercel, GitHub, Filesystem, Fetch):
+
+```bash
+bash scripts/setup/install-mcp.sh
+```
+
+Then restart Cursor if you use it, and in Claude Code run `/mcp` to authenticate with Vercel and GitHub. See [docs/mcp-setup.md](mcp-setup.md) for details and troubleshooting.
 
 ### Quick Smoke Test
 

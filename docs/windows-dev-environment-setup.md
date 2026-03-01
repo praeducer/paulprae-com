@@ -2,7 +2,7 @@
 
 > **Purpose:** Windows-specific environment setup for developing paulprae.com and related projects. Covers Dev Drive, filesystem layout, security guardrails, and cross-machine parity. For project installation, dependencies, and running the app, see the [project README](../README.md).
 >
-> **Last updated:** 2026-02-28
+> **Last updated:** 2026-03-01
 > **Applies to:** All development machines (laptop + desktop)
 
 ---
@@ -292,14 +292,45 @@ bash scripts/setup/install-pipeline-deps.sh
 
 ### 5.4 Claude Code Settings Sync
 
-Windows and WSL maintain **separate** Claude Code settings files:
+Windows and WSL maintain **separate** Claude Code settings files and **separate** authentication sessions:
 
-| Platform | Settings Path                               |
-| -------- | ------------------------------------------- |
-| Windows  | `C:\Users\<username>\.claude\settings.json` |
-| WSL      | `~/.claude/settings.json`                   |
+| Platform | Settings Path | Auth |
+| -------- | ------------------------------------------- | --- |
+| Windows  | `C:\Users\<username>\.claude\settings.json` | `claude /login` in PowerShell |
+| WSL      | `~/.claude/settings.json` | `claude /login` in WSL terminal |
 
-Keep both in sync manually. The WSL copy should omit Windows-specific entries like `additionalDirectories` (which use Windows paths). See the [Linux guide's Claude Code section](linux-dev-environment-setup.md#6-claude-code-cli) for the canonical permission set.
+Both use the same permission rules (see [Linux guide: Permissions Philosophy](linux-dev-environment-setup.md#permissions-philosophy)). The only difference is `additionalDirectories`:
+
+**Windows canonical settings** (`C:\Users\<username>\.claude\settings.json`):
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "WebSearch",
+      "WebFetch",
+      "mcp__*"
+    ],
+    "deny": [],
+    "additionalDirectories": [
+      "\\\\wsl.localhost\\Ubuntu\\home\\<username>\\dev",
+      "D:\\dev"
+    ]
+  }
+}
+```
+
+Replace `<username>` with your WSL username (e.g., your Linux login).
+
+**WSL canonical settings:** See the [Linux guide's Claude Code section](linux-dev-environment-setup.md#canonical-settings-linux--wsl).
+
+> **Why `Bash(*)`:** Per-command allowlists cannot cover piped commands, subshells, or chained commands — causing constant approval prompts that make Claude Code effectively non-autonomous. The wildcard allows all bash commands. See the [Linux guide: Permissions Philosophy](linux-dev-environment-setup.md#permissions-philosophy) for the full rationale and a restricted alternative for contributors who prefer explicit allowlisting.
 
 ### 5.5 When to Use WSL vs Windows (Dev Drive)
 
@@ -426,9 +457,12 @@ VHD file path (varies by Windows username), computer name, hardware specs, addit
 5. Run `scripts\setup\setup-dev-drive.ps1` (admin PowerShell)
 6. `robocopy C:\dev\paulprae-com D:\dev\paulprae-com /E /MOVE`
 7. Follow [project README](../README.md) for `npm install`, `.env.local`, and first run
-8. `wsl -e bash -c 'mkdir -p ~/dev'`
-9. Create `.wslconfig` per section 5, then `wsl --shutdown`
-10. Update Machine Inventory (section 1) and commit
+8. **MCP (optional):** Run `powershell -NoProfile -File scripts\setup\install-mcp.ps1` to install MCP config for Claude Code and Cursor; see [docs/mcp-setup.md](mcp-setup.md).
+9. **Claude Code settings:** Copy the canonical `settings.json` to `C:\Users\<username>\.claude\settings.json` — see [section 5.4](#54-claude-code-settings-sync). Run `claude /login` to authenticate.
+10. `wsl -e bash -c 'mkdir -p ~/dev'`
+11. **WSL Claude Code:** Follow the [Linux guide](linux-dev-environment-setup.md#6-claude-code-cli) to install Claude Code natively in WSL and run `claude /login` inside WSL.
+12. Create `.wslconfig` per section 5, then `wsl --shutdown`
+13. Update Machine Inventory (section 1) and commit
 
 ### Keeping Machines in Sync
 
@@ -473,6 +507,18 @@ VHD file path (varies by Windows username), computer name, hardware specs, addit
 **Decision:** Require WSL kernel ≥ 6.2 and document the `wsl --update` step in the setup guide.
 
 **Rationale:** Claude Code's sandbox relies on Linux [Landlock v3](https://docs.kernel.org/userspace-api/landlock.html), available from kernel 6.2+. WSL's default kernel (5.15) is too old — Claude Code falls back to unsandboxed execution with a warning. Running `wsl --update` from an Admin PowerShell upgrades the kernel (e.g., to 6.6.x). This is a one-time step per machine.
+
+### 2026-03-01: Claude Code Maximum Autonomy Configuration
+
+**Decision:** Replace per-command allowlists (57 individual `Bash(command:*)` rules) with `Bash(*)` wildcard. Add `mcp__*` to auto-allow all MCP tool calls.
+
+**Rationale:** Per-command allowlists used deprecated colon syntax (`Bash(command:*)` instead of `Bash(command *)`), could not handle piped/chained/subshell commands, and triggered false-positive blocks on commands Claude Code itself generated (e.g., "Command contains quoted characters in flag names"). The `Bash(*)` wildcard eliminates all approval prompts for shell commands. Combined with Landlock v3 sandbox (kernel ≥ 6.2), this provides both maximum autonomy and filesystem-level security isolation. A restricted alternative with explicit per-command allowlisting is documented in the [Linux guide](linux-dev-environment-setup.md#restricted-permissions-alternative) for contributors who prefer tighter controls.
+
+### 2026-03-01: Claude Code Native Installation in WSL
+
+**Decision:** Install Claude Code natively in WSL via nvm (not via Windows PATH interop).
+
+**Rationale:** The Windows-interop path (`/mnt/c/.../npm/claude`) failed because it resolved through `cmd.exe` and couldn't find `node`. Native installation via nvm gives a Linux-native binary at `~/.nvm/versions/node/.../bin/claude` with proper sandboxing support and independent authentication. Both Windows and WSL installations must be kept at the same version (`npm install -g @anthropic-ai/claude-code` on both).
 
 ### 2026-02-27: Git Repos Must Not Live in Cloud-Synced Folders
 

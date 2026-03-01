@@ -86,9 +86,15 @@ Items removed during Phase 1 cleanup (2026-03-01) that should be recreated for P
 
 ## Architecture Evolution (Phase 2+)
 
-### MCP Integration
+### MCP Integration (Phase 2/3 — when stacks are in use)
 
-`mcp-pandoc` for agent-driven format conversion in the chat interface.
+Add MCP servers as those stacks are adopted; not in initial scope:
+
+- **Sentry MCP** — when error monitoring is in use (e.g. Phase 2 production observability)
+- **PostgreSQL MCP** — when Supabase/Postgres is the primary data store (Phase 2)
+- **Supabase MCP** — if an official or widely adopted Supabase MCP exists for auth/storage/DB
+- **Neo4j MCP** — when the knowledge graph (Phase 3) is operational
+- **mcp-pandoc** — agent-driven format conversion in the chat interface (e.g. "Download as PDF" in Phase 2)
 
 ### Vercel AI SDK Migration
 
@@ -97,6 +103,14 @@ Replace `@anthropic-ai/sdk` with `@ai-sdk/anthropic` + `generateText()`/`streamT
 ### Claude Agent SDK Exploration
 
 Evaluate `@anthropic-ai/claude-agent-sdk` for pipeline orchestration and self-evaluation.
+
+---
+
+## Future / Tooling (backlog)
+
+- **MCP expansion:** Revisit MCP server list as Phase 2/3 progress; add Sentry, PostgreSQL, Supabase, Neo4j when those stacks are in use (see [MCP Integration](#mcp-integration-phase-23--when-stacks-are-in-use) above).
+- **One-command dev setup:** Optional single script or command (e.g. `npm run setup` or `/setup-env`) that chains tool install + MCP config + env check so new contributors can replicate the environment with minimal steps.
+- **CI extensions:** Add format/lint/test to PR checks; optional deployment previews or Lighthouse gates in Phase 2.
 
 ---
 
