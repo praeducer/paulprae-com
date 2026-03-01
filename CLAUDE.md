@@ -6,7 +6,7 @@
 
 **Current Phase:** Phase 1 — AI-Generated Static Resume
 **Repository:** github.com/praeducer/paulprae-com
-**Live URL:** paulprae.vercel.app (custom domain: paulprae.com)
+**Live URL:** paulprae-com-one.vercel.app (custom domain: paulprae.com — DNS pending)
 
 ## Tech Stack (Phase 1)
 
@@ -31,7 +31,7 @@ data/generated/        → Pipeline outputs: career-data.json + Paul-Prae-Resume
 scripts/               → Pipeline scripts (ingest, generate, export) + resume-pdf.typ stylesheet
 lib/                   → Shared utilities: config.ts, types.ts, markdown.ts
 tests/                 → Unit and integration tests (Vitest)
-public/                → Static assets (robots.txt, sitemap.xml)
+public/                → Static assets + resume downloads (PDF, DOCX, MD committed for Vercel)
 docs/                  → Technical documentation (TDD, dev environment setup, MCP)
 .mcp.json              → MCP config for Claude Code (project root; see docs/mcp-setup.md)
 .cursor/mcp.json       → MCP config for Cursor (same sources as .mcp.json)
@@ -55,7 +55,7 @@ docs/                  → Technical documentation (TDD, dev environment setup, 
 
 4. **Environment variables** — `ANTHROPIC_API_KEY` in `.env.local` (never committed). Used only by build scripts, not by the Next.js runtime.
 
-5. **Data committal policy** — All pipeline data is recruiter-facing content, so most is committed to git for portability across machines. Only LinkedIn CSV raw exports are gitignored (may contain unparsed columns). Knowledge base JSONs, career-data.json, and the resume markdown are all committed. PDF/DOCX are gitignored as regenerable binary artifacts. **Principle:** if data can't be public, it shouldn't be in the data model — this pipeline generates content sent to strangers.
+5. **Data committal policy** — All pipeline data is recruiter-facing content, so most is committed to git for portability across machines. Only LinkedIn CSV raw exports are gitignored (may contain unparsed columns). Knowledge base JSONs, career-data.json, and the resume markdown are all committed. PDF/DOCX in `data/generated/` are gitignored as regenerable binary artifacts, but copies in `public/` (PDF, DOCX, MD) are committed so Vercel can serve them as downloads. **Principle:** if data can't be public, it shouldn't be in the data model — this pipeline generates content sent to strangers.
 
 ## Brand Voice Guidelines
 
@@ -86,6 +86,10 @@ The build pipeline transforms raw career data into a deployed site:
 ```
 
 **Full pipeline shortcut:** `npm run pipeline` (runs ingest → generate → export → build sequentially)
+
+**Composable sub-pipelines:** `pipeline:content` (ingest + generate), `pipeline:render` (export + build), `pipeline:deploy` (full + git stage)
+
+**Skip logic:** All pipeline steps skip automatically when outputs are newer than inputs. Use `--force` to override (e.g., `npm run generate:force`).
 
 **System dependencies for export:** `pandoc` and `typst` must be installed (see TDD §5.6).
 

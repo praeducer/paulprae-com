@@ -1,7 +1,7 @@
 # Backlog — paulprae.com
 
 > **Updated:** 2026-03-01
-> **Status:** Phase 1 complete and deployed. All items below are optional enhancements or Phase 2+ work. None block the current site.
+> **Status:** Phase 1 complete and live at https://paulprae-com-one.vercel.app/. Custom domain DNS pending. All items below are optional enhancements or Phase 2+ work. None block the current site.
 
 ---
 
@@ -9,15 +9,10 @@
 
 ### Favicon & OG Image
 
-`public/` has `robots.txt` and `sitemap.xml` but no visual branding assets.
+`app/layout.tsx` already has metadata wired for OG image and Twitter card. Just need the assets:
 
 1. **Favicon:** Add `favicon.ico` or `favicon.svg` to `public/`. A "PP" monogram or initials-based design.
-2. **OG Image:** Create `public/og-image.png` (1200x630px) for social media link previews. Then update `app/layout.tsx`:
-   ```typescript
-   openGraph: {
-     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
-   }
-   ```
+2. **OG Image:** Create `public/og-image.png` (1200x630px) for social media link previews. Metadata already configured — just drop the file in.
 3. **Apple Touch Icon:** Optional for iOS bookmarks.
 
 ### Analytics
@@ -79,7 +74,7 @@ Items removed during Phase 1 cleanup (2026-03-01) that should be recreated for P
 - **Recreate `lib/knowledge-types.ts`** — structured KB types for Supabase schema and Neo4j graph mapping (generate from knowledge JSON schemas)
 - **Recreate `data/sources/knowledge/_meta/manifest.json`** — auto-generate from knowledge directory listing (not manually maintained)
 - **Add knowledge base audit tests** — port Python audit checks to Vitest (validate JSON schemas, detect missing fields, count coverage)
-- **Create `components/` directory** — shared UI components for chat interface, resume viewer, etc.
+- **Create `components/` directory** — shared UI components for chat interface, resume viewer, etc. (was deleted during Phase 1 cleanup)
 - **Add `KNOWLEDGE_PATHS` to `lib/config.ts`** — only if structured KB access patterns emerge (Phase 2 RAG may need per-category paths)
 
 ---

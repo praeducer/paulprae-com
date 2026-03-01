@@ -61,6 +61,7 @@ export const PATHS = {
   publicDir: path.join(ROOT, "public"),
   publicPdf: path.join(ROOT, "public", `${RESUME_FILE_BASE}.pdf`),
   publicDocx: path.join(ROOT, "public", `${RESUME_FILE_BASE}.docx`),
+  publicMd: path.join(ROOT, "public", `${RESUME_FILE_BASE}.md`),
   ingestHash: path.join(ROOT, "data", "generated", ".ingest-hash"),
 } as const;
 

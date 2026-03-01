@@ -39,7 +39,7 @@ export default function Home() {
   const profile = careerData.profile;
   const pdfPath = `/${RESUME_FILE_BASE}.pdf`;
   const docxPath = `/${RESUME_FILE_BASE}.docx`;
-  const githubResumeUrl = `https://github.com/praeducer/paulprae-com/blob/main/data/generated/${RESUME_FILE_BASE}.md`;
+  const mdPath = `/${RESUME_FILE_BASE}.md`;
 
   return (
     <>
@@ -55,7 +55,7 @@ export default function Home() {
               download
               className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-3 py-1.5 text-white hover:bg-slate-700 transition-colors"
             >
-              Download PDF
+              PDF
             </a>
             <a
               href={docxPath}
@@ -63,6 +63,13 @@ export default function Home() {
               className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 transition-colors"
             >
               DOCX
+            </a>
+            <a
+              href={mdPath}
+              download
+              className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              Markdown
             </a>
             {profile.email && (
               <a
@@ -83,7 +90,7 @@ export default function Home() {
               </a>
             )}
             <a
-              href={githubResumeUrl}
+              href="https://github.com/praeducer"
               target="_blank"
               rel="noopener noreferrer"
               className="text-slate-500 hover:text-slate-900 transition-colors"

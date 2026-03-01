@@ -334,6 +334,10 @@ function copyToPublic(format: ExportFormat): void {
   if ((format === "all" || format === "docx") && fs.existsSync(PATHS.docxOutput)) {
     copies.push({ src: PATHS.docxOutput, dest: PATHS.publicDocx });
   }
+  // Always copy markdown for direct download
+  if (fs.existsSync(PATHS.resumeOutput)) {
+    copies.push({ src: PATHS.resumeOutput, dest: PATHS.publicMd });
+  }
 
   if (copies.length === 0) return;
 
