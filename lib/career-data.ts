@@ -1,6 +1,6 @@
 import fs from "fs";
-import path from "path";
 import type { CareerData } from "./types";
+import { PATHS } from "./config";
 
 /**
  * Load career data from the generated JSON file.
@@ -8,8 +8,7 @@ import type { CareerData } from "./types";
  */
 export function loadCareerData(): CareerData | null {
   try {
-    const filePath = path.join(process.cwd(), "data/generated/career-data.json");
-    const raw = fs.readFileSync(filePath, "utf-8");
+    const raw = fs.readFileSync(PATHS.careerDataOutput, "utf-8");
     return JSON.parse(raw) as CareerData;
   } catch {
     return null;

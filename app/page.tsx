@@ -3,7 +3,7 @@ import path from "path";
 import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { stripHtmlComments } from "../lib/markdown";
+import { stripHtmlComments, stripHeaderBlock } from "../lib/markdown";
 import { PATHS, RESUME_FILE_BASE } from "../lib/config";
 import { loadCareerData } from "../lib/career-data";
 import { slugify } from "../lib/ui-utils";
@@ -115,22 +115,16 @@ export default function Home() {
   const docxSize = getFileSize(path.join(publicDir, `${RESUME_FILE_BASE}.docx`));
   const mdSize = getFileSize(path.join(publicDir, `${RESUME_FILE_BASE}.md`));
 
+  // Strip the header block (H1 + contact line + HR) — already shown in the
+  // sticky header, so we don't render it again in the body.
+  const bodyMarkdown = stripHeaderBlock(cleanMarkdown);
+
   // Extract section headings for the navigation bar
-  const sections = extractSections(cleanMarkdown);
+  const sections = extractSections(bodyMarkdown);
 
   // ─── Markdown component overrides ──────────────────────────────────────────
-  // Defined inside Home() so closures can suppress duplicate header content.
-  // The resume markdown starts with: # H1 → contact info <p> → <hr> → ## sections
-  // The sticky header already displays the name and contact links, so suppress
-  // the H1, the contact line, and the separator from the rendered body.
-  let suppressCount = 0;
 
   const markdownComponents: Components = {
-    h1: () => {
-      suppressCount = 2; // suppress next <p> (contact line) + <hr> (separator)
-      return null;
-    },
-
     h2: ({ children, ...props }) => {
       const id = slugify(String(children ?? ""));
       return (
@@ -138,22 +132,6 @@ export default function Home() {
           {children}
         </h2>
       );
-    },
-
-    p: ({ children, ...props }) => {
-      if (suppressCount > 0) {
-        suppressCount--;
-        return null;
-      }
-      return <p {...props}>{children}</p>;
-    },
-
-    hr: ({ ...props }) => {
-      if (suppressCount > 0) {
-        suppressCount--;
-        return null;
-      }
-      return <hr {...props} />;
     },
 
     a: ({ href, children, ...props }) => {
@@ -187,9 +165,7 @@ export default function Home() {
               <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">
                 {profile.name}
               </h1>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Principal AI Engineer &amp; Solutions Architect
-              </p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{profile.headline}</p>
             </div>
             <nav aria-label="Resume downloads and contact links" className="space-y-2">
               {/* Download buttons */}
@@ -228,7 +204,7 @@ export default function Home() {
                   <a
                     href={`mailto:${profile.email}`}
                     aria-label="Send email to Paul Prae"
-                    className="rounded-md px-1 py-0.5 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+                    className="inline-flex min-h-[44px] items-center rounded-md px-2 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
                   >
                     Email
                   </a>
@@ -239,7 +215,7 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="View Paul Prae on LinkedIn"
-                    className="rounded-md px-1 py-0.5 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+                    className="inline-flex min-h-[44px] items-center rounded-md px-2 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
                   >
                     LinkedIn
                   </a>
@@ -250,7 +226,7 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="View Paul Prae on GitHub"
-                    className="rounded-md px-1 py-0.5 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+                    className="inline-flex min-h-[44px] items-center rounded-md px-2 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
                   >
                     GitHub
                   </a>
@@ -265,11 +241,12 @@ export default function Home() {
 
       <main
         id="resume-content"
-        className="max-w-3xl mx-auto px-6 py-8 print:py-4 print:px-0 print:max-w-none"
+        tabIndex={-1}
+        className="max-w-3xl mx-auto px-6 py-8 print:py-4 print:px-0 print:max-w-none focus:outline-none"
       >
         <article className="resume-prose prose prose-slate max-w-none">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-            {cleanMarkdown}
+            {bodyMarkdown}
           </ReactMarkdown>
         </article>
       </main>

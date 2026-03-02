@@ -102,7 +102,8 @@ Graduated Cum Laude · Dean's List · Interdisciplinary Certificates in New Medi
 
 ## Publications
 
-- **[Enhancing Collaborative Neuroimaging Research: COINSTAC Vaults for Federated Analysis and Reproducibility](https://www.frontiersin.org/journals/neuroinformatics/articles/10.3389/fninf.2023.1207721/full)** — Frontiers in Neuroinformatics (Jun 2023): Co-authored peer-reviewed research on federated analysis enabling collaborative neuroimaging while preserving patient data privacy through differential privacy algorithms.
+### [Enhancing Collaborative Neuroimaging Research: COINSTAC Vaults for Federated Analysis and Reproducibility](https://www.frontiersin.org/journals/neuroinformatics/articles/10.3389/fninf.2023.1207721/full)
+Frontiers in Neuroinformatics (Jun 2023). Co-authored peer-reviewed research on federated analysis enabling collaborative neuroimaging while preserving patient data privacy through differential privacy algorithms.
 
 ---
 

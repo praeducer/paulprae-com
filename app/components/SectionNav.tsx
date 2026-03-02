@@ -17,28 +17,35 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
   const [activeId, setActiveId] = useState<string>("");
   const navRef = useRef<HTMLElement>(null);
 
-  // Dynamically measure the header height and set the nav's top position.
-  // The header wraps at narrow viewports, so a hardcoded value won't work.
+  // Dynamically measure the header and nav heights so CSS custom properties
+  // (--header-height, --nav-height) always reflect the true rendered sizes.
+  // This drives scroll-padding-top and scroll-margin-top via --sticky-offset.
   useEffect(() => {
     const header = document.querySelector("header");
-    if (!header || !navRef.current) return;
+    const nav = navRef.current;
+    if (!header || !nav) return;
 
-    const updateTop = () => {
-      const h = header.offsetHeight;
-      navRef.current!.style.top = `${h}px`;
-      // Also update scroll-margin for anchor links so they clear both sticky bars
-      document.documentElement.style.setProperty("--header-height", `${h}px`);
+    const sync = (entries?: ResizeObserverEntry[]) => {
+      const root = document.documentElement.style;
+      root.setProperty("--nav-height", `${nav.offsetHeight}px`);
+      // Only reposition the nav when the header height changed.
+      // The nav is observed solely to keep --nav-height accurate;
+      // setting nav.style.top only depends on the header.
+      if (!entries || entries.some((e) => e.target === header)) {
+        root.setProperty("--header-height", `${header.offsetHeight}px`);
+        nav.style.top = `${header.offsetHeight}px`;
+      }
     };
 
-    updateTop();
-    const ro = new ResizeObserver(updateTop);
+    sync();
+    const ro = new ResizeObserver(sync);
     ro.observe(header);
+    ro.observe(nav);
     return () => ro.disconnect();
   }, []);
 
-  // Track active section via scroll position. This replaces IntersectionObserver
-  // which had non-deterministic entry ordering (causing off-by-one highlights).
-  // The last section whose heading top is at or above the sticky offset is active.
+  // Track which section is active based on scroll position.
+  // Reads --sticky-offset (header + nav) from CSS so JS and CSS stay in sync.
   useEffect(() => {
     const onScroll = () => {
       if (window.scrollY < 100) {
@@ -46,12 +53,10 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
         return;
       }
 
-      // Read the sticky offset from CSS custom properties (set by ResizeObserver above)
-      const headerH = parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue("--header-height") || "0",
+      const stickyOffset = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue("--sticky-offset") || "0",
       );
-      const navH = navRef.current?.offsetHeight ?? 0;
-      const threshold = headerH + navH + 32; // sticky offset + breathing room
+      const threshold = stickyOffset + 24;
 
       let current = "";
       for (const section of sections) {
@@ -64,8 +69,12 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll(); // Set initial state on mount
-    return () => window.removeEventListener("scroll", onScroll);
+    // Defer the initial check so layout measurement is complete.
+    const raf = requestAnimationFrame(onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
   }, [sections]);
 
   if (sections.length === 0) return null;
