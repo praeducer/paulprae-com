@@ -16,6 +16,7 @@
 **Root cause:** IntersectionObserver callback receives entries in arbitrary order. The code takes the first `isIntersecting` entry, which may not be the topmost visible section.
 
 **Fix:** Replace IntersectionObserver with a scroll-position-based approach:
+
 - Single `scroll` event listener (passive) replaces both useEffect #2 (IntersectionObserver) and useEffect #3 (scroll-to-top clearing)
 - On each scroll, loop through sections in DOM order, check `getBoundingClientRect().top`
 - The last section whose heading top is ≤ the sticky offset threshold becomes active
@@ -27,6 +28,7 @@
 **File:** `app/page.tsx`
 
 Change labels:
+
 - `Resume PDF` → `PDF`
 - `DOCX` → `DOCX` (already fine)
 - `MD` → `Markdown`
@@ -38,6 +40,7 @@ All three get the download icon + file size badge. The download icon communicate
 **File:** `app/page.tsx`
 
 Split the single `<nav>` with 6 items into two visual rows:
+
 - **Row 1 (Downloads):** PDF, DOCX, Markdown buttons — with download icons
 - **Row 2 (Contact):** Email, LinkedIn, GitHub links — text links with subtle styling
 - Vertical gap between rows
@@ -75,12 +78,12 @@ Chain of changes (each is 1-3 lines):
 
 ## Files Modified
 
-| File | Change |
-|------|--------|
-| `app/components/SectionNav.tsx` | Replace IO with scroll-based tracking |
-| `app/page.tsx` | Button labels, layout split, profile.github |
-| `lib/types.ts` | Add `github?: string` to CareerProfile |
-| `scripts/ingest-linkedin.ts` | Add 3-line github enrichment |
-| `scripts/generate-resume.ts` | Add `[GitHub URL]` to template |
-| `data/generated/career-data.json` | Add github to profile |
-| `data/generated/Paul-Prae-Resume.md` | Add GitHub to contact line |
+| File                                 | Change                                      |
+| ------------------------------------ | ------------------------------------------- |
+| `app/components/SectionNav.tsx`      | Replace IO with scroll-based tracking       |
+| `app/page.tsx`                       | Button labels, layout split, profile.github |
+| `lib/types.ts`                       | Add `github?: string` to CareerProfile      |
+| `scripts/ingest-linkedin.ts`         | Add 3-line github enrichment                |
+| `scripts/generate-resume.ts`         | Add `[GitHub URL]` to template              |
+| `data/generated/career-data.json`    | Add github to profile                       |
+| `data/generated/Paul-Prae-Resume.md` | Add GitHub to contact line                  |
