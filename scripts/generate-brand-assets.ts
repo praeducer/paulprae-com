@@ -11,12 +11,9 @@ import fs from "fs";
 import path from "path";
 import sharp from "sharp";
 import { PATHS } from "../lib/config.js";
+import { isDirectRun, hasForceFlag } from "../lib/script-utils.js";
 
 const PUBLIC_DIR = PATHS.publicDir;
-
-function hasForceFlag(): boolean {
-  return process.argv.includes("--force");
-}
 
 // ─── Design tokens (matching site's Tailwind slate palette) ───────────────────
 
@@ -201,15 +198,11 @@ async function main() {
 }
 
 // Only run when executed directly (not when imported for testing).
-const isDirectRun = ["generate-brand-assets.ts", "generate-brand-assets.js"].includes(
-  path.basename(process.argv[1] ?? ""),
-);
-
-if (isDirectRun) {
+if (isDirectRun("generate-brand-assets")) {
   main().catch((err) => {
     console.error("Brand asset generation failed:", err);
     process.exit(1);
   });
 }
 
-export const _testExports = { ogImageSvg, faviconSvg, buildIco, main, hasForceFlag, COLORS };
+export const _testExports = { ogImageSvg, faviconSvg, buildIco, main, COLORS };

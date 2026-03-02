@@ -25,16 +25,13 @@ import * as prettier from "prettier";
 import { config } from "dotenv";
 import { PATHS, CLAUDE } from "../lib/config.js";
 import type { CareerData, GenerationResult } from "../lib/types.js";
+import { isDirectRun, hasForceFlag } from "../lib/script-utils.js";
 
 // Load environment variables from .env.local
 config({ path: PATHS.envFile });
 
 // ─── Skip Logic ──────────────────────────────────────────────────────────────
 // Skip generation if the resume markdown is newer than career-data.json.
-
-function hasForceFlag(): boolean {
-  return process.argv.includes("--force");
-}
 
 function shouldSkipGenerate(): boolean {
   if (!fs.existsSync(PATHS.careerDataOutput)) return false;
@@ -483,18 +480,13 @@ export const _testExports = {
   validateResumeOutput,
   formatMarkdown,
   shouldSkipGenerate,
-  hasForceFlag,
   generate,
 };
 
 // ─── Execute ─────────────────────────────────────────────────────────────────
 // Only run when executed directly (not when imported for testing).
 
-const isDirectRun = ["generate-resume.ts", "generate-resume.js"].includes(
-  path.basename(process.argv[1] ?? ""),
-);
-
-if (isDirectRun) {
+if (isDirectRun("generate-resume")) {
   generate().catch((err) => {
     console.error("\n❌ Generation failed:\n");
     if (err instanceof Anthropic.APIError) {

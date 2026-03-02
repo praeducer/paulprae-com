@@ -16,6 +16,7 @@
 
 import fs from "fs";
 import path from "path";
+import { isDirectRun, hasForceFlag } from "../lib/script-utils";
 import crypto from "crypto";
 import { execFileSync } from "child_process";
 import Papa from "papaparse";
@@ -504,10 +505,6 @@ function loadKnowledgeBase(): KnowledgeEntry[] {
 // Hash all input files (LinkedIn CSVs + knowledge JSONs) and compare to a
 // stored hash. Skip ingestion if inputs haven't changed.
 
-function hasForceFlag(): boolean {
-  return process.argv.includes("--force");
-}
-
 /** Recursively collect all file paths under a directory. */
 function collectFiles(dir: string): string[] {
   if (!fs.existsSync(dir)) return [];
@@ -938,7 +935,6 @@ export const _testExports = {
   computeInputHash,
   shouldSkipIngest,
   writeIngestHash,
-  hasForceFlag,
   CareerDataSchema,
   ingest,
 };
@@ -946,11 +942,7 @@ export const _testExports = {
 // ─── Execute ─────────────────────────────────────────────────────────────────
 // Only run when executed directly (not when imported for testing).
 
-const isDirectRun = ["ingest-linkedin.ts", "ingest-linkedin.js"].includes(
-  path.basename(process.argv[1] ?? ""),
-);
-
-if (isDirectRun) {
+if (isDirectRun("ingest-linkedin")) {
   const result = ingest();
 
   if (!result.success) {

@@ -29,7 +29,7 @@ data/sources/linkedin/ → LinkedIn CSV exports (gitignored — raw exports may 
 data/sources/knowledge/→ Knowledge base JSONs (committed — recruiter-facing content for Phase 2 RAG)
 data/generated/        → Pipeline outputs: career-data.json + Paul-Prae-Resume.md (committed), PDF + DOCX (gitignored)
 scripts/               → Pipeline scripts (ingest, generate, export, brand) + resume-pdf.typ stylesheet
-lib/                   → Shared utilities: config.ts, types.ts, markdown.ts
+lib/                   → Shared utilities: config, types, markdown, career-data, ui-utils, script-utils
 tests/                 → Unit and integration tests (Vitest)
 public/                → Static assets (OG image, favicons, resume downloads) committed for Vercel
 docs/                  → Technical documentation (TDD, dev environment, MCP, browser prompts)
@@ -111,7 +111,7 @@ See [README.md](README.md#5-run-the-pipeline) for the full command reference. Qu
 - `npm run build` — website only (reads committed data, no API key)
 - `npm run pipeline:full` — pipeline + build (convenience)
 - `npm run brand` — generate brand assets (OG image, favicons) if missing
-- `npm test` — run all 220+ tests
+- `npm test` — run all 240+ tests
 - `npm run check` — full pre-push release checklist (data + docs + lint + format + test + build + validate)
 - `npm run check:quick` — instant data file validation only
 - `npm run check:fix` — quick check + auto-fix stale public/ copies

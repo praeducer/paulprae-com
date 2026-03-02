@@ -26,6 +26,7 @@ import path from "path";
 import crypto from "crypto";
 import { execFileSync } from "child_process";
 import { PATHS, RESUME_FILE_BASE } from "../lib/config";
+import { isDirectRun } from "../lib/script-utils";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -350,10 +351,7 @@ function main(): void {
 
 // ─── Entry Point ─────────────────────────────────────────────────────────────
 
-const isDirectRun =
-  process.argv[1] && path.basename(process.argv[1]).replace(/\.[^.]+$/, "") === "release-check";
-
-if (isDirectRun) {
+if (isDirectRun("release-check")) {
   main();
 }
 

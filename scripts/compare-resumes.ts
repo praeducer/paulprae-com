@@ -21,6 +21,7 @@ import readline from "readline";
 import Anthropic from "@anthropic-ai/sdk";
 import { PATHS, CLAUDE } from "../lib/config";
 import { parseResume, assembleResume } from "../lib/resume-parser";
+import { isDirectRun } from "../lib/script-utils";
 import type { ParsedResume, ResumeSection } from "../lib/resume-parser";
 import type { SectionScore } from "../lib/types";
 
@@ -439,11 +440,7 @@ export const _testExports = {
 
 // ─── Execute ─────────────────────────────────────────────────────────────────
 
-const isDirectRun = ["compare-resumes.ts", "compare-resumes.js"].includes(
-  path.basename(process.argv[1] ?? ""),
-);
-
-if (isDirectRun) {
+if (isDirectRun("compare-resumes")) {
   compare().catch((err) => {
     console.error("   ❌ Comparison failed:", err);
     process.exit(1);

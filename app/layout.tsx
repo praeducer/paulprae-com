@@ -1,22 +1,8 @@
-import fs from "fs";
-import path from "path";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
-import type { CareerData } from "../lib/types";
-
-// ─── Career Data (optional — website works without pipeline outputs) ────────
-
-function loadCareerData(): CareerData | null {
-  try {
-    const filePath = path.join(process.cwd(), "data/generated/career-data.json");
-    const raw = fs.readFileSync(filePath, "utf-8");
-    return JSON.parse(raw) as CareerData;
-  } catch {
-    return null;
-  }
-}
+import { loadCareerData } from "../lib/career-data";
 
 const careerData = loadCareerData();
 
@@ -80,7 +66,7 @@ function PersonJsonLd() {
     url: profile.website || "https://paulprae.com",
     image: "https://paulprae.com/og-image.png",
     email: profile.email,
-    jobTitle: recentPosition?.title || profile.headline,
+    jobTitle: "Principal AI Engineer & Solutions Architect",
     description: metadata.description,
     sameAs: [profile.linkedin, "https://github.com/praeducer"].filter(Boolean),
     knowsAbout: careerData.skills.slice(0, 20),

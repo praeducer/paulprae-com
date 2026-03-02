@@ -19,12 +19,7 @@ import path from "path";
 import crypto from "crypto";
 import { execFileSync } from "child_process";
 import { PATHS, RESUME_FILE_BASE } from "../lib/config.js";
-
-// ─── CLI Flag Parsing ────────────────────────────────────────────────────────
-
-function hasForceFlag(): boolean {
-  return process.argv.includes("--force");
-}
+import { isDirectRun, hasForceFlag } from "../lib/script-utils.js";
 import { stripHtmlComments } from "../lib/markdown.js";
 
 // ─── CLI Argument Parsing ────────────────────────────────────────────────────
@@ -436,17 +431,12 @@ export const _testExports = {
   checkBinary,
   copyToPublic,
   shouldSkipExport,
-  hasForceFlag,
   main,
 };
 
 // ─── Execute ─────────────────────────────────────────────────────────────────
 // Only run when executed directly (not when imported for testing).
 
-const isDirectRun = ["export-resume.ts", "export-resume.js"].includes(
-  path.basename(process.argv[1] ?? ""),
-);
-
-if (isDirectRun) {
+if (isDirectRun("export-resume")) {
   main();
 }
