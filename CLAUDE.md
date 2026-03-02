@@ -109,8 +109,9 @@ See [README.md](README.md#5-run-the-pipeline) for the full command reference. Qu
 - `npm run build` — website only (reads committed data, no API key)
 - `npm run pipeline:full` — pipeline + build (convenience)
 - `npm run brand` — generate brand assets (OG image, favicons) if missing
-- `npm test` — run all 178+ tests
-- `npm run lint && npm run format:check` — verify code quality
+- `npm test` — run all 190+ tests
+- `npm run check` — full pre-push release checklist (data + lint + format + test + build + validate)
+- `npm run check:quick` — instant data file validation only
 
 ## Phase 2 Preview (Do Not Implement Yet)
 
