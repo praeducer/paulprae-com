@@ -161,7 +161,7 @@ export default function Home() {
       <header className="no-print sticky top-0 z-40 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95">
         <div className="max-w-3xl mx-auto px-6 py-3">
           {/* Row 1: Name + short title */}
-          <div className="flex items-baseline justify-between gap-4">
+          <div className="flex items-baseline gap-3">
             <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">{profile.name}</h1>
             <p className="hidden sm:block text-sm text-slate-500 dark:text-slate-400 truncate">
               {profile.headline.split("|")[0].trim()}
