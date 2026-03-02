@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* ─── Color Scheme ──────────────────────────────────────────────────────── */
+/* Enables native dark mode for scrollbars, form controls, etc. */
+
+:root {
+  color-scheme: light dark;
+}
+
 /* ─── Resume Prose Overrides ─────────────────────────────────────────────── */
 /* Tailwind Typography prose defaults tuned for a professional resume layout */
 
@@ -44,6 +51,43 @@
   @apply border-slate-200 my-6;
 }
 
+/* ─── Dark Mode Prose Overrides ─────────────────────────────────────────── */
+/* Typography plugin colors adapted for dark backgrounds */
+
+@media (prefers-color-scheme: dark) {
+  .resume-prose h1 {
+    @apply text-slate-100;
+  }
+
+  .resume-prose h2 {
+    @apply text-slate-300 border-slate-600;
+  }
+
+  .resume-prose h3 {
+    @apply text-slate-100;
+  }
+
+  .resume-prose p {
+    @apply text-slate-300;
+  }
+
+  .resume-prose ul {
+    @apply text-slate-300;
+  }
+
+  .resume-prose strong {
+    @apply text-slate-200;
+  }
+
+  .resume-prose a {
+    @apply text-blue-400;
+  }
+
+  .resume-prose hr {
+    @apply border-slate-700;
+  }
+}
+
 /* ─── Utility: hide scrollbar ─────────────────────────────────────────────
    Used by the horizontal section nav to allow overflow without visible scrollbar */
 
@@ -59,10 +103,12 @@
 /* Clean PDF output when printing from browser (Cmd+P / Ctrl+P) */
 
 @media print {
+  /* Force light colors for print — override any dark mode preferences */
   body {
     @apply bg-white text-black;
     font-size: 11pt;
     line-height: 1.4;
+    color-scheme: light;
   }
 
   .resume-prose {
@@ -74,6 +120,7 @@
   .resume-prose h1 {
     font-size: 20pt;
     margin-bottom: 2pt;
+    color: #0f172a;
   }
 
   .resume-prose h2 {
@@ -81,11 +128,14 @@
     margin-top: 14pt;
     margin-bottom: 4pt;
     page-break-after: avoid;
+    color: #334155;
+    border-color: #cbd5e1;
   }
 
   .resume-prose h3 {
     font-size: 11pt;
     page-break-after: avoid;
+    color: #0f172a;
   }
 
   .resume-prose p,
@@ -93,6 +143,11 @@
     font-size: 10pt;
     orphans: 3;
     widows: 3;
+    color: #334155;
+  }
+
+  .resume-prose strong {
+    color: #1e293b;
   }
 
   .resume-prose a {
@@ -102,6 +157,7 @@
 
   .resume-prose hr {
     margin: 8pt 0;
+    border-color: #e2e8f0;
   }
 
   .no-print {

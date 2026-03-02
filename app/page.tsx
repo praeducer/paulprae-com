@@ -119,11 +119,16 @@ export default function Home() {
     return (
       <main className="max-w-3xl mx-auto px-6 py-12">
         <h1 className="text-2xl font-bold mb-4">paulprae.com</h1>
-        <p className="text-slate-600">
+        <p className="text-slate-600 dark:text-slate-400">
           Resume not yet generated. Run{" "}
-          <code className="bg-slate-100 px-2 py-0.5 rounded text-sm">npm run pipeline</code> after
-          adding your LinkedIn data to{" "}
-          <code className="bg-slate-100 px-2 py-0.5 rounded text-sm">data/sources/linkedin/</code>.
+          <code className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-sm">
+            npm run pipeline
+          </code>{" "}
+          after adding your LinkedIn data to{" "}
+          <code className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-sm">
+            data/sources/linkedin/
+          </code>
+          .
         </p>
       </main>
     );
@@ -133,12 +138,16 @@ export default function Home() {
     return (
       <main className="max-w-3xl mx-auto px-6 py-12">
         <h1 className="text-2xl font-bold mb-4">paulprae.com</h1>
-        <p className="text-slate-600">
+        <p className="text-slate-600 dark:text-slate-400">
           Career data not found. Run{" "}
-          <code className="bg-slate-100 px-2 py-0.5 rounded text-sm">npm run ingest</code> to
-          generate{" "}
-          <code className="bg-slate-100 px-2 py-0.5 rounded text-sm">career-data.json</code> from
-          your LinkedIn data.
+          <code className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-sm">
+            npm run ingest
+          </code>{" "}
+          to generate{" "}
+          <code className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-sm">
+            career-data.json
+          </code>{" "}
+          from your LinkedIn data.
         </p>
       </main>
     );
@@ -171,12 +180,14 @@ export default function Home() {
         Skip to resume content
       </a>
 
-      <header className="no-print sticky top-0 z-40 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm">
+      <header className="no-print sticky top-0 z-40 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95">
         <div className="max-w-3xl mx-auto px-6 pt-4 pb-3">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h1 className="text-xl font-bold text-slate-900">{profile.name}</h1>
-              <p className="text-sm text-slate-500">
+              <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                {profile.name}
+              </h1>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 Principal AI Engineer &amp; Solutions Architect
               </p>
             </div>
@@ -186,7 +197,7 @@ export default function Home() {
                   href={pdfPath}
                   download
                   aria-label="Download resume as PDF"
-                  className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-3 py-1.5 text-white hover:bg-slate-700 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-3 py-1.5 text-white hover:bg-slate-700 transition-colors dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-slate-300"
                 >
                   <DownloadIcon />
                   Resume PDF{pdfSize && <span className="text-xs opacity-70">({pdfSize})</span>}
@@ -195,7 +206,7 @@ export default function Home() {
                   href={docxPath}
                   download
                   aria-label="Download resume as DOCX"
-                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 transition-colors dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   <DownloadIcon />
                   DOCX{docxSize && <span className="text-xs opacity-60">({docxSize})</span>}
@@ -204,7 +215,7 @@ export default function Home() {
                   href={mdPath}
                   download
                   aria-label="Download resume as Markdown"
-                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 transition-colors dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   <DownloadIcon />
                   MD{mdSize && <span className="text-xs opacity-60">({mdSize})</span>}
@@ -213,7 +224,7 @@ export default function Home() {
                   <a
                     href={`mailto:${profile.email}`}
                     aria-label="Send email to Paul Prae"
-                    className="text-slate-500 hover:text-slate-900 transition-colors"
+                    className="text-slate-500 hover:text-slate-900 transition-colors dark:text-slate-400 dark:hover:text-slate-100"
                   >
                     Email
                   </a>
@@ -224,7 +235,7 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="View Paul Prae on LinkedIn"
-                    className="text-slate-500 hover:text-slate-900 transition-colors"
+                    className="text-slate-500 hover:text-slate-900 transition-colors dark:text-slate-400 dark:hover:text-slate-100"
                   >
                     LinkedIn
                   </a>
@@ -234,7 +245,7 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="View Paul Prae on GitHub"
-                  className="text-slate-500 hover:text-slate-900 transition-colors"
+                  className="text-slate-500 hover:text-slate-900 transition-colors dark:text-slate-400 dark:hover:text-slate-100"
                 >
                   GitHub
                 </a>
@@ -257,15 +268,15 @@ export default function Home() {
         </article>
       </main>
 
-      <footer className="no-print max-w-3xl mx-auto px-6 pb-8 pt-4 border-t border-slate-200">
-        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-slate-400">
+      <footer className="no-print max-w-3xl mx-auto px-6 pb-8 pt-4 border-t border-slate-200 dark:border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-slate-400 dark:text-slate-500">
           <p>
             &copy; {new Date().getFullYear()} {profile.name} &mdash; AI-generated resume &mdash;{" "}
             <a
               href="https://github.com/praeducer/paulprae-com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 hover:text-slate-600 underline"
+              className="text-slate-400 hover:text-slate-600 underline dark:text-slate-500 dark:hover:text-slate-300"
             >
               view pipeline on GitHub
             </a>

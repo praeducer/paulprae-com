@@ -44,8 +44,19 @@ chore/<name>      # Tooling, CI, dependency updates (e.g., chore/upgrade-next)
 
    ```bash
    git push -u origin feature/my-feature
-   gh pr create --fill  # or use GitHub web UI
+   # Write PR body to a temp file (avoids shell escaping issues with backticks):
+   cat > /tmp/pr-body.md << 'PREOF'
+   ## Summary
+   - Description of changes
+
+   ## Test plan
+   - [ ] `npm run check` passes
+   PREOF
+   gh pr create --title "feat: my feature" --body-file /tmp/pr-body.md
    ```
+
+   > **Tip:** Always use `--body-file` for PR descriptions containing backticks or code blocks.
+   > Using `<< 'PREOF'` (quoted delimiter) prevents variable/command expansion.
 
 4. **CI runs automatically** — lint, format check, tests, and build must all pass
 
@@ -60,6 +71,18 @@ chore/<name>      # Tooling, CI, dependency updates (e.g., chore/upgrade-next)
 - Keep branches short-lived (days, not weeks)
 - Delete branches after merge
 - **Never** use `git commit --amend` on pushed commits — force pushes orphan SHAs that Vercel and CI depend on
+
+## GitHub CLI Setup (WSL)
+
+For PR creation from the WSL terminal, authenticate `gh` with a personal access token:
+
+1. Create a fine-grained token at https://github.com/settings/tokens
+   - Scopes: **Contents** (read/write), **Pull Requests** (read/write)
+2. Add to `.env.local`: `GH_TOKEN=github_pat_...`
+3. Source it: `export GH_TOKEN=$(grep GH_TOKEN .env.local | cut -d= -f2)`
+4. Verify: `gh auth status`
+
+> **Note:** Claude Code uses the Windows `gh.exe` (already authenticated). This setup is only needed for manual `gh` commands in WSL.
 
 ## Commit Messages
 

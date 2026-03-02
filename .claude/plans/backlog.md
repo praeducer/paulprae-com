@@ -4,8 +4,8 @@ Only actionable coding/documentation tasks belong here.
 
 ## Phase 1 Follow-ups (next)
 
-- [ ] Add privacy-preserving analytics (Vercel Analytics or Plausible) with a short architecture note in `README.md`.
-- [ ] Add a docs quality check script (local markdown links + required-doc ownership) and wire it into CI.
+- [x] Add privacy-preserving analytics (Vercel Analytics + Speed Insights) with note in `README.md`.
+- [x] Add a docs quality check script (`validate-docs.ts`) and wire it into CI.
 - [x] Add CI workflow for `npm run lint`, `npm run format:check`, `npm test`, and `npm run build`.
 - [x] Add multi-stage deployment (local → preview → production) with GitHub Flow branching and CONTRIBUTING.md.
 - [x] Fix Vercel build failures (remove fragile ignoreCommand, decouple pipeline from website build).
@@ -29,7 +29,7 @@ Only actionable coding/documentation tasks belong here.
 
 ## UX Enhancements (deferred from Phase 1 review)
 
-- [ ] Add dark mode support — CSS-only `prefers-color-scheme` as quick-add, or full theme provider with localStorage toggle for Phase 2.
+- [x] Add dark mode support — CSS-only `prefers-color-scheme` with Tailwind `dark:` variants. Phase 2: add JS toggle with localStorage persistence.
 - [ ] Add professional headshot to header/OG image (requires obtaining a photo asset).
 - [ ] Add highlight reel badges (e.g., "15+ Years", "Fortune 500", "50M+ Members") below the header — significant layout change better suited for Phase 2 component library.
 - [ ] Add skill-tier visualization (chips, progress bars, or tag clouds) — advanced layout deferred; Phase 1 uses blank-line-separated categories.

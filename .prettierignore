@@ -1,9 +1,14 @@
 .next/
 out/
-data/
 node_modules/
 package-lock.json
 *.pdf
 *.docx
-# Resume downloads in public/ are generated copies — format the source, not the copy
+
+# Pipeline-generated data — career-data.json has large generated structures,
+# and resume markdown is pre-formatted by generate-resume.ts (Prettier API).
+data/
+
+# Resume downloads in public/ are byte-exact copies of data/generated/ sources.
+# Formatting them would cause hash mismatches detected by `npm run check`.
 public/*-Resume.*

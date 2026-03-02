@@ -63,6 +63,7 @@ You can develop and deploy the website without touching the pipeline, and vice v
 | Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF)              |
 | Linting       | ESLint 9 + eslint-config-next + Prettier       |
 | Testing       | Vitest (190+ unit and integration tests)       |
+| Analytics     | Vercel Analytics + Speed Insights (no cookies) |
 | Deployment    | Vercel (free tier, auto-deploy from GitHub)    |
 | Dev Tooling   | Claude Code CLI + Cursor                       |
 

@@ -57,6 +57,8 @@ docs/                  → Technical documentation (TDD, dev environment, MCP, b
 
 5. **Data committal policy** — All pipeline data is recruiter-facing content, so most is committed to git for portability across machines. Only LinkedIn CSV raw exports are gitignored (may contain unparsed columns). Knowledge base JSONs, career-data.json, and the resume markdown are all committed. PDF/DOCX in `data/generated/` are gitignored as regenerable binary artifacts, but copies in `public/` (PDF, DOCX, MD) are committed so Vercel can serve them as downloads. **Principle:** if data can't be public, it shouldn't be in the data model — this pipeline generates content sent to strangers.
 
+6. **Public download sync** — After modifying any resume output in `data/generated/`, always run `npm run check:fix` or `npm run export` to sync `public/` copies. The release check (`npm run check`) detects hash mismatches before push. Never edit files in `public/` directly — they are byte-exact copies of their sources.
+
 ## Brand Voice Guidelines
 
 When generating resume content or any copy for paulprae.com, follow these guidelines:
@@ -109,9 +111,11 @@ See [README.md](README.md#5-run-the-pipeline) for the full command reference. Qu
 - `npm run build` — website only (reads committed data, no API key)
 - `npm run pipeline:full` — pipeline + build (convenience)
 - `npm run brand` — generate brand assets (OG image, favicons) if missing
-- `npm test` — run all 190+ tests
-- `npm run check` — full pre-push release checklist (data + lint + format + test + build + validate)
+- `npm test` — run all 220+ tests
+- `npm run check` — full pre-push release checklist (data + docs + lint + format + test + build + validate)
 - `npm run check:quick` — instant data file validation only
+- `npm run check:fix` — quick check + auto-fix stale public/ copies
+- `npm run validate:docs` — validate internal markdown links and required docs
 
 ## Phase 2 Preview (Do Not Implement Yet)
 

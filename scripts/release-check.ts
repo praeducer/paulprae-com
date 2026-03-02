@@ -13,6 +13,7 @@
  * Usage:
  *   npm run check            # Full checklist (lint → format → test → build → validate)
  *   npm run check:quick      # Data file validation only (no lint/test/build)
+ *   npm run check:fix        # Quick check + auto-fix stale public/ copies
  *   npm run check -- --skip-build  # Skip the build step (useful during rapid iteration)
  *
  * Exit code:
@@ -22,6 +23,7 @@
 
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 import { execFileSync } from "child_process";
 import { PATHS, RESUME_FILE_BASE } from "../lib/config";
 
@@ -39,6 +41,7 @@ interface CheckResult {
 const args = process.argv.slice(2);
 const quickMode = args.includes("--quick");
 const skipBuild = args.includes("--skip-build");
+const fixMode = args.includes("--fix");
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -64,6 +67,15 @@ function humanSize(bytes: number): string {
   if (bytes === 0) return "0 B";
   if (bytes < 1024) return `${bytes} B`;
   return `${Math.round(bytes / 1024)} KB`;
+}
+
+function fileHash(filePath: string): string {
+  try {
+    const content = fs.readFileSync(filePath);
+    return crypto.createHash("sha256").update(content).digest("hex").slice(0, 12);
+  } catch {
+    return "";
+  }
 }
 
 function runCommand(cmd: string, cmdArgs: string[]): { ok: boolean; output: string } {
@@ -128,14 +140,22 @@ function checkPublicDownloads(): CheckResult {
 
   for (const dl of downloads) {
     if (!fileExists(dl.publicPath)) {
-      issues.push(`missing: public/${RESUME_FILE_BASE}.${dl.label.toLowerCase()}`);
+      if (fixMode && fileExists(dl.sourcePath)) {
+        fs.copyFileSync(dl.sourcePath, dl.publicPath);
+        console.log(`  → Fixed: copied ${dl.label} to public/`);
+      } else {
+        issues.push(`missing: public/${RESUME_FILE_BASE}.${dl.label.toLowerCase()}`);
+      }
     } else {
-      const publicSize = fileSize(dl.publicPath);
-      const sourceSize = fileSize(dl.sourcePath);
-      if (sourceSize > 0 && publicSize !== sourceSize) {
-        issues.push(
-          `stale: public/ ${dl.label} (${humanSize(publicSize)}) != data/generated/ (${humanSize(sourceSize)})`,
-        );
+      const publicHash = fileHash(dl.publicPath);
+      const sourceHash = fileHash(dl.sourcePath);
+      if (sourceHash && publicHash !== sourceHash) {
+        if (fixMode) {
+          fs.copyFileSync(dl.sourcePath, dl.publicPath);
+          console.log(`  → Fixed: synced ${dl.label} to public/`);
+        } else {
+          issues.push(`stale: public/ ${dl.label} differs from data/generated/ (hash mismatch)`);
+        }
       }
     }
   }
@@ -253,6 +273,19 @@ function checkBuildOutput(): CheckResult {
   };
 }
 
+function checkDocs(): CheckResult {
+  const start = Date.now();
+  const { ok, output } = runCommand("npx", ["tsx", "scripts/validate-docs.ts"]);
+  return {
+    name: "Docs",
+    passed: ok,
+    detail: ok
+      ? "all links valid, required docs present"
+      : output.split("\n").slice(0, 3).join(" | "),
+    durationMs: Date.now() - start,
+  };
+}
+
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 function main(): void {
@@ -271,6 +304,7 @@ function main(): void {
 
   if (!quickMode) {
     // Phase 2: Code quality (skip in quick mode)
+    results.push(checkDocs());
     results.push(checkLint());
     results.push(checkFormat());
     results.push(checkTests());
@@ -329,5 +363,6 @@ export const _testExports = {
   checkBuildOutput,
   fileExists,
   fileSize,
+  fileHash,
   humanSize,
 };

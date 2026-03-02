@@ -42,7 +42,7 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
   return (
     <nav
       aria-label="Resume sections"
-      className="no-print sticky top-[57px] z-30 -mx-6 border-b border-slate-200/80 bg-white/95 px-6 backdrop-blur-sm"
+      className="no-print sticky top-[57px] z-30 -mx-6 border-b border-slate-200/80 bg-white/95 px-6 backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-950/95"
     >
       <div className="mx-auto flex max-w-3xl items-center gap-1 overflow-x-auto py-1.5 text-xs scrollbar-none">
         {sections.map((s) => (
@@ -51,8 +51,8 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
             href={`#${s.id}`}
             className={`shrink-0 rounded-md px-2.5 py-1 transition-colors ${
               activeId === s.id
-                ? "bg-slate-900 text-white"
-                : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                ? "bg-slate-900 text-white dark:bg-slate-200 dark:text-slate-900"
+                : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
             }`}
           >
             {s.label}

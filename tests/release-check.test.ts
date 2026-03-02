@@ -12,8 +12,15 @@ import fs from "fs";
 import { _testExports } from "../scripts/release-check.js";
 import { PATHS, RESUME_FILE_BASE } from "../lib/config.js";
 
-const { checkDataFiles, checkPublicDownloads, checkBuildOutput, fileExists, fileSize, humanSize } =
-  _testExports;
+const {
+  checkDataFiles,
+  checkPublicDownloads,
+  checkBuildOutput,
+  fileExists,
+  fileSize,
+  fileHash,
+  humanSize,
+} = _testExports;
 
 // ─── humanSize formatting ────────────────────────────────────────────────────
 
@@ -52,6 +59,30 @@ describe("fileExists", () => {
 
   it("returns false for a directory", () => {
     expect(fileExists(path.join(process.cwd(), "app"))).toBe(false);
+  });
+});
+
+// ─── fileHash ────────────────────────────────────────────────────────────────
+
+describe("fileHash", () => {
+  it("returns a 12-character hex string for existing file", () => {
+    const hash = fileHash(path.join(process.cwd(), "package.json"));
+    expect(hash).toMatch(/^[a-f0-9]{12}$/);
+  });
+
+  it("returns empty string for non-existent file", () => {
+    expect(fileHash(path.join(process.cwd(), "nonexistent.xyz"))).toBe("");
+  });
+
+  it("returns consistent hash for same file", () => {
+    const pkg = path.join(process.cwd(), "package.json");
+    expect(fileHash(pkg)).toBe(fileHash(pkg));
+  });
+
+  it("returns different hashes for different files", () => {
+    const h1 = fileHash(path.join(process.cwd(), "package.json"));
+    const h2 = fileHash(path.join(process.cwd(), "tsconfig.json"));
+    expect(h1).not.toBe(h2);
   });
 });
 

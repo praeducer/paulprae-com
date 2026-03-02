@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import type { CareerData } from "../lib/types";
 
@@ -59,7 +61,7 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   other: {
-    "theme-color": "#0f172a",
+    "theme-color": "#ffffff",
   },
 };
 
@@ -113,9 +115,11 @@ function PersonJsonLd() {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="bg-white text-slate-900 antialiased">
+      <body className="bg-white text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
         <PersonJsonLd />
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

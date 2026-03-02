@@ -328,6 +328,33 @@ CURSOR_EOF
     fi
 fi
 
+# ─── GitHub CLI (for PR creation) ────────────────────────────────────────────
+
+if command -v gh &>/dev/null; then
+    skip "gh already installed: $(gh --version | head -1)"
+else
+    info "Installing GitHub CLI..."
+    if [[ "$OS" == "linux" ]]; then
+        (type -p wget >/dev/null || sudo apt-get install wget -y -qq) \
+            && sudo mkdir -p -m 755 /etc/apt/keyrings \
+            && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+                | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+            && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+                | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+            && sudo apt-get update -qq \
+            && sudo apt-get install -y -qq gh
+    elif [[ "$OS" == "macos" ]]; then
+        brew install gh
+    fi
+
+    if command -v gh &>/dev/null; then
+        ok "gh installed: $(gh --version | head -1)"
+    else
+        fail "gh installation failed"
+        echo "  Install manually: https://cli.github.com/"
+    fi
+fi
+
 # ─── Shell Health Check ──────────────────────────────────────────────────────
 
 echo ""
@@ -364,7 +391,7 @@ if $IS_WSL; then
 fi
 
 # Verify key tools resolve correctly
-for cmd in node npm claude pandoc typst cursor; do
+for cmd in node npm claude pandoc typst gh cursor; do
     if command -v "$cmd" &>/dev/null; then
         ok "$cmd → $(which "$cmd")"
     else
@@ -382,6 +409,7 @@ echo "  typst:  $(command -v typst &>/dev/null && typst --version || echo 'NOT I
 echo "  node:   $(command -v node &>/dev/null && node --version || echo 'NOT INSTALLED')"
 echo "  npm:    $(command -v npm &>/dev/null && npm --version || echo 'NOT INSTALLED')"
 echo "  claude: $(command -v claude &>/dev/null && claude --version 2>/dev/null || echo 'NOT INSTALLED')"
+echo "  gh:     $(command -v gh &>/dev/null && gh --version | head -1 || echo 'NOT INSTALLED')"
 echo "  cursor: $(command -v cursor &>/dev/null && echo 'AVAILABLE' || echo 'NOT INSTALLED')"
 echo ""
 echo "  Next steps:"
