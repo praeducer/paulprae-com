@@ -6,11 +6,15 @@
 
 :root {
   color-scheme: light dark;
+  /* --header-height is set dynamically by SectionNav's ResizeObserver.
+     Fallback 61px matches the header at wide (sm+) viewports. */
   --header-height: 61px;
+  --nav-height: 45px;
+  --sticky-offset: calc(var(--header-height) + var(--nav-height));
 }
 
 html {
-  scroll-padding-top: 105px;
+  scroll-padding-top: calc(var(--sticky-offset) + 16px);
 }
 
 /* ─── Resume Prose Overrides ─────────────────────────────────────────────── */
@@ -22,7 +26,7 @@ html {
 
 .resume-prose h2 {
   @apply text-lg font-semibold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mt-8 mb-4;
-  scroll-margin-top: 105px;
+  scroll-margin-top: calc(var(--sticky-offset) + 16px);
 }
 
 .resume-prose h3 {

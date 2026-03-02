@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Section {
   id: string;
@@ -10,10 +10,31 @@ interface Section {
 /**
  * Compact horizontal section navigation bar.
  * Highlights the currently visible section based on scroll position.
+ * Dynamically positions itself below the sticky header using ResizeObserver.
  * Hidden on print via the no-print class.
  */
 export default function SectionNav({ sections }: { sections: Section[] }) {
   const [activeId, setActiveId] = useState<string>("");
+  const navRef = useRef<HTMLElement>(null);
+
+  // Dynamically measure the header height and set the nav's top position.
+  // The header wraps at narrow viewports, so a hardcoded value won't work.
+  useEffect(() => {
+    const header = document.querySelector("header");
+    if (!header || !navRef.current) return;
+
+    const updateTop = () => {
+      const h = header.offsetHeight;
+      navRef.current!.style.top = `${h}px`;
+      // Also update scroll-margin for anchor links so they clear both sticky bars
+      document.documentElement.style.setProperty("--header-height", `${h}px`);
+    };
+
+    updateTop();
+    const ro = new ResizeObserver(updateTop);
+    ro.observe(header);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -50,8 +71,9 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
 
   return (
     <nav
+      ref={navRef}
       aria-label="Resume sections"
-      className="no-print sticky top-[61px] z-30 overflow-x-clip border-b border-slate-200/80 bg-white/95 backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-950/95"
+      className="no-print sticky top-0 z-30 overflow-x-clip border-b border-slate-200/80 bg-white/95 backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-950/95"
     >
       <div className="mx-auto flex max-w-3xl items-center gap-1 overflow-x-auto px-6 py-1.5 text-xs scrollbar-none">
         {sections.map((s) => (
