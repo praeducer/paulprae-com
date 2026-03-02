@@ -62,7 +62,7 @@ You can develop and deploy the website without touching the pipeline, and vice v
 | Validation    | Zod (schema validation)                        |
 | Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF)              |
 | Linting       | ESLint 9 + eslint-config-next + Prettier       |
-| Testing       | Vitest (160+ unit and integration tests)       |
+| Testing       | Vitest (190+ unit and integration tests)       |
 | Deployment    | Vercel (free tier, auto-deploy from GitHub)    |
 | Dev Tooling   | Claude Code CLI + Cursor                       |
 
@@ -217,6 +217,15 @@ npm run format        # Prettier format all files
 npm run format:check  # Prettier check (CI-friendly)
 ```
 
+### Pre-Push Checklist
+
+```bash
+npm run check         # Full checklist: data files → lint → format → test → build → validate
+npm run check:quick   # Data file validation only (instant, no lint/test/build)
+```
+
+`npm run check` runs the same checks as CI plus validates that resume data files exist, public download copies are in sync, and the build output contains expected content. Run it before pushing to catch issues locally.
+
 ### Local Development
 
 ```bash
@@ -227,12 +236,12 @@ Hot-reload is enabled — edit any `.tsx`, `.css`, or `.ts` file and the browser
 
 **Common tasks:**
 
-| Task                   | Command                                                             | Notes                           |
-| ---------------------- | ------------------------------------------------------------------- | ------------------------------- |
-| Change CSS/layout      | Edit `app/globals.css` or `.tsx` files                              | Hot-reloads on `localhost:3000` |
-| Preview resume changes | `npm run generate && npm run approve`                               | Then refresh browser            |
-| Run tests              | `npm test`                                                          | 178+ tests, ~300ms              |
-| Check before push      | `npm run lint && npm run format:check && npm test && npm run build` | CI runs these too               |
+| Task                   | Command                                | Notes                                |
+| ---------------------- | -------------------------------------- | ------------------------------------ |
+| Change CSS/layout      | Edit `app/globals.css` or `.tsx` files | Hot-reloads on `localhost:3000`      |
+| Preview resume changes | `npm run generate && npm run approve`  | Then refresh browser                 |
+| Run tests              | `npm test`                             | 190+ tests, ~300ms                   |
+| Check before push      | `npm run check`                        | Full CI-equivalent + data validation |
 
 ### Repeating on a Fresh Machine
 

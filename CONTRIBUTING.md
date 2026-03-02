@@ -96,16 +96,23 @@ Generated files that should be committed: `data/generated/career-data.json`, `da
 
 ## Code Quality
 
-Run these before pushing:
+Run the release checklist before pushing:
+
+```bash
+npm run check         # Full checklist: data files → lint → format → test → build → validate
+npm run check:quick   # Data file validation only (instant)
+```
+
+Or run individual checks:
 
 ```bash
 npm run lint          # ESLint
 npm run format:check  # Prettier
-npm test              # Vitest (178+ tests)
+npm test              # Vitest (190+ tests)
 npm run build         # Next.js static export
 ```
 
-CI runs all four checks on every PR. All must pass to merge.
+CI runs lint, format, test, build, and build output validation on every PR. All must pass to merge.
 
 ## What NOT to Commit
 

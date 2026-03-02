@@ -10,7 +10,7 @@ Only actionable coding/documentation tasks belong here.
 - [x] Add multi-stage deployment (local → preview → production) with GitHub Flow branching and CONTRIBUTING.md.
 - [x] Fix Vercel build failures (remove fragile ignoreCommand, decouple pipeline from website build).
 - [x] Add architecture documentation (CI badge, architecture diagram, Quick Start guide, graceful fallback).
-- [ ] Add a release checklist script/command for pipeline + verification before pushing to `main`.
+- [x] Add a release checklist script/command for pipeline + verification before pushing to `main`.
 
 ## Pipeline Enhancements
 
