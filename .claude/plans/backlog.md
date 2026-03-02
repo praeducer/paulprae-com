@@ -6,12 +6,14 @@ Only actionable coding/documentation tasks belong here.
 
 - [ ] Add privacy-preserving analytics (Vercel Analytics or Plausible) with a short architecture note in `README.md`.
 - [ ] Add a docs quality check script (local markdown links + required-doc ownership) and wire it into CI.
-- [ ] Add CI workflow for `npm run lint`, `npm run format:check`, and `npm test`.
+- [x] Add CI workflow for `npm run lint`, `npm run format:check`, `npm test`, and `npm run build`.
+- [x] Add multi-stage deployment (local → preview → production) with GitHub Flow branching and CONTRIBUTING.md.
 - [ ] Add a release checklist script/command for pipeline + verification before pushing to `main`.
 
 ## Pipeline Enhancements
 
 - [x] Add resume comparison and approval pipeline (`npm run compare`, `npm run approve`) — staging/approved decoupling with interactive CLI and optional LLM-as-judge scoring.
+- [ ] Add job description comparison CLI (`npm run compare:jobs`) with stakeholder persona voting (FAANG Hiring Manager, Healthcare CTO, Technical Recruiter, VP of Engineering) and weighted scoring algorithm. Decoupled from `compare-resumes.ts`.
 - [ ] Add tailored resume generation flags (`--job-url` and `--job-text`) with output `resume-tailored.{md,pdf,docx}`.
 - [ ] Add pipeline metrics output (`tokens`, `cost`, `latency`, artifact sizes) to a gitignored metrics file.
 - [ ] Add optional JSON Resume export from `career-data.json`.

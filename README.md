@@ -207,19 +207,27 @@ The knowledge base (`data/sources/knowledge/`) is committed to git and transfers
 
 ## Deployment
 
-The site auto-deploys to Vercel on every push to `main`. AI generation happens locally — Vercel only runs `next build` against committed files (no API keys needed on the server).
+The site uses a three-environment setup with Vercel:
+
+| Environment       | Branch      | URL                                  | Deploys on      |
+| ----------------- | ----------- | ------------------------------------ | --------------- |
+| Local dev         | any         | `localhost:3000`                     | `npm run dev`   |
+| Preview / Staging | PR branches | `*.vercel.app`                       | Push to PR      |
+| Production        | `main`      | [paulprae.com](https://paulprae.com) | Merge to `main` |
+
+AI generation happens **locally** — Vercel only runs `next build` against committed files (no API keys needed on the server). Every pull request gets an automatic Vercel preview deploy for testing.
 
 ```
 Local: npm run pipeline → ingest → generate → export → build
-       git push origin main
-Vercel: npm ci → next build → serves out/ directory via CDN
+       git push origin feature/my-change → open PR
+Vercel: PR preview deploy → review → merge to main → production deploy
 ```
 
 1. Run the pipeline locally: `npm run pipeline`
 2. Commit generated files: `git add data/generated/ public/Paul-Prae-Resume.* && git commit`
-3. Push to deploy: `git push origin main`
-4. Vercel auto-builds within ~60 seconds
-5. Live at [paulprae.com](https://paulprae.com) (also: [paulprae-com-one.vercel.app](https://paulprae-com-one.vercel.app/))
+3. Push and open a PR (CI runs lint, format, test, build; Vercel deploys preview)
+4. Review the preview deploy, then merge to `main`
+5. Production updates within ~60 seconds at [paulprae.com](https://paulprae.com)
 
 Custom-domain DNS operations are documented in [docs/domain-dns-runbook.md](docs/domain-dns-runbook.md).
 
@@ -277,6 +285,10 @@ paulprae-com/
 ## Resume Versioning
 
 Each pipeline run archives the resume to `data/generated/versions/` and logs it in [`data/generated/VERSIONS.md`](data/generated/VERSIONS.md). Use git tags (`resume/YYYY-MM-DD`) for milestone versions.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow, branching strategy, commit conventions, and code quality standards.
 
 ## License
 
