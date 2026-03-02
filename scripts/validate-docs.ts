@@ -16,6 +16,7 @@
 
 import fs from "fs";
 import path from "path";
+import { isDirectRun } from "../lib/script-utils";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -286,10 +287,7 @@ function main(): void {
 
 // ─── Entry Point ─────────────────────────────────────────────────────────────
 
-const isDirectRun =
-  process.argv[1] && path.basename(process.argv[1]).replace(/\.[^.]+$/, "") === "validate-docs";
-
-if (isDirectRun) {
+if (isDirectRun("validate-docs")) {
   main();
 }
 

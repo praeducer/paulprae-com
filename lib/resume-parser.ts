@@ -32,15 +32,9 @@ export interface ParsedResume {
   raw: string;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+import { slugify } from "./ui-utils";
 
-/** Convert heading text to a URL-safe slug. Matches app/page.tsx extractSections(). */
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Count non-empty lines in a string. */
 function countLines(text: string): number {

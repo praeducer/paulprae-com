@@ -14,12 +14,9 @@ import path from "path";
 import readline from "readline";
 import { PATHS } from "../lib/config";
 import { parseResume } from "../lib/resume-parser";
+import { isDirectRun, hasForceFlag } from "../lib/script-utils";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function hasForceFlag(): boolean {
-  return process.argv.includes("--force");
-}
 
 function getStagingInfo(): { chars: number; sections: string[] } | null {
   if (!fs.existsSync(PATHS.resumeStaging)) return null;
@@ -103,16 +100,11 @@ async function approve(): Promise<boolean> {
 export const _testExports = {
   approve,
   getStagingInfo,
-  hasForceFlag,
 };
 
 // ─── Execute ─────────────────────────────────────────────────────────────────
 
-const isDirectRun = ["approve-resume.ts", "approve-resume.js"].includes(
-  path.basename(process.argv[1] ?? ""),
-);
-
-if (isDirectRun) {
+if (isDirectRun("approve-resume")) {
   approve()
     .then((success) => {
       if (!success) process.exit(1);

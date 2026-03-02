@@ -5,21 +5,10 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { stripHtmlComments } from "../lib/markdown";
 import { PATHS, RESUME_FILE_BASE } from "../lib/config";
-import type { CareerData } from "../lib/types";
+import { loadCareerData } from "../lib/career-data";
+import { slugify } from "../lib/ui-utils";
 import BackToTop from "./components/BackToTop";
 import SectionNav from "./components/SectionNav";
-
-// ─── Career Data (optional — website works without pipeline outputs) ────────
-
-function loadCareerData(): CareerData | null {
-  try {
-    const filePath = path.join(process.cwd(), "data/generated/career-data.json");
-    const raw = fs.readFileSync(filePath, "utf-8");
-    return JSON.parse(raw) as CareerData;
-  } catch {
-    return null;
-  }
-}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -54,11 +43,7 @@ function extractSections(markdown: string): { id: string; label: string }[] {
   const matches = markdown.matchAll(/^## (.+)$/gm);
   return [...matches].map((m) => {
     const label = m[1].trim();
-    const id = label
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-    return { id, label };
+    return { id: slugify(label), label };
   });
 }
 
@@ -147,11 +132,7 @@ export default function Home() {
     },
 
     h2: ({ children, ...props }) => {
-      const text = String(children ?? "");
-      const id = text
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
+      const id = slugify(String(children ?? ""));
       return (
         <h2 id={id} {...props}>
           {children}
