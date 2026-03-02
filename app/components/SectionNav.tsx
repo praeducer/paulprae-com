@@ -56,7 +56,7 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
       const stickyOffset = parseFloat(
         getComputedStyle(document.documentElement).getPropertyValue("--sticky-offset") || "0",
       );
-      const threshold = stickyOffset + 24;
+      const threshold = stickyOffset + 16;
 
       let current = "";
       for (const section of sections) {
