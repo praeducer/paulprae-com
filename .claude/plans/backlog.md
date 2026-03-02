@@ -11,10 +11,9 @@ Only actionable coding/documentation tasks belong here.
 
 ## Pipeline Enhancements
 
-- [ ] Add evaluation loop to resume generation (generate -> score -> revise with max retry count).
+- [x] Add resume comparison and approval pipeline (`npm run compare`, `npm run approve`) — staging/approved decoupling with interactive CLI and optional LLM-as-judge scoring.
 - [ ] Add tailored resume generation flags (`--job-url` and `--job-text`) with output `resume-tailored.{md,pdf,docx}`.
 - [ ] Add pipeline metrics output (`tokens`, `cost`, `latency`, artifact sizes) to a gitignored metrics file.
-- [ ] Add A/B resume variant generation and comparison summary output.
 - [ ] Add optional JSON Resume export from `career-data.json`.
 
 ## Phase 2 Preparation

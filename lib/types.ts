@@ -267,3 +267,32 @@ export interface GenerationResult {
   outputTokens: number;
   durationMs: number;
 }
+
+// ─── D. Resume Comparison Types ─────────────────────────────────────────────
+
+export interface SectionScore {
+  /** Evaluation criterion name, e.g. "Impact Clarity" */
+  criterion: string;
+  /** Score on 1-10 scale */
+  score: number;
+  /** One-line rationale for the score */
+  rationale: string;
+}
+
+export interface SectionComparison {
+  /** Section heading, e.g. "Professional Experience" */
+  heading: string;
+  /** Versions being compared with optional LLM scores */
+  versions: { label: string; content: string; scores?: SectionScore[] }[];
+  /** Label of the chosen version (set after user selection) */
+  chosen?: string;
+}
+
+export interface ComparisonResult {
+  /** Per-section comparison results with chosen versions */
+  sections: SectionComparison[];
+  /** Assembled composite resume markdown */
+  compositeMarkdown: string;
+  /** ISO timestamp of comparison */
+  timestamp: string;
+}

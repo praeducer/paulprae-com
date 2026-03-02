@@ -37,10 +37,10 @@ function hasForceFlag(): boolean {
 
 function shouldSkipGenerate(): boolean {
   if (!fs.existsSync(PATHS.careerDataOutput)) return false;
-  if (!fs.existsSync(PATHS.resumeOutput)) return false;
+  if (!fs.existsSync(PATHS.resumeStaging)) return false;
 
   const inputMtime = fs.statSync(PATHS.careerDataOutput).mtimeMs;
-  const outputMtime = fs.statSync(PATHS.resumeOutput).mtimeMs;
+  const outputMtime = fs.statSync(PATHS.resumeStaging).mtimeMs;
   return outputMtime > inputMtime;
 }
 
@@ -256,9 +256,9 @@ async function generate(): Promise<GenerationResult> {
 
   // Skip if resume is already newer than career data
   if (!hasForceFlag() && shouldSkipGenerate()) {
-    console.log("   ✅ Resume is up to date (career data unchanged). Skipping generation.");
-    console.log("   Use --force to override.\n");
-    const existingMarkdown = fs.readFileSync(PATHS.resumeOutput, "utf-8");
+    console.log("   ✅ Staging resume is up to date (career data unchanged). Skipping generation.");
+    console.log("   Use --force to override. Run 'npm run approve' to promote staging to live.\n");
+    const existingMarkdown = fs.readFileSync(PATHS.resumeStaging, "utf-8");
     return {
       success: true,
       markdownLength: existingMarkdown.length,
@@ -388,12 +388,19 @@ async function generate(): Promise<GenerationResult> {
 
   const finalContent = header + markdown;
 
-  // Write output
-  const outputDir = path.dirname(PATHS.resumeOutput);
+  // Write to staging (not directly to approved/live path)
+  const outputDir = path.dirname(PATHS.resumeStaging);
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
-  fs.writeFileSync(PATHS.resumeOutput, finalContent, "utf-8");
+  fs.writeFileSync(PATHS.resumeStaging, finalContent, "utf-8");
+
+  // Auto-approve on first run: if no approved version exists yet, copy staging → approved
+  // so the pipeline works out-of-the-box for new setups without requiring manual approval.
+  if (!fs.existsSync(PATHS.resumeOutput)) {
+    fs.copyFileSync(PATHS.resumeStaging, PATHS.resumeOutput);
+    console.log("   📋 First generation — auto-approved (no previous version existed).");
+  }
 
   // Report cache performance if available
   const usage = response.usage as unknown as Record<string, unknown>;
@@ -432,7 +439,14 @@ async function generate(): Promise<GenerationResult> {
   if (validationWarnings.length > 0) {
     console.log(`      Warnings: ${validationWarnings.length} quality check(s) flagged`);
   }
-  console.log(`\n   📝 Written to: ${PATHS.resumeOutput}\n`);
+  console.log(`\n   📝 Written to staging: ${PATHS.resumeStaging}`);
+  if (fs.existsSync(PATHS.resumeOutput)) {
+    console.log(
+      "   💡 Run 'npm run compare' to review changes, then 'npm run approve' to go live.\n",
+    );
+  } else {
+    console.log("   📋 Auto-approved as first generation.\n");
+  }
 
   return result;
 }

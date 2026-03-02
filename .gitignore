@@ -36,6 +36,9 @@ data/generated/Resume.docx
 data/generated/resume.pdf
 data/generated/resume.docx
 
+# Pipeline: staging resume (transient, not yet approved for deploy)
+data/generated/*.staging.md
+
 # Pipeline: skip-logic hash (machine-local, regenerated each run)
 data/generated/.ingest-hash
 

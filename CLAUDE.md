@@ -79,15 +79,21 @@ The build pipeline transforms raw career data into a deployed site:
 
 ```
 1. npm run ingest    → Parse LinkedIn CSVs + knowledge JSONs → data/generated/career-data.json
-2. npm run generate  → Load career data → Claude API (Opus 4.6) → data/generated/Paul-Prae-Resume.md
-3. npm run export    → Pandoc + Typst convert → data/generated/Paul-Prae-Resume.pdf + .docx
-4. npm run build     → Next.js reads Paul-Prae-Resume.md at build time → static HTML in out/
-5. git push          → Vercel auto-deploys from main branch
+2. npm run generate  → Claude API (Opus 4.6) → Paul-Prae-Resume.staging.md (NOT live)
+3. npm run compare   → Interactive section-by-section review (optional: --judge for LLM scoring)
+4. npm run approve   → Promote staging → Paul-Prae-Resume.md (approved/live)
+5. npm run export    → Pandoc + Typst convert → Paul-Prae-Resume.pdf + .docx
+6. npm run build     → Next.js reads approved resume at build time → static HTML in out/
+7. git push          → Vercel auto-deploys from main branch
 ```
 
 **Full pipeline shortcut:** `npm run pipeline` (runs ingest → generate → export → build sequentially)
 
+**Content review workflow:** `npm run generate` → `npm run compare` → `npm run approve` → `npm run export`
+
 **Composable sub-pipelines:** `pipeline:content` (ingest + generate), `pipeline:render` (export + build), `pipeline:deploy` (full + git stage)
+
+**Staging/Approved decoupling:** Generation writes to `.staging.md`; the website and export read from the approved `.md`. This prevents regeneration from overwriting reviewed content. First-time generation auto-approves.
 
 **Skip logic:** All pipeline steps skip automatically when outputs are newer than inputs. Use `--force` to override (e.g., `npm run generate:force`).
 

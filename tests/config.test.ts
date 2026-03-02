@@ -99,10 +99,15 @@ describe("PATHS", () => {
     expect(path.basename(PATHS.docxOutput)).toBe(`${RESUME_FILE_BASE}.docx`);
   });
 
+  it("has a staging path with .staging.md suffix", () => {
+    expect(path.basename(PATHS.resumeStaging)).toBe(`${RESUME_FILE_BASE}.staging.md`);
+  });
+
   it("places resume outputs in data/generated/", () => {
     const root = process.cwd();
     const generatedDir = path.join(root, "data", "generated");
     expect(path.dirname(PATHS.resumeOutput)).toBe(generatedDir);
+    expect(path.dirname(PATHS.resumeStaging)).toBe(generatedDir);
     expect(path.dirname(PATHS.pdfOutput)).toBe(generatedDir);
     expect(path.dirname(PATHS.docxOutput)).toBe(generatedDir);
   });

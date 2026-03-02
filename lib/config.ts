@@ -52,6 +52,7 @@ export const PATHS = {
   knowledgeDir: path.join(ROOT, "data", "sources", "knowledge"),
   careerDataOutput: path.join(ROOT, "data", "generated", "career-data.json"),
   resumeOutput: path.join(ROOT, "data", "generated", `${RESUME_FILE_BASE}.md`),
+  resumeStaging: path.join(ROOT, "data", "generated", `${RESUME_FILE_BASE}.staging.md`),
   pdfOutput: path.join(ROOT, "data", "generated", `${RESUME_FILE_BASE}.pdf`),
   docxOutput: path.join(ROOT, "data", "generated", `${RESUME_FILE_BASE}.docx`),
   pdfStylesheet: path.join(ROOT, "scripts", "resume-pdf.typ"),
