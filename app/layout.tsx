@@ -1,6 +1,22 @@
+import fs from "fs";
+import path from "path";
 import type { Metadata } from "next";
 import "./globals.css";
-import careerData from "../data/generated/career-data.json";
+import type { CareerData } from "../lib/types";
+
+// ─── Career Data (optional — website works without pipeline outputs) ────────
+
+function loadCareerData(): CareerData | null {
+  try {
+    const filePath = path.join(process.cwd(), "data/generated/career-data.json");
+    const raw = fs.readFileSync(filePath, "utf-8");
+    return JSON.parse(raw) as CareerData;
+  } catch {
+    return null;
+  }
+}
+
+const careerData = loadCareerData();
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://paulprae.com"),
@@ -48,6 +64,8 @@ export const metadata: Metadata = {
 };
 
 function PersonJsonLd() {
+  if (!careerData) return null;
+
   const profile = careerData.profile;
   const recentPosition = careerData.positions[0];
   const education = careerData.education[0];
