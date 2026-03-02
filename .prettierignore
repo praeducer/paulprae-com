@@ -5,3 +5,5 @@ node_modules/
 package-lock.json
 *.pdf
 *.docx
+# Resume downloads in public/ are generated copies — format the source, not the copy
+public/*-Resume.*

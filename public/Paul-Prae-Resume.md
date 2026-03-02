@@ -2,7 +2,6 @@
 <!-- To regenerate: npm run generate -->
 <!-- To modify output: edit scripts/generate-resume.ts -->
 <!-- Generated: 2026-03-02T00:22:07.748Z | Model: claude-opus-4-6 | Tokens: 21295 -->
-
 # Paul Prae
 
 **Principal AI Engineer & Architect** | Buford, GA | hireme@paulprae.com | [linkedin.com/in/paulprae](https://www.linkedin.com/in/paulprae) | [paulprae.com](https://www.paulprae.com)
@@ -18,7 +17,6 @@ Principal AI Engineer and Architect with 15 years of experience delivering enter
 ## Professional Experience
 
 ### Staff AI DataOps Engineer
-
 **Arine** | Remote | Sep 2025 – Present
 
 - Designed and maintained the AI DataOps Toolkit — an agentic development framework and interactive knowledge base — equipping a data services organization supporting 45+ health plans and 50M+ members with AI development tools, governance standards, and reference architectures.
@@ -28,7 +26,6 @@ Principal AI Engineer and Architect with 15 years of experience delivering enter
 - Managed the enterprise data platform on Snowflake and AWS, processing petabytes of healthcare data from hundreds of heterogeneous sources to support downstream ML systems core to clinical decision support products.
 
 ### Chief AI Architect, Senior Manager
-
 **Booz Allen Hamilton** | Atlanta, GA | Jul 2024 – Mar 2025
 
 - Led development and operationalization of AI and analytics solutions enabling healthcare and life science clients to harness clinical, behavioral, and genomic data for population health and predictive medicine.
@@ -36,15 +33,13 @@ Principal AI Engineer and Architect with 15 years of experience delivering enter
 - Advised cross-functional teams on AI strategy, translating rapidly evolving clinical, regulatory, and technological needs into production-ready solutions driving measurable client outcomes.
 
 ### Neuroinformatics Data Platform Architect
-
 **TReNDS Center** | Atlanta, GA | Jan 2022 – Sep 2023
 
 - Served as tech lead and architect for COINSTAC, an open-source federated analysis platform processing neuroimaging and genomics data with differential privacy algorithms ensuring PHI protection across distributed research institutions.
-- Architected AWS cloud infrastructure including GPU-focused deep learning compute; co-authored a peer-reviewed publication in _Frontiers in Neuroinformatics_ demonstrating federated analysis capabilities.
+- Architected AWS cloud infrastructure including GPU-focused deep learning compute; co-authored a peer-reviewed publication in *Frontiers in Neuroinformatics* demonstrating federated analysis capabilities.
 - Drove platform commercialization through SBIR grant writing, open-source contributor recruitment, and industry partnerships while leading Agile ceremonies as Scrum master.
 
 ### Chief AI Officer, Founder
-
 **Hyperbloom** | United States | Jan 2020 – Sep 2025
 
 - Founded and scaled an AI consulting practice to $1.4M ARR from a $40K investment, delivering cloud-based AI and data solutions to healthcare, life science, and financial services clients.
@@ -52,7 +47,6 @@ Principal AI Engineer and Architect with 15 years of experience delivering enter
 - Designed HIPAA/GDPR-compliant data platforms including a genomics data lake on AWS (S3, Glue, CloudWatch) and a blockchain-based life science data exchange system meeting CCPA, FAIR, and HL7 standards.
 
 ### Enterprise AI & ML Solutions Architect
-
 **Amazon Web Services** | Atlanta, GA | Aug 2018 – May 2021
 
 - Architected and integrated AI/ML solutions on AWS for Fortune 500 customers including Cox Enterprises, Equifax, NCR, Accenture, and Deloitte, providing prescriptive guidance on secure, scalable, and performant application design.
@@ -60,14 +54,12 @@ Principal AI Engineer and Architect with 15 years of experience delivering enter
 - Built executive relationships driving AWS adoption and revenue while acting as technical liaison between customers and AWS service teams to deliver customer-driven product improvements.
 
 ### Advanced Analytics Consultant
-
 **Slalom Consulting** | Atlanta, GA | Jul 2015 – Jan 2018
 
 - Delivered a behavioral healthcare application generating $2M+ in revenue, enabling nurses across dozens of Georgia facilities to collect and visualize patient care data using C#, Azure, Power BI, and XAML.
 - Recognized nationally as a subject matter expert in NLP and machine learning; operationalized data science experiments from isolated environments to cloud-based production systems on Microsoft Azure.
 
 ### Senior Support Engineer
-
 **Microsoft** | Charlotte, NC | Jul 2012 – Mar 2014
 
 - Delivered advanced technical troubleshooting for Fortune 100 customers (Chevron, Walmart, Disney, BlueCross BlueShield) across SharePoint environments supporting tens of thousands of users.
@@ -78,7 +70,6 @@ Principal AI Engineer and Architect with 15 years of experience delivering enter
 ## Education
 
 ### BS in Computer Science (AI Emphasis) & BA in Cognitive Science (AI Foundation)
-
 **University of Georgia** | 2008 – 2012
 Graduated Cum Laude · Dean's List · Interdisciplinary Certificates in New Media and Music Business
 
@@ -118,9 +109,7 @@ Graduated Cum Laude · Dean's List · Interdisciplinary Certificates in New Medi
 ## Projects
 
 ### [COINSTAC: Federated Neuroinformatics Platform](http://coinstac.org)
-
 Architected an open-source federated analysis platform enabling decentralized neuroimaging and genomics research with differential privacy, supporting multi-site collaboration without exposing PHI.
 
 ### [Open-Source AI Agent Framework](https://github.com/Modular-Earth-LLC)
-
 Building local-first, privacy-preserving AI agents using Ollama, LangChain, n8n, and Neo4j to democratize access to career strategy and financial planning tools for working-class families.
