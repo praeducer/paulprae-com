@@ -15,14 +15,25 @@ export default function BackToTop() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Dispatch a scroll event after the smooth scroll completes so that
+    // SectionNav's scroll listener clears the active section highlight.
+    const onScrollEnd = () => {
+      if (window.scrollY < 1) {
+        window.dispatchEvent(new Event("scroll"));
+        window.removeEventListener("scroll", onScrollEnd);
+      }
+    };
+    window.addEventListener("scroll", onScrollEnd, { passive: true });
+  };
 
   return (
     <button
       type="button"
       onClick={scrollToTop}
       aria-label="Back to top"
-      className={`no-print fixed bottom-6 right-6 z-50 rounded-full bg-slate-900 p-2.5 text-white shadow-lg transition-all hover:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-slate-300 ${
+      className={`no-print fixed bottom-6 right-6 z-50 rounded-full bg-slate-900 p-2.5 text-white shadow-lg transition-all hover:bg-slate-700 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-slate-300 ${
         visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
       }`}
     >
