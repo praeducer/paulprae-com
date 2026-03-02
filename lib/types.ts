@@ -143,6 +143,7 @@ export interface CareerProfile {
   email: string;
   linkedin: string;
   website: string;
+  github?: string;
 }
 
 export interface CareerPosition {

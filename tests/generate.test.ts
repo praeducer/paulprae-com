@@ -192,6 +192,7 @@ describe("resume content quality (fixture)", () => {
   it("includes contact information", () => {
     expect(resume).toContain("paul@example.com");
     expect(resume).toContain("linkedin.com");
+    expect(resume).toContain("github.com");
     expect(resume).toContain("paulprae.com");
   });
 

@@ -191,8 +191,9 @@ export default function Home() {
                 Principal AI Engineer &amp; Solutions Architect
               </p>
             </div>
-            <nav aria-label="Resume downloads and contact links">
-              <div className="flex flex-wrap items-center gap-3 text-sm">
+            <nav aria-label="Resume downloads and contact links" className="space-y-2">
+              {/* Download buttons */}
+              <div className="flex flex-wrap items-center gap-2 text-sm">
                 <a
                   href={pdfPath}
                   download
@@ -200,7 +201,7 @@ export default function Home() {
                   className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-slate-900 px-3 py-1.5 text-white transition-colors hover:bg-slate-700 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-slate-300"
                 >
                   <DownloadIcon />
-                  Resume PDF{pdfSize && <span className="text-xs opacity-70">({pdfSize})</span>}
+                  PDF{pdfSize && <span className="text-xs opacity-70">({pdfSize})</span>}
                 </a>
                 <a
                   href={docxPath}
@@ -218,8 +219,11 @@ export default function Home() {
                   className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   <DownloadIcon />
-                  MD{mdSize && <span className="text-xs opacity-60">({mdSize})</span>}
+                  Markdown{mdSize && <span className="text-xs opacity-60">({mdSize})</span>}
                 </a>
+              </div>
+              {/* Contact links */}
+              <div className="flex flex-wrap items-center gap-3 text-sm">
                 {profile.email && (
                   <a
                     href={`mailto:${profile.email}`}
@@ -240,15 +244,17 @@ export default function Home() {
                     LinkedIn
                   </a>
                 )}
-                <a
-                  href="https://github.com/praeducer"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="View Paul Prae on GitHub"
-                  className="rounded-md px-1 py-0.5 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
-                >
-                  GitHub
-                </a>
+                {profile.github && (
+                  <a
+                    href={profile.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="View Paul Prae on GitHub"
+                    className="rounded-md px-1 py-0.5 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+                  >
+                    GitHub
+                  </a>
+                )}
               </div>
             </nav>
           </div>

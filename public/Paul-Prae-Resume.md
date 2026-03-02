@@ -4,7 +4,7 @@
 <!-- Generated: 2026-03-02T00:22:07.748Z | Model: claude-opus-4-6 | Tokens: 21295 -->
 # Paul Prae
 
-**Principal AI Engineer & Architect** | Buford, GA | hireme@paulprae.com | [linkedin.com/in/paulprae](https://www.linkedin.com/in/paulprae) | [paulprae.com](https://www.paulprae.com)
+**Principal AI Engineer & Architect** | Buford, GA | hireme@paulprae.com | [linkedin.com/in/paulprae](https://www.linkedin.com/in/paulprae) | [github.com/praeducer](https://github.com/praeducer) | [paulprae.com](https://www.paulprae.com)
 
 ---
 

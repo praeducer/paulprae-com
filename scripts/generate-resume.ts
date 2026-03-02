@@ -75,7 +75,7 @@ Output the resume using this exact structure:
 \`\`\`
 # [Full Name]
 
-**[Headline / Target Title]** | [Location] | [Email] | [LinkedIn URL] | [Website URL]
+**[Headline / Target Title]** | [Location] | [Email] | [LinkedIn URL] | [GitHub URL] | [Website URL]
 
 ---
 
