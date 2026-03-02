@@ -8,6 +8,8 @@ Only actionable coding/documentation tasks belong here.
 - [ ] Add a docs quality check script (local markdown links + required-doc ownership) and wire it into CI.
 - [x] Add CI workflow for `npm run lint`, `npm run format:check`, `npm test`, and `npm run build`.
 - [x] Add multi-stage deployment (local → preview → production) with GitHub Flow branching and CONTRIBUTING.md.
+- [x] Fix Vercel build failures (remove fragile ignoreCommand, decouple pipeline from website build).
+- [x] Add architecture documentation (CI badge, architecture diagram, Quick Start guide, graceful fallback).
 - [ ] Add a release checklist script/command for pipeline + verification before pushing to `main`.
 
 ## Pipeline Enhancements
