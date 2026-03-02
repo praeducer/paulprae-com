@@ -5,7 +5,6 @@
   "outputDirectory": "out",
   "cleanUrls": true,
   "trailingSlash": false,
-  "ignoreCommand": "[ -z \"$VERCEL_GIT_PREVIOUS_SHA\" ] && exit 1 || git diff $VERCEL_GIT_PREVIOUS_SHA HEAD --quiet -- data/generated/ app/ lib/ public/ next.config.ts package.json tailwind.config.ts vercel.json",
   "headers": [
     {
       "source": "/(.*)",
