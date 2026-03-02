@@ -1,5 +1,7 @@
 # paulprae.com — AI-Powered Career Platform
 
+[![CI](https://github.com/praeducer/paulprae-com/actions/workflows/ci.yml/badge.svg)](https://github.com/praeducer/paulprae-com/actions/workflows/ci.yml)
+
 A professional career platform that uses AI to generate, tailor, and present Paul Prae's experience as a Principal AI Engineer & Architect. Built with Next.js 16, TypeScript, and Claude AI.
 
 ## Overview
@@ -24,6 +26,31 @@ LinkedIn CSV Export → Ingestion Script → Claude API → Markdown Resume → 
 4. **Build** a responsive static site with Next.js that renders the Markdown resume
 5. **Deploy** automatically to Vercel on every push to `main`
 
+## Architecture
+
+The project has two independent workflows connected only by committed data files:
+
+```
+┌─────────────────────────────┬──────────────────────────────┐
+│   Resume Pipeline           │   Website Development        │
+│   (local-only)              │   (standard web workflow)    │
+├─────────────────────────────┼──────────────────────────────┤
+│ npm run pipeline            │ npm run dev / npm run build  │
+│ Requires: API key,          │ Requires: Node.js only       │
+│   pandoc, typst             │                              │
+│ Outputs: career-data.json,  │ Reads: committed data files  │
+│   resume .md, PDF, DOCX     │ Outputs: static HTML (out/)  │
+│ Frequency: When career      │ Frequency: Any UI/style      │
+│   data changes              │   change                     │
+└──────────────┬──────────────┴──────────────────────────────┘
+               │ committed to git
+               ▼
+       data/generated/career-data.json
+       data/generated/Paul-Prae-Resume.md
+```
+
+You can develop and deploy the website without touching the pipeline, and vice versa. The website gracefully handles missing pipeline outputs with a placeholder message.
+
 ## Tech Stack
 
 | Layer         | Technology                                     |
@@ -41,10 +68,23 @@ LinkedIn CSV Export → Ingestion Script → Claude API → Markdown Resume → 
 
 ## Getting Started
 
-### Prerequisites
+### Quick Start (Website Development Only)
 
-- Node.js 24+ (via nvm)
-- npm or pnpm
+No API key, no system dependencies — just Node.js:
+
+```bash
+git clone https://github.com/praeducer/paulprae-com.git
+cd paulprae-com
+npm install
+npm run dev        # → localhost:3000 (hot-reload with Turbopack)
+```
+
+The website reads committed data files and works out of the box. If you only need to make UI/style changes, this is all you need.
+
+### Full Pipeline Setup (Resume Generation)
+
+To regenerate resume content from LinkedIn data, you also need:
+
 - Anthropic API key ([console.anthropic.com](https://console.anthropic.com/))
 - Pandoc ([pandoc.org](https://pandoc.org/installing.html)) — for resume export
 - Typst ([typst.app](https://github.com/typst/typst)) — for PDF export
@@ -132,7 +172,7 @@ Verify: `pandoc --version && typst --version`
 ### 5. Run the Pipeline
 
 ```bash
-# Full pipeline: ingest → generate → export → build
+# Full pipeline: ingest → generate → export (no website build)
 npm run pipeline
 
 # Or run steps individually:
@@ -141,12 +181,13 @@ npm run generate    # Call Claude API → data/generated/Paul-Prae-Resume.md
 npm run export      # Convert to PDF + DOCX (requires pandoc + typst)
 npm run export:pdf  # PDF only
 npm run export:docx # DOCX only
-npm run build       # Next.js static export → out/
+npm run build       # Next.js static export → out/ (website only, no API key needed)
 
 # Composable sub-pipelines:
 npm run pipeline:content  # ingest → generate (AI steps only)
-npm run pipeline:render   # export → build (from existing markdown)
-npm run pipeline:deploy   # full pipeline + stage generated files for git
+npm run pipeline:render   # export (from existing markdown)
+npm run pipeline:full     # pipeline + build (convenience for full rebuild)
+npm run pipeline:deploy   # full pipeline + build + stage files for git
 
 # Force variants (skip freshness checks):
 npm run ingest:force      # Re-ingest even if inputs unchanged
@@ -179,8 +220,19 @@ npm run format:check  # Prettier check (CI-friendly)
 ### Local Development
 
 ```bash
-npm run dev         # Start dev server with Turbopack
+npm run dev         # Start dev server with Turbopack (localhost:3000)
 ```
+
+Hot-reload is enabled — edit any `.tsx`, `.css`, or `.ts` file and the browser updates instantly. No API key or pipeline setup needed for website development.
+
+**Common tasks:**
+
+| Task                   | Command                                                             | Notes                           |
+| ---------------------- | ------------------------------------------------------------------- | ------------------------------- |
+| Change CSS/layout      | Edit `app/globals.css` or `.tsx` files                              | Hot-reloads on `localhost:3000` |
+| Preview resume changes | `npm run generate && npm run approve`                               | Then refresh browser            |
+| Run tests              | `npm test`                                                          | 178+ tests, ~300ms              |
+| Check before push      | `npm run lint && npm run format:check && npm test && npm run build` | CI runs these too               |
 
 ### Repeating on a Fresh Machine
 
@@ -231,7 +283,7 @@ Vercel: PR preview deploy → review → merge to main → production deploy
 
 Custom-domain DNS operations are documented in [docs/domain-dns-runbook.md](docs/domain-dns-runbook.md).
 
-Vercel skips rebuilds when only docs or tooling files change (configured via `ignoreCommand` in `vercel.json`). The `ignoreCommand` uses `VERCEL_GIT_PREVIOUS_SHA` to compare against the last successful deployment, not just the previous commit — this prevents skipped builds when multi-commit pushes include both code and docs changes. The project uses `framework: null` in `vercel.json` because `output: 'export'` produces a plain static site that Vercel's Next.js adapter cannot serve directly.
+The project uses `framework: null` in `vercel.json` because `output: 'export'` produces a plain static site that Vercel's Next.js adapter cannot serve directly. Every push to `main` triggers a build — for a static site that builds in <5 seconds, this is simpler and more reliable than conditional skip logic.
 
 ## Project Structure
 

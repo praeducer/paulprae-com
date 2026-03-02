@@ -5,9 +5,21 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { stripHtmlComments } from "../lib/markdown";
 import { PATHS, RESUME_FILE_BASE } from "../lib/config";
-import careerData from "../data/generated/career-data.json";
+import type { CareerData } from "../lib/types";
 import BackToTop from "./components/BackToTop";
 import SectionNav from "./components/SectionNav";
+
+// ─── Career Data (optional — website works without pipeline outputs) ────────
+
+function loadCareerData(): CareerData | null {
+  try {
+    const filePath = path.join(process.cwd(), "data/generated/career-data.json");
+    const raw = fs.readFileSync(filePath, "utf-8");
+    return JSON.parse(raw) as CareerData;
+  } catch {
+    return null;
+  }
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -97,6 +109,7 @@ const markdownComponents: Components = {
 };
 
 export default function Home() {
+  const careerData = loadCareerData();
   const resumePath = PATHS.resumeOutput;
   let resumeMarkdown: string;
 
@@ -111,6 +124,21 @@ export default function Home() {
           <code className="bg-slate-100 px-2 py-0.5 rounded text-sm">npm run pipeline</code> after
           adding your LinkedIn data to{" "}
           <code className="bg-slate-100 px-2 py-0.5 rounded text-sm">data/sources/linkedin/</code>.
+        </p>
+      </main>
+    );
+  }
+
+  if (!careerData) {
+    return (
+      <main className="max-w-3xl mx-auto px-6 py-12">
+        <h1 className="text-2xl font-bold mb-4">paulprae.com</h1>
+        <p className="text-slate-600">
+          Career data not found. Run{" "}
+          <code className="bg-slate-100 px-2 py-0.5 rounded text-sm">npm run ingest</code> to
+          generate{" "}
+          <code className="bg-slate-100 px-2 py-0.5 rounded text-sm">career-data.json</code> from
+          your LinkedIn data.
         </p>
       </main>
     );

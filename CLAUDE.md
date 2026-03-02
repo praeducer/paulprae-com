@@ -87,11 +87,13 @@ The build pipeline transforms raw career data into a deployed site:
 7. git push          → Vercel auto-deploys from main branch
 ```
 
-**Full pipeline shortcut:** `npm run pipeline` (runs ingest → generate → export → build sequentially)
+**Full pipeline shortcut:** `npm run pipeline` (runs ingest → generate → export)
 
 **Content review workflow:** `npm run generate` → `npm run compare` → `npm run approve` → `npm run export`
 
-**Composable sub-pipelines:** `pipeline:content` (ingest + generate), `pipeline:render` (export + build), `pipeline:deploy` (full + git stage)
+**Composable sub-pipelines:** `pipeline:content` (ingest + generate), `pipeline:render` (export), `pipeline:full` (pipeline + build), `pipeline:deploy` (full + git stage)
+
+**Pipeline vs Website:** The pipeline and website are independent. `npm run pipeline` produces data files; `npm run build` compiles the website from committed files. No API key needed for website development.
 
 **Staging/Approved decoupling:** Generation writes to `.staging.md`; the website and export read from the approved `.md`. This prevents regeneration from overwriting reviewed content. First-time generation auto-approves.
 
@@ -103,9 +105,11 @@ The build pipeline transforms raw career data into a deployed site:
 
 See [README.md](README.md#5-run-the-pipeline) for the full command reference. Quick shortcuts:
 
-- `npm run pipeline` — full pipeline: ingest → generate → export → build
+- `npm run pipeline` — full pipeline: ingest → generate → export (no build)
+- `npm run build` — website only (reads committed data, no API key)
+- `npm run pipeline:full` — pipeline + build (convenience)
 - `npm run brand` — generate brand assets (OG image, favicons) if missing
-- `npm test` — run all 160+ tests
+- `npm test` — run all 178+ tests
 - `npm run lint && npm run format:check` — verify code quality
 
 ## Phase 2 Preview (Do Not Implement Yet)

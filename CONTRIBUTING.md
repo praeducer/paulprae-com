@@ -59,6 +59,7 @@ chore/<name>      # Tooling, CI, dependency updates (e.g., chore/upgrade-next)
 - CI must pass before merge
 - Keep branches short-lived (days, not weeks)
 - Delete branches after merge
+- **Never** use `git commit --amend` on pushed commits — force pushes orphan SHAs that Vercel and CI depend on
 
 ## Commit Messages
 
