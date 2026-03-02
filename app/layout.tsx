@@ -41,6 +41,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://paulprae.com",
   },
+  manifest: "/manifest.json",
+  other: {
+    "theme-color": "#0f172a",
+  },
 };
 
 function PersonJsonLd() {
@@ -51,13 +55,21 @@ function PersonJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
+    "@id": "https://paulprae.com/#person",
     name: profile.name,
     url: profile.website || "https://paulprae.com",
+    image: "https://paulprae.com/og-image.png",
     email: profile.email,
     jobTitle: recentPosition?.title || profile.headline,
     description: metadata.description,
     sameAs: [profile.linkedin, "https://github.com/praeducer"].filter(Boolean),
     knowsAbout: careerData.skills.slice(0, 20),
+    ...(recentPosition && {
+      worksFor: {
+        "@type": "Organization",
+        name: recentPosition.company,
+      },
+    }),
     ...(education && {
       alumniOf: {
         "@type": "EducationalOrganization",

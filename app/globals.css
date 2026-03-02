@@ -44,6 +44,17 @@
   @apply border-slate-200 my-6;
 }
 
+/* ─── Utility: hide scrollbar ─────────────────────────────────────────────
+   Used by the horizontal section nav to allow overflow without visible scrollbar */
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* ─── Print Styles ───────────────────────────────────────────────────────── */
 /* Clean PDF output when printing from browser (Cmd+P / Ctrl+P) */
 

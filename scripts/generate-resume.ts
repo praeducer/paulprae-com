@@ -111,7 +111,19 @@ Output the resume using this exact structure:
 
 ## Technical Skills
 
-[Organize into categories: AI/ML, Cloud & Infrastructure, Programming Languages, Data Engineering, Leadership & Strategy, etc. Use comma-separated lists within each category.]
+Each skill category MUST be its own paragraph separated by a blank line.
+Order categories by relevance to AI leadership roles:
+1. AI & Machine Learning (lead with this — most relevant to target roles)
+2. Cloud & Infrastructure
+3. Data Engineering
+4. Programming Languages
+5. AI Tools & Frameworks
+6. Leadership & Strategy
+
+Format each category as a bold label followed by a comma-separated list:
+**Category Name:** Skill 1, Skill 2, Skill 3
+
+IMPORTANT: Insert a blank line between each category so they render as separate paragraphs.
 
 ---
 
@@ -123,14 +135,15 @@ Output the resume using this exact structure:
 
 ## Projects
 
-### [Project Title]
-[Description. Emphasize technical complexity, leadership, and outcomes.]
+### [Project Title](URL if available)
+[Description. Emphasize technical complexity, leadership, and outcomes. If a URL exists for the project (e.g., GitHub repo), make the title a markdown hyperlink.]
 
 ---
 
 ## Publications
 
-- **[Publication Name]** — [Publisher] ([Date]): [Brief description]
+- **[Publication Name](URL)** — [Publisher] ([Date]): [Brief description]
+- If a URL is available in the publication data, make the publication name a markdown hyperlink.
 \`\`\`
 
 ## Quality Criteria

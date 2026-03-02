@@ -24,6 +24,15 @@ Only actionable coding/documentation tasks belong here.
 - [ ] Add reusable UI component foundation for chat/resume tooling in `components/`.
 - [ ] Add configurable knowledge path constants only when structured retrieval is implemented.
 
+## UX Enhancements (deferred from Phase 1 review)
+
+- [ ] Add dark mode support — CSS-only `prefers-color-scheme` as quick-add, or full theme provider with localStorage toggle for Phase 2.
+- [ ] Add professional headshot to header/OG image (requires obtaining a photo asset).
+- [ ] Add highlight reel badges (e.g., "15+ Years", "Fortune 500", "50M+ Members") below the header — significant layout change better suited for Phase 2 component library.
+- [ ] Add skill-tier visualization (chips, progress bars, or tag clouds) — advanced layout deferred; Phase 1 uses blank-line-separated categories.
+- [ ] Add contact chips/badges styling (pill-shaped Email/LinkedIn/GitHub links) — nice-to-have lift for Phase 2 component system.
+- [ ] Add `<time>` element wrapping for date patterns in resume body (e.g., "Sep 2025 – Present") — complex regex; consider as SEO micro-optimization.
+
 ## MCP Expansion (when corresponding stack exists)
 
 - [ ] Add Sentry MCP when production monitoring is enabled.

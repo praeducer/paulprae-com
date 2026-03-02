@@ -1,0 +1,13 @@
+{
+  "name": "Paul Prae — Principal AI Engineer & Solutions Architect",
+  "short_name": "Paul Prae",
+  "description": "Building AI agents that ship AI products. AI-powered career platform.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any" },
+    { "src": "/apple-touch-icon.png", "type": "image/png", "sizes": "180x180" }
+  ]
+}
