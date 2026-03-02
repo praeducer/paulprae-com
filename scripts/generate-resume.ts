@@ -140,8 +140,8 @@ IMPORTANT: Insert a blank line between each category so they render as separate 
 
 ## Publications
 
-- **[Publication Name](URL)** — [Publisher] ([Date]): [Brief description]
-- If a URL is available in the publication data, make the publication name a markdown hyperlink.
+### [Publication Name](URL)
+[Publisher] ([Date]). [Brief description of contribution and significance. If a URL exists, make the title a markdown hyperlink.]
 \`\`\`
 
 ## Quality Criteria

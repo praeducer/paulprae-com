@@ -15,7 +15,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { stripHtmlComments } from "../lib/markdown.js";
+import { stripHtmlComments, stripHeaderBlock } from "../lib/markdown.js";
 import { SAMPLE_RESUME_MD, SAMPLE_RESUME_CLEAN } from "./fixtures/sample-data.js";
 
 // ─── Markdown Comment Stripping ─────────────────────────────────────────────
@@ -48,6 +48,37 @@ describe("HTML comment stripping", () => {
 
   it("handles empty input", () => {
     expect(stripHtmlComments("")).toBe("");
+  });
+});
+
+// ─── Header Block Stripping ─────────────────────────────────────────────────
+// page.tsx strips the H1 + contact line + first HR so the sticky header doesn't
+// duplicate. This logic lives in stripHeaderBlock() in lib/markdown.ts.
+
+describe("stripHeaderBlock()", () => {
+  it("strips H1, contact line, and first HR", () => {
+    const input = "# Name\n\n**Title** | email\n\n---\n\n## Summary\n\nText.";
+    expect(stripHeaderBlock(input)).toBe("## Summary\n\nText.");
+  });
+
+  it("keeps content after the first --- when multiple exist", () => {
+    const input = "# Name\n\n---\n\n## Section\n\nContent\n\n---\n\nMore.";
+    expect(stripHeaderBlock(input)).toBe("## Section\n\nContent\n\n---\n\nMore.");
+  });
+
+  it("returns original markdown when no --- separator exists", () => {
+    const input = "# Name\n\nNo separator here.";
+    expect(stripHeaderBlock(input)).toBe(input);
+  });
+
+  it("handles empty string", () => {
+    expect(stripHeaderBlock("")).toBe("");
+  });
+
+  it("works correctly on the sample resume fixture", () => {
+    const body = stripHeaderBlock(SAMPLE_RESUME_CLEAN);
+    expect(body).not.toContain("# Paul Prae");
+    expect(body).toMatch(/^## Professional Summary/);
   });
 });
 

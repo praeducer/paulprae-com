@@ -6,10 +6,13 @@
 
 :root {
   color-scheme: light dark;
-  /* --header-height is set dynamically by SectionNav's ResizeObserver.
-     Fallback 61px matches the header at wide (sm+) viewports. */
+  /* --header-height and --nav-height are set dynamically by SectionNav's
+     ResizeObserver. --sticky-offset drives both scroll-padding-top and
+     the JS active-section threshold.
+     --nav-height defaults to 0 because the nav is hidden on mobile
+     (sm:block hidden) — JS sets the real value after hydration. */
   --header-height: 61px;
-  --nav-height: 45px;
+  --nav-height: 0px;
   --sticky-offset: calc(var(--header-height) + var(--nav-height));
 }
 

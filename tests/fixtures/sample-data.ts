@@ -358,7 +358,8 @@ Generates resumes from career data using Claude AI. Built with TypeScript, Next.
 
 ## Publications
 
-- **Scaling AI Pipelines in Healthcare** — IEEE (Mar 2022): Technical paper on ML deployment in healthcare settings.
+### Scaling AI Pipelines in Healthcare
+IEEE (Mar 2022). Technical paper on ML deployment in healthcare settings.
 `;
 
 /** Resume markdown stripped of HTML comments (as page.tsx renders it). */
