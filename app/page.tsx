@@ -197,7 +197,7 @@ export default function Home() {
                   href={pdfPath}
                   download
                   aria-label="Download resume as PDF"
-                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-slate-900 px-3 py-1.5 text-white hover:bg-slate-700 transition-colors dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-slate-300"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-slate-900 px-3 py-1.5 text-white transition-colors hover:bg-slate-700 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-slate-300"
                 >
                   <DownloadIcon />
                   Resume PDF{pdfSize && <span className="text-xs opacity-70">({pdfSize})</span>}
@@ -206,7 +206,7 @@ export default function Home() {
                   href={docxPath}
                   download
                   aria-label="Download resume as DOCX"
-                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 transition-colors dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   <DownloadIcon />
                   DOCX{docxSize && <span className="text-xs opacity-60">({docxSize})</span>}
@@ -215,7 +215,7 @@ export default function Home() {
                   href={mdPath}
                   download
                   aria-label="Download resume as Markdown"
-                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 transition-colors dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   <DownloadIcon />
                   MD{mdSize && <span className="text-xs opacity-60">({mdSize})</span>}
@@ -224,7 +224,7 @@ export default function Home() {
                   <a
                     href={`mailto:${profile.email}`}
                     aria-label="Send email to Paul Prae"
-                    className="text-slate-500 hover:text-slate-900 transition-colors dark:text-slate-400 dark:hover:text-slate-100"
+                    className="rounded-md px-1 py-0.5 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
                   >
                     Email
                   </a>
@@ -235,7 +235,7 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="View Paul Prae on LinkedIn"
-                    className="text-slate-500 hover:text-slate-900 transition-colors dark:text-slate-400 dark:hover:text-slate-100"
+                    className="rounded-md px-1 py-0.5 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
                   >
                     LinkedIn
                   </a>
@@ -245,7 +245,7 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="View Paul Prae on GitHub"
-                  className="text-slate-500 hover:text-slate-900 transition-colors dark:text-slate-400 dark:hover:text-slate-100"
+                  className="rounded-md px-1 py-0.5 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
                 >
                   GitHub
                 </a>
@@ -269,14 +269,14 @@ export default function Home() {
       </main>
 
       <footer className="no-print max-w-3xl mx-auto px-6 pb-8 pt-4 border-t border-slate-200 dark:border-slate-800">
-        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-slate-600 dark:text-slate-400">
           <p>
             &copy; {new Date().getFullYear()} {profile.name} &mdash; AI-generated resume &mdash;{" "}
             <a
               href="https://github.com/praeducer/paulprae-com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-500 hover:text-slate-700 underline dark:text-slate-400 dark:hover:text-slate-200"
+              className="text-slate-600 underline hover:text-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:rounded focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-200"
             >
               view pipeline on GitHub
             </a>

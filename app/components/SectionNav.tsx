@@ -73,14 +73,14 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
     <nav
       ref={navRef}
       aria-label="Resume sections"
-      className="no-print sticky top-0 z-30 overflow-x-clip border-b border-slate-200/80 bg-white/95 backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-950/95"
+      className="no-print sticky top-0 z-30 hidden overflow-x-clip border-b border-slate-200/80 bg-white/95 backdrop-blur-sm sm:block dark:border-slate-700/80 dark:bg-slate-950/95"
     >
       <div className="mx-auto flex max-w-3xl items-center gap-1 overflow-x-auto px-6 py-1.5 text-xs scrollbar-none">
         {sections.map((s) => (
           <a
             key={s.id}
             href={`#${s.id}`}
-            className={`shrink-0 rounded-md px-3 py-2 transition-colors ${
+            className={`shrink-0 rounded-md px-3 py-2.5 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none ${
               activeId === s.id
                 ? "bg-slate-900 text-white dark:bg-slate-200 dark:text-slate-900"
                 : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
