@@ -6,6 +6,11 @@
 
 :root {
   color-scheme: light dark;
+  --header-height: 61px;
+}
+
+html {
+  scroll-padding-top: 105px;
 }
 
 /* ─── Resume Prose Overrides ─────────────────────────────────────────────── */
@@ -17,6 +22,7 @@
 
 .resume-prose h2 {
   @apply text-lg font-semibold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mt-8 mb-4;
+  scroll-margin-top: 105px;
 }
 
 .resume-prose h3 {

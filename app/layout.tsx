@@ -80,7 +80,7 @@ function PersonJsonLd() {
     url: profile.website || "https://paulprae.com",
     image: "https://paulprae.com/og-image.png",
     email: profile.email,
-    jobTitle: recentPosition?.title || profile.headline,
+    jobTitle: "Principal AI Engineer & Solutions Architect",
     description: metadata.description,
     sameAs: [profile.linkedin, "https://github.com/praeducer"].filter(Boolean),
     knowsAbout: careerData.skills.slice(0, 20),

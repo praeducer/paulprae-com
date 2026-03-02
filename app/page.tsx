@@ -71,43 +71,6 @@ function extractSections(markdown: string): { id: string; label: string }[] {
  * To regenerate: edit scripts/generate-resume.ts and run npm run generate
  */
 
-// ─── Markdown component overrides ────────────────────────────────────────────
-// Customizes how react-markdown renders specific HTML elements.
-
-const markdownComponents: Components = {
-  // Suppress the resume's # H1 — the page header already provides the H1.
-  // The markdown keeps its H1 for PDF/DOCX export (Pandoc reads it).
-  h1: () => null,
-
-  // Add id slugs to H2 headings for deep-linking and section navigation.
-  h2: ({ children, ...props }) => {
-    const text = String(children ?? "");
-    const id = text
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-    return (
-      <h2 id={id} {...props}>
-        {children}
-      </h2>
-    );
-  },
-
-  // Open external links in a new tab with security attributes.
-  a: ({ href, children, ...props }) => {
-    const isExternal = href?.startsWith("http");
-    return (
-      <a
-        href={href}
-        {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-        {...props}
-      >
-        {children}
-      </a>
-    );
-  },
-};
-
 export default function Home() {
   const careerData = loadCareerData();
   const resumePath = PATHS.resumeOutput;
@@ -170,6 +133,62 @@ export default function Home() {
   // Extract section headings for the navigation bar
   const sections = extractSections(cleanMarkdown);
 
+  // ─── Markdown component overrides ──────────────────────────────────────────
+  // Defined inside Home() so closures can suppress duplicate header content.
+  // The resume markdown starts with: # H1 → contact info <p> → <hr> → ## sections
+  // The sticky header already displays the name and contact links, so suppress
+  // the H1, the contact line, and the separator from the rendered body.
+  let suppressCount = 0;
+
+  const markdownComponents: Components = {
+    h1: () => {
+      suppressCount = 2; // suppress next <p> (contact line) + <hr> (separator)
+      return null;
+    },
+
+    h2: ({ children, ...props }) => {
+      const text = String(children ?? "");
+      const id = text
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+      return (
+        <h2 id={id} {...props}>
+          {children}
+        </h2>
+      );
+    },
+
+    p: ({ children, ...props }) => {
+      if (suppressCount > 0) {
+        suppressCount--;
+        return null;
+      }
+      return <p {...props}>{children}</p>;
+    },
+
+    hr: ({ ...props }) => {
+      if (suppressCount > 0) {
+        suppressCount--;
+        return null;
+      }
+      return <hr {...props} />;
+    },
+
+    a: ({ href, children, ...props }) => {
+      const isExternal = href?.startsWith("http");
+      return (
+        <a
+          href={href}
+          {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          {...props}
+        >
+          {children}
+        </a>
+      );
+    },
+  };
+
   return (
     <>
       {/* Skip navigation — visible only on keyboard focus */}
@@ -197,7 +216,7 @@ export default function Home() {
                   href={pdfPath}
                   download
                   aria-label="Download resume as PDF"
-                  className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-3 py-1.5 text-white hover:bg-slate-700 transition-colors dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-slate-300"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-slate-900 px-3 py-1.5 text-white hover:bg-slate-700 transition-colors dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-slate-300"
                 >
                   <DownloadIcon />
                   Resume PDF{pdfSize && <span className="text-xs opacity-70">({pdfSize})</span>}
@@ -206,7 +225,7 @@ export default function Home() {
                   href={docxPath}
                   download
                   aria-label="Download resume as DOCX"
-                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 transition-colors dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 transition-colors dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   <DownloadIcon />
                   DOCX{docxSize && <span className="text-xs opacity-60">({docxSize})</span>}
@@ -215,7 +234,7 @@ export default function Home() {
                   href={mdPath}
                   download
                   aria-label="Download resume as Markdown"
-                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 transition-colors dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 transition-colors dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   <DownloadIcon />
                   MD{mdSize && <span className="text-xs opacity-60">({mdSize})</span>}
@@ -269,14 +288,14 @@ export default function Home() {
       </main>
 
       <footer className="no-print max-w-3xl mx-auto px-6 pb-8 pt-4 border-t border-slate-200 dark:border-slate-800">
-        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-slate-400 dark:text-slate-500">
+        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-slate-500 dark:text-slate-400">
           <p>
             &copy; {new Date().getFullYear()} {profile.name} &mdash; AI-generated resume &mdash;{" "}
             <a
               href="https://github.com/praeducer/paulprae-com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 hover:text-slate-600 underline dark:text-slate-500 dark:hover:text-slate-300"
+              className="text-slate-500 hover:text-slate-700 underline dark:text-slate-400 dark:hover:text-slate-200"
             >
               view pipeline on GitHub
             </a>
