@@ -396,6 +396,9 @@ function enrichProfileFromKnowledge(data: CareerData, knowledgeDir: string): voi
     if (!data.profile.website && kbProfile.website) {
       data.profile.website = kbProfile.website;
     }
+    if (!data.profile.github && kbProfile.github) {
+      data.profile.github = kbProfile.github;
+    }
 
     console.log("   🔗 Enriched profile from knowledge base (career/profile.json)");
   } catch {

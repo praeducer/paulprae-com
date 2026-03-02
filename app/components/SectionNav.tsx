@@ -36,36 +36,37 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
     return () => ro.disconnect();
   }, []);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // Find the first section that is intersecting (visible)
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-            break;
-          }
-        }
-      },
-      { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
-    );
-
-    for (const section of sections) {
-      const el = document.getElementById(section.id);
-      if (el) observer.observe(el);
-    }
-
-    return () => observer.disconnect();
-  }, [sections]);
-
-  // Clear active section highlight when scrolled near the top of the page
+  // Track active section via scroll position. This replaces IntersectionObserver
+  // which had non-deterministic entry ordering (causing off-by-one highlights).
+  // The last section whose heading top is at or above the sticky offset is active.
   useEffect(() => {
     const onScroll = () => {
-      if (window.scrollY < 100) setActiveId("");
+      if (window.scrollY < 100) {
+        setActiveId("");
+        return;
+      }
+
+      // Read the sticky offset from CSS custom properties (set by ResizeObserver above)
+      const headerH = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue("--header-height") || "0",
+      );
+      const navH = navRef.current?.offsetHeight ?? 0;
+      const threshold = headerH + navH + 32; // sticky offset + breathing room
+
+      let current = "";
+      for (const section of sections) {
+        const el = document.getElementById(section.id);
+        if (el && el.getBoundingClientRect().top <= threshold) {
+          current = section.id;
+        }
+      }
+      setActiveId(current);
     };
+
     window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll(); // Set initial state on mount
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [sections]);
 
   if (sections.length === 0) return null;
 

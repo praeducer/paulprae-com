@@ -68,6 +68,7 @@ describe("career-data.json", () => {
     expect(data!.profile.linkedin).toBeTruthy();
     expect(data!.profile.website).toBeTruthy();
     expect(data!.profile.email).toBeTruthy();
+    expect(data!.profile.github).toBeTruthy();
   });
 
   it.skipIf(!data)("has expected number of positions (10+)", () => {
