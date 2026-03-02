@@ -397,7 +397,8 @@ async function generate(): Promise<GenerationResult> {
 
   // Auto-approve on first run: if no approved version exists yet, copy staging → approved
   // so the pipeline works out-of-the-box for new setups without requiring manual approval.
-  if (!fs.existsSync(PATHS.resumeOutput)) {
+  const isFirstGeneration = !fs.existsSync(PATHS.resumeOutput);
+  if (isFirstGeneration) {
     fs.copyFileSync(PATHS.resumeStaging, PATHS.resumeOutput);
     console.log("   📋 First generation — auto-approved (no previous version existed).");
   }
@@ -440,12 +441,12 @@ async function generate(): Promise<GenerationResult> {
     console.log(`      Warnings: ${validationWarnings.length} quality check(s) flagged`);
   }
   console.log(`\n   📝 Written to staging: ${PATHS.resumeStaging}`);
-  if (fs.existsSync(PATHS.resumeOutput)) {
+  if (isFirstGeneration) {
+    console.log("   📋 Auto-approved as first generation.\n");
+  } else {
     console.log(
       "   💡 Run 'npm run compare' to review changes, then 'npm run approve' to go live.\n",
     );
-  } else {
-    console.log("   📋 Auto-approved as first generation.\n");
   }
 
   return result;

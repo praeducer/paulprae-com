@@ -91,7 +91,7 @@ npm run pipeline:content  # Just: ingest → generate
 npm run pipeline:render   # Just: export → build
 ```
 
-Generated files that should be committed: `data/generated/career-data.json`, `data/generated/Paul-Prae-Resume.md`, `public/Paul-Prae-Resume.*`
+Generated files that should be committed: `data/generated/career-data.json`, `data/generated/<Name>-Resume.md` (filename derived from profile name), `public/<Name>-Resume.*`
 
 ## Code Quality
 
@@ -116,7 +116,7 @@ CI runs all four checks on every PR. All must pass to merge.
 
 ## Resume Content Changes
 
-The resume markdown is **generated** — don't edit `Paul-Prae-Resume.md` directly. To change content:
+The resume markdown is **generated** — don't edit the resume `.md` file directly. To change content:
 
 1. Edit `scripts/generate-resume.ts` (prompt, formatting, data processing)
 2. Run `npm run generate` (writes to staging)

@@ -301,8 +301,14 @@ async function compare(): Promise<void> {
     }
 
     const letters = frontMatters.map((_, i) => String.fromCharCode(65 + i));
-    const choicePrompt = `\n   Choose: ${letters.map((l, i) => `[${l}] ${frontMatters[i].label}`).join("  ")}  [S] Skip\n   > `;
+    const choicePrompt = `\n   Choose: ${letters.map((l, i) => `[${l}] ${frontMatters[i].label}`).join("  ")}  [S] Skip  [Q] Quit\n   > `;
     const answer = await askChoice(rl, choicePrompt);
+
+    if (answer === "Q") {
+      console.log("\n   Quitting without saving.\n");
+      rl.close();
+      return;
+    }
 
     const idx = answer.charCodeAt(0) - 65;
     if (idx >= 0 && idx < frontMatters.length) {
