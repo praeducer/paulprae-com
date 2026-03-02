@@ -10,7 +10,7 @@
 
 ## Professional Summary
 
-Principal AI Engineer and Architect with 15+ years of experience building enterprise AI, machine learning, and data platform solutions for healthcare, life sciences, and financial services. Architected HIPAA-compliant agentic AI systems at scale — from a medication-optimization platform serving 50M+ health plan members to federated neuroimaging research published in peer-reviewed journals. Delivered high-impact AI solutions at Amazon Web Services, Microsoft, Booz Allen Hamilton, and Slalom Consulting for Fortune 500 clients including Cox Enterprises, Equifax, and BlueCross BlueShield. Brings full-stack depth across cloud infrastructure, generative AI, and MLOps with proven ability to lead engineering teams, define AI strategy, and translate complex technical capabilities into measurable business outcomes.
+Principal AI Engineer and Architect with 15 years of experience delivering enterprise AI, machine learning, and data platform solutions across healthcare, life sciences, and financial services. Proven track record at Amazon Web Services, Microsoft, Booz Allen Hamilton, and Slalom Consulting serving Fortune 500 clients including Cox Enterprises, Equifax, and BlueCross BlueShield. Currently architecting HIPAA-compliant AI agents and petabyte-scale healthcare data platforms serving 50M+ health plan members. Combines deep expertise in cloud infrastructure, generative AI, and multi-agent systems with healthcare domain knowledge, responsible AI governance, and engineering team leadership.
 
 ---
 
@@ -19,49 +19,51 @@ Principal AI Engineer and Architect with 15+ years of experience building enterp
 ### Staff AI DataOps Engineer
 **Arine** | Remote | Sep 2025 – Present
 
-Arine is a WEF Technology Pioneer whose AI-driven medication-optimization platform serves 45+ health plans covering 50M members.
-
-- Designed the AI DataOps Toolkit — an agentic development framework with reference architectures and governance standards — and led enablement workshops training 100+ engineers on AI-first software development practices.
-- Developed HIPAA-compliant AI coding assistants including a Data Engineering Agent that autonomously generates, deploys, and tests ETL pipelines, and a Dev Environment Setup Agent that eliminated multi-day onboarding friction.
-- Built an observability pipeline monitoring Arine's autonomous pharmacist AI agent — ingesting production behavior data from DynamoDB into Snowflake via dbt transformations and surfacing performance metrics in QuickSight dashboards.
-- Managed the enterprise data platform on Snowflake and AWS, processing petabytes of healthcare data from hundreds of heterogeneous sources to support downstream ML/AI systems core to the company's products.
+- Designed and maintained the AI DataOps Toolkit — an agentic development framework and interactive knowledge base — equipping a data services organization supporting 45+ health plans and 50M+ members with AI development tools, governance standards, and reference architectures.
+- Developed HIPAA-compliant AI coding assistants that transformed data operations into an AI-augmented practice, including a Data Engineering Agent that autonomously generated, deployed, and tested ETL pipelines and a Dev Environment Setup Agent that eliminated multi-day onboarding delays.
+- Led AI enablement workshops training up to 100 engineers on AI-first software development with Cursor AI, Claude Code, and GitHub Copilot, accelerating organization-wide generative AI adoption.
+- Built an observability pipeline monitoring Arine's autonomous pharmacist AI agent — ingesting production behavior data from DynamoDB into Snowflake, transforming with dbt, and visualizing performance metrics in QuickSight dashboards.
+- Managed the enterprise data platform on Snowflake and AWS, processing petabytes of healthcare data from hundreds of heterogeneous sources to support downstream ML systems core to clinical decision support products.
 
 ### Chief AI Architect, Senior Manager
 **Booz Allen Hamilton** | Atlanta, GA | Jul 2024 – Mar 2025
 
 - Led development and operationalization of AI and analytics solutions enabling healthcare and life science clients to harness clinical, behavioral, and genomic data for population health and predictive medicine.
-- Directed cross-functional teams in designing and deploying AI products while mitigating algorithmic bias and ensuring HIPAA compliance across healthcare and life science engagements.
+- Designed and deployed AI software products for regulated healthcare environments, mitigating risks including algorithmic bias and privacy breaches while meeting clinical and regulatory requirements.
+- Advised cross-functional teams on AI strategy, translating rapidly evolving clinical, regulatory, and technological needs into production-ready solutions driving measurable client outcomes.
 
 ### Neuroinformatics Data Platform Architect
 **TReNDS Center** | Atlanta, GA | Jan 2022 – Sep 2023
 
-- Led technical development of COINSTAC, an open-source federated analysis platform for neuroimaging and genomics data with differential privacy — co-authoring a peer-reviewed publication in Frontiers in Neuroinformatics.
-- Architected AWS cloud infrastructure with GPU-focused compute for deep learning; drove platform commercialization through SBIR grant writing, open-source contributor recruitment, and industry partnerships.
+- Served as tech lead and architect for COINSTAC, an open-source federated analysis platform processing neuroimaging and genomics data with differential privacy algorithms ensuring PHI protection across distributed research institutions.
+- Architected AWS cloud infrastructure including GPU-focused deep learning compute; co-authored a peer-reviewed publication in *Frontiers in Neuroinformatics* demonstrating federated analysis capabilities.
+- Drove platform commercialization through SBIR grant writing, open-source contributor recruitment, and industry partnerships while leading Agile ceremonies as Scrum master.
 
 ### Chief AI Officer, Founder
 **Hyperbloom** | United States | Jan 2020 – Sep 2025
 
-- Grew an AI consulting practice from a $40K investment to $1.4M ARR, delivering cloud-based AI and data solutions to healthcare, life science, and financial services clients.
-- Architected disaster recovery and data governance solutions for clinical trial software supporting 10,000+ research sites across 45 countries with 5.5M monthly remote monitoring activities.
-- Designed a genomics data lake on AWS (S3, Glue, CloudWatch) automating VCF-to-Parquet transformations and migrating a client from on-premises HPC to production-ready cloud infrastructure.
+- Founded and scaled an AI consulting practice to $1.4M ARR from a $40K investment, delivering cloud-based AI and data solutions to healthcare, life science, and financial services clients.
+- Architected disaster recovery solutions for clinical trial software supporting 10,000+ research sites across 45 countries processing 5.5M monthly remote monitoring activities.
+- Designed HIPAA/GDPR-compliant data platforms including a genomics data lake on AWS (S3, Glue, CloudWatch) and a blockchain-based life science data exchange system meeting CCPA, FAIR, and HL7 standards.
 
 ### Enterprise AI & ML Solutions Architect
 **Amazon Web Services** | Atlanta, GA | Aug 2018 – May 2021
 
-- Architected AI/ML solutions for Fortune 500 customers including Cox Enterprises, Equifax, NCR, Accenture, and Deloitte while serving as a nationally recognized subject matter expert in artificial intelligence and machine learning.
-- Authored technical white papers, reference architectures, and proof of concepts delivering prescriptive guidance on secure, scalable AI system design using SageMaker, Lex, and Comprehend.
-- Built deep executive relationships driving technical and business strategy; served as a technical liaison between enterprise customers and AWS service teams to accelerate product adoption and revenue growth.
+- Architected and integrated AI/ML solutions on AWS for Fortune 500 customers including Cox Enterprises, Equifax, NCR, Accenture, and Deloitte, providing prescriptive guidance on secure, scalable, and performant application design.
+- Engaged nationally as a subject matter expert in AI and machine learning, authoring technical white papers, reference architectures, and proof-of-concept implementations using SageMaker, Lex, and Comprehend.
+- Built executive relationships driving AWS adoption and revenue while acting as technical liaison between customers and AWS service teams to deliver customer-driven product improvements.
 
 ### Advanced Analytics Consultant
 **Slalom Consulting** | Atlanta, GA | Jul 2015 – Jan 2018
 
-- Led development of a behavioral healthcare application (C#, Azure, Power BI) that generated $2M+ in revenue while improving patient care quality across dozens of Georgia facilities.
-- Earned national recognition as an NLP and ML subject matter expert; predicted demand for behavioral health crisis services statewide and delivered a chatbot platform assessment for a Fortune 100 insurance company.
+- Delivered a behavioral healthcare application generating $2M+ in revenue, enabling nurses across dozens of Georgia facilities to collect and visualize patient care data using C#, Azure, Power BI, and XAML.
+- Recognized nationally as a subject matter expert in NLP and machine learning; operationalized data science experiments from isolated environments to cloud-based production systems on Microsoft Azure.
 
 ### Senior Support Engineer
 **Microsoft** | Charlotte, NC | Jul 2012 – Mar 2014
 
-- Delivered advanced technical troubleshooting for hundreds of high-impact web applications and server farms serving tens of thousands of users at Fortune 100 customers including Chevron, Walmart, and BlueCross BlueShield. Graduated from the Microsoft Academy for College Hires; nominated for "Entrepreneur of the Year" (2013).
+- Delivered advanced technical troubleshooting for Fortune 100 customers (Chevron, Walmart, Disney, BlueCross BlueShield) across SharePoint environments supporting tens of thousands of users.
+- Automated deployment and testing workflows using PowerShell and C#; nominated for Global Business Support's "Entrepreneur of the Year" (2013).
 
 ---
 
