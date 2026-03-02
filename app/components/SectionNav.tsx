@@ -80,7 +80,7 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
           <a
             key={s.id}
             href={`#${s.id}`}
-            className={`shrink-0 rounded-md px-3 py-2.5 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none ${
+            className={`inline-flex min-h-[44px] shrink-0 items-center rounded-md px-3 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none ${
               activeId === s.id
                 ? "bg-slate-900 text-white dark:bg-slate-200 dark:text-slate-900"
                 : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
