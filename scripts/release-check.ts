@@ -273,6 +273,19 @@ function checkBuildOutput(): CheckResult {
   };
 }
 
+function checkDocs(): CheckResult {
+  const start = Date.now();
+  const { ok, output } = runCommand("npx", ["tsx", "scripts/validate-docs.ts"]);
+  return {
+    name: "Docs",
+    passed: ok,
+    detail: ok
+      ? "all links valid, required docs present"
+      : output.split("\n").slice(0, 3).join(" | "),
+    durationMs: Date.now() - start,
+  };
+}
+
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 function main(): void {
@@ -291,6 +304,7 @@ function main(): void {
 
   if (!quickMode) {
     // Phase 2: Code quality (skip in quick mode)
+    results.push(checkDocs());
     results.push(checkLint());
     results.push(checkFormat());
     results.push(checkTests());

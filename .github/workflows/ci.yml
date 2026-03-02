@@ -22,6 +22,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Validate documentation
+        run: npm run validate:docs
+
       - name: Lint
         run: npm run lint
 
