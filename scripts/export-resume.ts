@@ -120,7 +120,10 @@ function fixDocxCompatibility(docxPath: string): void {
 
     // Patch word/settings.xml to add compatibility mode
     const settingsPath = path.join(extractDir, "word", "settings.xml");
-    if (!fs.existsSync(settingsPath)) return;
+    if (!fs.existsSync(settingsPath)) {
+      console.warn("      ⚠️  word/settings.xml not found in DOCX; skipping compatibility fix");
+      return;
+    }
 
     let settings = fs.readFileSync(settingsPath, "utf-8");
 
@@ -182,7 +185,9 @@ function exportDocx(markdown: string): void {
       fixDocxCompatibility(PATHS.docxOutput);
     } catch (err: unknown) {
       // Non-fatal: the DOCX is still usable, just may show the compat warning
-      console.warn(`      ⚠️  DOCX compatibility fix skipped: ${extractStderr(err)}`);
+      console.warn(
+        `      ⚠️  DOCX compatibility fix failed (file still usable): ${extractStderr(err)}`,
+      );
     }
 
     const stats = fs.statSync(PATHS.docxOutput);
