@@ -167,13 +167,13 @@ export default function Home() {
               {profile.headline.split("|")[0].trim()}
             </p>
           </div>
-          {/* Row 2: Contact links */}
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+          {/* Row 2: Contact + Downloads — unified text-style links */}
+          <div className="mt-1 flex flex-wrap items-center gap-x-0.5 gap-y-0.5">
             {profile.email && (
               <a
                 href={`mailto:${profile.email}`}
                 aria-label="Send email to Paul Prae"
-                className="inline-flex min-h-[44px] items-center rounded-md px-2 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+                className="inline-flex min-h-[44px] items-center rounded-md px-2 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
               >
                 Email
               </a>
@@ -184,7 +184,7 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="View Paul Prae on LinkedIn"
-                className="inline-flex min-h-[44px] items-center rounded-md px-2 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+                className="inline-flex min-h-[44px] items-center rounded-md px-2 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
               >
                 LinkedIn
               </a>
@@ -195,43 +195,44 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="View Paul Prae on GitHub"
-                className="inline-flex min-h-[44px] items-center rounded-md px-2 text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+                className="inline-flex min-h-[44px] items-center rounded-md px-2 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
               >
                 GitHub
               </a>
             )}
-          </div>
-          {/* Row 3: Resume downloads */}
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
-            <span className="text-xs font-medium tracking-wide uppercase text-slate-400 dark:text-slate-500">
-              Resume
+            {/* Separator between contact and download groups */}
+            <span
+              aria-hidden="true"
+              className="select-none px-1 text-xs text-slate-300 dark:text-slate-600"
+            >
+              ·
             </span>
             <a
               href={pdfPath}
               download
               aria-label="Download resume as PDF"
-              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-slate-900 px-3 py-1.5 text-white transition-colors hover:bg-slate-700 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-slate-300"
+              className="inline-flex min-h-[44px] items-center gap-1 rounded-md px-2 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
             >
               <DownloadIcon />
-              PDF{pdfSize && <span className="text-xs opacity-70">({pdfSize})</span>}
+              PDF{pdfSize && <span className="opacity-60">({pdfSize})</span>}
             </a>
             <a
               href={docxPath}
               download
               aria-label="Download resume as DOCX"
-              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="inline-flex min-h-[44px] items-center gap-1 rounded-md px-2 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
             >
               <DownloadIcon />
-              DOCX{docxSize && <span className="text-xs opacity-60">({docxSize})</span>}
+              DOCX{docxSize && <span className="opacity-60">({docxSize})</span>}
             </a>
             <a
               href={mdPath}
               download
               aria-label="Download resume as Markdown"
-              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="inline-flex min-h-[44px] items-center gap-1 rounded-md px-2 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
             >
               <DownloadIcon />
-              Markdown{mdSize && <span className="text-xs opacity-60">({mdSize})</span>}
+              MD{mdSize && <span className="opacity-60">({mdSize})</span>}
             </a>
           </div>
         </div>

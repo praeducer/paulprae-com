@@ -93,10 +93,10 @@ Use [Conventional Commits](https://www.conventionalcommits.org/) style:
 
 [optional body explaining why, not what]
 
-Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>   # if AI-assisted
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>   # if AI-assisted
 ```
 
-**Types:** `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `style`
+**Types:** `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `style`, `design`
 
 **Examples:**
 
@@ -119,6 +119,8 @@ Generated files that should be committed: `data/generated/career-data.json`, `da
 
 ## Code Quality
 
+A **pre-commit hook** runs automatically on every `git commit`. It formats staged files with Prettier before the commit is recorded, so formatting issues never reach CI. It is installed by `npm install` via the `prepare` lifecycle hook — no extra setup needed.
+
 Run the release checklist before pushing:
 
 ```bash
@@ -131,7 +133,7 @@ Or run individual checks:
 ```bash
 npm run lint          # ESLint
 npm run format:check  # Prettier
-npm test              # Vitest (190+ tests)
+npm test              # Vitest (245+ tests)
 npm run build         # Next.js static export
 ```
 
