@@ -53,19 +53,19 @@ You can develop and deploy the website without touching the pipeline, and vice v
 
 ## Tech Stack
 
-| Layer         | Technology                                     |
-| ------------- | ---------------------------------------------- |
-| Framework     | Next.js 16 (App Router, TypeScript, Turbopack) |
-| Styling       | Tailwind CSS 4.x                               |
-| Markdown      | react-markdown + remark-gfm                    |
-| AI Generation | Anthropic Claude API (Opus 4.6)                |
-| Validation    | Zod (schema validation)                        |
-| Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF)              |
-| Linting       | ESLint 9 + eslint-config-next + Prettier       |
-| Testing       | Vitest (190+ unit and integration tests)       |
-| Analytics     | Vercel Analytics + Speed Insights (no cookies) |
-| Deployment    | Vercel (free tier, auto-deploy from GitHub)    |
-| Dev Tooling   | Claude Code CLI + Cursor                       |
+| Layer         | Technology                                                     |
+| ------------- | -------------------------------------------------------------- |
+| Framework     | Next.js 16 (App Router, TypeScript, Turbopack)                 |
+| Styling       | Tailwind CSS 4.x                                               |
+| Markdown      | react-markdown + remark-gfm                                    |
+| AI Generation | Anthropic Claude API (Opus 4.6)                                |
+| Validation    | Zod (schema validation)                                        |
+| Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF)                              |
+| Linting       | ESLint 9 + eslint-config-next + Prettier + husky + lint-staged |
+| Testing       | Vitest (245+ unit and integration tests)                       |
+| Analytics     | Vercel Analytics + Speed Insights (no cookies)                 |
+| Deployment    | Vercel (free tier, auto-deploy from GitHub)                    |
+| Dev Tooling   | Claude Code CLI + Cursor                                       |
 
 ## Getting Started
 
@@ -218,6 +218,8 @@ npm run format        # Prettier format all files
 npm run format:check  # Prettier check (CI-friendly)
 ```
 
+A **pre-commit hook** runs automatically on every `git commit` (installed via `npm install`). It runs Prettier on staged files only, so formatting issues are fixed before they reach CI. No extra setup needed — husky wires it in via the `prepare` npm lifecycle hook.
+
 ### Pre-Push Checklist
 
 ```bash
@@ -241,7 +243,7 @@ Hot-reload is enabled — edit any `.tsx`, `.css`, or `.ts` file and the browser
 | ---------------------- | -------------------------------------- | ------------------------------------ |
 | Change CSS/layout      | Edit `app/globals.css` or `.tsx` files | Hot-reloads on `localhost:3000`      |
 | Preview resume changes | `npm run generate && npm run approve`  | Then refresh browser                 |
-| Run tests              | `npm test`                             | 190+ tests, ~300ms                   |
+| Run tests              | `npm test`                             | 245+ tests, ~300ms                   |
 | Check before push      | `npm run check`                        | Full CI-equivalent + data validation |
 
 ### Repeating on a Fresh Machine
