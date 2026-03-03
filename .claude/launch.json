@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "wsl",
+      "runtimeArgs": ["bash", "-lc", "source ~/.nvm/nvm.sh && cd /home/praeducer/dev/paulprae-com && npx next dev --port 3001"],
+      "port": 3001
+    }
+  ]
+}

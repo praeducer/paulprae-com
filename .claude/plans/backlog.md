@@ -2,20 +2,27 @@
 
 Only actionable coding/documentation tasks belong here.
 
-## Phase 1 Follow-ups (next)
+> Last reconciled: 2026-03-03 against local git history and current `main` working tree.
 
-- [x] Add privacy-preserving analytics (Vercel Analytics + Speed Insights) with note in `README.md`.
-- [x] Add a docs quality check script (`validate-docs.ts`) and wire it into CI.
-- [x] Add CI workflow for `npm run lint`, `npm run format:check`, `npm test`, and `npm run build`.
-- [x] Add multi-stage deployment (local → preview → production) with GitHub Flow branching and CONTRIBUTING.md.
-- [x] Fix Vercel build failures (remove fragile ignoreCommand, decouple pipeline from website build).
-- [x] Add architecture documentation (CI badge, architecture diagram, Quick Start guide, graceful fallback).
-- [x] Add a release checklist script/command for pipeline + verification before pushing to `main`.
+## Repository State (completed)
+
+- [x] Merge PR #11 (`Claude/fix word formatting and improve sticky header layout`) into `main`.
+- [x] Merge PR #12 (`fix: address Copilot review — safer DOCX repackaging and robust tests`) into `main`.
+- [x] Delete stale remote branches: `claude/fix-word-formatting-aWxHa`, `claude/test-github-connection-tOmsE`, `fix/header-layout-nav-uat`, `fix/nav-buttons-layout-github`.
+- [x] Delete stale local branches for the same remotes.
+- [x] Delete no-op branch `claude/copilot-review-fixes-aWxHa` after confirming its tree was identical to `main` (no net file diff).
+- [x] Confirm only `main` remains both locally and on `origin`.
+
+## Branch Review Follow-ups (open)
+
+- [ ] Add `github: z.string().optional()` to `CareerDataSchema` in `scripts/ingest-linkedin.ts` so runtime validation matches `CareerProfile`.
+- [ ] Add targeted unit tests for `enrichProfileFromKnowledge` in `tests/ingest.test.ts` (linkedin/website/email/github enrichment).
+- [x] Keep GitHub header link WCAG touch target compliant (`min-h-[44px]`) in `app/page.tsx` (verified on current `main`).
 
 ## Pipeline Enhancements
 
-- [x] Add resume comparison and approval pipeline (`npm run compare`, `npm run approve`) — staging/approved decoupling with interactive CLI and optional LLM-as-judge scoring.
-- [ ] Add job description comparison CLI (`npm run compare:jobs`) with stakeholder persona voting (FAANG Hiring Manager, Healthcare CTO, Technical Recruiter, VP of Engineering) and weighted scoring algorithm. Decoupled from `compare-resumes.ts`.
+- [x] Add resume comparison and approval pipeline (`npm run compare`, `npm run approve`) with staging/approved decoupling.
+- [ ] Add job description comparison CLI (`npm run compare:jobs`) with stakeholder persona voting and weighted scoring.
 - [ ] Add tailored resume generation flags (`--job-url` and `--job-text`) with output `resume-tailored.{md,pdf,docx}`.
 - [ ] Add pipeline metrics output (`tokens`, `cost`, `latency`, artifact sizes) to a gitignored metrics file.
 - [ ] Add optional JSON Resume export from `career-data.json`.
@@ -29,12 +36,12 @@ Only actionable coding/documentation tasks belong here.
 
 ## UX Enhancements (deferred from Phase 1 review)
 
-- [x] Add dark mode support — CSS-only `prefers-color-scheme` with Tailwind `dark:` variants. Phase 2: add JS toggle with localStorage persistence.
+- [x] Add dark mode support (CSS-only `prefers-color-scheme` + Tailwind `dark:` variants).
 - [ ] Add professional headshot to header/OG image (requires obtaining a photo asset).
-- [ ] Add highlight reel badges (e.g., "15+ Years", "Fortune 500", "50M+ Members") below the header — significant layout change better suited for Phase 2 component library.
-- [ ] Add skill-tier visualization (chips, progress bars, or tag clouds) — advanced layout deferred; Phase 1 uses blank-line-separated categories.
-- [ ] Add contact chips/badges styling (pill-shaped Email/LinkedIn/GitHub links) — nice-to-have lift for Phase 2 component system.
-- [ ] Add `<time>` element wrapping for date patterns in resume body (e.g., "Sep 2025 – Present") — complex regex; consider as SEO micro-optimization.
+- [ ] Add highlight reel badges below the header (defer to Phase 2 component work).
+- [ ] Add skill-tier visualization (chips/progress bars/tag clouds; currently plain grouped lists).
+- [ ] Add contact chips/badges styling for Email/LinkedIn/GitHub links.
+- [ ] Add `<time>` element wrapping for date ranges in resume body as optional SEO micro-optimization.
 
 ## MCP Expansion (when corresponding stack exists)
 
