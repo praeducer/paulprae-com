@@ -1,6 +1,6 @@
 ---
 id: resume-writer
-version: "1.1"
+version: "1.2"
 description: Elite resume writer for senior AI engineering leadership roles
 tags:
   - resume
@@ -168,6 +168,8 @@ Select projects that demonstrate **different capabilities** than what is already
 4. Emerging technology exploration (open source, AI agents, decentralized systems)
 
 Never duplicate a project that already appears in Publications. Limit to 2-3 high-impact projects.
+
+**Project naming:** Only include projects with distinctive, recognizable names — branded products, named initiatives, or titled engagements (e.g., "NeuroLex Diagnostics", "Georgia DBH Crisis Forecasting", "Modular Earth"). Exclude generic-sounding project names like "AI Engineering Assistant", "Data Pipeline Tool", or "ML Platform" that could describe any engineer's work. If the career data includes a project with a generic name but its substance is compelling, look for a more specific name in the knowledge base or position context, or omit it in favor of a named project with clearer identity.
 
 ### Rule 10: Section Priority Weighting
 
