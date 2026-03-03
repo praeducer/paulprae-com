@@ -2,7 +2,7 @@
 
 ## Context
 
-The paulprae-com resume pipeline is a production-grade 4-stage system (ingest → generate → export → build) that transforms LinkedIn career data into an AI-generated resume via Claude Opus 4.6. Phase 1 is complete and deployed. The code is well-tested (245+ tests) and functional, but the AI layer was built pragmatically — the system prompt is embedded in a script, knowledge base schemas are ad-hoc, there's no AI service abstraction, and the architecture doesn't position for the next phase: a chat interface with dynamic resume generation, RAG over career data, and convergence with the [job-finding-assistant](https://github.com/Modular-Earth-LLC/job-finding-assistant) project's 6 AI skills.
+The paulprae-com resume pipeline is a production-grade 4-stage system (ingest → generate → export → build) that transforms LinkedIn career data into an AI-generated resume via Claude Opus 4.6. Phase 1 is complete and deployed. The code is well-tested (202 tests across 11 files) and functional, but the AI layer was built pragmatically — the system prompt is embedded in a script, knowledge base schemas are ad-hoc, there's no AI service abstraction, and the architecture doesn't position for the next phase: a chat interface with dynamic resume generation, RAG over career data, and convergence with the [job-finding-assistant](https://github.com/Modular-Earth-LLC/job-finding-assistant) project's 6 AI skills.
 
 This refactoring has three goals:
 
@@ -13,146 +13,233 @@ This refactoring has three goals:
 ### What prompted this
 
 - Knowledge base already contains `agents/agent-definitions.json` mapping to job-finding-assistant prompts — the bridge exists but isn't utilized
-- System prompt (166 lines) is embedded in `generate-resume.ts` — not versionable, not reusable, not testable as a standalone asset
+- System prompt (118 lines) is embedded in `generate-resume.ts` — not versionable, not reusable, not testable as a standalone asset
 - Knowledge base has 3+ incompatible schemas (KnowledgeEntry, raw arrays, structured career data) — needs standardization before pgvector
 - No telemetry beyond console.log — can't track prompt quality, cost trends, or cache effectiveness
-- `ingest-linkedin.ts` is 958 lines — monolithic, mixing CSV parsing, date normalization, knowledge loading, and Zod validation
+- `ingest-linkedin.ts` is 959 lines — monolithic, mixing CSV parsing, date normalization, knowledge loading, and Zod validation
 
 ---
 
-## Phase A: Prompt Architecture — Extract, Version, Structure
+## Stakeholder Review Summary
+
+This plan was reviewed by 5 stakeholder personas. Key changes from their feedback:
+
+| Stakeholder      | Role                     | Key Feedback Incorporated                                                                                                                          |
+| ---------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Maya Chen**    | VP Engineering           | Added rollback strategy, reduced Phase C from 6→3 modules, added test import migration table, realistic time estimates                             |
+| **Raj Patel**    | Staff AI/ML Engineer     | Config inheritance instead of duplication, two-tier AI client API, configurable few-shot examples, empirical testing before context format changes |
+| **Sarah Kim**    | DevOps/Platform Engineer | CI impact analysis per phase, telemetry rotation, YAML dependency evaluation, explicit `_testExports` migration strategy                           |
+| **David Torres** | Product Manager          | Reordered phases for business value (F first), deferred Phase D to Phase 2, cut Phase H as premature documentation                                 |
+| **Lisa Wang**    | QA Lead                  | Added test strategy for AI service layer, snapshot test for context engineering, negative tests for validation, test count targets per phase       |
+
+---
+
+## Rollback Strategy
+
+**After each phase:** Create a tagged commit (`refactor/phase-X-complete`). If the next phase breaks CI:
+
+1. Run `npm test` and `npm run check:quick` to identify failures
+2. If unfixable within 30 minutes, revert to the last phase tag
+3. Root-cause the failure before reattempting
+
+**Git discipline:** Each phase is a single PR or commit series. Never mix phases in one commit.
+
+---
+
+## Phase 1: Prompt Quality Improvements (Highest Business Value)
+
+**Goal:** Better resume output — the only Phase 1 deliverable recruiters see.
+
+**Rationale (David Torres feedback):** Infrastructure refactoring is invisible to end users. Start with what directly improves the product.
+
+### 1.1. Add few-shot examples to system prompt
+
+Add 2-3 examples of strong vs weak resume bullets directly in the `SYSTEM_PROMPT` constant in `generate-resume.ts`:
+
+```markdown
+## Examples of Strong Position Bullets
+
+Weak: "Worked on machine learning projects"
+Strong: "Designed and deployed 3 production ML models serving 50M+ health plan members,
+reducing manual clinical review time by 40% and generating $2M+ in annual value"
+
+Weak: "Led a team of engineers"
+Strong: "Led cross-functional team of 8 engineers delivering HIPAA-compliant AI agents
+across 45+ health plans, reducing manual data operations by 60%"
+```
+
+**Config option (Raj Patel feedback):** Add a `INCLUDE_FEW_SHOT` constant (default `true`) so Phase 2 chat skills can omit examples to save tokens per conversation turn.
+
+### 1.2. Add section priority guidance
+
+Add explicit priority weighting to the system prompt:
+
+- Professional Summary: Most critical — screened first by recruiters
+- Experience: Core content — most resume real estate
+- Skills: ATS gating — must include target keywords
+- Certifications/Projects/Publications: Supporting evidence — selective inclusion
+
+### 1.3. Strengthen output format validation
+
+Strengthen `validateResumeOutput()`:
+
+- Check for markdown link syntax validity
+- Verify date format consistency (Mon YYYY)
+- Check for forbidden patterns (first-person "I", passive voice markers)
+- Count action verbs per position (should be ≥2)
+
+### 1.4. Tests for new validation rules
+
+Add both positive and negative test cases (Lisa Wang feedback):
+
+- Test that valid resumes pass all new checks
+- Test that first-person "I" is caught
+- Test that passive voice markers are caught
+- Test that missing action verbs are caught
+- Test that invalid markdown links are caught
+
+**Quality gate:** Run current pipeline, apply prompt changes, regenerate, compare with `npm run compare -- --judge`. Document scores.
+
+**Files modified:** `scripts/generate-resume.ts`, `tests/generate.test.ts`
+**Tests added:** ~8 (target: 210 total)
+**Tag:** `refactor/phase-1-complete`
+
+---
+
+## Phase 2: Backlog Bug Fixes
+
+**Goal:** Clear open backlog items that touch the pipeline. Zero risk, immediate value.
+
+### 2.1. Add `github` to CareerDataSchema
+
+In `scripts/ingest-linkedin.ts` (the Zod schema section):
+
+- Add `github: z.string().optional()` to the profile schema
+- Currently `CareerProfile` interface has `github?: string` but Zod schema doesn't validate it
+
+### 2.2. Add enrichProfileFromKnowledge tests
+
+In `tests/ingest.test.ts`:
+
+- Test linkedin URL enrichment from knowledge base
+- Test website enrichment
+- Test email enrichment
+- Test github enrichment
+- Test that existing values are not overwritten
+
+**Files modified:** `scripts/ingest-linkedin.ts`, `tests/ingest.test.ts`
+**Tests added:** ~6 (target: 216 total)
+**Tag:** `refactor/phase-2-complete`
+
+---
+
+## Phase 3: Prompt Architecture — Extract, Version, Structure
 
 **Goal:** Prompts become first-class assets — versionable files that map 1:1 to future Anthropic Agent Skills.
 
-### A1. Create prompt file format
+### 3.1. Create prompt file format
 
 Create `lib/prompts/` directory with markdown-based prompt files:
 
 ```
 lib/prompts/
-  resume-writer.system.md      ← extracted from generate-resume.ts line 49-166
-  resume-writer.config.json    ← model settings (currently in lib/config.ts CLAUDE object)
-  README.md                    ← documents the prompt format convention
+  resume-writer.system.md      ← extracted from generate-resume.ts SYSTEM_PROMPT
+  resume-writer.config.json    ← prompt-specific overrides only (see 3.1a)
 ```
 
 **Prompt file format** (`resume-writer.system.md`):
 
-- YAML frontmatter with metadata: `id`, `version`, `model`, `description`, `tags`
+- YAML frontmatter with metadata: `id`, `version`, `description`, `tags`
 - Body is the raw system prompt text (no code, no TypeScript)
 - This maps directly to how Anthropic Agent Skills package instructions
 
-**Config file** (`resume-writer.config.json`):
+**YAML dependency decision (Sarah Kim feedback):** Use `gray-matter` (309B gzipped, zero dependencies, already widely used in Next.js ecosystems) for frontmatter parsing. The alternative — putting metadata in `.config.json` — loses co-location with the prompt text and makes the format non-standard.
+
+**Config inheritance (Raj Patel feedback):** The prompt config file contains **only overrides**, not duplicates of `lib/config.ts` CLAUDE values:
 
 ```json
 {
-  "model": "claude-opus-4-6",
-  "maxTokens": 32768,
-  "thinking": { "type": "adaptive" },
-  "effort": "max",
-  "cacheSystemPrompt": true
+  "cacheSystemPrompt": true,
+  "includeFewShot": true
 }
 ```
 
-### A2. Create prompt loader utility
+The loader merges: `{ ...CLAUDE_DEFAULTS, ...promptConfig }`. Global model/maxTokens/thinking/effort stay in `lib/config.ts` as the single source of truth. Prompt-specific configs only override when they need different values.
+
+### 3.2. Create prompt loader utility
 
 Create `lib/prompts/loader.ts`:
 
 - `loadPrompt(id: string)` → returns `{ systemPrompt: string, config: PromptConfig, metadata: PromptMetadata }`
-- Parses YAML frontmatter from `.system.md` files
-- Loads corresponding `.config.json`
+- Parses YAML frontmatter from `.system.md` files via `gray-matter`
+- Loads corresponding `.config.json` (optional — uses defaults if missing)
+- Merges prompt config with global `CLAUDE` config from `lib/config.ts`
 - Add `PromptConfig` and `PromptMetadata` types to `lib/types.ts`
-- Validates config with Zod (fail fast on invalid model/token settings)
+- Validates config with Zod (fail fast on invalid settings)
 
-### A3. Refactor generate-resume.ts
+### 3.3. Refactor generate-resume.ts
 
-- Remove embedded `SYSTEM_PROMPT` constant (lines 49-166)
+- Remove embedded `SYSTEM_PROMPT` constant (118 lines)
 - Replace with `loadPrompt("resume-writer")` call
 - Add `promptVersion` field to `GenerationResult` type (tracks which prompt version produced each output)
 - Embed prompt version in the HTML comment header of generated resume files
 - Keep `buildUserMessage()` in the script (it's data-specific, not a prompt)
 
-### A4. Update tests
+### 3.4. Update tests
 
-- `tests/generate.test.ts`: Update tests that reference `_testExports.SYSTEM_PROMPT` to use `loadPrompt()`
-- Add `tests/prompts.test.ts`: Test prompt loading, frontmatter parsing, config validation
-- Add prompt regression test: hash the system prompt content and assert stability (catches accidental edits)
+**Import migration (Maya Chen + Lisa Wang feedback):**
 
-**Files created:** `lib/prompts/resume-writer.system.md`, `lib/prompts/resume-writer.config.json`, `lib/prompts/loader.ts`, `lib/prompts/README.md`, `tests/prompts.test.ts`
+| Old import                                                 | New import                                 |
+| ---------------------------------------------------------- | ------------------------------------------ |
+| `_testExports.SYSTEM_PROMPT` (8 tests in generate.test.ts) | `loadPrompt("resume-writer").systemPrompt` |
+
+- `tests/generate.test.ts`: Update the 8 system prompt quality tests to use `loadPrompt()`
+- Add `tests/prompts.test.ts` with comprehensive edge cases:
+  - Happy path: load valid prompt with frontmatter + config
+  - Missing file: throws descriptive error
+  - Malformed YAML frontmatter: throws parse error
+  - Empty prompt body: throws validation error
+  - Missing config file: falls back to global defaults
+  - Invalid config values: Zod rejects unknown models
+  - Prompt regression: hash the system prompt content and assert stability (catches accidental edits)
+
+**CI impact (Sarah Kim feedback):** No CI changes needed — new test files are auto-discovered by Vitest. New `lib/` files are auto-covered by existing ESLint config.
+
+**Files created:** `lib/prompts/resume-writer.system.md`, `lib/prompts/resume-writer.config.json`, `lib/prompts/loader.ts`, `tests/prompts.test.ts`
 **Files modified:** `scripts/generate-resume.ts`, `lib/types.ts`, `tests/generate.test.ts`
-**Files deleted:** None
-**Net effect:** ~166 lines removed from generate-resume.ts, ~80 lines added to loader.ts + types, prompt file is ~170 lines of pure markdown
+**New dependency:** `gray-matter` (YAML frontmatter parser)
+**Tests added:** ~12 (target: 228 total)
+**Net effect:** ~118 lines removed from generate-resume.ts, ~80 lines added to loader.ts + types, prompt file is ~130 lines of pure markdown
+**Tag:** `refactor/phase-3-complete`
 
 ---
 
-## Phase B: AI Service Layer — Thin, Typed, Observable
+## Phase 4: Ingest Decomposition — Focused Modules
 
-**Goal:** Encapsulate Anthropic SDK patterns (streaming, caching, error handling, telemetry) in a reusable service. Not a framework — just clean DRY patterns.
+**Goal:** Break the 959-line monolith into composable, testable modules.
 
-### B1. Create AI client module
+### 4.1. Extract utilities module
 
-Create `lib/ai/client.ts`:
+Create `lib/ingest/utils.ts` **(Maya Chen feedback — merge small modules):**
 
-- `createClient()` → wraps `new Anthropic()` with env validation
-- `generateWithPrompt(promptId, userMessage, options?)` → loads prompt, calls API with streaming, returns typed result
-- Encapsulates: streaming setup, `stream.finalMessage()`, thinking block extraction, cache stat reporting, error classification (401/429/529)
-- Returns `GenerationResponse` type with: `text`, `thinkingTokens`, `usage`, `cacheStats`, `durationMs`, `stopReason`, `promptVersion`
+Consolidate small extractions that don't justify separate files:
 
-### B2. Create telemetry module
+- `MONTH_MAP`, `normalizeDate()`, `normalizeDateOrNull()` (45 lines from dates)
+- `stripBOM()`, `parseLinkedInCsv<T>()`, `extractZipArchive()` (25 lines from CSV)
+- `safeString()` helper
+- `CareerDataSchema` Zod schema, `buildStats()` (110 lines from validation)
 
-Create `lib/ai/telemetry.ts`:
+Total: ~180 lines. All utility/infrastructure functions in one place.
 
-- `GenerationTelemetry` type: tokens, cost estimate, cache hits, duration, model, prompt version, timestamp
-- `logGeneration(telemetry)` → structured JSON to `data/generated/.telemetry.jsonl` (gitignored, append-only)
-- `estimateCost(usage)` → calculate dollar cost from token counts and model pricing
-- Console output formatter for human-readable summaries (replaces current ad-hoc console.log block in generate-resume.ts lines 443-462)
-
-### B3. Refactor generate-resume.ts to use AI service
-
-- Replace lines 327-375 (API call, streaming, block extraction) with `generateWithPrompt("resume-writer", buildUserMessage(careerData))`
-- Replace lines 426-462 (telemetry logging) with telemetry module calls
-- Replace lines 489-506 (error handling) with AI client's classified errors
-- `generate()` function drops from ~210 lines to ~80 lines
-
-### B4. Update compare-resumes.ts
-
-- If `compare-resumes.ts` uses Claude for LLM scoring, refactor it to use the same AI client
-- Ensure `compare:judge` benefits from the service layer
-
-**Files created:** `lib/ai/client.ts`, `lib/ai/telemetry.ts`, `lib/ai/index.ts` (barrel export)
-**Files modified:** `scripts/generate-resume.ts`, `scripts/compare-resumes.ts`
-**Net effect:** generate-resume.ts drops from 506 to ~300 lines. AI patterns become reusable for Phase 2 chat.
-
----
-
-## Phase C: Ingest Decomposition — Focused Modules
-
-**Goal:** Break the 958-line monolith into composable, testable modules.
-
-### C1. Extract date utilities
-
-Create `lib/ingest/dates.ts`:
-
-- Move `MONTH_MAP`, `normalizeDate()` from ingest-linkedin.ts (lines 59-100)
-- Already well-tested with 4+ format variations
-- Reusable for any date normalization across the pipeline
-
-### C2. Extract CSV parsing
-
-Create `lib/ingest/csv.ts`:
-
-- Move BOM stripping, PapaParse wrapper, header normalization
-- Move ZIP extraction logic (Python3 zipfile call)
-- Export: `parseLinkedInCsv<T>(filePath)`, `extractZipArchive(zipPath, targetDir)`
-
-### C3. Extract normalizers
+### 4.2. Extract normalizers
 
 Create `lib/ingest/normalizers.ts`:
 
-- Move all 13 normalize functions: `normalizePositions()`, `normalizeEducation()`, `normalizeSkills()`, etc.
+- Move all 16 normalize functions: `normalizePositions()`, `normalizeEducation()`, `normalizeSkills()`, `normalizeCertifications()`, `normalizeProjects()`, `normalizePublications()`, `normalizeProfile()`, `extractEmail()`, `normalizeLanguages()`, `normalizeRecommendations()`, `normalizeHonors()`, `normalizeVolunteering()`, `normalizeCourses()`
 - Each takes raw LinkedIn rows → typed Career\* objects
-- Import `normalizeDate` from `dates.ts`, `safeString` as a local helper
+- Import `normalizeDate` from `utils.ts`
 
-### C4. Extract knowledge base loader
+### 4.3. Extract knowledge base loader
 
 Create `lib/ingest/knowledge.ts`:
 
@@ -160,121 +247,131 @@ Create `lib/ingest/knowledge.ts`:
 - Replace ad-hoc `isKnowledgeEntry()` type check with Zod `.safeParse()` using `KnowledgeEntrySchema`
 - Add `KnowledgeEntrySchema` to `lib/types.ts` (Zod version of the existing `KnowledgeEntry` interface)
 
-### C5. Extract validation
-
-Create `lib/ingest/validation.ts`:
-
-- Move `CareerDataSchema` (the Zod schema, currently defined inline in ingest-linkedin.ts)
-- Move `buildStats()` function
-- Export the Zod schema so it's importable by tests and other modules
-
-### C6. Slim down ingest-linkedin.ts
+### 4.4. Slim down ingest-linkedin.ts
 
 - Becomes an orchestrator: import modules → call in sequence → write output
 - Skip logic stays here (it's orchestration, not domain logic)
-- Target: ~150-200 lines (down from 958)
+- Target: ~150-200 lines (down from 959)
 
-### C7. Update tests
+### 4.5. Update tests — explicit import migration
 
-- `tests/ingest.test.ts`: Update imports from `_testExports` to direct module imports where possible
-- Tests should continue passing unchanged (same functions, new locations)
-- Add focused tests for knowledge base Zod validation (backlog item)
+**\_testExports migration table (Maya Chen + Lisa Wang feedback):**
 
-**Files created:** `lib/ingest/dates.ts`, `lib/ingest/csv.ts`, `lib/ingest/normalizers.ts`, `lib/ingest/knowledge.ts`, `lib/ingest/validation.ts`, `lib/ingest/index.ts`
+The 56 tests in `ingest.test.ts` currently import from `_testExports`. Strategy: **rewrite all imports to use direct module imports** (option A). The `_testExports` pattern on `ingest-linkedin.ts` becomes minimal (only orchestration functions). Sub-modules export directly.
+
+| Current `_testExports.*`                                                                                                                                                                                                                                                                     | New import source        | Tests affected |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | -------------- |
+| `normalizeDate`, `normalizeDateOrNull`, `safeString`, `stripBOM`                                                                                                                                                                                                                             | `lib/ingest/utils`       | 12 tests       |
+| `normalizePositions`, `normalizeEducation`, `normalizeSkills`, `normalizeCertifications`, `normalizeProjects`, `normalizePublications`, `normalizeProfile`, `extractEmail`, `normalizeLanguages`, `normalizeRecommendations`, `normalizeHonors`, `normalizeVolunteering`, `normalizeCourses` | `lib/ingest/normalizers` | 11 tests       |
+| `findJsonFiles`, `isKnowledgeEntry`, `wrapAsKnowledgeEntry`                                                                                                                                                                                                                                  | `lib/ingest/knowledge`   | 6 tests        |
+| `CareerDataSchema`                                                                                                                                                                                                                                                                           | `lib/ingest/utils`       | 10 tests       |
+
+Remaining `_testExports` on `ingest-linkedin.ts`: `shouldSkipIngest`, `ingest` (orchestration only).
+
+- Add focused tests for knowledge base Zod validation
+- Add barrel export: `lib/ingest/index.ts`
+
+**CI impact (Sarah Kim feedback):** No workflow changes. Vitest auto-discovers. ESLint auto-covers new `lib/` paths.
+
+**Files created:** `lib/ingest/utils.ts`, `lib/ingest/normalizers.ts`, `lib/ingest/knowledge.ts`, `lib/ingest/index.ts`
 **Files modified:** `scripts/ingest-linkedin.ts`, `lib/types.ts`, `tests/ingest.test.ts`
-**Net effect:** ingest-linkedin.ts drops from 958 to ~150-200 lines. Each module is independently testable.
+**Tests added:** ~5 (target: 233 total)
+**Net effect:** ingest-linkedin.ts drops from 959 to ~150-200 lines. 3 focused modules instead of 6 micro-modules.
+**Tag:** `refactor/phase-4-complete`
 
 ---
 
-## Phase D: Knowledge Base Schema Standardization
+## Phase 5: AI Service Layer — Thin, Typed, Observable
 
-**Goal:** One canonical schema for all knowledge entries — works for local JSON, pgvector embeddings, and RAG retrieval.
+**Goal:** Encapsulate Anthropic SDK patterns in a reusable service. Not a framework — just clean DRY patterns.
 
-### D1. Audit current knowledge base schemas
+**Depends on:** Phase 3 (prompt loader)
 
-Current state (28 files across 4 subdirectories):
+### 5.1. Create AI client module
 
-- `career/*.json` — Rich structured objects with `id`, `company_id`, `technologies`, `industries`, `sort_order` (NOT KnowledgeEntry format)
-- `brand/*.json` — Mix of string arrays (`brand-narratives.json`) and objects
-- `strategy/*.json` — Various structured objects
-- `agents/*.json` — Agent definitions with `id`, `role`, `purpose`, `prerequisites`, `outputs`, `source_prompt_file`
-- `content/*.json` — Various structured content
+Create `lib/ai/client.ts` **(Raj Patel feedback — two-tier API):**
 
-Only some files follow the `KnowledgeEntry` interface. The ingest currently wraps non-conforming files at load time.
+- `createClient()` → wraps `new Anthropic()` with env validation
+- **Tier 1 — Full pipeline:** `generateWithPrompt(promptId, userMessage, options?)` → loads prompt, calls API with streaming + thinking + caching, returns typed result
+- **Tier 2 — Simple call:** `callModel(systemPrompt, userMessage, options?)` → direct API call without streaming/thinking/caching (for LLM judging in compare-resumes.ts and other lightweight calls)
+- Both return `GenerationResponse` type with: `text`, `usage`, `durationMs`, `stopReason`
+- `generateWithPrompt` additionally returns: `thinkingTokens`, `cacheStats`, `promptVersion`
+- Error classification: `ApiKeyError` (401), `RateLimitError` (429), `OverloadError` (529), `GenerationError` (other)
 
-### D2. Design unified KnowledgeDocument type
+### 5.2. Create telemetry module
 
-Add to `lib/types.ts`:
+Create `lib/ai/telemetry.ts`:
 
-```typescript
-// Universal knowledge document — works for JSON files, pgvector rows, and RAG retrieval
-interface KnowledgeDocument {
-  id: string; // Stable identifier (e.g., "arine-staff-data-ops-2025")
-  category: string; // Taxonomy: "career", "brand", "strategy", "agent", "content"
-  subcategory: string; // Finer grain: "position", "narrative", "objective"
-  title: string; // Human-readable title
-  content: string; // Primary text content (for embedding/RAG)
-  metadata: Record<string, unknown>; // Structured data preserved from source
-  tags: string[]; // For filtering and retrieval
-  relatedPositions?: string[]; // Cross-reference to career positions
-  source: string; // File path or origin (for provenance)
-}
-```
+- `GenerationTelemetry` type: tokens, cost estimate, cache hits, duration, model, prompt version, timestamp
+- `logGeneration(telemetry)` → structured JSON to `data/generated/.telemetry.jsonl` (gitignored, append-only)
+- **Rotation (Sarah Kim feedback):** On write, if file exceeds 100 entries, truncate to most recent 50. Simple and prevents unbounded growth.
+- `estimateCost(usage)` → calculate dollar cost from token counts and model pricing
+- Console output formatter for human-readable summaries (replaces ad-hoc console.log block in generate-resume.ts)
 
-This is an evolution of `KnowledgeEntry`, not a replacement. The key additions:
+### 5.3. Refactor generate-resume.ts to use AI service
 
-- `id` — stable identifier for deduplication and cross-referencing (many files already have this)
-- `subcategory` — finer taxonomy (currently lost when wrapping arbitrary JSON)
-- `metadata` — preserves original structured data (currently flattened to string)
-- `source` — provenance tracking (which file did this come from)
+- Replace API call + streaming + block extraction with `generateWithPrompt("resume-writer", buildUserMessage(careerData))`
+- Replace telemetry logging with telemetry module calls
+- Replace error handling with AI client's classified errors
+- `generate()` function drops from ~210 lines to ~80 lines
 
-### D3. Add Zod schema for KnowledgeDocument
+### 5.4. Update compare-resumes.ts
 
-Create `KnowledgeDocumentSchema` in `lib/types.ts` — validates at ingest time.
-Create `KnowledgeEntrySchema` in `lib/types.ts` — validates the legacy format for backward compat.
+- Refactor `judgeSection()` to use `callModel()` (Tier 2) instead of raw Anthropic SDK
+- Ensure `compare:judge` benefits from the service layer
 
-### D4. Update knowledge loader
+### 5.5. Tests for AI service layer
 
-In `lib/ingest/knowledge.ts` (from Phase C4):
+**Test strategy (Lisa Wang feedback):**
 
-- Transform all source formats into `KnowledgeDocument` at load time
-- Career positions: `id` from source, `category: "career"`, `subcategory: "position"`, structured fields in `metadata`
-- Brand narratives: generate deterministic `id`, `category: "brand"`, `subcategory: "narrative"`, each string becomes a separate document
-- Agent definitions: `id` from source, `category: "agent"`, `subcategory: "definition"`, full definition in `metadata`
-- Validate with `KnowledgeDocumentSchema.safeParse()`
+Create `tests/ai-client.test.ts`:
 
-### D5. Update CareerData to use KnowledgeDocument
+- **Unit tests with mocked Anthropic client:** mock `client.messages.stream()` and `client.messages.create()` to return fixture responses
+- **Contract tests:** validate `GenerationResponse` shape matches expected type
+- **Error classification:** mock 401/429/529 responses, verify correct error types thrown
+- **Telemetry:** verify JSONL append format, rotation at 100 entries, cost estimation accuracy
 
-Change `knowledge: KnowledgeEntry[]` to `knowledge: KnowledgeDocument[]` in `CareerData`.
-Update `buildUserMessage()` in generate-resume.ts to format `KnowledgeDocument[]` for Claude.
+Create `tests/ai-telemetry.test.ts`:
 
-### D6. Migration: Convert knowledge base files (optional, future)
+- Telemetry write/read round-trip
+- Rotation behavior
+- Cost estimation for known token counts
 
-Don't rewrite all 28 JSON files now. The loader handles transformation at ingest time. When we're ready for pgvector, we can batch-export normalized `KnowledgeDocument` records.
-
-**Files modified:** `lib/types.ts`, `lib/ingest/knowledge.ts`, `scripts/generate-resume.ts` (buildUserMessage), `tests/ingest.test.ts`
-**Net effect:** Universal document model ready for pgvector. No source file changes needed.
+**Files created:** `lib/ai/client.ts`, `lib/ai/telemetry.ts`, `lib/ai/index.ts`, `tests/ai-client.test.ts`, `tests/ai-telemetry.test.ts`
+**Files modified:** `scripts/generate-resume.ts`, `scripts/compare-resumes.ts`
+**Tests added:** ~15 (target: 248 total)
+**Net effect:** generate-resume.ts drops from ~390 (post Phase 3) to ~270 lines. AI patterns reusable for Phase 2 chat.
+**Tag:** `refactor/phase-5-complete`
 
 ---
 
-## Phase E: Context Engineering — Optimize Token Usage
+## Phase 6: Context Engineering — Optimize Token Usage
 
 **Goal:** Reduce input tokens, improve context quality, prepare for selective RAG retrieval.
 
-### E1. Optimize career data serialization
+**Depends on:** Phase 5 (AI client for token logging)
 
-Current `buildUserMessage()` dumps the entire CareerData as `JSON.stringify(coreData, null, 2)` — ~50K tokens of indented JSON including empty strings, null values, and irrelevant fields.
+### 6.1. Optimize career data serialization
+
+Current `buildUserMessage()` dumps the entire CareerData as `JSON.stringify(coreData, null, 2)` — verbose indented JSON including empty strings, null values, and irrelevant fields.
 
 Refactor `buildUserMessage()`:
 
-- Strip empty/null fields before serialization
+- Strip empty/null/empty-array fields before serialization
 - Use compact JSON (`JSON.stringify(data)` without indentation) — saves ~20% tokens
 - Omit rarely-useful fields for resume generation (e.g., `licenseNumber`, `activities`, `cause`)
-- Add field-level comments as JSON keys only when values exist
 
-### E2. Structured context sections
+### 6.2. Structured context sections (with empirical validation)
 
-Replace single JSON dump with labeled sections in the user message:
+**(Raj Patel feedback — test before committing):** This is a high-risk change. Before replacing the JSON format:
+
+1. Capture current `buildUserMessage()` output as a baseline
+2. Build the new structured format
+3. Run both formats through `generateWithPrompt()` on identical career data
+4. Compare outputs via `compare-resumes.ts --judge`
+5. **Only adopt the new format if LLM judge scores are equal or better**
+
+Proposed structured format:
 
 ```
 ## Profile
@@ -293,144 +390,72 @@ AI & Machine Learning, Cloud Computing, Python, ...
 ## Knowledge Context (29 entries, grouped by category)
 ### Career Achievements
 - [arine-staff-data-ops-2025] Leading data operations...
-### Brand Narratives
-- Drives innovation that serves human flourishing...
 ```
 
-This gives Claude structured natural language instead of raw JSON — better for reasoning, fewer tokens.
+If the structured format degrades quality, fall back to compact JSON (step 6.1) which still saves ~20% tokens with no quality risk.
 
-### E3. Token budget estimation
+### 6.3. Token budget awareness
 
-Add to `lib/ai/client.ts`:
+**(Sarah Kim feedback — actionable, not just warnings):**
 
-- `estimateTokens(text)` — rough estimation (chars / 4 for English text, chars / 3 for JSON)
-- Log estimated input tokens before API call
-- Warn if estimated input exceeds 80% of context window (currently 200K standard)
+Add to `lib/ai/telemetry.ts` (not client.ts — it's observability, not flow control):
 
-**Files modified:** `scripts/generate-resume.ts` (buildUserMessage), `lib/ai/client.ts`
-**Net effect:** ~20-30% reduction in input tokens (~15-22K fewer tokens per generation, saving ~$0.05-0.07/run)
+- `estimateTokens(text)` — use `text.length / 4` as rough heuristic (acknowledge it's approximate in the JSDoc)
+- Log estimated vs actual tokens after API call (the response includes actual counts)
+- **No build-time warnings or failures** — just telemetry data. The actual token count from the API response is what matters; estimation is for pre-flight logging only.
 
----
+### 6.4. Snapshot test for context format
 
-## Phase F: Prompt Quality Improvements
+**(Lisa Wang feedback):** Add a snapshot test that captures the current `buildUserMessage()` output structure:
 
-**Goal:** Higher-quality, more consistent resume output.
+- Before refactoring: snapshot the output with sample career data
+- After refactoring: verify the new format contains all the same entities (every position title, every skill name, every knowledge entry title)
+- This is a **data completeness** test, not an exact-match test
 
-### F1. Add few-shot examples to system prompt
-
-Add 2-3 examples of strong vs weak resume bullets to `lib/prompts/resume-writer.system.md`:
-
-```markdown
-## Examples of Strong Position Bullets
-
-Weak: "Worked on machine learning projects"
-Strong: "Designed and deployed 3 production ML models serving 50M+ health plan members,
-reducing manual clinical review time by 40% and generating $2M+ in annual value"
-
-Weak: "Led a team of engineers"
-Strong: "Led cross-functional team of 8 engineers delivering HIPAA-compliant AI agents
-across 45+ health plans, reducing manual data operations by 60%"
-```
-
-### F2. Add section priority guidance
-
-Add explicit priority weighting to the system prompt:
-
-- Professional Summary: Most critical — screened first by recruiters
-- Experience: Core content — most resume real estate
-- Skills: ATS gating — must include target keywords
-- Certifications/Projects/Publications: Supporting evidence — selective inclusion
-
-### F3. Add output format validation
-
-Strengthen `validateResumeOutput()`:
-
-- Check for markdown link syntax validity
-- Verify date format consistency (Mon YYYY)
-- Check for forbidden patterns (first-person "I", passive voice markers)
-- Count action verbs per position (should be ≥2)
-
-**Files modified:** `lib/prompts/resume-writer.system.md`, `scripts/generate-resume.ts`
-**Net effect:** More consistent resume quality. Regression-testable via prompt hash + output validation.
+**Files modified:** `scripts/generate-resume.ts` (buildUserMessage), `lib/ai/telemetry.ts`
+**Tests added:** ~6 (target: 254 total)
+**Net effect:** ~20-30% reduction in input tokens. Quality validated empirically before adoption.
+**Tag:** `refactor/phase-6-complete`
 
 ---
 
-## Phase G: Backlog Bug Fixes
+## Deferred to Phase 2 (Intentionally)
 
-**Goal:** Clear open backlog items that touch the pipeline.
+### Knowledge Base Schema Standardization (was Phase D)
 
-### G1. Add `github` to CareerDataSchema
+**(David Torres feedback):** The `KnowledgeDocument` type is designed for pgvector, which is Phase 2. The current knowledge loading works correctly. Spending hours on a schema that won't be used until Phase 2 actually begins is speculative engineering.
 
-In `lib/ingest/validation.ts` (after Phase C5 extraction):
+**When to do it:** First task of Phase 2, immediately before pgvector integration. By then, the ingest decomposition (Phase 4) will have isolated `lib/ingest/knowledge.ts`, making the schema change straightforward.
 
-- Add `github: z.string().optional()` to the profile schema
-- Currently `CareerProfile` interface has `github?: string` but Zod schema doesn't validate it
+### Skills Architecture Documentation (was Phase H)
 
-### G2. Add enrichProfileFromKnowledge tests
+**(David Torres feedback):** A README mapping local prompts to hypothetical future skills is a roadmap in a README. CLAUDE.md already documents the Phase 2/3 vision. The `lib/prompts/README.md` created in Phase 3 should document the **current** prompt format convention, not speculative future skills.
 
-In `tests/ingest.test.ts`:
-
-- Test linkedin URL enrichment from knowledge base
-- Test website enrichment
-- Test email enrichment
-- Test github enrichment
-- Test that existing values are not overwritten
-
-**Files modified:** `lib/ingest/validation.ts`, `tests/ingest.test.ts`
-
----
-
-## Phase H: Skills Architecture Preparation
-
-**Goal:** Design the prompt/skills structure so it maps naturally to Anthropic Agent Skills and the job-finding-assistant prompts.
-
-### H1. Document the skills mapping
-
-Create `lib/prompts/README.md` documenting how local prompt files map to:
-
-- Anthropic Agent Skills (folders of instructions/scripts/resources)
-- job-finding-assistant system prompts (6 specialized assistants)
-- Future paulprae.com chat interface skills
-
-Mapping table:
-| Local Prompt File | job-finding-assistant | Anthropic Skill | Purpose |
-|---|---|---|---|
-| `resume-writer.system.md` | Stage 4B (resume) | Resume Generation | Generate ATS-optimized resume |
-| `brand-voice.system.md` (future) | personal_brand_development | Brand Development | Guide brand voice and positioning |
-| `career-coach.system.md` (future) | career_coach_assistant | Career Coaching | Initial consultation and objective gathering |
-| `interview-prep.system.md` (future) | job_application_interview | Interview Prep | Interview preparation and strategy |
-| `market-positioning.system.md` (future) | job_market_positioning | Market Analysis | Competitive positioning analysis |
-| `resume-reviewer.system.md` (future) | (new) | Resume Review | Critique and improve resume drafts |
-
-### H2. Prepare agent-definitions.json integration
-
-The knowledge base already has `agents/agent-definitions.json` with structured definitions referencing `source_prompt_file: "AI_assistants/career_coach_assistant.system.prompt.md"`. This is the bridge to the job-finding-assistant project.
-
-For now: document this mapping. When Phase 2 arrives, the prompt loader can resolve `source_prompt_file` references to load skills from either local files or the job-finding-assistant repo.
-
-**Files created:** `lib/prompts/README.md` (comprehensive skills architecture doc)
-**Net effect:** Clear roadmap for skills convergence. No premature implementation.
+**When to do it:** When the second prompt file is actually created (Phase 2 chat skill).
 
 ---
 
 ## Implementation Order
 
-Execute phases in this order to minimize risk and maximize incremental value:
+Execute phases in this order, optimized for business value first, then infrastructure:
 
 ```
-Phase G (30 min)  → Bug fixes — clear backlog, zero risk
-Phase A (2-3 hrs) → Prompt extraction — highest visibility, moderate risk
-Phase C (3-4 hrs) → Ingest decomposition — largest file, moderate risk
-Phase B (2-3 hrs) → AI service layer — depends on Phase A prompts
-Phase E (1-2 hrs) → Context engineering — depends on Phase B client
-Phase D (2-3 hrs) → Knowledge schema — depends on Phase C knowledge loader
-Phase F (1 hr)    → Prompt quality — depends on Phase A prompt files
-Phase H (1 hr)    → Skills architecture — documentation only, depends on Phase A
+Phase 1 (2 hrs)   → Prompt quality — direct resume improvement, highest business value
+Phase 2 (1 hr)    → Bug fixes — clear backlog, zero risk
+Phase 3 (3-4 hrs) → Prompt extraction — highest architectural visibility
+Phase 4 (4-6 hrs) → Ingest decomposition — largest file, test import rewiring
+Phase 5 (3-4 hrs) → AI service layer — depends on Phase 3 prompts
+Phase 6 (2-3 hrs) → Context engineering — depends on Phase 5 client, requires empirical testing
 ```
 
-Total estimated effort: ~14-18 hours across multiple sessions.
+Total estimated effort: ~16-20 hours across multiple sessions.
 
-**After each phase:** Run `npm test` to verify all 245+ tests pass. Run `npm run check:quick` to validate data files.
+**After each phase:**
+
+1. Run `npm test` — all existing tests pass + new tests added
+2. Run `npm run check:quick` — data files valid
+3. Create tagged commit: `refactor/phase-N-complete`
+4. If pipeline uses API: run `npm run pipeline` to verify end-to-end
 
 ---
 
@@ -438,12 +463,12 @@ Total estimated effort: ~14-18 hours across multiple sessions.
 
 After this refactoring, the codebase is positioned for:
 
-1. **Chat interface** — `lib/ai/client.ts` handles streaming; `lib/prompts/` provides skills; `KnowledgeDocument` feeds RAG
+1. **Chat interface** — `lib/ai/client.ts` handles streaming; `lib/prompts/` provides skills
 2. **Dynamic resume generation** — `generateWithPrompt("resume-writer", jobSpecificContext)` with different user messages per job
-3. **pgvector migration** — `KnowledgeDocument` records map directly to embedding rows with metadata
+3. **pgvector migration** — knowledge loader is isolated in `lib/ingest/knowledge.ts`, ready for `KnowledgeDocument` schema
 4. **Anthropic Agent Skills** — each `lib/prompts/*.system.md` file is a deployable skill
-5. **job-finding-assistant convergence** — skills mapping documented, prompt loader designed for multi-source resolution
-6. **Vercel AI SDK integration** — AI service layer can wrap either Anthropic SDK (batch) or Vercel AI SDK (streaming UI) behind the same interface
+5. **job-finding-assistant convergence** — prompt loader designed for multi-source resolution
+6. **Vercel AI SDK integration** — AI service layer can wrap either Anthropic SDK (batch) or Vercel AI SDK (streaming UI)
 7. **Cost tracking** — telemetry JSONL enables cost trend analysis and prompt optimization
 
 ---
@@ -455,8 +480,11 @@ After this refactoring, the codebase is positioned for:
 - **No Vercel AI SDK yet** — wait for Phase 2 chat interface
 - **No LangChain** — too heavy for this use case; Anthropic SDK is sufficient
 - **No knowledge base file rewrites** — loader transforms at runtime
+- **No knowledge base schema standardization** — deferred to Phase 2 (when pgvector needs it)
+- **No skills architecture documentation** — deferred until second prompt file exists
 - **No CLI framework** — current arg parsing is adequate
 - **No multi-agent orchestration** — single-agent pipeline is correct for Phase 1
+- **No token estimation library** — heuristic is sufficient for telemetry; actual counts come from API response
 
 ---
 
@@ -464,21 +492,34 @@ After this refactoring, the codebase is positioned for:
 
 After all phases complete:
 
-1. **Tests pass:** `npm test` — all 245+ existing tests pass + new tests added
+1. **Tests pass:** `npm test` — all existing tests pass + ~52 new tests (target: 254+)
 2. **Pipeline works:** `npm run pipeline` — full ingest → generate → export succeeds
 3. **Build works:** `npm run build` — static site builds correctly
 4. **Release check:** `npm run check` — full pre-push validation passes
-5. **Resume quality:** Generated resume is at least as good as current output (manual comparison)
-6. **Code reduction:** `scripts/generate-resume.ts` drops from 506 to ~300 lines; `scripts/ingest-linkedin.ts` drops from 958 to ~200 lines
-7. **New test count:** Expect ~270+ tests (up from 245+)
+5. **Resume quality:** Run `npm run compare -- --judge` on pre-refactoring vs post-refactoring output. Scores must be equal or better.
+6. **Code reduction:** `scripts/generate-resume.ts` drops from 507 to ~270 lines; `scripts/ingest-linkedin.ts` drops from 959 to ~200 lines
+7. **New test count:** ~254+ tests (up from 202)
+
+### Test count targets per phase (Lisa Wang feedback):
+
+| Phase                         | New tests | Running total |
+| ----------------------------- | --------- | ------------- |
+| Phase 1: Prompt quality       | +8        | 210           |
+| Phase 2: Bug fixes            | +6        | 216           |
+| Phase 3: Prompt architecture  | +12       | 228           |
+| Phase 4: Ingest decomposition | +5        | 233           |
+| Phase 5: AI service layer     | +15       | 248           |
+| Phase 6: Context engineering  | +6        | 254           |
 
 ### Critical files to verify:
 
 - `lib/prompts/resume-writer.system.md` — contains extracted system prompt
-- `lib/prompts/loader.ts` — prompt loading works correctly
-- `lib/ai/client.ts` — API calls work with streaming, caching, telemetry
-- `lib/ai/telemetry.ts` — structured logging to .telemetry.jsonl
-- `lib/ingest/` — all 6 extracted modules work correctly
-- `lib/types.ts` — KnowledgeDocument type added, PromptConfig/PromptMetadata added
+- `lib/prompts/loader.ts` — prompt loading works correctly with config inheritance
+- `lib/ai/client.ts` — two-tier API: `generateWithPrompt()` + `callModel()`
+- `lib/ai/telemetry.ts` — structured logging with rotation
+- `lib/ingest/utils.ts` — dates, CSV, validation utilities
+- `lib/ingest/normalizers.ts` — all 16 normalize functions
+- `lib/ingest/knowledge.ts` — knowledge loading with Zod validation
+- `lib/types.ts` — PromptConfig/PromptMetadata added, KnowledgeEntrySchema added
 - `scripts/generate-resume.ts` — uses AI client + prompt loader
-- `scripts/ingest-linkedin.ts` — uses extracted modules
+- `scripts/ingest-linkedin.ts` — uses extracted modules, slim orchestrator
