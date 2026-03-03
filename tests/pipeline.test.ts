@@ -28,6 +28,7 @@
 import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
+import { execFileSync } from "child_process";
 import { PATHS } from "../lib/config.js";
 import { stripHtmlComments } from "../lib/markdown.js";
 import type { CareerData } from "../lib/types.js";
@@ -307,7 +308,6 @@ describe("resume DOCX", () => {
 
   it.skipIf(!exists)("has Word 2013+ compatibility mode (no Compatibility Mode banner)", () => {
     // DOCX is a ZIP archive; word/settings.xml must declare compatibilityMode=15
-    const { execFileSync } = require("child_process");
     const tmpDir = path.join(path.dirname(PATHS.docxOutput), `_docx_test_${Date.now()}`);
     try {
       fs.mkdirSync(tmpDir, { recursive: true });
