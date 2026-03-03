@@ -105,6 +105,6 @@ describe("prompt regression", () => {
     expect(hash.length).toBe(12);
     // Snapshot: if you change the prompt, update the expected hash below
     // To get the current hash: node -e "const fs=require('fs'),c=require('crypto'); console.log(c.createHash('sha256').update(fs.readFileSync('lib/prompts/resume-writer.system.md','utf-8')).digest('hex').slice(0,12))"
-    expect(hash).toMatchInlineSnapshot(`"d7941e890181"`);
+    expect(hash).toMatchInlineSnapshot(`"70d0dd81a830"`);
   });
 });
