@@ -120,7 +120,10 @@ function fixDocxCompatibility(docxPath: string): void {
 
     // Patch word/settings.xml to add compatibility mode
     const settingsPath = path.join(extractDir, "word", "settings.xml");
-    if (!fs.existsSync(settingsPath)) return;
+    if (!fs.existsSync(settingsPath)) {
+      console.warn("      ⚠️  word/settings.xml not found in DOCX; skipping compatibility fix");
+      return;
+    }
 
     let settings = fs.readFileSync(settingsPath, "utf-8");
 
@@ -130,23 +133,26 @@ function fixDocxCompatibility(docxPath: string): void {
     // Add <w:compat> section with Word 2013+ compatibility mode (val=15)
     // Insert before the closing </w:settings> tag
     if (!settings.includes("<w:compat")) {
-      const compatBlock = [
-        "<w:compat>",
-        '  <w:compatSetting w:name="compatibilityMode"',
-        '    w:uri="http://schemas.microsoft.com/office/word" w:val="15"/>',
-        "</w:compat>",
-      ].join("");
+      const compatBlock =
+        [
+          "<w:compat>",
+          '  <w:compatSetting w:name="compatibilityMode"',
+          '    w:uri="http://schemas.microsoft.com/office/word" w:val="15"/>',
+          "</w:compat>",
+        ].join("\n") + "\n";
       settings = settings.replace("</w:settings>", compatBlock + "</w:settings>");
     }
 
     fs.writeFileSync(settingsPath, settings, "utf-8");
 
-    // Repackage into DOCX — must use stored paths relative to the extract root
-    fs.unlinkSync(docxPath);
-    execFileSync("zip", ["-r", docxPath, "."], {
+    // Repackage into a temp DOCX first, then atomically replace the original.
+    // This avoids data loss if `zip` fails after the original is deleted.
+    const tmpDocx = docxPath + `.tmp_${suffix}`;
+    execFileSync("zip", ["-r", tmpDocx, "."], {
       cwd: extractDir,
       stdio: ["pipe", "pipe", "pipe"],
     });
+    fs.renameSync(tmpDocx, docxPath);
   } finally {
     // Clean up extracted directory
     fs.rmSync(extractDir, { recursive: true, force: true });
@@ -179,7 +185,9 @@ function exportDocx(markdown: string): void {
       fixDocxCompatibility(PATHS.docxOutput);
     } catch (err: unknown) {
       // Non-fatal: the DOCX is still usable, just may show the compat warning
-      console.warn(`      ⚠️  DOCX compatibility fix skipped: ${extractStderr(err)}`);
+      console.warn(
+        `      ⚠️  DOCX compatibility fix failed (file still usable): ${extractStderr(err)}`,
+      );
     }
 
     const stats = fs.statSync(PATHS.docxOutput);
