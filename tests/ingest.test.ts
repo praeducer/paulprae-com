@@ -1,5 +1,5 @@
 /**
- * ingest-linkedin.ts — Unit tests for the LinkedIn data ingestion pipeline.
+ * ingest.test.ts — Unit tests for the LinkedIn data ingestion pipeline.
  *
  * Tests cover: date normalization, CSV row normalization, knowledge base loading,
  * profile enrichment, Zod validation, and the full ingest() pipeline.
@@ -17,7 +17,34 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "fs";
 import path from "path";
-import { _testExports } from "../scripts/ingest-linkedin.js";
+import {
+  normalizeDate,
+  normalizeDateOrNull,
+  safeString,
+  stripBOM,
+  CareerDataSchema,
+} from "../lib/ingest/utils.js";
+import {
+  normalizePositions,
+  normalizeEducation,
+  normalizeSkills,
+  normalizeCertifications,
+  normalizeProjects,
+  normalizePublications,
+  normalizeProfile,
+  extractEmail,
+  normalizeLanguages,
+  normalizeRecommendations,
+  normalizeHonors,
+  normalizeVolunteering,
+  normalizeCourses,
+} from "../lib/ingest/normalizers.js";
+import {
+  findJsonFiles,
+  isKnowledgeEntry,
+  wrapAsKnowledgeEntry,
+  enrichProfileFromKnowledge,
+} from "../lib/ingest/knowledge.js";
 import {
   SAMPLE_POSITIONS,
   SAMPLE_EDUCATION,
@@ -36,31 +63,6 @@ import {
   SAMPLE_KNOWLEDGE_NON_ENTRY,
   SAMPLE_CAREER_DATA,
 } from "./fixtures/sample-data.js";
-
-const {
-  normalizeDate,
-  normalizeDateOrNull,
-  safeString,
-  stripBOM,
-  normalizePositions,
-  normalizeEducation,
-  normalizeSkills,
-  normalizeCertifications,
-  normalizeProjects,
-  normalizePublications,
-  normalizeProfile,
-  extractEmail,
-  normalizeLanguages,
-  normalizeRecommendations,
-  normalizeHonors,
-  normalizeVolunteering,
-  normalizeCourses,
-  findJsonFiles,
-  isKnowledgeEntry,
-  wrapAsKnowledgeEntry,
-  CareerDataSchema,
-  enrichProfileFromKnowledge,
-} = _testExports;
 
 // ─── Date Normalization ─────────────────────────────────────────────────────
 // LinkedIn exports dates in 4+ formats. This is the most critical parser.
