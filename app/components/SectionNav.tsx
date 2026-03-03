@@ -93,7 +93,7 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
             href={`#${s.id}`}
             className={`inline-flex min-h-[44px] shrink-0 items-center rounded-md px-2.5 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none ${
               activeId === s.id
-                ? "bg-slate-100 font-medium text-slate-900 dark:bg-slate-800 dark:text-slate-100"
+                ? "bg-slate-200 font-medium text-slate-900 dark:bg-slate-700 dark:text-slate-100"
                 : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
             }`}
           >

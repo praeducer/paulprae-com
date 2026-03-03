@@ -21,3 +21,4 @@ if command -v wsl.exe >/dev/null 2>&1; then
 fi
 
 echo "husky: npx not found — skipping pre-commit hook"
+exit 0
