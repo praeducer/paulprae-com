@@ -101,7 +101,7 @@ Supporting commands:
 
 ### 6.1 Automated checks
 
-- Pre-commit: `lint-staged` runs Prettier on staged files (via husky `prepare` hook — installs on `npm install`). Works cross-platform: WSL/Linux/macOS use `npx` directly; Windows Git clients (GitHub Desktop, VS Code) auto-delegate to WSL
+- Pre-commit: `lint-staged` runs Prettier on staged files (via husky `prepare` hook — installs on `npm install`). Uses POSIX-safe nvm PATH detection (not `nvm.sh` sourcing) so hooks work under `dash`/`sh`. Windows Git clients (GitHub Desktop, VS Code) auto-delegate to WSL when `npx` is unavailable
 - `npm run lint`
 - `npm run format:check`
 - `npm test`

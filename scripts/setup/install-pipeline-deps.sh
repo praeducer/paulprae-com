@@ -204,6 +204,27 @@ else
     ok "npm dependencies installed"
 fi
 
+# ─── Husky Environment Init (POSIX-safe nvm PATH) ──────────────────────────
+
+HUSKY_INIT_DIR="$HOME/.config/husky"
+HUSKY_INIT="$HUSKY_INIT_DIR/init.sh"
+
+if [[ -f "$HUSKY_INIT" ]]; then
+    skip "Husky init already exists: $HUSKY_INIT"
+else
+    info "Creating husky init.sh (POSIX-safe nvm PATH detection)..."
+    mkdir -p "$HUSKY_INIT_DIR"
+    cat > "$HUSKY_INIT" << 'HUSKY_EOF'
+# Add nvm-managed Node.js to PATH (POSIX-safe — nvm.sh requires bash but husky uses sh/dash)
+NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+if [ -d "$NVM_DIR/versions/node" ]; then
+  NODE_BIN="$(ls -td "$NVM_DIR/versions/node/"*/bin 2>/dev/null | head -1)"
+  [ -d "$NODE_BIN" ] && PATH="$NODE_BIN:$PATH" && export PATH
+fi
+HUSKY_EOF
+    ok "Created $HUSKY_INIT"
+fi
+
 # ─── Claude Code CLI ─────────────────────────────────────────────────────────
 
 if command -v claude &>/dev/null; then

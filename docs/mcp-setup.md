@@ -13,14 +13,14 @@ Both files are generated from the canonical template **`scripts/setup/mcp-server
 
 ## Servers included
 
-| Server         | Transport    | Purpose                                                                                                                      |
-| -------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| **Vercel**     | HTTP (OAuth) | List deployments, get build/runtime logs, manage projects, search Vercel docs. Use to verify deployment or debug production. |
-| **GitHub**     | HTTP (OAuth) | PRs, issues, repo context. Authenticate via `/mcp` in Claude or Cursor MCP UI.                                               |
-| **Filesystem** | stdio (npx)  | Read/write under project directory (`.`). Scoped to repo.                                                                    |
-| **Fetch**      | stdio (npx)  | Fetch web content for docs or links.                                                                                         |
+| Server     | Transport    | Purpose                                                                                                                      |
+| ---------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Vercel** | HTTP (OAuth) | List deployments, get build/runtime logs, manage projects, search Vercel docs. Use to verify deployment or debug production. |
+| **GitHub** | HTTP (OAuth) | PRs, issues, repo context. Authenticate via `/mcp` in Claude or Cursor MCP UI.                                               |
 
-Vercel and GitHub use OAuth; no API keys in the config. Filesystem and Fetch run locally via `npx`.
+Both use OAuth; no API keys in the config.
+
+> **Removed:** `filesystem` and `fetch` stdio servers were removed — Claude Code provides native Read/Write/Edit/Glob/Grep and WebFetch tools that are faster and more capable.
 
 ## One-time setup (new contributor)
 
@@ -33,7 +33,6 @@ Vercel and GitHub use OAuth; no API keys in the config. Filesystem and Fetch run
 
 ## Env vars (optional)
 
-- **Filesystem:** By default the filesystem server allows the current directory (`.`). To override, set `MCP_FILESYSTEM_ALLOWED_DIRS` (not required for typical use).
 - **Secrets:** Do not put API keys in the JSON. Vercel and GitHub use OAuth via the client.
 
 ## Troubleshooting
@@ -41,6 +40,4 @@ Vercel and GitHub use OAuth; no API keys in the config. Filesystem and Fetch run
 - **Cursor not seeing new servers:** Fully restart Cursor after changing `.cursor/mcp.json`.
 - **Claude Code:** Project-scoped servers are read from **project root** `.mcp.json`, not from `.claude/`. If you added servers under `.claude/` before, use the root `.mcp.json` now.
 - **Vercel / GitHub "Needs login":** Use `/mcp` in Claude Code or the MCP authentication flow in Cursor to sign in.
-- **stdio servers (filesystem, fetch):** Require Node.js and `npx` on PATH. On Windows, local stdio servers using `npx` may need `cmd /c` in some clients; the config here is the standard form.
-
-Future MCP additions (Sentry/PostgreSQL/Supabase/Neo4j) are tracked as actionable items in `.claude/plans/backlog.md`.
+  Future MCP additions (Sentry/PostgreSQL/Supabase/Neo4j) are tracked as actionable items in `.claude/plans/backlog.md`.

@@ -149,6 +149,25 @@ Avoid hardcoded PATH overrides in shell startup files that prepend Windows paths
 
 Ensure `~/.local/bin` is on PATH and wrapper script exists.
 
+### Pre-commit hook fails with exit code 127
+
+On Ubuntu/Debian, `sh` is `dash` (not `bash`). Husky runs hooks via `sh -e`, so sourcing `nvm.sh` (which requires bash) silently fails, leaving `npx` missing from PATH.
+
+The project's pre-commit hook uses POSIX-safe PATH detection instead of sourcing `nvm.sh`. If you still see code 127:
+
+1. Run the setup script to create husky's global init file:
+
+   ```bash
+   bash scripts/setup/install-pipeline-deps.sh
+   ```
+
+   This creates `~/.config/husky/init.sh` which adds nvm-managed Node.js to PATH before any hook runs.
+
+2. Verify manually:
+   ```bash
+   sh -e .husky/pre-commit
+   ```
+
 ### Sandbox warning in Claude Code
 
 Update to kernel 6.2+ (WSL: `wsl --update`) and restart WSL.

@@ -211,8 +211,13 @@ fsutil devdrv query D:
 The husky pre-commit hook automatically delegates to WSL when `npx` is not found. If it still fails:
 
 1. Verify WSL is running: `wsl --status`
-2. Verify Node.js in WSL: `wsl bash -lc "source ~/.nvm/nvm.sh && node --version"`
+2. Verify Node.js in WSL: `wsl bash -lc "node --version"`
 3. Ensure the repo was cloned on the WSL filesystem (`\\wsl.localhost\Ubuntu\...`), not `C:\`
+4. Run the setup script in WSL to create the husky init file:
+   ```bash
+   bash scripts/setup/install-pipeline-deps.sh
+   ```
+   This creates `~/.config/husky/init.sh` which adds nvm-managed Node.js to PATH using POSIX-safe detection (required because husky runs hooks via `sh`/`dash`, not `bash`).
 
 ### Cross-filesystem performance is slow
 

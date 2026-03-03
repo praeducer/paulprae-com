@@ -1,21 +1,24 @@
 #!/usr/bin/env sh
 
-# Source nvm if available (WSL / Linux with nvm-managed node)
-[ -f "$HOME/.nvm/nvm.sh" ] && . "$HOME/.nvm/nvm.sh"
+# Add nvm-managed Node.js to PATH (POSIX-safe — nvm.sh requires bash but husky uses sh/dash)
+NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+if [ -d "$NVM_DIR/versions/node" ]; then
+  NODE_BIN="$(ls -td "$NVM_DIR/versions/node/"*/bin 2>/dev/null | head -1)"
+  [ -d "$NODE_BIN" ] && PATH="$NODE_BIN:$PATH" && export PATH
+fi
 
-# Run lint-staged directly if npx is on PATH
+# Primary: run lint-staged (also uses node_modules/.bin from husky's h script)
 if command -v npx >/dev/null 2>&1; then
   npx lint-staged
   exit $?
 fi
 
-# Fallback: Windows Git client (GitHub Desktop, VS Code, etc.)
+# Fallback: Windows Git client (GitHub Desktop, VS Code)
 # npx isn't available in MINGW bash — delegate to WSL where node lives
 if command -v wsl.exe >/dev/null 2>&1; then
-  # MINGW pwd returns //wsl.localhost/Ubuntu/home/... — strip the UNC prefix
   WSL_DIR="$(pwd | sed 's|^//wsl\.localhost/[^/]*||')"
   if [ -n "$WSL_DIR" ]; then
-    wsl.exe bash -lc ". \$HOME/.nvm/nvm.sh 2>/dev/null; cd \"${WSL_DIR}\" && npx lint-staged"
+    wsl.exe bash -lc "cd \"${WSL_DIR}\" && npx lint-staged"
     exit $?
   fi
 fi
