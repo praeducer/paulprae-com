@@ -92,3 +92,5 @@ coverage/
 
 # Misc
 *.pem
+.vercel
+data/generated/.telemetry.jsonl

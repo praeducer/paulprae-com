@@ -13,12 +13,7 @@ export {
   OverloadError,
   GenerationError,
 } from "./client.js";
-export type {
-  GenerationResponse,
-  FullGenerationResponse,
-  CallModelOptions,
-  GenerateOptions,
-} from "./client.js";
+export type { GenerationResponse, FullGenerationResponse } from "./client.js";
 
 export {
   estimateCost,

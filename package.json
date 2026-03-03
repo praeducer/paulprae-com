@@ -37,6 +37,7 @@
     "lint:fix": "eslint --cache --cache-location .next/cache/eslint/ --fix .",
     "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,css,md}\"",
+    "smoke": "tsx scripts/smoke-test.ts",
     "check": "tsx scripts/release-check.ts",
     "check:quick": "tsx scripts/release-check.ts --quick",
     "check:fix": "tsx scripts/release-check.ts --quick --fix",

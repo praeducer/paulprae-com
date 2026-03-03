@@ -1,6 +1,7 @@
 # paulprae.com — AI-Powered Career Platform
 
 [![CI](https://github.com/praeducer/paulprae-com/actions/workflows/ci.yml/badge.svg)](https://github.com/praeducer/paulprae-com/actions/workflows/ci.yml)
+[![Deploy](https://github.com/praeducer/paulprae-com/actions/workflows/deploy.yml/badge.svg)](https://github.com/praeducer/paulprae-com/actions/workflows/deploy.yml)
 
 A professional career platform that uses AI to generate, tailor, and present Paul Prae's experience as a Principal AI Engineer & Architect. Built with Next.js 16, TypeScript, and Claude AI.
 
@@ -345,6 +346,7 @@ paulprae-com/
 | [`docs/domain-dns-runbook.md`](docs/domain-dns-runbook.md)                       | Custom-domain DNS operations, validation, troubleshooting, rollback                 |
 | [`docs/linux-dev-environment-setup.md`](docs/linux-dev-environment-setup.md)     | Linux/WSL setup: nvm, Claude Code CLI, Cursor, pipeline deps                        |
 | [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows host setup: Dev Drive, tooling, and validation                              |
+| [`docs/devops.md`](docs/devops.md)                                               | Deployment, smoke tests, rollback, CI/CD configuration                              |
 | [`docs/mcp-setup.md`](docs/mcp-setup.md)                                         | MCP config for Claude Code and Cursor (Vercel, GitHub, Filesystem, Fetch)           |
 | [`scripts/setup/`](scripts/setup/)                                               | Automated setup scripts (Windows + Linux/WSL) for dev environment and pipeline deps |
 
