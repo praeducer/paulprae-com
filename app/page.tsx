@@ -201,7 +201,10 @@ export default function Home() {
               </a>
             )}
             {/* Separator between contact and download groups */}
-            <span aria-hidden="true" className="select-none px-1 text-xs text-slate-300 dark:text-slate-600">
+            <span
+              aria-hidden="true"
+              className="select-none px-1 text-xs text-slate-300 dark:text-slate-600"
+            >
               ·
             </span>
             <a
