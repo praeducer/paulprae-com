@@ -14,3 +14,20 @@ Strong: "Architected AI and analytics solutions for healthcare and life science 
 
 Weak: "Managed engineering team and mentored junior engineers"
 Strong: "Built and led cross-functional teams of 5-8 engineers, data scientists, and analysts; established hiring pipelines, delivered coaching to 15+ engineers, and achieved 93% client-reported performance improvement through structured mentorship programs"
+
+## Examples of Strong vs Weak Phrasing
+
+Weak: "progressive engineering leadership spanning data operations"
+Strong: "engineering leadership across data operations"
+
+Weak: "holistic AI transformation methodology"
+Strong: "AI transformation strategy"
+
+Weak: "synergistic delivery framework for enterprise clients"
+Strong: "delivery framework for enterprise clients"
+
+Weak: "transformational pipeline architecture enabling next-generation insights"
+Strong: "pipeline architecture supporting real-time analytics"
+
+Weak: "full-spectrum technology orchestration capabilities"
+Strong: "end-to-end technical execution"

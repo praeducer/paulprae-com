@@ -143,6 +143,7 @@ async function formatMarkdown(markdown: string): Promise<string> {
 
 function validateResumeOutput(markdown: string, careerData: CareerData): string[] {
   const warnings: string[] = [];
+  const currentYear = new Date().getFullYear();
 
   const expectedSections = [
     "Professional Summary",
@@ -207,6 +208,35 @@ function validateResumeOutput(markdown: string, careerData: CareerData): string[
     warnings.push("Resume contains malformed markdown link syntax");
   }
 
+  // HTTP URL check in Projects section
+  const projectsSection = markdown.split("## Projects")[1]?.split(/^## /m)[0] || "";
+  if (projectsSection) {
+    const httpLinks = projectsSection.match(/\]\(http:\/\/[^)]+\)/g) || [];
+    for (const link of httpLinks) {
+      warnings.push(`Projects section contains non-HTTPS link (likely stale): ${link}`);
+    }
+  }
+
+  // Invented-phrase detection in Professional Summary
+  const summarySection = markdown.split("## Professional Summary")[1]?.split(/^---$/m)[0] || "";
+  if (summarySection) {
+    const suspiciousPatterns = [
+      /progressive\s+\w+\s+leadership/i,
+      /holistic\s+\w+\s+\w+/i,
+      /synergistic\s+\w+/i,
+      /transformational\s+\w+\s+architecture/i,
+      /full-spectrum\s+\w+/i,
+    ];
+    for (const pattern of suspiciousPatterns) {
+      const match = summarySection.match(pattern);
+      if (match) {
+        warnings.push(
+          `Professional Summary may contain invented phrasing: "${match[0]}" — verify this is standard industry terminology`,
+        );
+      }
+    }
+  }
+
   const experienceSection =
     markdown.split("## Professional Experience")[1]?.split(/^## /m)[0] || "";
   if (experienceSection) {
@@ -240,7 +270,6 @@ function validateResumeOutput(markdown: string, careerData: CareerData): string[
   }
 
   // Minimum bullet count by recency tier
-  const currentYear = new Date().getFullYear();
   for (const block of positionBlocks) {
     const posTitle = block.split("\n")[0].trim();
     const bullets = block.match(/^- .+/gm) || [];

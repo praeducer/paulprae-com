@@ -71,6 +71,10 @@ describe("SYSTEM_PROMPT", () => {
       "Knowledge Base Integration Strategy",
       "Output ONLY the Markdown resume content",
       "Section Priority Weighting",
+      "expert conversation test",
+      "Language integrity",
+      "Technology relevance",
+      "Live URLs required",
     ];
     for (const section of requiredSections) {
       expect(SYSTEM_PROMPT).toContain(section);
@@ -329,6 +333,30 @@ describe("validateResumeOutput — enhanced checks", () => {
   it("does not flag positions with strong action verbs", () => {
     const warnings = validateResumeOutput(validResume, SAMPLE_CAREER_DATA);
     expect(warnings.some((w) => w.includes("action verbs"))).toBe(false);
+  });
+
+  it("warns on HTTP links in Projects section", () => {
+    const withHttpProject =
+      "# Paul Prae\n\n## Professional Summary\n\nSummary.\n\n## Professional Experience\n\n### Engineer\n**Acme AI Corp** | SF | Jan 2023 – Present\n\n- Led AI platform\n- Built systems\n- Reduced latency by 40%\n\n## Education\n\n## Technical Skills\n\n## Projects\n\n### [Old Project](http://example.com/old)\nA stale project.\n\n" +
+      "x".repeat(3000);
+    const warnings = validateResumeOutput(withHttpProject, SAMPLE_CAREER_DATA);
+    expect(warnings.some((w) => w.includes("non-HTTPS link"))).toBe(true);
+  });
+
+  it("does not warn on HTTPS links in Projects section", () => {
+    const withHttpsProject =
+      "# Paul Prae\n\n## Professional Summary\n\nSummary.\n\n## Professional Experience\n\n### Engineer\n**Acme AI Corp** | SF | Jan 2023 – Present\n\n- Led AI platform\n- Built systems\n- Reduced latency by 40%\n\n## Education\n\n## Technical Skills\n\n## Projects\n\n### [Good Project](https://example.com/good)\nA modern project.\n\n" +
+      "x".repeat(3000);
+    const warnings = validateResumeOutput(withHttpsProject, SAMPLE_CAREER_DATA);
+    expect(warnings.some((w) => w.includes("non-HTTPS link"))).toBe(false);
+  });
+
+  it("warns on suspicious compound phrases in Professional Summary", () => {
+    const withInventedPhrase =
+      "# Paul Prae\n\n## Professional Summary\n\nDemonstrates progressive engineering leadership across multiple domains.\n\n---\n\n## Professional Experience\n\n### Engineer\n**Acme AI Corp** | SF | Jan 2023 – Present\n\n- Led AI platform\n- Built systems\n- Reduced latency by 40%\n\n## Education\n\n## Technical Skills\n\n" +
+      "x".repeat(3000);
+    const warnings = validateResumeOutput(withInventedPhrase, SAMPLE_CAREER_DATA);
+    expect(warnings.some((w) => w.includes("invented phrasing"))).toBe(true);
   });
 });
 
