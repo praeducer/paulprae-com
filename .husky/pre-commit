@@ -1,1 +1,23 @@
-npx lint-staged
+#!/usr/bin/env sh
+
+# Source nvm if available (WSL / Linux with nvm-managed node)
+[ -f "$HOME/.nvm/nvm.sh" ] && . "$HOME/.nvm/nvm.sh"
+
+# Run lint-staged directly if npx is on PATH
+if command -v npx >/dev/null 2>&1; then
+  npx lint-staged
+  exit $?
+fi
+
+# Fallback: Windows Git client (GitHub Desktop, VS Code, etc.)
+# npx isn't available in MINGW bash — delegate to WSL where node lives
+if command -v wsl.exe >/dev/null 2>&1; then
+  # MINGW pwd returns //wsl.localhost/Ubuntu/home/... — strip the UNC prefix
+  WSL_DIR="$(pwd | sed 's|^//wsl\.localhost/[^/]*||')"
+  if [ -n "$WSL_DIR" ]; then
+    wsl.exe bash -lc ". \$HOME/.nvm/nvm.sh 2>/dev/null; cd \"${WSL_DIR}\" && npx lint-staged"
+    exit $?
+  fi
+fi
+
+echo "husky: npx not found — skipping pre-commit hook"
