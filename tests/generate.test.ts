@@ -22,7 +22,14 @@ import { describe, it, expect } from "vitest";
 import { _testExports } from "../scripts/generate-resume.js";
 import { SAMPLE_CAREER_DATA, SAMPLE_RESUME_CLEAN } from "./fixtures/sample-data.js";
 
-const { SYSTEM_PROMPT, buildUserMessage, validateResumeOutput } = _testExports;
+const {
+  SYSTEM_PROMPT,
+  SYSTEM_PROMPT_BASE,
+  FEW_SHOT_EXAMPLES,
+  INCLUDE_FEW_SHOT,
+  buildUserMessage,
+  validateResumeOutput,
+} = _testExports;
 
 // ─── System Prompt Quality ──────────────────────────────────────────────────
 // The system prompt is the foundation of resume quality. These tests ensure
@@ -229,5 +236,90 @@ describe("resume content quality (fixture)", () => {
     const principalIdx = resume.indexOf("Principal AI Engineer");
     const seniorIdx = resume.indexOf("Senior ML Engineer");
     expect(principalIdx).toBeLessThan(seniorIdx);
+  });
+});
+
+// ─── Few-Shot Examples & Section Priority ────────────────────────────────────
+
+describe("few-shot examples", () => {
+  it("INCLUDE_FEW_SHOT is enabled by default", () => {
+    expect(INCLUDE_FEW_SHOT).toBe(true);
+  });
+
+  it("SYSTEM_PROMPT includes few-shot examples when enabled", () => {
+    expect(SYSTEM_PROMPT).toContain("Examples of Strong vs Weak Position Bullets");
+    expect(SYSTEM_PROMPT).toContain("Weak:");
+    expect(SYSTEM_PROMPT).toContain("Strong:");
+  });
+
+  it("FEW_SHOT_EXAMPLES contains at least 3 weak/strong pairs", () => {
+    const weakCount = (FEW_SHOT_EXAMPLES.match(/Weak:/g) || []).length;
+    const strongCount = (FEW_SHOT_EXAMPLES.match(/Strong:/g) || []).length;
+    expect(weakCount).toBeGreaterThanOrEqual(3);
+    expect(strongCount).toBeGreaterThanOrEqual(3);
+  });
+
+  it("SYSTEM_PROMPT_BASE does not contain few-shot examples", () => {
+    expect(SYSTEM_PROMPT_BASE).not.toContain("Examples of Strong vs Weak");
+  });
+
+  it("includes section priority guidance", () => {
+    expect(SYSTEM_PROMPT).toContain("Section Priority Guidance");
+    expect(SYSTEM_PROMPT).toContain("HIGHEST PRIORITY");
+    expect(SYSTEM_PROMPT).toContain("Professional Summary");
+  });
+});
+
+// ─── Enhanced Validation Rules ───────────────────────────────────────────────
+
+describe("validateResumeOutput — enhanced checks", () => {
+  const validResume = SAMPLE_RESUME_CLEAN + "\n\n" + "Additional experience details. ".repeat(100);
+
+  it("catches first-person I statements", () => {
+    const withFirstPerson =
+      "# Paul Prae\n\n## Professional Summary\n\nI led a team.\n\n## Professional Experience\n\n## Education\n\n## Technical Skills\n\n" +
+      "x".repeat(3000);
+    const warnings = validateResumeOutput(withFirstPerson, SAMPLE_CAREER_DATA);
+    expect(warnings.some((w) => w.includes("first-person"))).toBe(true);
+  });
+
+  it("does not flag AI or other words containing I", () => {
+    const warnings = validateResumeOutput(validResume, SAMPLE_CAREER_DATA);
+    // The sample resume contains "AI" many times — should not trigger
+    expect(warnings.some((w) => w.includes("first-person"))).toBe(false);
+  });
+
+  it("catches passive voice markers", () => {
+    const withPassive =
+      "# Paul Prae\n\n## Professional Summary\n\nWas responsible for building systems.\n\n## Professional Experience\n\n## Education\n\n## Technical Skills\n\n" +
+      "x".repeat(3000);
+    const warnings = validateResumeOutput(withPassive, SAMPLE_CAREER_DATA);
+    expect(warnings.some((w) => w.includes("passive/weak phrasing"))).toBe(true);
+  });
+
+  it("does not flag valid resume for passive voice", () => {
+    const warnings = validateResumeOutput(validResume, SAMPLE_CAREER_DATA);
+    expect(warnings.some((w) => w.includes("passive/weak phrasing"))).toBe(false);
+  });
+
+  it("catches numeric date formats in experience section", () => {
+    const withNumericDates =
+      "# Paul Prae\n\n## Professional Summary\n\nSummary.\n\n## Professional Experience\n\n### Engineer\n**Acme AI Corp** | SF | 01/2023 – Present\n\n- Built stuff\n\n## Education\n\n## Technical Skills\n\n" +
+      "x".repeat(3000);
+    const warnings = validateResumeOutput(withNumericDates, SAMPLE_CAREER_DATA);
+    expect(warnings.some((w) => w.includes("numeric format"))).toBe(true);
+  });
+
+  it("validates action verbs in experience bullets", () => {
+    const weakBullets =
+      "# Paul Prae\n\n## Professional Summary\n\nSummary.\n\n## Professional Experience\n\n### Engineer\n**Acme AI Corp** | SF | Jan 2023 – Present\n\n- Worked on stuff\n- Did things\n- Helped team\n\n## Education\n\n## Technical Skills\n\n" +
+      "x".repeat(3000);
+    const warnings = validateResumeOutput(weakBullets, SAMPLE_CAREER_DATA);
+    expect(warnings.some((w) => w.includes("action verbs"))).toBe(true);
+  });
+
+  it("does not flag positions with strong action verbs", () => {
+    const warnings = validateResumeOutput(validResume, SAMPLE_CAREER_DATA);
+    expect(warnings.some((w) => w.includes("action verbs"))).toBe(false);
   });
 });

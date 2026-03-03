@@ -42,11 +42,17 @@ function shouldSkipGenerate(): boolean {
   return outputMtime > inputMtime;
 }
 
+// ─── Prompt Configuration ────────────────────────────────────────────────────
+// INCLUDE_FEW_SHOT controls whether few-shot examples are appended to the
+// system prompt. Enabled for resume generation (infrequent, quality-critical).
+// Phase 2 chat skills may disable this to save tokens per conversation turn.
+const INCLUDE_FEW_SHOT = true;
+
 // ─── System Prompt ───────────────────────────────────────────────────────────
 // Encodes brand voice, formatting rules, quality criteria, and target context.
 // Kept separate from career data so it's stable across regenerations.
 
-const SYSTEM_PROMPT = `You are an elite professional resume writer and career strategist specializing in senior technology leadership roles. You produce polished, ATS-optimized resumes that position candidates for maximum impact.
+const SYSTEM_PROMPT_BASE = `You are an elite professional resume writer and career strategist specializing in senior technology leadership roles. You produce polished, ATS-optimized resumes that position candidates for maximum impact.
 
 ## Your Task
 
@@ -163,7 +169,32 @@ IMPORTANT: Insert a blank line between each category so they render as separate 
 - Use standard Markdown: # for H1, ## for H2, ### for H3, - for bullets, **bold** for emphasis
 - Use --- for horizontal rules between major sections
 - Dates should use "Mon YYYY" format (e.g., "Jan 2020")
-- For current positions, use "Present" as the end date`;
+- For current positions, use "Present" as the end date
+
+## Section Priority Guidance
+
+Weight resume real estate according to recruiter reading patterns:
+1. **Professional Summary** (HIGHEST PRIORITY) — First thing screened. Must immediately convey seniority, domain expertise, and unique value proposition. Make every word count.
+2. **Professional Experience** — Core content, largest section. Recent roles (last 5 years) get 3-5 bullets each; older roles get 1-2 bullets. Transform responsibilities into measurable impacts.
+3. **Technical Skills** — ATS gating section. Must include keywords that match target job descriptions. Group by relevance to AI leadership.
+4. **Certifications / Projects / Publications** — Supporting evidence. Include selectively — only items that strengthen the AI engineering narrative.`;
+
+const FEW_SHOT_EXAMPLES = `
+
+## Examples of Strong vs Weak Position Bullets
+
+Weak: "Worked on machine learning projects"
+Strong: "Designed and deployed 3 production ML models serving 50M+ health plan members, reducing manual clinical review time by 40% and generating $2M+ in annual value"
+
+Weak: "Led a team of engineers"
+Strong: "Led cross-functional team of 8 engineers delivering HIPAA-compliant AI agents across 45+ health plans, reducing manual data operations by 60%"
+
+Weak: "Responsible for data pipeline development"
+Strong: "Architected real-time data pipeline processing 500M+ clinical records daily, achieving 99.9% uptime and reducing processing latency from 4 hours to 12 minutes"`;
+
+const SYSTEM_PROMPT = INCLUDE_FEW_SHOT
+  ? SYSTEM_PROMPT_BASE + FEW_SHOT_EXAMPLES
+  : SYSTEM_PROMPT_BASE;
 
 // ─── Build User Message ──────────────────────────────────────────────────────
 // Structures career data into labeled sections so Claude can reason about
@@ -254,6 +285,63 @@ function validateResumeOutput(markdown: string, careerData: CareerData): string[
   // Check H1 heading exists (candidate name)
   if (!markdown.startsWith("# ")) {
     warnings.push("Resume does not start with H1 heading (# Name)");
+  }
+
+  // Check for first-person "I" statements (brand voice requires third-person)
+  // Match standalone "I" as a word (not inside other words like "AI" or "LinkedIn")
+  const firstPersonPattern =
+    /(?<![A-Za-z])I(?:\s+(?:led|built|managed|created|developed|designed|worked|helped|assisted|was|am|have|had))\b/;
+  if (firstPersonPattern.test(markdown)) {
+    warnings.push(
+      'Resume contains first-person "I" statements (brand voice requires third-person)',
+    );
+  }
+
+  // Check for passive voice markers
+  const passiveMarkers = [
+    "was responsible for",
+    "was involved in",
+    "was tasked with",
+    "assisted with",
+    "helped with",
+    "participated in",
+  ];
+  for (const marker of passiveMarkers) {
+    if (markdown.toLowerCase().includes(marker)) {
+      warnings.push(`Resume contains passive/weak phrasing: "${marker}"`);
+    }
+  }
+
+  // Check for invalid markdown link syntax (unmatched brackets/parens)
+  const brokenLinks = /\[[^\]]*\]\([^)]*$|\[[^\]]*$\(/gm;
+  if (brokenLinks.test(markdown)) {
+    warnings.push("Resume contains malformed markdown link syntax");
+  }
+
+  // Check date format consistency (should be "Mon YYYY" in experience sections)
+  const experienceSection =
+    markdown.split("## Professional Experience")[1]?.split(/^## /m)[0] || "";
+  if (experienceSection) {
+    // Dates in experience should follow "Mon YYYY" or "Present" — flag numeric-only dates
+    const numericDates = /\b(?:0?[1-9]|1[0-2])\/\d{4}\b/.test(experienceSection);
+    if (numericDates) {
+      warnings.push('Experience dates use numeric format (expected "Mon YYYY")');
+    }
+  }
+
+  // Check that experience bullets use action verbs (at least 2 per position)
+  const positionBlocks = experienceSection.split(/^### /m).filter((b) => b.trim());
+  for (const block of positionBlocks) {
+    const bullets = block.match(/^- .+/gm) || [];
+    const actionVerbPattern =
+      /^- (?:Led|Architected|Built|Designed|Delivered|Developed|Established|Scaled|Reduced|Automated|Deployed|Implemented|Launched|Managed|Mentored|Optimized|Spearheaded|Transformed|Created|Drove|Engineered|Executed|Integrated|Migrated|Orchestrated|Pioneered|Streamlined)/;
+    const actionBullets = bullets.filter((b) => actionVerbPattern.test(b));
+    if (bullets.length >= 2 && actionBullets.length < 2) {
+      const posTitle = block.split("\n")[0].trim();
+      warnings.push(
+        `Position "${posTitle}" has ${actionBullets.length}/${bullets.length} bullets starting with action verbs (recommend ≥2)`,
+      );
+    }
   }
 
   return warnings;
@@ -476,6 +564,9 @@ async function generate(): Promise<GenerationResult> {
 
 export const _testExports = {
   SYSTEM_PROMPT,
+  SYSTEM_PROMPT_BASE,
+  FEW_SHOT_EXAMPLES,
+  INCLUDE_FEW_SHOT,
   buildUserMessage,
   validateResumeOutput,
   formatMarkdown,
