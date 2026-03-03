@@ -28,6 +28,7 @@
 import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
+import { execFileSync } from "child_process";
 import { PATHS } from "../lib/config.js";
 import { stripHtmlComments } from "../lib/markdown.js";
 import type { CareerData } from "../lib/types.js";
@@ -303,6 +304,23 @@ describe("resume DOCX", () => {
     const kb = stats.size / 1024;
     expect(kb).toBeGreaterThanOrEqual(5);
     expect(kb).toBeLessThanOrEqual(200);
+  });
+
+  it.skipIf(!exists)("has Word 2013+ compatibility mode (no Compatibility Mode banner)", () => {
+    // DOCX is a ZIP archive; word/settings.xml must declare compatibilityMode=15
+    const tmpDir = path.join(path.dirname(PATHS.docxOutput), `_docx_test_${Date.now()}`);
+    try {
+      fs.mkdirSync(tmpDir, { recursive: true });
+      execFileSync("unzip", ["-o", PATHS.docxOutput, "word/settings.xml", "-d", tmpDir], {
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+      const settings = fs.readFileSync(path.join(tmpDir, "word", "settings.xml"), "utf-8");
+      expect(settings).toContain("compatibilityMode");
+      expect(settings).toContain('w:val="15"');
+      expect(settings).not.toContain("<w:doNotTrackMoves");
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
   });
 });
 

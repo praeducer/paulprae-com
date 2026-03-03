@@ -99,6 +99,60 @@ function ensureOutputDir(): void {
   }
 }
 
+/**
+ * Post-process a Pandoc-generated DOCX to set Word 2013+ compatibility mode.
+ *
+ * Pandoc's default DOCX template omits the <w:compat> section in word/settings.xml,
+ * which causes modern versions of Microsoft Word to open the document in
+ * "Compatibility Mode" with a warning banner. Adding compatibilityMode=15 (Word 2013+)
+ * eliminates this and enables full modern Word features.
+ */
+function fixDocxCompatibility(docxPath: string): void {
+  const suffix = crypto.randomUUID().slice(0, 8);
+  const extractDir = path.join(path.dirname(docxPath), `_docx_fix_${suffix}`);
+
+  try {
+    // Extract the DOCX (which is a ZIP archive)
+    fs.mkdirSync(extractDir, { recursive: true });
+    execFileSync("unzip", ["-o", docxPath, "-d", extractDir], {
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+
+    // Patch word/settings.xml to add compatibility mode
+    const settingsPath = path.join(extractDir, "word", "settings.xml");
+    if (!fs.existsSync(settingsPath)) return;
+
+    let settings = fs.readFileSync(settingsPath, "utf-8");
+
+    // Remove legacy compatibility flags that trigger old-format detection
+    settings = settings.replace(/<w:doNotTrackMoves\s*\/>/g, "");
+
+    // Add <w:compat> section with Word 2013+ compatibility mode (val=15)
+    // Insert before the closing </w:settings> tag
+    if (!settings.includes("<w:compat")) {
+      const compatBlock = [
+        "<w:compat>",
+        '  <w:compatSetting w:name="compatibilityMode"',
+        '    w:uri="http://schemas.microsoft.com/office/word" w:val="15"/>',
+        "</w:compat>",
+      ].join("");
+      settings = settings.replace("</w:settings>", compatBlock + "</w:settings>");
+    }
+
+    fs.writeFileSync(settingsPath, settings, "utf-8");
+
+    // Repackage into DOCX — must use stored paths relative to the extract root
+    fs.unlinkSync(docxPath);
+    execFileSync("zip", ["-r", docxPath, "."], {
+      cwd: extractDir,
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+  } finally {
+    // Clean up extracted directory
+    fs.rmSync(extractDir, { recursive: true, force: true });
+  }
+}
+
 function exportDocx(markdown: string): void {
   console.log("   📄 Generating DOCX...");
 
@@ -118,6 +172,14 @@ function exportDocx(markdown: string): void {
     } catch (err: unknown) {
       console.error(`      ❌ Pandoc DOCX conversion failed:\n      ${extractStderr(err)}`);
       process.exit(1);
+    }
+
+    // Fix compatibility mode so Word doesn't show "Compatibility Mode" banner
+    try {
+      fixDocxCompatibility(PATHS.docxOutput);
+    } catch (err: unknown) {
+      // Non-fatal: the DOCX is still usable, just may show the compat warning
+      console.warn(`      ⚠️  DOCX compatibility fix skipped: ${extractStderr(err)}`);
     }
 
     const stats = fs.statSync(PATHS.docxOutput);
@@ -424,6 +486,7 @@ export const _testExports = {
   loadAndCleanMarkdown,
   exportDocx,
   exportPdf,
+  fixDocxCompatibility,
   ensureOutputDir,
   archiveVersions,
   updateManifest,
