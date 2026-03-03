@@ -2,7 +2,7 @@
  * generate-resume.ts — Unit tests for Claude API resume generation.
  *
  * Tests cover: system prompt quality, user message construction,
- * post-generation validation, and content quality checks.
+ * post-generation validation, quality scoring, and content quality checks.
  *
  * NOTE: These tests do NOT call the Claude API. They test the prompt
  * engineering, message construction, and validation logic around the API call.
@@ -25,8 +25,17 @@ import matter from "gray-matter";
 import { _testExports } from "../scripts/generate-resume.js";
 import { SAMPLE_CAREER_DATA, SAMPLE_RESUME_CLEAN } from "./fixtures/sample-data.js";
 
-const { SYSTEM_PROMPT, INCLUDE_FEW_SHOT, buildUserMessage, validateResumeOutput, stripEmpty } =
-  _testExports;
+const {
+  SYSTEM_PROMPT,
+  INCLUDE_FEW_SHOT,
+  PROMPT_VERSION,
+  buildUserMessage,
+  validateResumeOutput,
+  scoreResume,
+  formatScoreReport,
+  MAJOR_COMPANIES,
+  stripEmpty,
+} = _testExports;
 
 // ─── System Prompt Quality ──────────────────────────────────────────────────
 // The system prompt is the foundation of resume quality. These tests ensure
@@ -57,11 +66,43 @@ describe("SYSTEM_PROMPT", () => {
     expect(SYSTEM_PROMPT).toContain("Technical Skills");
   });
 
-  it("includes quality criteria", () => {
-    expect(SYSTEM_PROMPT).toContain("ATS Optimization");
-    expect(SYSTEM_PROMPT).toContain("Quantified Impact");
-    expect(SYSTEM_PROMPT).toContain("No Fabrication");
+  it("includes quality rules (v1.1 numbered format)", () => {
+    expect(SYSTEM_PROMPT).toContain("Quality Rules");
+    expect(SYSTEM_PROMPT).toContain("Rule 1: Length");
+    expect(SYSTEM_PROMPT).toContain("Rule 2: ATS Optimization");
+    expect(SYSTEM_PROMPT).toContain("Rule 3: Quantified Impact");
+    expect(SYSTEM_PROMPT).toContain("Rule 7: No Fabrication");
     expect(SYSTEM_PROMPT).toContain("Approximately 2 pages");
+  });
+
+  it("includes recency-based bullet allocation tiers (Rule 4)", () => {
+    expect(SYSTEM_PROMPT).toContain("Rule 4: Recency-Based Bullet Allocation");
+    expect(SYSTEM_PROMPT).toContain("Tier 1 (last 2 years)");
+    expect(SYSTEM_PROMPT).toContain("Tier 2 (2-5 years");
+    expect(SYSTEM_PROMPT).toContain("Tier 3 (5-10 years");
+    expect(SYSTEM_PROMPT).toContain("Tier 4 (10+ years");
+    expect(SYSTEM_PROMPT).toContain("Never drop a position at a major company");
+  });
+
+  it("includes cross-section deduplication rule (Rule 8)", () => {
+    expect(SYSTEM_PROMPT).toContain("Rule 8: No Cross-Section Duplication");
+    expect(SYSTEM_PROMPT).toContain("Publications section MUST NOT repeat in the Projects section");
+  });
+
+  it("includes projects selection guidance (Rule 9)", () => {
+    expect(SYSTEM_PROMPT).toContain("Rule 9: Projects Selection");
+    expect(SYSTEM_PROMPT).toContain("different capabilities");
+    expect(SYSTEM_PROMPT).toContain(
+      "Never duplicate a project that already appears in Publications",
+    );
+  });
+
+  it("includes knowledge base integration strategy", () => {
+    expect(SYSTEM_PROMPT).toContain("Knowledge Base Integration Strategy");
+    expect(SYSTEM_PROMPT).toContain("relatedPositions");
+    expect(SYSTEM_PROMPT).toContain("position_id");
+    expect(SYSTEM_PROMPT).toContain("Cross-reference company context");
+    expect(SYSTEM_PROMPT).toContain("Synthesize multiple signals");
   });
 
   it("includes output format instructions", () => {
@@ -73,13 +114,19 @@ describe("SYSTEM_PROMPT", () => {
     expect(SYSTEM_PROMPT).toContain("STAR method");
   });
 
-  it("prohibits fabrication", () => {
+  it("includes strengthened no-fabrication rule with data maximization", () => {
     expect(SYSTEM_PROMPT).toContain("Only use data provided");
+    expect(SYSTEM_PROMPT).toContain("maximize data utilization");
+    expect(SYSTEM_PROMPT).toContain("knowledge base entry");
   });
 
   it("is long enough for prompt caching (>1024 tokens ≈ 4000 chars)", () => {
     // Anthropic prompt caching requires >1024 tokens. System prompt is ~2000 tokens.
     expect(SYSTEM_PROMPT.length).toBeGreaterThan(4000);
+  });
+
+  it("has prompt version 1.1", () => {
+    expect(PROMPT_VERSION).toBe("resume-writer@1.1");
   });
 });
 
@@ -249,11 +296,19 @@ describe("few-shot examples", () => {
     expect(SYSTEM_PROMPT).toContain("Strong:");
   });
 
-  it("SYSTEM_PROMPT contains at least 3 weak/strong pairs from few-shot file", () => {
+  it("SYSTEM_PROMPT contains at least 5 weak/strong pairs from few-shot file", () => {
     const weakCount = (SYSTEM_PROMPT.match(/Weak:/g) || []).length;
     const strongCount = (SYSTEM_PROMPT.match(/Strong:/g) || []).length;
-    expect(weakCount).toBeGreaterThanOrEqual(3);
-    expect(strongCount).toBeGreaterThanOrEqual(3);
+    expect(weakCount).toBeGreaterThanOrEqual(5);
+    expect(strongCount).toBeGreaterThanOrEqual(5);
+  });
+
+  it("includes sparse-data enrichment example", () => {
+    expect(SYSTEM_PROMPT).toContain("Fortune 500 consulting firm");
+  });
+
+  it("includes leadership/management transformation example", () => {
+    expect(SYSTEM_PROMPT).toContain("structured mentorship programs");
   });
 
   it("loading without few-shot excludes examples", () => {
@@ -263,8 +318,8 @@ describe("few-shot examples", () => {
     expect(content).not.toContain("Examples of Strong vs Weak");
   });
 
-  it("includes section priority guidance", () => {
-    expect(SYSTEM_PROMPT).toContain("Section Priority Guidance");
+  it("includes section priority weighting (Rule 10)", () => {
+    expect(SYSTEM_PROMPT).toContain("Section Priority Weighting");
     expect(SYSTEM_PROMPT).toContain("HIGHEST PRIORITY");
     expect(SYSTEM_PROMPT).toContain("Professional Summary");
   });
@@ -321,6 +376,105 @@ describe("validateResumeOutput — enhanced checks", () => {
   it("does not flag positions with strong action verbs", () => {
     const warnings = validateResumeOutput(validResume, SAMPLE_CAREER_DATA);
     expect(warnings.some((w) => w.includes("action verbs"))).toBe(false);
+  });
+});
+
+// ─── Quantification Density Validation ──────────────────────────────────────
+
+describe("validateResumeOutput — quantification density", () => {
+  it("warns when a position has 2+ bullets but zero quantified metrics", () => {
+    const noMetrics =
+      "# Paul Prae\n\n## Professional Summary\n\nSummary.\n\n## Professional Experience\n\n### Engineer\n**Acme AI Corp** | SF | Jan 2023 – Present\n\n- Led the development of AI solutions\n- Collaborated with cross-functional teams on projects\n- Designed systems for healthcare clients\n\n## Education\n\n## Technical Skills\n\n" +
+      "x".repeat(3000);
+    const warnings = validateResumeOutput(noMetrics, SAMPLE_CAREER_DATA);
+    expect(warnings.some((w) => w.includes("zero quantified metrics"))).toBe(true);
+  });
+
+  it("does not warn when bullets contain quantified metrics", () => {
+    const withMetrics =
+      "# Paul Prae\n\n## Professional Summary\n\nSummary.\n\n## Professional Experience\n\n### Engineer\n**Acme AI Corp** | SF | Jan 2023 – Present\n\n- Led team of 8 engineers delivering AI solutions\n- Reduced processing time by 40% through optimization\n- Architected systems serving 10+ enterprise clients\n\n## Education\n\n## Technical Skills\n\n" +
+      "x".repeat(3000);
+    const warnings = validateResumeOutput(withMetrics, SAMPLE_CAREER_DATA);
+    expect(warnings.some((w) => w.includes("zero quantified metrics"))).toBe(false);
+  });
+});
+
+// ─── Recency Tier Bullet Count Validation ───────────────────────────────────
+
+describe("validateResumeOutput — recency tier bullet counts", () => {
+  it("warns when a recent position (Tier 1) has fewer than 3 bullets", () => {
+    const fewBullets =
+      "# Paul Prae\n\n## Professional Summary\n\nSummary.\n\n## Professional Experience\n\n### Engineer\n**Acme AI Corp** | SF | Jan 2024 – Present\n\n- Led AI platform with 500+ clients\n\n## Education\n\n## Technical Skills\n\n" +
+      "x".repeat(3000);
+    const warnings = validateResumeOutput(fewBullets, SAMPLE_CAREER_DATA);
+    expect(warnings.some((w) => w.includes("Tier 1") && w.includes("minimum is 3"))).toBe(true);
+  });
+
+  it("does not warn when a recent position has sufficient bullets", () => {
+    const enoughBullets =
+      "# Paul Prae\n\n## Professional Summary\n\nSummary.\n\n## Professional Experience\n\n### Engineer\n**Acme AI Corp** | SF | Jan 2024 – Present\n\n- Led AI platform serving 500+ clients\n- Reduced latency by 40% through optimization\n- Built team of 8 engineers for ML deployment\n\n## Education\n\n## Technical Skills\n\n" +
+      "x".repeat(3000);
+    const warnings = validateResumeOutput(enoughBullets, SAMPLE_CAREER_DATA);
+    expect(warnings.some((w) => w.includes("Tier 1"))).toBe(false);
+  });
+});
+
+// ─── Quality Scoring ────────────────────────────────────────────────────────
+
+describe("scoreResume", () => {
+  it("scores sample resume with expected components", () => {
+    const score = scoreResume(SAMPLE_RESUME_CLEAN);
+    expect(score.sectionCount).toBeGreaterThanOrEqual(4);
+    expect(score.positionCount).toBe(2);
+    expect(score.totalBullets).toBeGreaterThanOrEqual(4);
+    expect(score.quantifiedBullets).toBeGreaterThan(0);
+    expect(score.charCount).toBeGreaterThan(0);
+    expect(score.total).toBeGreaterThan(0);
+  });
+
+  it("scores an empty resume at zero or near-zero", () => {
+    const score = scoreResume("# Name\n\nEmpty resume");
+    expect(score.positionCount).toBe(0);
+    expect(score.totalBullets).toBe(0);
+    expect(score.total).toBeLessThan(50);
+  });
+
+  it("scores higher for more positions and bullets", () => {
+    const simple =
+      "# Name\n\n## Professional Experience\n\n### Role A\n**Co A** | Loc | Jan 2024 – Present\n\n- Did thing 1\n";
+    const rich =
+      "# Name\n\n## Professional Experience\n\n### Role A\n**Co A** | Loc | Jan 2024 – Present\n\n- Led team of 5 engineers\n- Reduced cost by 30%\n- Built 3 production systems\n\n### Role B\n**Co B** | Loc | Jan 2020 – Dec 2023\n\n- Delivered $2M+ in revenue\n- Managed 10+ client accounts\n";
+    const simpleScore = scoreResume(simple);
+    const richScore = scoreResume(rich);
+    expect(richScore.total).toBeGreaterThan(simpleScore.total);
+  });
+
+  it("detects major company coverage", () => {
+    const withCompanies =
+      "# Name\n\n## Professional Experience\n\n### Architect\n**Amazon Web Services** | Remote\n\n- Stuff\n\n### Engineer\n**Microsoft** | Remote\n\n- Things\n";
+    const score = scoreResume(withCompanies);
+    expect(score.majorCompanyCoverage).toBeGreaterThanOrEqual(2);
+  });
+
+  it("MAJOR_COMPANIES list includes key companies", () => {
+    expect(MAJOR_COMPANIES).toContain("Arine");
+    expect(MAJOR_COMPANIES).toContain("Booz Allen Hamilton");
+    expect(MAJOR_COMPANIES).toContain("Amazon Web Services");
+    expect(MAJOR_COMPANIES).toContain("Slalom");
+    expect(MAJOR_COMPANIES).toContain("Red Ventures");
+    expect(MAJOR_COMPANIES).toContain("Microsoft");
+  });
+});
+
+describe("formatScoreReport", () => {
+  it("formats a readable score report", () => {
+    const score = scoreResume(SAMPLE_RESUME_CLEAN);
+    const report = formatScoreReport("Test", score);
+    expect(report).toContain("Test Quality Score:");
+    expect(report).toContain("Sections:");
+    expect(report).toContain("Positions:");
+    expect(report).toContain("Quantified bullets:");
+    expect(report).toContain("Major companies:");
   });
 });
 

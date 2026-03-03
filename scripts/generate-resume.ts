@@ -219,18 +219,156 @@ function validateResumeOutput(markdown: string, careerData: CareerData): string[
   const positionBlocks = experienceSection.split(/^### /m).filter((b) => b.trim());
   for (const block of positionBlocks) {
     const bullets = block.match(/^- .+/gm) || [];
+    const posTitle = block.split("\n")[0].trim();
     const actionVerbPattern =
       /^- (?:Led|Architected|Built|Designed|Delivered|Developed|Established|Scaled|Reduced|Automated|Deployed|Implemented|Launched|Managed|Mentored|Optimized|Spearheaded|Transformed|Created|Drove|Engineered|Executed|Integrated|Migrated|Orchestrated|Pioneered|Streamlined)/;
     const actionBullets = bullets.filter((b) => actionVerbPattern.test(b));
     if (bullets.length >= 2 && actionBullets.length < 2) {
-      const posTitle = block.split("\n")[0].trim();
       warnings.push(
         `Position "${posTitle}" has ${actionBullets.length}/${bullets.length} bullets starting with action verbs (recommend ≥2)`,
+      );
+    }
+
+    // Quantification density: warn if a position has 2+ bullets but zero quantified metrics
+    const quantPattern = /\d+[%+]|\$[\d,.]+|\d+M\+|\d+K\+|\d+,\d{3}|\d+\+\s|team of \d/;
+    const quantBullets = bullets.filter((b) => quantPattern.test(b));
+    if (bullets.length >= 2 && quantBullets.length === 0) {
+      warnings.push(
+        `Position "${posTitle}" has ${bullets.length} bullets but zero quantified metrics (numbers, percentages, dollar amounts)`,
+      );
+    }
+  }
+
+  // Minimum bullet count by recency tier
+  const currentYear = new Date().getFullYear();
+  for (const block of positionBlocks) {
+    const posTitle = block.split("\n")[0].trim();
+    const bullets = block.match(/^- .+/gm) || [];
+
+    // Extract end date from the position block (format: "Mon YYYY – Mon YYYY" or "– Present")
+    const dateMatch = block.match(
+      /\|\s*(?:[A-Z][a-z]{2}\s+)?(\d{4})\s*[–-]\s*(?:Present|(?:[A-Z][a-z]{2}\s+)?(\d{4}))/,
+    );
+    let endYear = currentYear;
+    if (dateMatch) {
+      endYear = dateMatch[2] ? parseInt(dateMatch[2]) : currentYear;
+    }
+
+    const yearsAgo = currentYear - endYear;
+    let minBullets: number;
+    let tier: string;
+
+    if (yearsAgo <= 2) {
+      minBullets = 3;
+      tier = "Tier 1 (last 2 years)";
+    } else if (yearsAgo <= 5) {
+      minBullets = 2;
+      tier = "Tier 2 (2-5 years)";
+    } else if (yearsAgo <= 10) {
+      minBullets = 2;
+      tier = "Tier 3 (5-10 years)";
+    } else {
+      minBullets = 1;
+      tier = "Tier 4 (10+ years)";
+    }
+
+    if (bullets.length < minBullets) {
+      warnings.push(
+        `Position "${posTitle}" has ${bullets.length} bullet(s) — ${tier} minimum is ${minBullets}`,
       );
     }
   }
 
   return warnings;
+}
+
+// ─── Quality Scoring ─────────────────────────────────────────────────────────
+// Numeric quality score for regression detection. Higher is better.
+
+interface ResumeQualityScore {
+  /** Total score (sum of all components) */
+  total: number;
+  /** Number of ## sections found */
+  sectionCount: number;
+  /** Number of positions in Experience section */
+  positionCount: number;
+  /** Total bullet count across all positions */
+  totalBullets: number;
+  /** Number of bullets containing quantified metrics */
+  quantifiedBullets: number;
+  /** Resume character count */
+  charCount: number;
+  /** Number of major companies (Fortune 500 / recognized brands) found */
+  majorCompanyCoverage: number;
+}
+
+const MAJOR_COMPANIES = [
+  "Arine",
+  "Booz Allen Hamilton",
+  "Amazon Web Services",
+  "Slalom",
+  "Red Ventures",
+  "Microsoft",
+  "Hyperbloom",
+  "Modular Earth",
+  "Mento",
+  "TReNDS",
+  "NeuroLex",
+  "Decooda",
+];
+
+function scoreResume(markdown: string): ResumeQualityScore {
+  const sectionCount = (markdown.match(/^## /gm) || []).length;
+
+  const experienceSection =
+    markdown.split("## Professional Experience")[1]?.split(/^## /m)[0] || "";
+  const positionBlocks = experienceSection.split(/^### /m).filter((b) => b.trim());
+  const positionCount = positionBlocks.length;
+
+  let totalBullets = 0;
+  let quantifiedBullets = 0;
+  const quantPattern = /\d+[%+]|\$[\d,.]+|\d+M\+|\d+K\+|\d+,\d{3}|\d+\+\s|team of \d/;
+
+  for (const block of positionBlocks) {
+    const bullets = block.match(/^- .+/gm) || [];
+    totalBullets += bullets.length;
+    quantifiedBullets += bullets.filter((b) => quantPattern.test(b)).length;
+  }
+
+  const charCount = markdown.length;
+
+  let majorCompanyCoverage = 0;
+  for (const company of MAJOR_COMPANIES) {
+    if (markdown.includes(company)) majorCompanyCoverage++;
+  }
+
+  // Scoring weights — each component contributes to the total
+  const total =
+    sectionCount * 5 + // ~6 sections × 5 = 30 points
+    positionCount * 8 + // ~10 positions × 8 = 80 points
+    totalBullets * 3 + // ~30 bullets × 3 = 90 points
+    quantifiedBullets * 5 + // ~15 quant bullets × 5 = 75 points
+    majorCompanyCoverage * 10 + // ~10 companies × 10 = 100 points
+    Math.min(charCount / 100, 80); // max 80 points for length
+
+  return {
+    total: Math.round(total),
+    sectionCount,
+    positionCount,
+    totalBullets,
+    quantifiedBullets,
+    charCount,
+    majorCompanyCoverage,
+  };
+}
+
+function formatScoreReport(label: string, score: ResumeQualityScore): string {
+  return [
+    `   ${label} Quality Score: ${score.total}`,
+    `     Sections: ${score.sectionCount} | Positions: ${score.positionCount} | Bullets: ${score.totalBullets}`,
+    `     Quantified bullets: ${score.quantifiedBullets}/${score.totalBullets} (${score.totalBullets > 0 ? Math.round((score.quantifiedBullets / score.totalBullets) * 100) : 0}%)`,
+    `     Major companies: ${score.majorCompanyCoverage}/${MAJOR_COMPANIES.length} | Length: ${score.charCount.toLocaleString()} chars`,
+  ].join("\n");
 }
 
 // ─── Main Generation Pipeline ────────────────────────────────────────────────
@@ -296,6 +434,35 @@ async function generate(): Promise<GenerationResult> {
   const validationWarnings = validateResumeOutput(response.text, careerData);
   for (const warning of validationWarnings) {
     console.warn(`   ⚠ ${warning}`);
+  }
+
+  // Quality regression detection — compare staging vs approved
+  const stagingScore = scoreResume(response.text);
+  console.log("\n" + formatScoreReport("📊 New (staging)", stagingScore));
+
+  if (fs.existsSync(PATHS.resumeOutput)) {
+    const approvedMarkdown = fs.readFileSync(PATHS.resumeOutput, "utf-8");
+    const approvedScore = scoreResume(approvedMarkdown);
+    console.log(formatScoreReport("📊 Current (approved)", approvedScore));
+
+    const delta = stagingScore.total - approvedScore.total;
+    const deltaPercent =
+      approvedScore.total > 0 ? Math.round((delta / approvedScore.total) * 100) : 0;
+
+    if (delta < 0) {
+      console.warn(
+        `\n   ⚠ QUALITY REGRESSION DETECTED: score dropped by ${Math.abs(delta)} points (${deltaPercent}%)`,
+      );
+      console.warn("   ⚠ The new resume scored LOWER than the current approved version.");
+      console.warn(
+        "   ⚠ Review carefully before approving. Run 'npm run compare' to see differences.\n",
+      );
+      validationWarnings.push(
+        `Quality regression: staging score ${stagingScore.total} < approved score ${approvedScore.total} (${deltaPercent}% drop)`,
+      );
+    } else {
+      console.log(`\n   ✅ Quality check: score improved by ${delta} points (+${deltaPercent}%)\n`);
+    }
   }
 
   // Format with Prettier
@@ -395,6 +562,9 @@ export const _testExports = {
   loadPrompt,
   buildUserMessage,
   validateResumeOutput,
+  scoreResume,
+  formatScoreReport,
+  MAJOR_COMPANIES,
   formatMarkdown,
   shouldSkipGenerate,
   stripEmpty,

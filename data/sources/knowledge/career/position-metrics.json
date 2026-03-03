@@ -1,0 +1,45 @@
+[
+  {
+    "category": "achievement",
+    "title": "Booz Allen Hamilton — Healthcare AI Practice Leadership",
+    "content": "Led AI and analytics solution development at Booz Allen Hamilton, a Fortune 500 management consulting firm (27,000+ employees, $9B+ revenue). Operated within their healthcare and life science practice, designing and deploying AI solutions across FedRAMP and HIPAA-compliant environments. Collaborated with cross-functional teams of engineers, data scientists, and domain experts to deliver AI products that harnessed clinical, behavioral, and genomic data for population health, predictive medicine, and research advancements. Addressed algorithmic bias and privacy risks in regulated healthcare AI deployments.",
+    "tags": ["healthcare", "ai", "leadership", "fortune-500", "compliance", "consulting"],
+    "relatedPositions": ["Chief AI Architect, Senior Manager at Booz Allen Hamilton"]
+  },
+  {
+    "category": "achievement",
+    "title": "AWS — Enterprise AI/ML Solutions Architecture Portfolio",
+    "content": "Managed a portfolio of 10+ enterprise accounts as an AI/ML Solutions Architect at Amazon Web Services, serving clients including Cox Enterprises, Cox Automotive (Autotrader, Dealer.com, Kelley Blue Book, Manheim, VinSolutions), Equifax, Jostens, NCR, Accenture, and Deloitte. Engaged nationally as a subject matter expert in artificial intelligence and machine learning. Built proof-of-concept solutions and ran benchmarking experiments that drove production adoption. Delivered technical white papers, presentations, and reference architectures. Partnered with C-suite executives to define technical and business strategies including go-to-market, cost management, and technical recruiting. Spoke at private and public AWS events with diverse stakeholder groups.",
+    "tags": ["aws", "enterprise", "solutions-architecture", "ai", "ml", "c-suite"],
+    "relatedPositions": ["Enterprise AI and ML Solutions Architect at Amazon Web Services"]
+  },
+  {
+    "category": "achievement",
+    "title": "Slalom Consulting — Multi-Engagement Analytics Practice",
+    "content": "Delivered 7+ client engagements over 2.5 years at Slalom Consulting, a modern consulting firm with 12,000+ employees. Key engagements included: (1) Behavioral healthcare service review application generating $2M+ in consulting revenue, (2) Statewide demand forecasting of behavioral health crisis services across dozens of facilities in Georgia, (3) Solution assessment comparing Azure Bot Service to Amazon Lex for a Fortune 100 insurance company, (4) Multiple public presentations on Azure Machine Learning, AI democratization, and cloud bot architecture. Recognized nationally as a subject matter expert in NLP and machine learning. Known as a domain expert in public sector, healthcare, digital marketing, and AI.",
+    "tags": ["consulting", "analytics", "healthcare", "presentations", "nlp", "azure"],
+    "relatedPositions": ["Advanced Analytics Consultant at Slalom Consulting"]
+  },
+  {
+    "category": "achievement",
+    "title": "Red Ventures — Full-Stack Engineering at Scale",
+    "content": "Engineered full-stack marketing platform at Red Ventures serving 16+ Fortune 500 clients including DirecTV, Vonage, ADT, Verizon, Boost Mobile, AT&T, Frontier Communications, CenturyLink, Safeco Insurance, Liberty Mutual, Progressive, The Hartford, Travelers, MetLife, and Foremost Insurance Group. Developed and maintained proprietary applications including a web framework, CMS, experience management platform, hundreds of high-traffic consumer-facing websites, a sales management system, a BI reporting framework, and various API implementations. Won first place at HACKATHON clt for engineering a crowdsourced delivery system, processing 140M+ rows of purchase data using Apache Spark and map-reduce algorithms.",
+    "tags": ["full-stack", "fortune-500", "marketing-tech", "hackathon", "big-data"],
+    "relatedPositions": ["Software Engineer at Red Ventures"]
+  },
+  {
+    "category": "leadership",
+    "title": "Engineering Management — Cross-Position Leadership Thread",
+    "content": "Progressive engineering leadership spanning 10+ years across multiple organizations. At Booz Allen Hamilton: collaborated with cross-functional teams to design and deploy AI products for healthcare clients. At AWS: built deep relationships with C-suite executives, led private and public technical events, partnered with sales teams to drive adoption and revenue. At NeuroLex Labs: mentored fellows in the Tribe program for neurodegenerative disease research, evangelized the company and recruited team members, drove TDD implementation across the engineering team. At Decooda: managed diverse teams of data scientists, software engineers, and CX experts; led client service delivery operations; established processes and tooling to improve organizational efficiency; engaged weekly in recruiting and hiring. At Slalom: delivered technical training to audiences spanning executives, nurses, and developers; grew the AI business through workshops and sales support. At Hyperbloom: led teams of sales coordinators, account managers, and solutions architects; trained engineers on entrepreneurship; recruited mission-driven technologists. At Mento: delivered science-backed executive coaching with 93% client-reported performance improvement and 100% leadership satisfaction.",
+    "tags": ["leadership", "management", "mentoring", "hiring", "coaching", "team-building"],
+    "relatedPositions": [
+      "Chief AI Architect, Senior Manager at Booz Allen Hamilton",
+      "Enterprise AI and ML Solutions Architect at Amazon Web Services",
+      "Senior AI Engineer at NeuroLex Labs",
+      "Senior AI Solutions Architect at Decooda",
+      "Advanced Analytics Consultant at Slalom Consulting",
+      "Chief AI Officer, Founder at Hyperbloom",
+      "Executive AI and Data Science Coach at Mento"
+    ]
+  }
+]

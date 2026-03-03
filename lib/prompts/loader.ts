@@ -11,11 +11,12 @@
 
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import matter from "gray-matter";
 import { z } from "zod";
 import type { PromptMetadata, PromptConfig, LoadedPrompt } from "../types.js";
 
-const PROMPTS_DIR = path.join(import.meta.dirname, ".");
+const PROMPTS_DIR = path.dirname(fileURLToPath(import.meta.url));
 
 // ─── Schemas ─────────────────────────────────────────────────────────────────
 

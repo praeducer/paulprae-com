@@ -274,6 +274,96 @@ function checkBuildOutput(): CheckResult {
   };
 }
 
+function checkResumeQuality(): CheckResult {
+  const start = Date.now();
+  const issues: string[] = [];
+
+  if (!fileExists(PATHS.resumeOutput)) {
+    return {
+      name: "Resume quality",
+      passed: false,
+      detail: "approved resume not found",
+      durationMs: Date.now() - start,
+    };
+  }
+
+  const markdown = fs.readFileSync(PATHS.resumeOutput, "utf-8");
+
+  // Check expected sections
+  const expectedSections = [
+    "Professional Summary",
+    "Professional Experience",
+    "Education",
+    "Technical Skills",
+  ];
+  for (const section of expectedSections) {
+    if (!markdown.includes(`## ${section}`)) {
+      issues.push(`missing section: ${section}`);
+    }
+  }
+
+  // Check position count
+  const experienceSection =
+    markdown.split("## Professional Experience")[1]?.split(/^## /m)[0] || "";
+  const positionBlocks = experienceSection.split(/^### /m).filter((b) => b.trim());
+  if (positionBlocks.length < 5) {
+    issues.push(`only ${positionBlocks.length} positions (expected ≥5)`);
+  }
+
+  // Check total bullet count
+  let totalBullets = 0;
+  let quantifiedBullets = 0;
+  const quantPattern = /\d+[%+]|\$[\d,.]+|\d+M\+|\d+K\+|\d+,\d{3}|\d+\+\s|team of \d/;
+  for (const block of positionBlocks) {
+    const bullets = block.match(/^- .+/gm) || [];
+    totalBullets += bullets.length;
+    quantifiedBullets += bullets.filter((b) => quantPattern.test(b)).length;
+  }
+  if (totalBullets < 15) {
+    issues.push(`only ${totalBullets} bullets (expected ≥15)`);
+  }
+
+  // Check quantification density (at least 30% of bullets should have metrics)
+  if (totalBullets > 0 && quantifiedBullets / totalBullets < 0.3) {
+    issues.push(
+      `low quantification: ${quantifiedBullets}/${totalBullets} bullets have metrics (${Math.round((quantifiedBullets / totalBullets) * 100)}%, target ≥30%)`,
+    );
+  }
+
+  // Check key companies are present
+  const keyCompanies = [
+    "Arine",
+    "Booz Allen Hamilton",
+    "Amazon Web Services",
+    "Slalom",
+    "Microsoft",
+  ];
+  const missingCompanies = keyCompanies.filter((c) => !markdown.includes(c));
+  if (missingCompanies.length > 0) {
+    issues.push(`missing key companies: ${missingCompanies.join(", ")}`);
+  }
+
+  // Check length is reasonable
+  const charCount = markdown.length;
+  if (charCount < 3000) {
+    issues.push(`too short (${charCount.toLocaleString()} chars)`);
+  } else if (charCount > 12000) {
+    issues.push(`too long (${charCount.toLocaleString()} chars)`);
+  }
+
+  const detail =
+    issues.length === 0
+      ? `${positionBlocks.length} positions, ${totalBullets} bullets, ${quantifiedBullets} quantified (${Math.round((quantifiedBullets / totalBullets) * 100)}%)`
+      : issues.join("; ");
+
+  return {
+    name: "Resume quality",
+    passed: issues.length === 0,
+    detail,
+    durationMs: Date.now() - start,
+  };
+}
+
 function checkDocs(): CheckResult {
   const start = Date.now();
   const { ok, output } = runCommand("npx", ["tsx", "scripts/validate-docs.ts"]);
@@ -299,8 +389,9 @@ function main(): void {
 
   const results: CheckResult[] = [];
 
-  // Phase 1: Data file validation (always runs)
+  // Phase 1: Data file + quality validation (always runs)
   results.push(checkDataFiles());
+  results.push(checkResumeQuality());
   results.push(checkPublicDownloads());
 
   if (!quickMode) {
@@ -357,6 +448,7 @@ if (isDirectRun("release-check")) {
 
 export const _testExports = {
   checkDataFiles,
+  checkResumeQuality,
   checkPublicDownloads,
   checkBuildOutput,
   fileExists,

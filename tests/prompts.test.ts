@@ -30,7 +30,7 @@ describe("loadPrompt — resume-writer", () => {
 
   it("has correct metadata", () => {
     expect(prompt.metadata.id).toBe("resume-writer");
-    expect(prompt.metadata.version).toBe("1.0");
+    expect(prompt.metadata.version).toBe("1.1");
     expect(prompt.metadata.description).toBeTruthy();
     expect(Array.isArray(prompt.metadata.tags)).toBe(true);
   });
@@ -42,7 +42,7 @@ describe("loadPrompt — resume-writer", () => {
   it("system prompt contains core instructions", () => {
     expect(prompt.systemPrompt).toContain("Brand Voice Guidelines");
     expect(prompt.systemPrompt).toContain("Resume Format");
-    expect(prompt.systemPrompt).toContain("Quality Criteria");
+    expect(prompt.systemPrompt).toContain("Quality Rules");
     expect(prompt.systemPrompt).toContain("Output Instructions");
   });
 
@@ -105,6 +105,6 @@ describe("prompt regression", () => {
     expect(hash.length).toBe(12);
     // Snapshot: if you change the prompt, update the expected hash below
     // To get the current hash: node -e "const fs=require('fs'),c=require('crypto'); console.log(c.createHash('sha256').update(fs.readFileSync('lib/prompts/resume-writer.system.md','utf-8')).digest('hex').slice(0,12))"
-    expect(hash).toMatchInlineSnapshot(`"70d0dd81a830"`);
+    expect(hash).toMatchInlineSnapshot(`"a37dc158b185"`);
   });
 });
