@@ -306,22 +306,34 @@ describe("resume DOCX", () => {
     expect(kb).toBeLessThanOrEqual(200);
   });
 
-  it.skipIf(!exists)("has Word 2013+ compatibility mode (no Compatibility Mode banner)", () => {
-    // DOCX is a ZIP archive; word/settings.xml must declare compatibilityMode=15
-    const tmpDir = path.join(path.dirname(PATHS.docxOutput), `_docx_test_${Date.now()}`);
+  // Check if unzip is available (not present on all platforms, e.g. Windows)
+  const hasUnzip = (() => {
     try {
-      fs.mkdirSync(tmpDir, { recursive: true });
-      execFileSync("unzip", ["-o", PATHS.docxOutput, "word/settings.xml", "-d", tmpDir], {
-        stdio: ["pipe", "pipe", "pipe"],
-      });
-      const settings = fs.readFileSync(path.join(tmpDir, "word", "settings.xml"), "utf-8");
-      expect(settings).toContain("compatibilityMode");
-      expect(settings).toContain('w:val="15"');
-      expect(settings).not.toContain("<w:doNotTrackMoves");
-    } finally {
-      fs.rmSync(tmpDir, { recursive: true, force: true });
+      execFileSync("unzip", ["-v"], { stdio: "pipe" });
+      return true;
+    } catch {
+      return false;
     }
-  });
+  })();
+
+  it.skipIf(!exists || !hasUnzip)(
+    "has Word 2013+ compatibility mode (no Compatibility Mode banner)",
+    () => {
+      // DOCX is a ZIP archive; word/settings.xml must declare compatibilityMode=15
+      const tmpDir = fs.mkdtempSync(path.join(path.dirname(PATHS.docxOutput), "_docx_test_"));
+      try {
+        execFileSync("unzip", ["-o", PATHS.docxOutput, "word/settings.xml", "-d", tmpDir], {
+          stdio: ["pipe", "pipe", "pipe"],
+        });
+        const settings = fs.readFileSync(path.join(tmpDir, "word", "settings.xml"), "utf-8");
+        expect(settings).toContain("compatibilityMode");
+        expect(settings).toContain('w:val="15"');
+        expect(settings).not.toContain("<w:doNotTrackMoves");
+      } finally {
+        fs.rmSync(tmpDir, { recursive: true, force: true });
+      }
+    },
+  );
 });
 
 // ─── Typst Stylesheet ───────────────────────────────────────────────────────

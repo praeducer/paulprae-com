@@ -130,23 +130,26 @@ function fixDocxCompatibility(docxPath: string): void {
     // Add <w:compat> section with Word 2013+ compatibility mode (val=15)
     // Insert before the closing </w:settings> tag
     if (!settings.includes("<w:compat")) {
-      const compatBlock = [
-        "<w:compat>",
-        '  <w:compatSetting w:name="compatibilityMode"',
-        '    w:uri="http://schemas.microsoft.com/office/word" w:val="15"/>',
-        "</w:compat>",
-      ].join("");
+      const compatBlock =
+        [
+          "<w:compat>",
+          '  <w:compatSetting w:name="compatibilityMode"',
+          '    w:uri="http://schemas.microsoft.com/office/word" w:val="15"/>',
+          "</w:compat>",
+        ].join("\n") + "\n";
       settings = settings.replace("</w:settings>", compatBlock + "</w:settings>");
     }
 
     fs.writeFileSync(settingsPath, settings, "utf-8");
 
-    // Repackage into DOCX — must use stored paths relative to the extract root
-    fs.unlinkSync(docxPath);
-    execFileSync("zip", ["-r", docxPath, "."], {
+    // Repackage into a temp DOCX first, then atomically replace the original.
+    // This avoids data loss if `zip` fails after the original is deleted.
+    const tmpDocx = docxPath + `.tmp_${suffix}`;
+    execFileSync("zip", ["-r", tmpDocx, "."], {
       cwd: extractDir,
       stdio: ["pipe", "pipe", "pipe"],
     });
+    fs.renameSync(tmpDocx, docxPath);
   } finally {
     // Clean up extracted directory
     fs.rmSync(extractDir, { recursive: true, force: true });
