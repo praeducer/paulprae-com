@@ -8,17 +8,19 @@
 
 ## Branch Inventory
 
-| # | Branch | Status | Commits Ahead | Commits Behind | Open PR | Verdict |
-|---|--------|--------|---------------|----------------|---------|---------|
-| 1 | `claude/fix-word-formatting-aWxHa` | **Active — PR #11 open** | 4 | 0 | #11 | **MERGE** |
-| 2 | `claude/test-github-connection-tOmsE` | Empty commit (connectivity test) | 1 (empty) | 0 | None | **DELETE** |
-| 3 | `fix/header-layout-nav-uat` | Already merged as PR #9; stale remnant 1 commit behind | 1 | 2 | None | **DELETE** |
-| 4 | `fix/nav-buttons-layout-github` | Already merged as PR #7; stale remnant 2 commits behind | 2 | 4 | None | **DELETE** |
+| #   | Branch                                | Status                                                  | Commits Ahead | Commits Behind | Open PR | Verdict    |
+| --- | ------------------------------------- | ------------------------------------------------------- | ------------- | -------------- | ------- | ---------- |
+| 1   | `claude/fix-word-formatting-aWxHa`    | **Active — PR #11 open**                                | 4             | 0              | #11     | **MERGE**  |
+| 2   | `claude/test-github-connection-tOmsE` | Empty commit (connectivity test)                        | 1 (empty)     | 0              | None    | **DELETE** |
+| 3   | `fix/header-layout-nav-uat`           | Already merged as PR #9; stale remnant 1 commit behind  | 1             | 2              | None    | **DELETE** |
+| 4   | `fix/nav-buttons-layout-github`       | Already merged as PR #7; stale remnant 2 commits behind | 2             | 4              | None    | **DELETE** |
 
 ### Branch Details
 
 #### 1. `claude/fix-word-formatting-aWxHa` (MERGE)
+
 **Purpose:** Three meaningful improvements + one lint fix.
+
 - **DOCX compatibility fix** (`scripts/export-resume.ts`): Post-processes Pandoc DOCX to inject `compatibilityMode=15` in `word/settings.xml`, eliminating the "Compatibility Mode" banner in Word 2013+. Uses `unzip`/`zip` CLI tools to extract, patch XML, and repackage.
 - **Sticky header reorganization** (`app/page.tsx`): Splits the header into 3 rows — name+title, contact links, then resume downloads with a "Resume" label.
 - **Test coverage** (`tests/pipeline.test.ts`): Validates DOCX has the compatibility flags.
@@ -27,12 +29,15 @@
 - **Conflicts with main:** None (clean merge).
 
 #### 2. `claude/test-github-connection-tOmsE` (DELETE)
+
 **Purpose:** Empty commit used to verify GitHub push connectivity from a Claude Code session. Contains zero code changes. No PR was created. Safe to delete.
 
 #### 3. `fix/header-layout-nav-uat` (DELETE)
+
 **Purpose:** Was the working branch for PR #9 (compact header layout and nav scroll alignment). PR #9 was merged to main on 2026-03-02. The remote branch is now stale — it's 2 commits behind main (PRs #9 and #10 both landed after this branch diverged). Its one unmerged commit is an earlier version of changes that were superseded by the merged PRs. Merging this would **regress** the current header layout.
 
 #### 4. `fix/nav-buttons-layout-github` (DELETE)
+
 **Purpose:** Was the working branch for PR #7 (nav tracking, button labels, header layout, GitHub in exports). PR #7 was merged on 2026-03-02. The remote branch has 2 commits (the original + a Prettier format fix) but is 4 commits behind main. All meaningful changes already landed via PR #7. The extra `qa-fixes-round-3.md` plan file and `VERSIONS.md` entry are stale artifacts. Merging would cause conflicts in 10+ files with no benefit.
 
 ---
@@ -44,6 +49,7 @@
 **Overall quality: Good.** All tests pass, CI green, clean diff.
 
 #### Positive
+
 - DOCX compat fix is well-structured with proper cleanup in `finally` block
 - Non-fatal error handling (DOCX still usable if fix fails)
 - Good use of `crypto.randomUUID()` for temp directory uniqueness
@@ -71,12 +77,12 @@
 
 ## Conflict Analysis
 
-| Merge Scenario | Conflicts? | Details |
-|---|---|---|
-| PR #11 → main | **None** | Clean fast-forward possible (0 commits behind) |
-| `header-layout-nav-uat` → main | **Yes** | `app/page.tsx` has 1 conflict (flex gap value). Would regress layout. |
+| Merge Scenario                     | Conflicts?      | Details                                                                                                                      |
+| ---------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| PR #11 → main                      | **None**        | Clean fast-forward possible (0 commits behind)                                                                               |
+| `header-layout-nav-uat` → main     | **Yes**         | `app/page.tsx` has 1 conflict (flex gap value). Would regress layout.                                                        |
 | `nav-buttons-layout-github` → main | **Yes, severe** | 10+ files conflict including `SectionNav.tsx`, `page.tsx`, resume data, binary files. All content already on main via PR #7. |
-| PR #11 + `header-layout-nav-uat` | **Yes** | `page.tsx` header layout is completely different between them. |
+| PR #11 + `header-layout-nav-uat`   | **Yes**         | `page.tsx` header layout is completely different between them.                                                               |
 
 ---
 
@@ -170,12 +176,12 @@ npm run check
 
 ## Risk Assessment
 
-| Risk | Likelihood | Impact | Mitigation |
-|---|---|---|---|
-| PR #11 merge breaks build | Very Low | Medium | CI already passes; Vercel preview is green |
-| Stale branch deletion loses work | None | None | All changes from stale branches are already on main via merged PRs #7 and #9 |
-| DOCX fix fails on some systems | Low | Low | Non-fatal try/catch; DOCX works without compat fix, just shows banner |
-| Vercel deployment fails | Very Low | Medium | Vercel has automatic rollback; previous deployment is preserved |
+| Risk                             | Likelihood | Impact | Mitigation                                                                   |
+| -------------------------------- | ---------- | ------ | ---------------------------------------------------------------------------- |
+| PR #11 merge breaks build        | Very Low   | Medium | CI already passes; Vercel preview is green                                   |
+| Stale branch deletion loses work | None       | None   | All changes from stale branches are already on main via merged PRs #7 and #9 |
+| DOCX fix fails on some systems   | Low        | Low    | Non-fatal try/catch; DOCX works without compat fix, just shows banner        |
+| Vercel deployment fails          | Very Low   | Medium | Vercel has automatic rollback; previous deployment is preserved              |
 
 ---
 

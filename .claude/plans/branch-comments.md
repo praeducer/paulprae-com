@@ -25,13 +25,13 @@ CI and Vercel preview are both green. No conflicts with main. Full analysis in t
 
 ### Review findings
 
-| # | Finding | Severity | Status |
-|---|---------|----------|--------|
-| 1 | `require()` lint violation in test | High | **Fixed** in commit `87896e8` |
-| 2 | No `checkBinary()` for `unzip`/`zip` | Low | Acceptable — non-fatal try/catch handles missing tools |
-| 3 | String-based XML manipulation | Low | Acceptable for controlled Pandoc output |
-| 4 | Security (shell commands) | None | Correct use of `execFileSync` with array args |
-| 5 | Binary DOCX in git | None | Follows project policy (public/ committed for Vercel) |
+| #   | Finding                              | Severity | Status                                                 |
+| --- | ------------------------------------ | -------- | ------------------------------------------------------ |
+| 1   | `require()` lint violation in test   | High     | **Fixed** in commit `87896e8`                          |
+| 2   | No `checkBinary()` for `unzip`/`zip` | Low      | Acceptable — non-fatal try/catch handles missing tools |
+| 3   | String-based XML manipulation        | Low      | Acceptable for controlled Pandoc output                |
+| 4   | Security (shell commands)            | None     | Correct use of `execFileSync` with array args          |
+| 5   | Binary DOCX in git                   | None     | Follows project policy (public/ committed for Vercel)  |
 
 ### Relationship to other branches
 
@@ -75,6 +75,7 @@ See the full branch analysis in the [integration plan](https://github.com/praedu
 ### Code quality notes from review
 
 This PR made solid improvements that are still active on main:
+
 - `--header-height: 80px` (up from 61px) correctly matches the taller stacked-row layout
 - SectionNav threshold `+16` aligns JS scroll tracking with the CSS `scroll-padding-top: +16px`
 - `requestAnimationFrame(onScroll)` defers initial measurement until layout settles
