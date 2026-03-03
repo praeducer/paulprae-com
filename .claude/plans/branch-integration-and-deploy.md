@@ -89,6 +89,18 @@ Only one branch needs merging. The order is:
 
 ---
 
+## Follow-up Tech Debt (from code review of already-merged PRs)
+
+These are not blockers but should be addressed in a future PR:
+
+1. **Zod schema gap:** `CareerDataSchema` in `scripts/ingest-linkedin.ts` (~line 562) is missing `github: z.string().optional()`. The TypeScript type has it, but the runtime Zod validation does not. The data survives because `.safeParse()` result is only checked for `success` — the raw object (not the parsed one) is written to disk. Add it for correctness.
+
+2. **No enrichment unit tests:** `enrichProfileFromKnowledge` has no unit tests in `tests/ingest.test.ts`. The function is exported via `_testExports` and covers linkedin, website, email, and github enrichment — all untested.
+
+3. **GitHub link accessibility:** The GitHub contact link in the header currently uses `className="rounded-md px-1 py-0.5"` which lacks the `min-h-[44px]` WCAG touch target that Email and LinkedIn links have. Should be consistent.
+
+---
+
 ## Execution Steps
 
 Run these commands on your Windows desktop (or any machine with git + gh CLI).
