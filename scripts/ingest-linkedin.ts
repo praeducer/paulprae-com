@@ -559,6 +559,7 @@ const CareerDataSchema = z.object({
     email: z.string(),
     linkedin: z.string(),
     website: z.string(),
+    github: z.string().optional(),
   }),
   positions: z.array(
     z.object({

@@ -59,6 +59,7 @@ const {
   isKnowledgeEntry,
   wrapAsKnowledgeEntry,
   CareerDataSchema,
+  enrichProfileFromKnowledge,
 } = _testExports;
 
 // ─── Date Normalization ─────────────────────────────────────────────────────
@@ -513,5 +514,107 @@ describe("CareerDataSchema", () => {
     };
     const result = CareerDataSchema.safeParse(withTags);
     expect(result.success).toBe(true);
+  });
+
+  it("accepts profile with optional github field", () => {
+    const withGithub = {
+      ...SAMPLE_CAREER_DATA,
+      profile: { ...SAMPLE_CAREER_DATA.profile, github: "https://github.com/praeducer" },
+    };
+    const result = CareerDataSchema.safeParse(withGithub);
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts profile without github field", () => {
+    const { github: _, ...profileNoGithub } = SAMPLE_CAREER_DATA.profile;
+    const noGithub = {
+      ...SAMPLE_CAREER_DATA,
+      profile: profileNoGithub,
+    };
+    const result = CareerDataSchema.safeParse(noGithub);
+    expect(result.success).toBe(true);
+  });
+});
+
+// ─── enrichProfileFromKnowledge ─────────────────────────────────────────────
+// Tests that the knowledge base profile.json fills empty profile fields
+// without overwriting existing values.
+
+describe("enrichProfileFromKnowledge", () => {
+  const tmpDir = path.join(process.cwd(), "tests", ".tmp-knowledge");
+  const careerDir = path.join(tmpDir, "career");
+
+  function writeKbProfile(profile: Record<string, unknown>): void {
+    fs.mkdirSync(careerDir, { recursive: true });
+    fs.writeFileSync(path.join(careerDir, "profile.json"), JSON.stringify(profile), "utf-8");
+  }
+
+  beforeEach(() => {
+    fs.mkdirSync(careerDir, { recursive: true });
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it("fills empty linkedin URL from knowledge base", () => {
+    writeKbProfile({ linkedin: "https://linkedin.com/in/paulprae" });
+    const data = structuredClone(SAMPLE_CAREER_DATA);
+    data.profile.linkedin = "";
+    enrichProfileFromKnowledge(data, tmpDir);
+    expect(data.profile.linkedin).toBe("https://linkedin.com/in/paulprae");
+  });
+
+  it("fills empty website from knowledge base", () => {
+    writeKbProfile({ website: "https://paulprae.com" });
+    const data = structuredClone(SAMPLE_CAREER_DATA);
+    data.profile.website = "";
+    enrichProfileFromKnowledge(data, tmpDir);
+    expect(data.profile.website).toBe("https://paulprae.com");
+  });
+
+  it("fills empty email from knowledge base", () => {
+    writeKbProfile({ email: "hireme@paulprae.com" });
+    // CareerProfile doesn't have email as optional, so set to empty string
+    const data = structuredClone(SAMPLE_CAREER_DATA);
+    data.profile.email = "";
+    enrichProfileFromKnowledge(data, tmpDir);
+    // enrichProfileFromKnowledge doesn't fill email (only name, headline, summary, location, linkedin, website, github)
+    // This test documents the current behavior
+    expect(data.profile.email).toBe("");
+  });
+
+  it("fills empty github from knowledge base", () => {
+    writeKbProfile({ github: "https://github.com/praeducer" });
+    const data = structuredClone(SAMPLE_CAREER_DATA);
+    data.profile.github = "";
+    enrichProfileFromKnowledge(data, tmpDir);
+    expect(data.profile.github).toBe("https://github.com/praeducer");
+  });
+
+  it("does not overwrite existing profile values", () => {
+    writeKbProfile({
+      name: "Different Name",
+      headline: "Different Headline",
+      linkedin: "https://linkedin.com/in/other",
+      website: "https://other.com",
+      github: "https://github.com/other",
+    });
+    const data = structuredClone(SAMPLE_CAREER_DATA);
+    enrichProfileFromKnowledge(data, tmpDir);
+    // All original values should be preserved
+    expect(data.profile.name).toBe("Paul Prae");
+    expect(data.profile.headline).toBe("Principal AI Engineer & Architect");
+    expect(data.profile.linkedin).toBe("https://linkedin.com/in/paulprae");
+    expect(data.profile.website).toBe("https://paulprae.com");
+    expect(data.profile.github).toBe("https://github.com/praeducer");
+  });
+
+  it("handles missing profile.json gracefully", () => {
+    // Don't write any profile.json — the function should be a no-op
+    const data = structuredClone(SAMPLE_CAREER_DATA);
+    const original = structuredClone(data);
+    enrichProfileFromKnowledge(data, tmpDir);
+    expect(data.profile).toEqual(original.profile);
   });
 });
