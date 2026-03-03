@@ -101,17 +101,6 @@ describe("fileSize", () => {
 // ─── checkDataFiles ──────────────────────────────────────────────────────────
 
 describe("checkDataFiles", () => {
-  it("returns a result object with required fields", () => {
-    const result = checkDataFiles();
-    expect(result).toHaveProperty("name");
-    expect(result).toHaveProperty("passed");
-    expect(result).toHaveProperty("detail");
-    expect(result).toHaveProperty("durationMs");
-    expect(result.name).toBe("Data files");
-    expect(typeof result.passed).toBe("boolean");
-    expect(typeof result.durationMs).toBe("number");
-  });
-
   // Both career-data.json and Paul-Prae-Resume.md exist in this repo
   it("passes when data files exist", () => {
     const result = checkDataFiles();
@@ -123,15 +112,6 @@ describe("checkDataFiles", () => {
 // ─── checkPublicDownloads ────────────────────────────────────────────────────
 
 describe("checkPublicDownloads", () => {
-  it("returns a result object with required fields", () => {
-    const result = checkPublicDownloads();
-    expect(result).toHaveProperty("name");
-    expect(result).toHaveProperty("passed");
-    expect(result).toHaveProperty("detail");
-    expect(result).toHaveProperty("durationMs");
-    expect(result.name).toBe("Public downloads");
-  });
-
   // Public download files should exist in committed repo
   const mdExists = fs.existsSync(PATHS.publicMd);
 
@@ -146,15 +126,6 @@ describe("checkPublicDownloads", () => {
 describe("checkBuildOutput", () => {
   const indexPath = path.join(process.cwd(), "out", "index.html");
   const buildExists = fs.existsSync(indexPath);
-
-  it("returns a result object with required fields", () => {
-    const result = checkBuildOutput();
-    expect(result).toHaveProperty("name");
-    expect(result).toHaveProperty("passed");
-    expect(result).toHaveProperty("detail");
-    expect(result).toHaveProperty("durationMs");
-    expect(result.name).toBe("Build output");
-  });
 
   it.skipIf(!buildExists)("passes when build output exists with expected content", () => {
     const result = checkBuildOutput();

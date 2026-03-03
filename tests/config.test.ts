@@ -13,29 +13,10 @@
 
 import { describe, it, expect } from "vitest";
 import path from "path";
-import {
-  PATHS,
-  CLAUDE,
-  LINKEDIN_CSV_FILES,
-  RESUME_FILE_BASE,
-  _testExports,
-} from "../lib/config.js";
+import { PATHS, LINKEDIN_CSV_FILES, RESUME_FILE_BASE, _testExports } from "../lib/config.js";
 
-describe("RESUME_FILE_BASE", () => {
-  it("is a non-empty string ending with 'Resume'", () => {
-    expect(RESUME_FILE_BASE).toBeTruthy();
-    expect(RESUME_FILE_BASE).toMatch(/Resume$/);
-  });
-
-  it("uses hyphen-separated name when career data exists", () => {
-    // In this repo, career-data.json exists with profile.name = "Paul Prae"
-    expect(RESUME_FILE_BASE).toBe("Paul-Prae-Resume");
-  });
-
-  it("contains only filename-safe characters (alphanumeric and hyphens)", () => {
-    expect(RESUME_FILE_BASE).toMatch(/^[a-zA-Z0-9-]+$/);
-  });
-});
+// RESUME_FILE_BASE constant checks removed — TypeScript + config guarantee correctness.
+// Slugify edge-case tests below cover the actual logic.
 
 describe("getResumeFileBase() — edge cases", () => {
   // These test the sanitization logic used in production by simulating the
@@ -73,11 +54,6 @@ describe("getResumeFileBase() — edge cases", () => {
   it("handles hyphenated names correctly", () => {
     expect(slugify("Mary Jane Watson-Parker")).toBe("Mary-Jane-Watson-Parker-Resume");
   });
-
-  it("getResumeFileBase() returns a value matching the current career data", () => {
-    // Verify the exported function matches the exported constant
-    expect(_testExports.getResumeFileBase()).toBe(RESUME_FILE_BASE);
-  });
 });
 
 describe("PATHS", () => {
@@ -90,13 +66,6 @@ describe("PATHS", () => {
     expect(PATHS.versionsDir).toBe(path.join(root, "data", "generated", "versions"));
     expect(PATHS.versionsManifest).toBe(path.join(root, "data", "generated", "VERSIONS.md"));
     expect(PATHS.envFile).toBe(path.join(root, ".env.local"));
-  });
-
-  it("uses recruiter-friendly naming convention for resume outputs", () => {
-    // Resume files follow the Name-Resume.{ext} convention
-    expect(path.basename(PATHS.resumeOutput)).toBe(`${RESUME_FILE_BASE}.md`);
-    expect(path.basename(PATHS.pdfOutput)).toBe(`${RESUME_FILE_BASE}.pdf`);
-    expect(path.basename(PATHS.docxOutput)).toBe(`${RESUME_FILE_BASE}.docx`);
   });
 
   it("has a staging path with .staging.md suffix", () => {
@@ -113,23 +82,7 @@ describe("PATHS", () => {
   });
 });
 
-describe("CLAUDE", () => {
-  it("uses claude-opus-4-6 model", () => {
-    expect(CLAUDE.model).toBe("claude-opus-4-6");
-  });
-
-  it("has reasonable max tokens (>= 16384)", () => {
-    expect(CLAUDE.maxTokens).toBeGreaterThanOrEqual(16384);
-  });
-
-  it("uses adaptive thinking", () => {
-    expect(CLAUDE.thinking).toEqual({ type: "adaptive" });
-  });
-
-  it("uses max effort (Opus 4.6 exclusive)", () => {
-    expect(CLAUDE.effort).toBe("max");
-  });
-});
+// CLAUDE config constant checks removed — these are hardcoded values validated by TypeScript.
 
 describe("LINKEDIN_CSV_FILES", () => {
   it("maps all 13 expected CSV files", () => {

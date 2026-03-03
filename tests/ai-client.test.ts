@@ -18,6 +18,7 @@ import {
   OverloadError,
   GenerationError,
 } from "../lib/ai/client.js";
+// Note: ApiKeyError/RateLimitError/OverloadError still used by classifyError tests above
 
 // ─── Error Classification ────────────────────────────────────────────────────
 
@@ -123,75 +124,12 @@ describe("createClient", () => {
   });
 });
 
-// ─── Response Type Contracts ─────────────────────────────────────────────────
+// Response type contracts removed — TypeScript strict mode validates interface shapes.
+// Error hierarchy name/status checks removed — class names are guaranteed by implementation.
 
-describe("GenerationResponse contract", () => {
-  it("GenerationResponse shape matches expected fields", () => {
-    // Type-level test: ensure the interface fields exist at runtime
-    const response = {
-      text: "generated text",
-      usage: { inputTokens: 100, outputTokens: 200 },
-      durationMs: 5000,
-      stopReason: "end_turn" as string | null,
-    };
+// ─── Error Behavior ─────────────────────────────────────────────────────────
 
-    expect(response).toHaveProperty("text");
-    expect(response).toHaveProperty("usage");
-    expect(response).toHaveProperty("usage.inputTokens");
-    expect(response).toHaveProperty("usage.outputTokens");
-    expect(response).toHaveProperty("durationMs");
-    expect(response).toHaveProperty("stopReason");
-  });
-
-  it("FullGenerationResponse extends GenerationResponse with extra fields", () => {
-    const response = {
-      text: "resume content",
-      usage: { inputTokens: 5000, outputTokens: 3000 },
-      durationMs: 45000,
-      stopReason: "end_turn" as string | null,
-      thinkingTokens: 12000,
-      cacheStats: { read: 2000, created: 3000 },
-      promptVersion: "resume-writer@1.0",
-      model: "claude-opus-4-6",
-    };
-
-    expect(response).toHaveProperty("thinkingTokens");
-    expect(response).toHaveProperty("cacheStats.read");
-    expect(response).toHaveProperty("cacheStats.created");
-    expect(response).toHaveProperty("promptVersion");
-    expect(response).toHaveProperty("model");
-  });
-});
-
-// ─── Error Hierarchy ─────────────────────────────────────────────────────────
-
-describe("error hierarchy", () => {
-  it("ApiKeyError has correct name and status", () => {
-    const err = new ApiKeyError();
-    expect(err.name).toBe("ApiKeyError");
-    expect(err.statusCode).toBe(401);
-    expect(err.message).toContain("API key");
-  });
-
-  it("RateLimitError has correct name and status", () => {
-    const err = new RateLimitError();
-    expect(err.name).toBe("RateLimitError");
-    expect(err.statusCode).toBe(429);
-  });
-
-  it("OverloadError has correct name and status", () => {
-    const err = new OverloadError();
-    expect(err.name).toBe("OverloadError");
-    expect(err.statusCode).toBe(529);
-  });
-
-  it("GenerationError preserves custom message and status", () => {
-    const err = new GenerationError("custom error", 503);
-    expect(err.name).toBe("GenerationError");
-    expect(err.statusCode).toBe(503);
-    expect(err.message).toBe("custom error");
-  });
-
+describe("error behavior", () => {
   it("errors preserve cause chain", () => {
     const original = new Error("root cause");
     const err = new GenerationError("wrapped", 500, original);

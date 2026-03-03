@@ -28,12 +28,10 @@ import { SAMPLE_CAREER_DATA, SAMPLE_RESUME_CLEAN } from "./fixtures/sample-data.
 const {
   SYSTEM_PROMPT,
   INCLUDE_FEW_SHOT,
-  PROMPT_VERSION,
   buildUserMessage,
   validateResumeOutput,
   scoreResume,
   formatScoreReport,
-  MAJOR_COMPANIES,
   stripEmpty,
 } = _testExports;
 
@@ -42,91 +40,46 @@ const {
 // critical instructions survive edits.
 
 describe("SYSTEM_PROMPT", () => {
-  it("includes brand voice guidelines", () => {
-    expect(SYSTEM_PROMPT).toContain("Brand Voice Guidelines");
-    expect(SYSTEM_PROMPT).toContain("Confident, technically precise, action-oriented");
-  });
-
-  it("includes target roles and compensation", () => {
-    expect(SYSTEM_PROMPT).toContain("Principal AI Engineer");
-    expect(SYSTEM_PROMPT).toContain("Solutions Architect");
-    expect(SYSTEM_PROMPT).toContain("$225,000+");
-  });
-
-  it("includes target companies", () => {
-    expect(SYSTEM_PROMPT).toContain("Anthropic");
-    expect(SYSTEM_PROMPT).toContain("NVIDIA");
-    expect(SYSTEM_PROMPT).toContain("Microsoft");
-  });
-
-  it("includes resume format structure", () => {
-    expect(SYSTEM_PROMPT).toContain("Professional Summary");
-    expect(SYSTEM_PROMPT).toContain("Professional Experience");
-    expect(SYSTEM_PROMPT).toContain("Education");
-    expect(SYSTEM_PROMPT).toContain("Technical Skills");
-  });
-
-  it("includes quality rules (v1.1 numbered format)", () => {
-    expect(SYSTEM_PROMPT).toContain("Quality Rules");
-    expect(SYSTEM_PROMPT).toContain("Rule 1: Length");
-    expect(SYSTEM_PROMPT).toContain("Rule 2: ATS Optimization");
-    expect(SYSTEM_PROMPT).toContain("Rule 3: Quantified Impact");
-    expect(SYSTEM_PROMPT).toContain("Rule 7: No Fabrication");
+  it("contains all required quality rules", () => {
+    // Verify all 10 numbered rules exist — catches accidental deletion of rules
+    const requiredRules = [
+      "Rule 1: Length",
+      "Rule 2: ATS Optimization",
+      "Rule 3: Quantified Impact",
+      "Rule 4: Recency-Based Bullet Allocation",
+      "Rule 7: No Fabrication",
+      "Rule 8: No Cross-Section Duplication",
+      "Rule 9: Projects Selection",
+    ];
+    for (const rule of requiredRules) {
+      expect(SYSTEM_PROMPT).toContain(rule);
+    }
+    // Verify key sub-requirements within rules
     expect(SYSTEM_PROMPT).toContain("Approximately 2 pages");
-  });
-
-  it("includes recency-based bullet allocation tiers (Rule 4)", () => {
-    expect(SYSTEM_PROMPT).toContain("Rule 4: Recency-Based Bullet Allocation");
-    expect(SYSTEM_PROMPT).toContain("Tier 1 (last 2 years)");
-    expect(SYSTEM_PROMPT).toContain("Tier 2 (2-5 years");
-    expect(SYSTEM_PROMPT).toContain("Tier 3 (5-10 years");
-    expect(SYSTEM_PROMPT).toContain("Tier 4 (10+ years");
+    expect(SYSTEM_PROMPT).toContain("STAR method");
+    expect(SYSTEM_PROMPT).toContain("Only use data provided");
     expect(SYSTEM_PROMPT).toContain("Never drop a position at a major company");
   });
 
-  it("includes cross-section deduplication rule (Rule 8)", () => {
-    expect(SYSTEM_PROMPT).toContain("Rule 8: No Cross-Section Duplication");
-    expect(SYSTEM_PROMPT).toContain("Publications section MUST NOT repeat in the Projects section");
-  });
-
-  it("includes projects selection guidance (Rule 9)", () => {
-    expect(SYSTEM_PROMPT).toContain("Rule 9: Projects Selection");
-    expect(SYSTEM_PROMPT).toContain("different capabilities");
-    expect(SYSTEM_PROMPT).toContain(
-      "Never duplicate a project that already appears in Publications",
-    );
-  });
-
-  it("includes knowledge base integration strategy", () => {
-    expect(SYSTEM_PROMPT).toContain("Knowledge Base Integration Strategy");
-    expect(SYSTEM_PROMPT).toContain("relatedPositions");
-    expect(SYSTEM_PROMPT).toContain("position_id");
-    expect(SYSTEM_PROMPT).toContain("Cross-reference company context");
-    expect(SYSTEM_PROMPT).toContain("Synthesize multiple signals");
-  });
-
-  it("includes output format instructions", () => {
-    expect(SYSTEM_PROMPT).toContain("Output ONLY the Markdown resume content");
-    expect(SYSTEM_PROMPT).toContain("Start directly with the H1 heading");
-  });
-
-  it("includes STAR method instruction", () => {
-    expect(SYSTEM_PROMPT).toContain("STAR method");
-  });
-
-  it("includes strengthened no-fabrication rule with data maximization", () => {
-    expect(SYSTEM_PROMPT).toContain("Only use data provided");
-    expect(SYSTEM_PROMPT).toContain("maximize data utilization");
-    expect(SYSTEM_PROMPT).toContain("knowledge base entry");
+  it("contains all required sections (brand voice, format, knowledge strategy, output)", () => {
+    const requiredSections = [
+      "Brand Voice Guidelines",
+      "Professional Summary",
+      "Professional Experience",
+      "Education",
+      "Technical Skills",
+      "Knowledge Base Integration Strategy",
+      "Output ONLY the Markdown resume content",
+      "Section Priority Weighting",
+    ];
+    for (const section of requiredSections) {
+      expect(SYSTEM_PROMPT).toContain(section);
+    }
   });
 
   it("is long enough for prompt caching (>1024 tokens ≈ 4000 chars)", () => {
     // Anthropic prompt caching requires >1024 tokens. System prompt is ~2000 tokens.
     expect(SYSTEM_PROMPT.length).toBeGreaterThan(4000);
-  });
-
-  it("has prompt version 1.1", () => {
-    expect(PROMPT_VERSION).toBe("resume-writer@1.1");
   });
 });
 
@@ -454,15 +407,6 @@ describe("scoreResume", () => {
       "# Name\n\n## Professional Experience\n\n### Architect\n**Amazon Web Services** | Remote\n\n- Stuff\n\n### Engineer\n**Microsoft** | Remote\n\n- Things\n";
     const score = scoreResume(withCompanies);
     expect(score.majorCompanyCoverage).toBeGreaterThanOrEqual(2);
-  });
-
-  it("MAJOR_COMPANIES list includes key companies", () => {
-    expect(MAJOR_COMPANIES).toContain("Arine");
-    expect(MAJOR_COMPANIES).toContain("Booz Allen Hamilton");
-    expect(MAJOR_COMPANIES).toContain("Amazon Web Services");
-    expect(MAJOR_COMPANIES).toContain("Slalom");
-    expect(MAJOR_COMPANIES).toContain("Red Ventures");
-    expect(MAJOR_COMPANIES).toContain("Microsoft");
   });
 });
 

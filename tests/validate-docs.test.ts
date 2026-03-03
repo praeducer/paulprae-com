@@ -162,15 +162,6 @@ describe("findMarkdownFiles", () => {
 // ─── checkRequiredDocs ──────────────────────────────────────────────────────
 
 describe("checkRequiredDocs", () => {
-  it("returns a result with required fields", () => {
-    const result = checkRequiredDocs();
-    expect(result).toHaveProperty("name");
-    expect(result).toHaveProperty("passed");
-    expect(result).toHaveProperty("detail");
-    expect(result).toHaveProperty("durationMs");
-    expect(result.name).toBe("Required docs");
-  });
-
   it("passes when all required docs exist", () => {
     const result = checkRequiredDocs();
     expect(result.passed).toBe(true);
@@ -181,15 +172,6 @@ describe("checkRequiredDocs", () => {
 // ─── checkLinks ─────────────────────────────────────────────────────────────
 
 describe("checkLinks", () => {
-  it("returns a result with required fields", () => {
-    const result = checkLinks();
-    expect(result).toHaveProperty("name");
-    expect(result).toHaveProperty("passed");
-    expect(result).toHaveProperty("detail");
-    expect(result).toHaveProperty("durationMs");
-    expect(result.name).toBe("Internal links");
-  });
-
   it("passes with current repo state (no broken links)", () => {
     const result = checkLinks();
     expect(result.passed).toBe(true);
