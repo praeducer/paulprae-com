@@ -20,13 +20,15 @@
 
 import { describe, it, expect } from "vitest";
 import { _testExports } from "../scripts/generate-resume.js";
+import { loadPrompt } from "../lib/prompts/loader.js";
 import { SAMPLE_CAREER_DATA, SAMPLE_RESUME_CLEAN } from "./fixtures/sample-data.js";
 
 const {
   SYSTEM_PROMPT,
-  SYSTEM_PROMPT_BASE,
-  FEW_SHOT_EXAMPLES,
   INCLUDE_FEW_SHOT,
+  PROMPT_VERSION,
+  promptMetadata,
+  promptConfig,
   buildUserMessage,
   validateResumeOutput,
 } = _testExports;
@@ -252,15 +254,21 @@ describe("few-shot examples", () => {
     expect(SYSTEM_PROMPT).toContain("Strong:");
   });
 
-  it("FEW_SHOT_EXAMPLES contains at least 3 weak/strong pairs", () => {
-    const weakCount = (FEW_SHOT_EXAMPLES.match(/Weak:/g) || []).length;
-    const strongCount = (FEW_SHOT_EXAMPLES.match(/Strong:/g) || []).length;
+  it("SYSTEM_PROMPT contains at least 3 weak/strong pairs from few-shot file", () => {
+    const weakCount = (SYSTEM_PROMPT.match(/Weak:/g) || []).length;
+    const strongCount = (SYSTEM_PROMPT.match(/Strong:/g) || []).length;
     expect(weakCount).toBeGreaterThanOrEqual(3);
     expect(strongCount).toBeGreaterThanOrEqual(3);
   });
 
-  it("SYSTEM_PROMPT_BASE does not contain few-shot examples", () => {
-    expect(SYSTEM_PROMPT_BASE).not.toContain("Examples of Strong vs Weak");
+  it("loading without few-shot excludes examples", () => {
+    // Load the base prompt file directly — its content shouldn't have examples
+    const fs = require("fs");
+    const path = require("path");
+    const matter = require("gray-matter");
+    const systemPath = path.join(process.cwd(), "lib/prompts/resume-writer.system.md");
+    const { content } = matter(fs.readFileSync(systemPath, "utf-8"));
+    expect(content).not.toContain("Examples of Strong vs Weak");
   });
 
   it("includes section priority guidance", () => {

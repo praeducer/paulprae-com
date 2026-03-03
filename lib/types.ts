@@ -267,6 +267,31 @@ export interface GenerationResult {
   inputTokens: number;
   outputTokens: number;
   durationMs: number;
+  promptVersion?: string;
+}
+
+// ─── Prompt System Types ──────────────────────────────────────────────────────
+
+export interface PromptMetadata {
+  id: string;
+  version: string;
+  description: string;
+  tags: string[];
+}
+
+export interface PromptConfig {
+  cacheSystemPrompt?: boolean;
+  includeFewShot?: boolean;
+  /** Override global model (from lib/config.ts CLAUDE.model) */
+  model?: string;
+  /** Override global maxTokens */
+  maxTokens?: number;
+}
+
+export interface LoadedPrompt {
+  systemPrompt: string;
+  config: PromptConfig;
+  metadata: PromptMetadata;
 }
 
 // ─── D. Resume Comparison Types ─────────────────────────────────────────────

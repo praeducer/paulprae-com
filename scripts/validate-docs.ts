@@ -57,6 +57,7 @@ const SKIP_DIRS = new Set([
   ".git",
   ".vercel",
   "data/generated/versions",
+  "lib/prompts", // AI prompt files contain template syntax that looks like markdown links
 ]);
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
