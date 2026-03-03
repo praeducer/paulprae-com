@@ -1,0 +1,118 @@
+# Pipeline: manual or scheduled resume generation workflow
+#
+# Runs the full ingestion → generation → export pipeline in CI,
+# then creates a PR with the generated changes for human review.
+#
+# Required secrets:
+#   ANTHROPIC_API_KEY — for Claude API resume generation
+#
+# Optional secrets (for export step):
+#   System deps (pandoc, typst) are installed automatically.
+
+name: Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Force regeneration (ignore skip logic)"
+        type: boolean
+        default: false
+      auto_approve:
+        description: "Auto-approve staging resume (skip human review of staging)"
+        type: boolean
+        default: false
+  schedule:
+    # First of each month at 9 AM UTC
+    - cron: "0 9 1 * *"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install pandoc
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq pandoc
+
+      - name: Install typst
+        run: |
+          TYPST_VERSION=$(curl -sL https://api.github.com/repos/typst/typst/releases/latest | grep '"tag_name"' | head -1 | cut -d'"' -f4)
+          TYPST_URL="https://github.com/typst/typst/releases/download/${TYPST_VERSION}/typst-x86_64-unknown-linux-musl.tar.xz"
+          curl -fsSL "$TYPST_URL" -o /tmp/typst.tar.xz
+          tar -xf /tmp/typst.tar.xz -C /tmp
+          sudo mv "/tmp/typst-x86_64-unknown-linux-musl/typst" /usr/local/bin/typst
+          chmod +x /usr/local/bin/typst
+          typst --version
+
+      - name: Ingest career data
+        run: npm run ingest${{ github.event.inputs.force == 'true' && ':force' || '' }}
+
+      - name: Generate resume
+        run: npm run generate${{ github.event.inputs.force == 'true' && ':force' || '' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Auto-approve staging
+        if: ${{ github.event.inputs.auto_approve == 'true' || github.event_name == 'schedule' }}
+        run: npm run approve:force
+
+      - name: Export to PDF and DOCX
+        run: npm run export
+
+      - name: Sync public downloads
+        run: npm run check:fix
+
+      - name: Validate quality
+        run: npm run check:quick -- --ci
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet data/generated/ public/; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No changes detected — pipeline outputs are up to date"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "Changes detected in generated files"
+          fi
+
+      - name: Create pull request
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          BRANCH="pipeline/resume-$(date +%Y-%m-%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add data/generated/ public/Paul-Prae-Resume.*
+          git commit -m "chore: regenerate resume $(date +%Y-%m-%d)
+
+          Automated pipeline run via GitHub Actions.
+
+          Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
+          git push origin "$BRANCH"
+          gh pr create \
+            --title "Resume regeneration $(date +%Y-%m-%d)" \
+            --body "$(cat <<'EOF'
+          ## Summary
+          - Automated resume regeneration via the Pipeline workflow
+          - Review the diff to verify content quality before merging
+
+          ## Quality
+          Run `npm run check:quick` locally or review the workflow logs for quality scores.
+
+          🤖 Generated with [GitHub Actions Pipeline](https://github.com/${{ github.repository }}/actions/workflows/pipeline.yml)
+          EOF
+          )" \
+            --base main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

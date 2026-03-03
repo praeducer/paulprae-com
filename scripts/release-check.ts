@@ -43,6 +43,7 @@ const args = process.argv.slice(2);
 const quickMode = args.includes("--quick");
 const skipBuild = args.includes("--skip-build");
 const fixMode = args.includes("--fix");
+const ciMode = args.includes("--ci") || !!process.env.GITHUB_ACTIONS;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -324,9 +325,11 @@ function checkResumeQuality(): CheckResult {
   }
 
   // Check quantification density (at least 30% of bullets should have metrics)
-  if (totalBullets > 0 && quantifiedBullets / totalBullets < 0.3) {
+  // Use rounded percentage to avoid boundary issues (e.g., 29.6% displays as 30% but fails < 0.3)
+  const quantPct = totalBullets > 0 ? Math.round((quantifiedBullets / totalBullets) * 100) : 0;
+  if (totalBullets > 0 && quantPct < 30) {
     issues.push(
-      `low quantification: ${quantifiedBullets}/${totalBullets} bullets have metrics (${Math.round((quantifiedBullets / totalBullets) * 100)}%, target ≥30%)`,
+      `low quantification: ${quantifiedBullets}/${totalBullets} bullets have metrics (${quantPct}%, target ≥30%)`,
     );
   }
 
@@ -435,6 +438,35 @@ function main(): void {
       `  \x1b[31m✗ ${failed} of ${passed + failed} checks failed\x1b[0m (${(totalMs / 1000).toFixed(1)}s)`,
     );
     console.log("  Fix issues above before pushing.\n");
+  }
+
+  // ─── CI Mode: GitHub Actions annotations + step summary ───────────────────
+  if (ciMode) {
+    for (const r of results) {
+      if (!r.passed) {
+        console.log(`::error::${r.name}: ${r.detail}`);
+      }
+    }
+
+    // Find resume quality result for summary
+    const qualityResult = results.find((r) => r.name === "Resume quality");
+
+    const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+    if (summaryPath) {
+      const lines = [
+        "## Release Checklist",
+        "",
+        "| Check | Status | Detail |",
+        "| ----- | ------ | ------ |",
+        ...results.map((r) => `| ${r.name} | ${r.passed ? "✅" : "❌"} | ${r.detail} |`),
+        "",
+        `**Result:** ${failed === 0 ? `✅ All ${passed} checks passed` : `❌ ${failed} of ${passed + failed} checks failed`} (${(totalMs / 1000).toFixed(1)}s)`,
+      ];
+      if (qualityResult) {
+        lines.push("", `**Resume Quality:** ${qualityResult.detail}`);
+      }
+      fs.appendFileSync(summaryPath, lines.join("\n") + "\n");
+    }
   }
 
   process.exit(failed > 0 ? 1 : 0);

@@ -1,0 +1,95 @@
+# Deploy: build and deploy to Vercel after CI passes on main
+#
+# Triggers on successful CI workflow completion (push to main only).
+# Runs smoke tests after deploy and auto-rolls back on failure.
+#
+# Required secrets:
+#   VERCEL_TOKEN      — from https://vercel.com/account/tokens
+#   VERCEL_ORG_ID     — from .vercel/project.json → orgId
+#   VERCEL_PROJECT_ID — from .vercel/project.json → projectId
+
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    branches: [main]
+    types: [completed]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment:
+      name: production
+      url: https://paulprae.com
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Vercel
+        id: deploy
+        run: npx vercel --prod --yes --token="${VERCEL_TOKEN}"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Wait for CDN propagation
+        run: sleep 15
+
+      - name: Post-deployment smoke test
+        id: smoke
+        run: npm run smoke
+        env:
+          SMOKE_TEST_URL: https://paulprae.com
+
+      - name: Rollback on smoke failure
+        if: failure() && steps.smoke.outcome == 'failure'
+        run: |
+          echo "Smoke test failed — attempting rollback to previous deployment..."
+          DEPLOYMENTS=$(npx vercel ls --prod --token="${VERCEL_TOKEN}" 2>/dev/null || true)
+          PREV_DEPLOY=$(echo "$DEPLOYMENTS" | awk 'NR==3{print $2}')
+          if [ -n "$PREV_DEPLOY" ]; then
+            npx vercel promote "$PREV_DEPLOY" --yes --token="${VERCEL_TOKEN}" || true
+            echo "::error::Smoke test failed — rolled back to: $PREV_DEPLOY"
+          else
+            echo "::error::Smoke test failed — could not determine previous deployment for rollback"
+          fi
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Create issue on failure
+        if: failure()
+        run: |
+          gh label create deploy-failure --description "Automated deploy failure" --color d73a49 2>/dev/null || true
+          gh issue create \
+            --title "Deploy failed: $(date +%Y-%m-%d)" \
+            --body "$(cat <<EOF
+          Deployment workflow failed.
+
+          **Commit:** ${{ github.event.workflow_run.head_sha }}
+          **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          **Trigger:** CI workflow run #${{ github.event.workflow_run.run_number }}
+
+          Check the workflow logs for details.
+          EOF
+          )" \
+            --label "deploy-failure"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

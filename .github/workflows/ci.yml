@@ -37,17 +37,8 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Validate data and resume quality
+        run: npm run check:quick -- --ci
+
       - name: Validate build output
-        run: |
-          # Verify static export produced index.html
-          test -f out/index.html || { echo "::error::out/index.html not found"; exit 1; }
-
-          # Verify resume content is present in the build
-          grep -qi "Professional Summary" out/index.html || { echo "::error::Resume content missing from build output"; exit 1; }
-
-          # Verify download files exist in the build
-          test -f out/Paul-Prae-Resume.pdf || echo "::warning::PDF download not in build output"
-          test -f out/Paul-Prae-Resume.docx || echo "::warning::DOCX download not in build output"
-          test -f out/Paul-Prae-Resume.md || echo "::warning::MD download not in build output"
-
-          echo "Build output validated successfully"
+        run: test -f out/index.html || { echo "::error::out/index.html not found"; exit 1; }
