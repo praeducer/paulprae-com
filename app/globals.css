@@ -28,12 +28,12 @@ html {
 }
 
 .resume-prose h2 {
-  @apply text-lg font-semibold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mt-8 mb-4;
+  @apply text-xl font-semibold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mt-8 mb-4;
   scroll-margin-top: calc(var(--sticky-offset) + 16px);
 }
 
 .resume-prose h3 {
-  @apply text-base font-semibold text-slate-900 mb-0;
+  @apply text-lg font-semibold text-slate-900 mb-0;
 }
 
 .resume-prose h3 + p {
@@ -41,11 +41,11 @@ html {
 }
 
 .resume-prose p {
-  @apply text-sm leading-relaxed text-slate-700;
+  @apply text-base leading-relaxed text-slate-700;
 }
 
 .resume-prose ul {
-  @apply text-sm leading-relaxed text-slate-700 pl-5 my-2;
+  @apply text-base leading-relaxed text-slate-700 pl-5 my-2;
 }
 
 .resume-prose li {
@@ -112,10 +112,28 @@ html {
   display: none;
 }
 
+/* ─── Reduced Motion ──────────────────────────────────────────────────────── */
+/* Respect user preferences for reduced motion (WCAG 2.2) */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ─── Print Styles ───────────────────────────────────────────────────────── */
 /* Clean PDF output when printing from browser (Cmd+P / Ctrl+P) */
 
 @media print {
+  @page {
+    margin: 0.5in;
+  }
+
   /* Force light colors for print — override any dark mode preferences */
   body {
     @apply bg-white text-black;
@@ -146,7 +164,7 @@ html {
   }
 
   .resume-prose h3 {
-    font-size: 11pt;
+    font-size: 10.5pt;
     page-break-after: avoid;
     color: #0f172a;
   }
