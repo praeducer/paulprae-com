@@ -42,6 +42,7 @@ This script installs:
 - npm dependencies
 - pandoc + typst tooling
 - Claude Code CLI
+- shellcheck (shell script linter)
 - WSL cursor wrapper when applicable
 
 ## 3. Manual Setup (if needed)
@@ -121,6 +122,7 @@ which claude
 claude --version
 pandoc --version
 typst --version
+shellcheck --version
 ```
 
 From repo root:

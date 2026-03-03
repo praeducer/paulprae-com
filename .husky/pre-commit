@@ -3,6 +3,8 @@
 # Add nvm-managed Node.js to PATH (POSIX-safe — nvm.sh requires bash but husky uses sh/dash)
 NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 if [ -d "$NVM_DIR/versions/node" ]; then
+  # nvm directories use only alphanumeric names; find is unnecessarily complex here
+  # shellcheck disable=SC2012
   NODE_BIN="$(ls -td "$NVM_DIR/versions/node/"*/bin 2>/dev/null | head -1)"
   [ -d "$NODE_BIN" ] && PATH="$NODE_BIN:$PATH" && export PATH
 fi

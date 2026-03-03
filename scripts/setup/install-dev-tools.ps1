@@ -47,7 +47,8 @@ Install-IfMissing -Command "node" -WingetId "OpenJS.NodeJS.LTS"          -Displa
 Install-IfMissing -Command "gh"   -WingetId "GitHub.cli"                 -DisplayName "GitHub CLI"
 Install-IfMissing -Command "code"   -WingetId "Microsoft.VisualStudioCode" -DisplayName "VS Code"
 Install-IfMissing -Command "pandoc" -WingetId "JohnMacFarlane.Pandoc"      -DisplayName "Pandoc"
-Install-IfMissing -Command "typst"  -WingetId "Typst.Typst"               -DisplayName "Typst"
+Install-IfMissing -Command "typst"      -WingetId "Typst.Typst"               -DisplayName "Typst"
+Install-IfMissing -Command "shellcheck" -WingetId "koalaman.shellcheck"        -DisplayName "ShellCheck"
 
 # Refresh PATH for npm-based installs
 $machinePath = [System.Environment]::GetEnvironmentVariable("Path", "Machine")

@@ -160,6 +160,27 @@ else
     fi
 fi
 
+# ─── Install ShellCheck ──────────────────────────────────────────────────────
+
+if command -v shellcheck &>/dev/null; then
+    skip "shellcheck already installed: $(shellcheck --version 2>/dev/null | grep '^version:' || echo 'unknown')"
+else
+    info "Installing shellcheck..."
+    if [[ "$OS" == "linux" ]]; then
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq shellcheck
+    elif [[ "$OS" == "macos" ]]; then
+        brew install shellcheck
+    fi
+
+    if command -v shellcheck &>/dev/null; then
+        ok "shellcheck installed: $(shellcheck --version | grep '^version:')"
+    else
+        fail "shellcheck installation failed"
+        echo "  Install manually: sudo apt-get install shellcheck"
+    fi
+fi
+
 # ─── Install Node.js (if missing) ────────────────────────────────────────────
 
 if command -v node &>/dev/null; then
@@ -390,9 +411,11 @@ if grep -qE '^export PATH=.*(mingw|MINGW|/c/Users)' "$HOME/.bashrc" 2>/dev/null;
 fi
 
 # Check cargo env is guarded
+# patterns intentionally match literal $HOME text in .bashrc
+# shellcheck disable=SC2016
 if grep -q '^\. "\$HOME/.cargo/env"' "$HOME/.bashrc" 2>/dev/null; then
     if ! grep -q '\[ -s "\$HOME/.cargo/env" \]' "$HOME/.bashrc" 2>/dev/null; then
-        fail "~/.bashrc sources cargo env without existence guard"
+        fail "$HOME/.bashrc sources cargo env without existence guard"
         echo "  Replace:  . \"\$HOME/.cargo/env\""
         echo "  With:     [ -s \"\$HOME/.cargo/env\" ] && . \"\$HOME/.cargo/env\""
     fi
@@ -412,7 +435,7 @@ if $IS_WSL; then
 fi
 
 # Verify key tools resolve correctly
-for cmd in node npm claude pandoc typst gh cursor; do
+for cmd in node npm claude pandoc typst shellcheck gh cursor; do
     if command -v "$cmd" &>/dev/null; then
         ok "$cmd → $(which "$cmd")"
     else
@@ -429,8 +452,9 @@ echo "  pandoc: $(command -v pandoc &>/dev/null && pandoc --version | head -1 ||
 echo "  typst:  $(command -v typst &>/dev/null && typst --version || echo 'NOT INSTALLED')"
 echo "  node:   $(command -v node &>/dev/null && node --version || echo 'NOT INSTALLED')"
 echo "  npm:    $(command -v npm &>/dev/null && npm --version || echo 'NOT INSTALLED')"
-echo "  claude: $(command -v claude &>/dev/null && claude --version 2>/dev/null || echo 'NOT INSTALLED')"
-echo "  gh:     $(command -v gh &>/dev/null && gh --version | head -1 || echo 'NOT INSTALLED')"
+echo "  claude:     $(command -v claude &>/dev/null && claude --version 2>/dev/null || echo 'NOT INSTALLED')"
+echo "  shellcheck: $(command -v shellcheck &>/dev/null && shellcheck --version 2>/dev/null | grep '^version:' || echo 'NOT INSTALLED')"
+echo "  gh:         $(command -v gh &>/dev/null && gh --version | head -1 || echo 'NOT INSTALLED')"
 echo "  cursor: $(command -v cursor &>/dev/null && echo 'AVAILABLE' || echo 'NOT INSTALLED')"
 echo ""
 echo "  Next steps:"

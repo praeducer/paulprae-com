@@ -80,6 +80,7 @@ winget install --id Microsoft.VisualStudioCode --exact
 winget install --id GitHub.cli --exact
 winget install --id JohnMacFarlane.Pandoc --exact
 winget install --id Typst.Typst --exact
+winget install --id koalaman.shellcheck --exact
 ```
 
 Install CLI tools via npm:
@@ -173,6 +174,7 @@ git --version
 gh --version
 pandoc --version
 typst --version
+shellcheck --version
 ```
 
 From repo root:
