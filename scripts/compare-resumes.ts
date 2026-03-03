@@ -18,10 +18,10 @@
 import fs from "fs";
 import path from "path";
 import readline from "readline";
-import Anthropic from "@anthropic-ai/sdk";
-import { PATHS, CLAUDE } from "../lib/config";
+import { PATHS } from "../lib/config";
 import { parseResume, assembleResume } from "../lib/resume-parser";
 import { isDirectRun } from "../lib/script-utils";
+import { callModel, ApiKeyError } from "../lib/ai/client";
 import type { ParsedResume, ResumeSection } from "../lib/resume-parser";
 import type { SectionScore } from "../lib/types";
 
@@ -120,19 +120,13 @@ async function judgeSection(
   heading: string,
   versions: { label: string; content: string }[],
 ): Promise<Map<string, SectionScore[]>> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    console.log(`   ${DIM}(Skipping LLM judge — ANTHROPIC_API_KEY not set)${RESET}`);
-    return new Map();
-  }
-
-  const client = new Anthropic();
-
   const versionTexts = versions
     .map((v, i) => `### Version ${String.fromCharCode(65 + i)} (${v.label})\n${v.content}`)
     .join("\n\n");
 
-  const prompt = `You are an expert resume evaluator. Score each version of the "${heading}" section on these 6 criteria (1-10 scale):
+  const systemPrompt = "You are an expert resume evaluator. Respond with valid JSON only.";
+
+  const userMessage = `Score each version of the "${heading}" section on these 6 criteria (1-10 scale):
 
 1. Impact Clarity — quantified outcomes, measurable results
 2. Action Verb Strength — strong, specific verbs vs passive/weak ones
@@ -151,23 +145,16 @@ Respond with valid JSON only — an object where keys are version labels and val
 }`;
 
   try {
-    const response = await client.messages.create({
-      model: CLAUDE.model,
-      max_tokens: 4096,
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    const text = response.content[0].type === "text" ? response.content[0].text : "";
+    const response = await callModel(systemPrompt, userMessage);
 
     // Extract JSON from response (may be wrapped in markdown code block)
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const jsonMatch = response.text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return new Map();
 
     const parsed = JSON.parse(jsonMatch[0]) as Record<string, SectionScore[]>;
     const result = new Map<string, SectionScore[]>();
 
     for (const [key, scores] of Object.entries(parsed)) {
-      // Match key back to version label
       const version = versions.find((v) => key.includes(v.label));
       if (version) {
         result.set(version.label, scores);
@@ -176,9 +163,13 @@ Respond with valid JSON only — an object where keys are version labels and val
 
     return result;
   } catch (err) {
-    console.error(
-      `   ${DIM}(LLM judge error: ${err instanceof Error ? err.message : err})${RESET}`,
-    );
+    if (err instanceof ApiKeyError) {
+      console.log(`   ${DIM}(Skipping LLM judge — ANTHROPIC_API_KEY not set)${RESET}`);
+    } else {
+      console.error(
+        `   ${DIM}(LLM judge error: ${err instanceof Error ? err.message : err})${RESET}`,
+      );
+    }
     return new Map();
   }
 }
