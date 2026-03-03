@@ -105,7 +105,25 @@ git config --global pull.rebase false
 git config --global push.autoSetupRemote true
 ```
 
-## 7. Optional WSL Setup
+## 7. Git GUI Tools
+
+### GitHub Desktop
+
+Install from [desktop.github.com](https://desktop.github.com/) or via winget:
+
+```powershell
+winget install --id GitHub.GitHubDesktop --exact
+```
+
+GitHub Desktop uses its own bundled Git (MINGW bash) which does **not** have access to WSL-installed Node.js or `npx`. The project's husky pre-commit hook handles this automatically — when `npx` is not available, the hook delegates to WSL via `wsl.exe`, converting the UNC path to a WSL-native path.
+
+No additional configuration is needed for GitHub Desktop to work with pre-commit hooks on this project.
+
+### VS Code Source Control
+
+VS Code's built-in Git also uses the Windows Git installation. The same WSL delegation in the pre-commit hook applies here. Ensure Git for Windows is installed (§5) and the repo is opened via the WSL filesystem path (`\\wsl.localhost\Ubuntu\...`).
+
+## 8. Optional WSL Setup
 
 If using Claude Code sandboxing or Linux-native workflows:
 
@@ -123,7 +141,7 @@ mkdir -p ~/dev
 
 Continue in `docs/linux-dev-environment-setup.md`.
 
-## 8. Package Cache Optimization
+## 9. Package Cache Optimization
 
 Set npm and pip caches to Dev Drive:
 
@@ -134,7 +152,7 @@ setx PIP_CACHE_DIR D:\packages\pip
 
 Restart terminal sessions after `setx`.
 
-## 9. Project Bootstrap
+## 10. Project Bootstrap
 
 ```powershell
 git clone https://github.com/praeducer/paulprae-com.git D:\dev\paulprae-com
@@ -144,7 +162,7 @@ npm install
 
 Then follow `README.md` for `.env.local`, data inputs, and pipeline commands.
 
-## 10. Verification Checklist
+## 11. Verification Checklist
 
 Run and confirm:
 
@@ -165,7 +183,7 @@ npm run format:check
 npm test
 ```
 
-## 11. Troubleshooting
+## 12. Troubleshooting
 
 ### Long-path or EPERM errors
 
@@ -187,6 +205,14 @@ fsutil devdrv query D:
 - Restart shell sessions.
 - Ensure expected binaries resolve first in PATH.
 - If also using WSL, keep Windows and WSL installs separate and explicit.
+
+### Pre-commit hook fails in GitHub Desktop or VS Code
+
+The husky pre-commit hook automatically delegates to WSL when `npx` is not found. If it still fails:
+
+1. Verify WSL is running: `wsl --status`
+2. Verify Node.js in WSL: `wsl bash -lc "source ~/.nvm/nvm.sh && node --version"`
+3. Ensure the repo was cloned on the WSL filesystem (`\\wsl.localhost\Ubuntu\...`), not `C:\`
 
 ### Cross-filesystem performance is slow
 

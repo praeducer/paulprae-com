@@ -218,7 +218,9 @@ npm run format        # Prettier format all files
 npm run format:check  # Prettier check (CI-friendly)
 ```
 
-A **pre-commit hook** runs automatically on every `git commit` (installed via `npm install`). It runs Prettier on staged files only, so formatting issues are fixed before they reach CI. No extra setup needed — husky wires it in via the `prepare` npm lifecycle hook.
+A **pre-commit hook** runs automatically on every `git commit` (installed via `npm install`). It runs Prettier on staged files via lint-staged, so formatting issues are fixed before they reach CI. No extra setup needed — husky wires it in via the `prepare` npm lifecycle hook.
+
+The hook works across all Git environments: WSL/Linux/macOS terminals use `npx` directly, while Windows Git clients (GitHub Desktop, VS Code) automatically delegate to WSL when `npx` isn't available in the Windows shell.
 
 ### Pre-Push Checklist
 
