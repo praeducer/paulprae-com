@@ -45,7 +45,8 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
   }, []);
 
   // Track which section is active based on scroll position.
-  // Reads --sticky-offset (header + nav) from CSS so JS and CSS stay in sync.
+  // Reads --header-height and --nav-height from CSS so JS and CSS stay in sync.
+  // (--sticky-offset is a calc() expression that parseFloat cannot resolve.)
   useEffect(() => {
     const onScroll = () => {
       if (window.scrollY < 100) {
@@ -53,10 +54,10 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
         return;
       }
 
-      const stickyOffset = parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue("--sticky-offset") || "0",
-      );
-      const threshold = stickyOffset + 16;
+      const style = getComputedStyle(document.documentElement);
+      const headerH = parseFloat(style.getPropertyValue("--header-height") || "0");
+      const navH = parseFloat(style.getPropertyValue("--nav-height") || "0");
+      const threshold = headerH + navH + 16;
 
       let current = "";
       for (const section of sections) {
@@ -90,9 +91,9 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
           <a
             key={s.id}
             href={`#${s.id}`}
-            className={`inline-flex min-h-[44px] shrink-0 items-center rounded-md px-3 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none ${
+            className={`inline-flex min-h-[44px] shrink-0 items-center rounded-md px-2.5 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none ${
               activeId === s.id
-                ? "bg-slate-900 text-white dark:bg-slate-200 dark:text-slate-900"
+                ? "bg-slate-200 font-medium text-slate-900 dark:bg-slate-700 dark:text-slate-100"
                 : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
             }`}
           >

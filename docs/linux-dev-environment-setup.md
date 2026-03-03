@@ -52,9 +52,11 @@ This script installs:
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-nvm install --lts
-nvm alias default lts/*
+nvm install   # reads version from .nvmrc (Node 24)
+nvm alias default 24
 ```
+
+The project includes a `.nvmrc` file pinning the Node.js major version. Running `nvm install` or `nvm use` in the repo root picks up this version automatically.
 
 ### 3.2 Export dependencies
 

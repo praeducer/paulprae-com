@@ -119,7 +119,12 @@ Generated files that should be committed: `data/generated/career-data.json`, `da
 
 ## Code Quality
 
-A **pre-commit hook** runs automatically on every `git commit`. It formats staged files with Prettier before the commit is recorded, so formatting issues never reach CI. It is installed by `npm install` via the `prepare` lifecycle hook — no extra setup needed.
+A **pre-commit hook** runs automatically on every `git commit`. It formats staged files with Prettier via lint-staged before the commit is recorded, so formatting issues never reach CI.
+
+The hook is installed by `npm install` via the `prepare` lifecycle hook — no extra setup needed. It works across all Git environments:
+
+- **WSL / Linux / macOS terminal:** Uses `npx` directly (sources nvm if present)
+- **Windows Git clients (GitHub Desktop, VS Code, etc.):** Automatically delegates to WSL via `wsl.exe` when `npx` isn't available in the Windows shell, converting UNC paths to WSL-native paths
 
 Run the release checklist before pushing:
 
