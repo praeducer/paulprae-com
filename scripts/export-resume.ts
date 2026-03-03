@@ -18,7 +18,7 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { execFileSync } from "child_process";
-import { PATHS, RESUME_FILE_BASE } from "../lib/config.js";
+import { PATHS, RESUME_FILE_BASE, CLAUDE } from "../lib/config.js";
 import { isDirectRun, hasForceFlag } from "../lib/script-utils.js";
 import { stripHtmlComments } from "../lib/markdown.js";
 
@@ -327,7 +327,7 @@ function updateManifest(format: ExportFormat): void {
     `### ${date}`,
     `- **Commit:** \`${sha}\``,
     `- **Generated:** ${timestamp}`,
-    `- **Model:** claude-opus-4-6`,
+    `- **Model:** ${CLAUDE.model}`,
     `- **Files:** ${prefix}.{md,pdf,docx}`,
     `- **Sizes:** ${sizes.join(", ")}`,
     "",

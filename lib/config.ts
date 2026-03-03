@@ -71,8 +71,10 @@ export const PATHS = {
 export const CLAUDE = {
   /** Opus 4.6 — latest alias (no date suffix). */
   model: "claude-opus-4-6" as const,
-  /** High ceiling so adaptive thinking doesn't crowd out resume output. */
-  maxTokens: 32768,
+  /** API maximum. With adaptive thinking, max_tokens is the combined budget for
+   *  thinking + text output. Opus 4.6 at max effort can use 30k+ thinking tokens,
+   *  so we set the ceiling as high as possible. Quality over cost. */
+  maxTokens: 128000,
   /** Adaptive thinking: Opus 4.6 dynamically determines reasoning depth. */
   thinking: { type: "adaptive" as const },
   /** Max effort: Opus 4.6 exclusive — no constraints on token spending. */
