@@ -169,6 +169,9 @@ export default function Home() {
           </div>
           {/* Row 2: Downloads + Contact links */}
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
+            <span className="text-xs font-medium tracking-wide text-slate-400 uppercase dark:text-slate-500">
+              Resume
+            </span>
             <a
               href={pdfPath}
               download
