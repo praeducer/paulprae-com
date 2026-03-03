@@ -292,12 +292,6 @@ function ingest(): IngestResult {
   return { success: true, careerData: data, errors, warnings, stats };
 }
 
-// ─── Exports for Testing ──────────────────────────────────────────────────────
-// Legacy _testExports maintained for backward compatibility during migration.
-// Tests should migrate to importing directly from lib/ingest/ modules.
-
-export { ingest };
-
 // ─── Execute ─────────────────────────────────────────────────────────────────
 
 if (isDirectRun("ingest-linkedin")) {

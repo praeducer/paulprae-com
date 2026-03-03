@@ -15,8 +15,8 @@ Only actionable coding/documentation tasks belong here.
 
 ## Branch Review Follow-ups (open)
 
-- [ ] Add `github: z.string().optional()` to `CareerDataSchema` in `scripts/ingest-linkedin.ts` so runtime validation matches `CareerProfile`.
-- [ ] Add targeted unit tests for `enrichProfileFromKnowledge` in `tests/ingest.test.ts` (linkedin/website/email/github enrichment).
+- [x] Add `github: z.string().optional()` to `CareerDataSchema` in `lib/ingest/utils.ts` so runtime validation matches `CareerProfile`.
+- [x] Add targeted unit tests for `enrichProfileFromKnowledge` in `tests/ingest.test.ts` (linkedin/website/email/github enrichment).
 - [x] Keep GitHub header link WCAG touch target compliant (`min-h-[44px]`) in `app/page.tsx` (verified on current `main`).
 
 ## Pipeline Enhancements
