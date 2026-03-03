@@ -9,14 +9,17 @@ if [ -d "$NVM_DIR/versions/node" ]; then
   [ -d "$NODE_BIN" ] && PATH="$NODE_BIN:$PATH" && export PATH
 fi
 
-# Primary: run lint-staged (also uses node_modules/.bin from husky's h script)
-if command -v npx >/dev/null 2>&1; then
+# Primary: run lint-staged
+# Both node AND npx must be available — husky's h script adds node_modules/.bin
+# to PATH, so npx is "found" even in MINGW where node itself is missing.
+# Without the node check, npx (#!/usr/bin/env node) fails with code 127.
+if command -v node >/dev/null 2>&1 && command -v npx >/dev/null 2>&1; then
   npx lint-staged
   exit $?
 fi
 
 # Fallback: Windows Git client (GitHub Desktop, VS Code)
-# npx isn't available in MINGW bash — delegate to WSL where node lives
+# In MINGW bash, node isn't available — delegate to WSL where node lives
 if command -v wsl.exe >/dev/null 2>&1; then
   WSL_DIR="$(pwd | sed 's|^//wsl\.localhost/[^/]*||')"
   if [ -n "$WSL_DIR" ]; then
