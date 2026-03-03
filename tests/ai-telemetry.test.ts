@@ -10,12 +10,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "fs";
 import path from "path";
-import {
-  estimateCost,
-  logGeneration,
-  readTelemetry,
-  formatTelemetrySummary,
-} from "../lib/ai/telemetry.js";
+import { estimateCost, estimateTokens, formatTelemetrySummary } from "../lib/ai/telemetry.js";
 import type { GenerationTelemetry } from "../lib/ai/telemetry.js";
 
 // ─── Test Fixtures ───────────────────────────────────────────────────────────
@@ -73,21 +68,36 @@ describe("estimateCost", () => {
   });
 });
 
+// ─── Token Estimation ────────────────────────────────────────────────────────
+
+describe("estimateTokens", () => {
+  it("estimates tokens as ceil(chars / 4)", () => {
+    // 100 chars → 25 tokens
+    expect(estimateTokens("a".repeat(100))).toBe(25);
+  });
+
+  it("rounds up for non-divisible lengths", () => {
+    // 101 chars → 26 tokens (ceil)
+    expect(estimateTokens("a".repeat(101))).toBe(26);
+  });
+
+  it("returns 0 for empty string", () => {
+    expect(estimateTokens("")).toBe(0);
+  });
+
+  it("handles large text (system prompt ~8000 chars → ~2000 tokens)", () => {
+    const bigText = "x".repeat(8000);
+    expect(estimateTokens(bigText)).toBe(2000);
+  });
+});
+
 // ─── JSONL Logging ───────────────────────────────────────────────────────────
 
-describe("logGeneration / readTelemetry", () => {
+describe("JSONL format", () => {
   const tmpDir = path.join(process.cwd(), "tests", ".tmp-telemetry");
-  const tmpFile = path.join(tmpDir, ".telemetry.jsonl");
-
-  // Override the telemetry path for testing by patching the module
-  // We'll test with the real functions but ensure cleanup
-  let originalCwd: string;
 
   beforeEach(() => {
     fs.mkdirSync(path.join(tmpDir, "data", "generated"), { recursive: true });
-    originalCwd = process.cwd();
-    // We can't easily override the TELEMETRY_PATH, so we'll test the format
-    // functions directly and test JSONL read/write via manual file operations
   });
 
   afterEach(() => {

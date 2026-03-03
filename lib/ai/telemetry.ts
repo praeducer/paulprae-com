@@ -94,6 +94,18 @@ function rotateIfNeeded(): void {
   }
 }
 
+// ─── Token Estimation ────────────────────────────────────────────────────────
+
+/**
+ * Rough token estimate from text length. Uses char_count / 4 heuristic.
+ *
+ * NOTE: This is approximate (±20%). The actual token count from the API
+ * response is what matters; this is for pre-flight logging only.
+ */
+export function estimateTokens(text: string): number {
+  return Math.ceil(text.length / 4);
+}
+
 // ─── Console Formatting ──────────────────────────────────────────────────────
 
 /** Format telemetry as a human-readable console summary. */

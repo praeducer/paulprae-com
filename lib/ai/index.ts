@@ -20,5 +20,11 @@ export type {
   GenerateOptions,
 } from "./client.js";
 
-export { estimateCost, logGeneration, readTelemetry, formatTelemetrySummary } from "./telemetry.js";
+export {
+  estimateCost,
+  estimateTokens,
+  logGeneration,
+  readTelemetry,
+  formatTelemetrySummary,
+} from "./telemetry.js";
 export type { GenerationTelemetry } from "./telemetry.js";

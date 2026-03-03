@@ -25,7 +25,8 @@ import matter from "gray-matter";
 import { _testExports } from "../scripts/generate-resume.js";
 import { SAMPLE_CAREER_DATA, SAMPLE_RESUME_CLEAN } from "./fixtures/sample-data.js";
 
-const { SYSTEM_PROMPT, INCLUDE_FEW_SHOT, buildUserMessage, validateResumeOutput } = _testExports;
+const { SYSTEM_PROMPT, INCLUDE_FEW_SHOT, buildUserMessage, validateResumeOutput, stripEmpty } =
+  _testExports;
 
 // ─── System Prompt Quality ──────────────────────────────────────────────────
 // The system prompt is the foundation of resume quality. These tests ensure
@@ -320,5 +321,106 @@ describe("validateResumeOutput — enhanced checks", () => {
   it("does not flag positions with strong action verbs", () => {
     const warnings = validateResumeOutput(validResume, SAMPLE_CAREER_DATA);
     expect(warnings.some((w) => w.includes("action verbs"))).toBe(false);
+  });
+});
+
+// ─── Context Optimization (Phase 6) ─────────────────────────────────────────
+
+describe("stripEmpty", () => {
+  it("strips empty strings", () => {
+    expect(stripEmpty({ a: "hello", b: "" })).toEqual({ a: "hello" });
+  });
+
+  it("strips null values", () => {
+    expect(stripEmpty({ a: "hello", b: null })).toEqual({ a: "hello" });
+  });
+
+  it("strips empty arrays", () => {
+    expect(stripEmpty({ a: [1], b: [] })).toEqual({ a: [1] });
+  });
+
+  it("strips OMIT_FIELDS (licenseNumber, activities, cause, number)", () => {
+    const obj = { name: "Test", licenseNumber: "ABC", activities: "stuff", cause: "education" };
+    expect(stripEmpty(obj)).toEqual({ name: "Test" });
+  });
+
+  it("recursively strips nested empty fields", () => {
+    const obj = { a: { b: "", c: "value" }, d: null };
+    expect(stripEmpty(obj)).toEqual({ a: { c: "value" } });
+  });
+
+  it("handles arrays of objects", () => {
+    const arr = [
+      { name: "Test", description: "" },
+      { name: "", title: "" },
+    ];
+    const result = stripEmpty(arr);
+    expect(result).toEqual([{ name: "Test" }]);
+  });
+
+  it("preserves non-empty scalar values", () => {
+    expect(stripEmpty("hello")).toBe("hello");
+    expect(stripEmpty(42)).toBe(42);
+    expect(stripEmpty(true)).toBe(true);
+    expect(stripEmpty(0)).toBe(0);
+    expect(stripEmpty(false)).toBe(false);
+  });
+});
+
+describe("buildUserMessage — compact format", () => {
+  it("uses compact JSON (no indentation)", () => {
+    const msg = buildUserMessage(SAMPLE_CAREER_DATA);
+    // Compact JSON has no newlines within the JSON block
+    const coreSection = msg.split("## Supplementary Knowledge Base")[0];
+    const jsonStart = coreSection.indexOf("{");
+    const jsonEnd = coreSection.lastIndexOf("}");
+    const jsonBlock = coreSection.slice(jsonStart, jsonEnd + 1);
+    // Compact JSON should not have leading whitespace + key pattern
+    expect(jsonBlock).not.toMatch(/\n\s{2,}"/);
+  });
+
+  it("preserves all position titles from career data", () => {
+    const msg = buildUserMessage(SAMPLE_CAREER_DATA);
+    const titles = SAMPLE_CAREER_DATA.positions.map((p) => p.title).filter(Boolean);
+    expect(titles.length).toBeGreaterThan(0);
+    for (const title of titles) {
+      expect(msg).toContain(title);
+    }
+  });
+
+  it("preserves all skill names from career data", () => {
+    const msg = buildUserMessage(SAMPLE_CAREER_DATA);
+    const skills = SAMPLE_CAREER_DATA.skills.filter(Boolean);
+    expect(skills.length).toBeGreaterThan(0);
+    for (const skill of skills) {
+      expect(msg).toContain(skill);
+    }
+  });
+
+  it("preserves profile name", () => {
+    const msg = buildUserMessage(SAMPLE_CAREER_DATA);
+    expect(msg).toContain(SAMPLE_CAREER_DATA.profile.name);
+  });
+
+  it("preserves all knowledge entry titles", () => {
+    const msg = buildUserMessage(SAMPLE_CAREER_DATA);
+    for (const entry of SAMPLE_CAREER_DATA.knowledge) {
+      expect(msg).toContain(entry.title);
+    }
+  });
+
+  it("omits empty string fields from JSON output", () => {
+    const dataWithEmpties = {
+      ...SAMPLE_CAREER_DATA,
+      positions: [{ ...SAMPLE_CAREER_DATA.positions[0], description: "" }],
+    };
+    const msg = buildUserMessage(dataWithEmpties);
+    // Parse the core JSON to verify empty description was stripped
+    const jsonStart = msg.indexOf("{");
+    const jsonEnd = msg.indexOf("## Supplementary") - 1;
+    const jsonBlock = msg.slice(jsonStart, jsonEnd).trim();
+    const parsed = JSON.parse(jsonBlock);
+    // First position should not have 'description' key
+    expect(parsed.positions[0]).not.toHaveProperty("description");
   });
 });

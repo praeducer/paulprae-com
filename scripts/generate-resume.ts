@@ -29,7 +29,6 @@ import { loadPrompt } from "../lib/prompts/loader.js";
 import {
   generateWithPrompt,
   classifyError,
-  ApiKeyError,
   estimateCost,
   logGeneration,
   formatTelemetrySummary,
@@ -61,10 +60,49 @@ const {
 const INCLUDE_FEW_SHOT = promptConfig.includeFewShot !== false;
 const PROMPT_VERSION = `${promptMetadata.id}@${promptMetadata.version}`;
 
+// ─── Context Optimization ────────────────────────────────────────────────────
+// Strip empty/null/empty-array fields and rarely-useful fields before
+// serialization to reduce token count by ~20-30%.
+
+/** Fields to omit from career data — rarely useful for resume generation. */
+const OMIT_FIELDS = new Set(["licenseNumber", "activities", "cause", "number"]);
+
+/**
+ * Recursively strip empty strings, null values, empty arrays, and
+ * fields in the OMIT_FIELDS set from an object tree.
+ */
+function stripEmpty(obj: unknown): unknown {
+  if (Array.isArray(obj)) {
+    const filtered = obj.map(stripEmpty).filter((item) => item !== undefined);
+    return filtered.length > 0 ? filtered : undefined;
+  }
+
+  if (obj !== null && typeof obj === "object") {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      if (OMIT_FIELDS.has(key)) continue;
+      const cleaned = stripEmpty(value);
+      if (cleaned !== undefined) {
+        result[key] = cleaned;
+      }
+    }
+    return Object.keys(result).length > 0 ? result : undefined;
+  }
+
+  // Scalar values: strip empty strings and nulls
+  if (obj === null || obj === "") return undefined;
+  return obj;
+}
+
 // ─── Build User Message ──────────────────────────────────────────────────────
+// Structures career data into labeled sections with compact JSON to minimize
+// token usage while preserving all data needed for resume generation.
 
 function buildUserMessage(careerData: CareerData): string {
   const { knowledge, ...coreData } = careerData;
+
+  // Strip empty fields and use compact JSON (no indentation) to save ~20% tokens
+  const compactCore = JSON.stringify(stripEmpty(coreData));
 
   const sections: string[] = [
     "Generate a professional resume from this career data. Apply all formatting rules and quality criteria from your instructions.",
@@ -73,17 +111,18 @@ function buildUserMessage(careerData: CareerData): string {
     "",
     "This is the structured career history — positions, education, profile, certifications, projects, and publications. Use this as the primary factual source.",
     "",
-    JSON.stringify(coreData, null, 2),
+    compactCore,
   ];
 
   if (knowledge.length > 0) {
+    const compactKnowledge = JSON.stringify(stripEmpty(knowledge));
     sections.push(
       "",
       "## Supplementary Knowledge Base",
       "",
       "These are curated context entries providing additional detail — achievements with quantified metrics, domain expertise narratives, brand voice guidelines, and strategic positioning context. Use these to enrich position bullet points with specific impacts, metrics, and STAR-method narratives. When knowledge entries reference specific positions (via relatedPositions), integrate that context into those roles' bullets. Do not fabricate — only use data provided here.",
       "",
-      JSON.stringify(knowledge, null, 2),
+      compactKnowledge,
     );
   }
 
@@ -358,6 +397,7 @@ export const _testExports = {
   validateResumeOutput,
   formatMarkdown,
   shouldSkipGenerate,
+  stripEmpty,
   generate,
 };
 
