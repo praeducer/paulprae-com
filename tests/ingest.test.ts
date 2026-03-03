@@ -526,7 +526,8 @@ describe("CareerDataSchema", () => {
   });
 
   it("accepts profile without github field", () => {
-    const { github: _, ...profileNoGithub } = SAMPLE_CAREER_DATA.profile;
+    const { github: _github, ...profileNoGithub } = SAMPLE_CAREER_DATA.profile;
+    void _github; // Intentionally discarded
     const noGithub = {
       ...SAMPLE_CAREER_DATA,
       profile: profileNoGithub,

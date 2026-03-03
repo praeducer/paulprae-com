@@ -19,19 +19,13 @@
  */
 
 import { describe, it, expect } from "vitest";
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
 import { _testExports } from "../scripts/generate-resume.js";
-import { loadPrompt } from "../lib/prompts/loader.js";
 import { SAMPLE_CAREER_DATA, SAMPLE_RESUME_CLEAN } from "./fixtures/sample-data.js";
 
-const {
-  SYSTEM_PROMPT,
-  INCLUDE_FEW_SHOT,
-  PROMPT_VERSION,
-  promptMetadata,
-  promptConfig,
-  buildUserMessage,
-  validateResumeOutput,
-} = _testExports;
+const { SYSTEM_PROMPT, INCLUDE_FEW_SHOT, buildUserMessage, validateResumeOutput } = _testExports;
 
 // ─── System Prompt Quality ──────────────────────────────────────────────────
 // The system prompt is the foundation of resume quality. These tests ensure
@@ -263,9 +257,6 @@ describe("few-shot examples", () => {
 
   it("loading without few-shot excludes examples", () => {
     // Load the base prompt file directly — its content shouldn't have examples
-    const fs = require("fs");
-    const path = require("path");
-    const matter = require("gray-matter");
     const systemPath = path.join(process.cwd(), "lib/prompts/resume-writer.system.md");
     const { content } = matter(fs.readFileSync(systemPath, "utf-8"));
     expect(content).not.toContain("Examples of Strong vs Weak");
