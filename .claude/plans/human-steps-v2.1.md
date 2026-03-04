@@ -1,7 +1,8 @@
 # Human Steps Guide — v2.1 Quality & Infrastructure
 
-> **Status: Steps 0-2 COMPLETE ✅** — All GitHub secrets are configured and Vercel bypass is active.
-> Nothing left for you to do manually. Claude Code is handling Step 3 (deploy fix) and Step 4 (pipeline).
+> **Status: Steps 0-3 COMPLETE ✅** — CI/CD chain is fully working end-to-end.
+> GitHub Actions deploy is verified: preview → smoke → promote → production all pass.
+> Only Step 4 remains: run the pipeline to regenerate the resume with v2.1 prompts.
 
 ---
 
@@ -22,14 +23,14 @@ Push to main
 
 ### What was broken / current status
 
-| Problem                               | Impact                                                       | Status                       |
-| ------------------------------------- | ------------------------------------------------------------ | ---------------------------- |
-| ~~No GitHub secrets~~                 | ~~Deploy workflow fails — VERCEL_TOKEN is empty~~            | ✅ Fixed (all 5 secrets set) |
-| ~~deploy.yml uses `--prebuilt` flag~~ | ~~`vercel deploy --prebuilt` fails~~                         | ✅ Fixed (PR #17)            |
-| ~~deploy.yml missing `permissions`~~  | ~~"Create issue on failure" step gets 403~~                  | ✅ Fixed (PR #17)            |
-| ~~Vercel Deployment Protection on~~   | ~~Preview URLs return HTTP 401, smoke tests fail~~           | ✅ Fixed (bypass added)      |
-| **`vercel promote` team scope error** | Promote step fails: "Deployment belongs to a different team" | 🔧 Fixed in this session     |
-| Open issues #16-#23 "Deploy failed"   | Noise from failed deploy attempts                            | 🔧 Being closed              |
+| Problem                                 | Impact                                                           | Status                       |
+| --------------------------------------- | ---------------------------------------------------------------- | ---------------------------- |
+| ~~No GitHub secrets~~                   | ~~Deploy workflow fails — VERCEL_TOKEN is empty~~                | ✅ Fixed (all 5 secrets set) |
+| ~~deploy.yml uses `--prebuilt` flag~~   | ~~`vercel deploy --prebuilt` fails~~                             | ✅ Fixed (PR #17)            |
+| ~~deploy.yml missing `permissions`~~    | ~~"Create issue on failure" step gets 403~~                      | ✅ Fixed (PR #17)            |
+| ~~Vercel Deployment Protection on~~     | ~~Preview URLs return HTTP 401, smoke tests fail~~               | ✅ Fixed (bypass added)      |
+| ~~`vercel promote` team scope error~~   | ~~Promote step fails: "Deployment belongs to a different team"~~ | ✅ Fixed (--scope flag)      |
+| ~~Open issues #16-#23 "Deploy failed"~~ | ~~Noise from failed deploy attempts~~                            | ✅ Closed                    |
 
 ### What's safe and working
 
@@ -60,19 +61,17 @@ All 5 secrets configured:
 | `VERCEL_AUTOMATION_BYPASS_SECRET` | _(generated)_                      | ✅ 2026-03-04T18:31:55Z |
 | `ANTHROPIC_API_KEY`               | _(key)_                            | ✅ 2026-03-04T17:39:36Z |
 
-### Step 3: Verify Deploy Workflow
+### ~~Step 3: Verify Deploy Workflow~~ ✅ DONE
 
-**Root cause found:** `vercel promote` doesn't pick up `VERCEL_ORG_ID` from env the same way `vercel deploy` does, causing "Deployment belongs to a different team." Fixed by adding `--scope="${VERCEL_ORG_ID}"` to both `vercel deploy` and `vercel promote` in `deploy.yml`.
+**Root cause was:** `vercel promote` doesn't pick up `VERCEL_ORG_ID` from env the same way `vercel deploy` does, causing "Deployment belongs to a different team." Fixed by adding `--scope="${VERCEL_ORG_ID}"` to both `vercel deploy` and `vercel promote` in `deploy.yml`.
 
-Smoke tests were already passing (all 6 checks) — only the promote step was failing.
-
-**Expected result after fix:**
+**Full deploy chain verified working** (run 22685137458):
 
 ```
-CI passes → Deploy triggers → Preview deploys → Smoke tests pass → Production promotes
+CI ✅ → Deploy preview ✅ → Smoke test (6/6) ✅ → Promote to production ✅ → Smoke test production ✅
 ```
 
-**After success:** Close issues #16-#23 (auto-generated deploy failure issues).
+Issues #16, #18-#20, #22-#23 closed.
 
 ### Step 4: Hand back to Claude Code
 
@@ -103,7 +102,7 @@ Once deploy is verified working, start a new Claude Code session and say:
 | Workflow     | File         | Trigger                                       | Secrets needed                                                                  | Current status          |
 | ------------ | ------------ | --------------------------------------------- | ------------------------------------------------------------------------------- | ----------------------- |
 | **CI**       | ci.yml       | Push to main, PRs to main                     | None                                                                            | ✅ Working              |
-| **Deploy**   | deploy.yml   | CI success on main (`workflow_run`)           | VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, VERCEL_AUTOMATION_BYPASS_SECRET | 🔧 Fix pushed to main   |
+| **Deploy**   | deploy.yml   | CI success on main (`workflow_run`)           | VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, VERCEL_AUTOMATION_BYPASS_SECRET | ✅ Working              |
 | **Pipeline** | pipeline.yml | Manual dispatch, monthly cron (1st, 9 AM UTC) | ANTHROPIC_API_KEY                                                               | ✅ Secret set, untested |
 
 ### Vercel configuration
