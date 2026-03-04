@@ -1,9 +1,7 @@
-# Human Steps — Active Action Items
+# Human Steps — Legacy Action Items
 
-Tasks that require manual action outside of code.
-
-> **v2.1 CI/CD human steps are COMPLETE** — see `human-steps-v2.1.md` for details.
-> These remaining items are lower-priority DNS/monitoring tasks.
+> **SUPERSEDED** by `human-steps-v2.1.md` (CI/CD — COMPLETE) and `human-steps-phase2.md` (Phase 2 setup).
+> These remaining items are lower-priority DNS/monitoring tasks that can be done at any time.
 
 ## DNS: Update A Record at DreamHost
 

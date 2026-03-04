@@ -89,7 +89,9 @@ jobs:
         run: npm run smoke
         env:
           SMOKE_TEST_URL: https://paulprae.com
-          SMOKE_WAIT_SECONDS: "15"
+          # 30s wait: CDN needs time to invalidate after promote. 15s caused
+          # false-alarm failures (issue #24) where content was correct but cache stale.
+          SMOKE_WAIT_SECONDS: "30"
 
       - name: Create issue on failure
         if: failure()
