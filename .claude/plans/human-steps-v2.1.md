@@ -1,7 +1,7 @@
 # Human Steps Guide — v2.1 Quality & Infrastructure
 
-> **When to loop back to Claude Code:** After completing Steps 1-3, tell Claude Code:
-> _"Secrets and metrics are configured. Run the pipeline, review quality, and deploy."_
+> **When to loop back to Claude Code:** After completing Steps 1-2, tell Claude Code:
+> _"GitHub Actions deploy is verified. Run the pipeline, review quality, and deploy."_
 > Claude Code can handle everything from that point autonomously.
 
 ---
@@ -25,12 +25,12 @@ Push to main
 
 | Problem                                | Impact                                                       | Fixed by                |
 | -------------------------------------- | ------------------------------------------------------------ | ----------------------- |
-| **No GitHub secrets**                  | Deploy workflow fails — VERCEL_TOKEN is empty                | Step 1 below            |
+| **No GitHub secrets**                  | Deploy workflow fails — VERCEL_TOKEN is empty                | Step 2 below            |
 | deploy.yml uses `--prebuilt` flag      | `vercel deploy --prebuilt` fails (no `.vercel/output` in CI) | PR #17 merge            |
 | deploy.yml missing `permissions` block | "Create issue on failure" step gets 403                      | PR #17 merge            |
-| **Vercel Deployment Protection** on    | Preview URLs return HTTP 401, smoke tests fail               | Step 2 below            |
-| Open issue #16 "Deploy failed"         | Noise from previous failed deploy attempts                   | Close after Step 4      |
-| **No ANTHROPIC_API_KEY secret**        | Pipeline workflow can't generate resumes in CI               | Step 1 below (optional) |
+| **Vercel Deployment Protection** on    | Preview URLs return HTTP 401, smoke tests fail               | Step 1 below            |
+| Open issue #16 "Deploy failed"         | Noise from previous failed deploy attempts                   | Close after Step 3      |
+| **No ANTHROPIC_API_KEY secret**        | Pipeline workflow can't generate resumes in CI               | Step 2 below (optional) |
 
 ### What's safe and working
 
@@ -56,15 +56,15 @@ Squash merge at: https://github.com/praeducer/paulprae-com/pull/17
 4. Deploy failure creates a new GitHub issue (the `permissions` fix from PR #17 enables this)
 5. **Production is untouched** — deploy never reaches the promote step
 
-**Risk: None.** The deploy failure is expected. You'll fix it in Step 1.
+**Risk: None.** The deploy failure is expected. You'll fix it in Step 2.
 
 After merging, delete the `feat/v2.1-quality-infra` branch (GitHub offers this button on the merged PR page).
 
 ---
 
-### Step 2: Add Protection Bypass for Automation (3 minutes)
+### Step 1: Add Protection Bypass for Automation (3 minutes)
 
-**Do this before Step 1** — you need the generated secret value before you can add it to GitHub.
+**Do this before Step 2** — you need the generated secret value before you can add it to GitHub.
 
 Go to: https://vercel.com/praeducers-projects/paulprae-com/settings/deployment-protection
 
@@ -81,7 +81,7 @@ Go to: https://vercel.com/praeducers-projects/paulprae-com/settings/deployment-p
 
 ---
 
-### Step 1: Configure GitHub Secrets (5 minutes)
+### Step 2: Configure GitHub Secrets (5 minutes)
 
 Go to: https://github.com/praeducer/paulprae-com/settings/secrets/actions
 
@@ -92,7 +92,7 @@ Click **"New repository secret"** for each:
 | `VERCEL_TOKEN`                    | _(create a new token)_             | https://vercel.com/account/tokens → "Create" button               |
 | `VERCEL_ORG_ID`                   | `team_EZa7yDGXuubGA4VpNUccqrgM`    | Your local `.vercel/project.json` (gitignored)                    |
 | `VERCEL_PROJECT_ID`               | `prj_XGIlmRtsRVSzfqETwwuos3G3elUT` | Your local `.vercel/project.json` (gitignored)                    |
-| `VERCEL_AUTOMATION_BYPASS_SECRET` | _(generated in Step 2)_            | Vercel → Deployment Protection → Protection Bypass for Automation |
+| `VERCEL_AUTOMATION_BYPASS_SECRET` | _(generated in Step 1)_            | Vercel → Deployment Protection → Protection Bypass for Automation |
 
 **Optional but recommended:**
 
@@ -100,52 +100,13 @@ Click **"New repository secret"** for each:
 | ------------------- | --------------------------------------- | -------------------------------------------------------------------------------------------- |
 | `ANTHROPIC_API_KEY` | _(your Claude API key from .env.local)_ | Enables Pipeline workflow: monthly auto-regeneration + manual trigger from GitHub Actions UI |
 
-**Risk:** If you paste the wrong Vercel token, deploys will fail with auth errors. You'll catch this in Step 4 — easy to fix by updating the secret.
+**Risk:** If you paste the wrong Vercel token, deploys will fail with auth errors. You'll catch this in Step 3 — easy to fix by updating the secret.
 
 ---
 
-### Step 3: Add Quantified Metrics (15-30 minutes)
+### Step 3: Verify Deploy Workflow (5 minutes)
 
-Edit `data/sources/knowledge/career/position-metrics.json` **on main** (since PR #17 is already merged).
-
-The resume generator cannot fabricate numbers (grounding rule G4: Source Grounding). These positions have qualitative context from the knowledge base but zero quantified metrics — only you have the real numbers from your career.
-
-**TReNDS Center** — Find the entry with `"entity": "Georgia State University / TReNDS Center"` and add numbers to the `content` field:
-
-- How many institutions/research sites use COINSTAC? (e.g., "deployed across 20+ research institutions")
-- Grant amounts secured? (e.g., "$2.1M NIH R01 grant" or "$500K SBIR Phase II")
-- Data scale processed? (e.g., "100K+ neuroimaging datasets")
-- Open-source community size? (e.g., "15+ contributors across 5 institutions")
-
-**NeuroLex Labs** — Find `"entity": "NeuroLex Diagnostics"`:
-
-- ML models deployed to production? (e.g., "5 production NLP models")
-- Voice data volume? (e.g., "analyzed 50K+ voice samples")
-- Test coverage growth? (e.g., "increased test coverage from 0% to 85%")
-- Tribe fellowship details? (e.g., "mentored cohort of 8 fellows")
-
-**Hyperbloom** — Find `"entity": "Hyperbloom"`:
-
-- Total client engagements? (e.g., "delivered 15+ client engagements")
-- Peak team size managed? (e.g., "team of 12 engineers and designers")
-- Industries served? (e.g., "across healthcare, fintech, and education verticals")
-
-**AWS (optional)** — Already has solid data. Nice-to-have:
-
-- Speaking engagements? (e.g., "delivered 10+ technical talks at AWS events")
-- Technical publications? (e.g., "authored 5 AWS solution briefs")
-
-**How to edit:** Add metrics directly into the `content` string of each JSON entry. Keep the `--- SCOPE BOUNDARY ---` markers intact — they prevent the generator from mixing achievements across companies.
-
-**Risk:** If you add inaccurate numbers, they will appear in the generated resume. The grounding rules trust your knowledge base as a verified source. Double-check everything.
-
-**Don't run the pipeline yet** — that's Step 5 (Claude Code does it).
-
----
-
-### Step 4: Verify Deploy Workflow (5 minutes)
-
-Now that secrets (Step 1) and Deployment Protection (Step 2) are configured, test the full chain.
+Now that secrets (Step 2) and Deployment Protection bypass (Step 1) are configured, test the full chain.
 
 **Option A — Re-run the failed deploy:**
 
@@ -154,7 +115,7 @@ Now that secrets (Step 1) and Deployment Protection (Step 2) are configured, tes
 
 **Option B — Push a small commit:**
 
-Any push to main triggers CI → Deploy. You could commit the metrics from Step 3 to trigger it.
+Any push to main triggers CI → Deploy.
 
 **Expected result:**
 
@@ -165,7 +126,7 @@ CI passes → Deploy triggers → Preview deploys → Smoke tests pass → Produ
 **If it fails, check:**
 
 - **"Deploy preview" step fails** → VERCEL_TOKEN is wrong (update the secret)
-- **"Smoke test preview" step fails with 401** → Deployment Protection still on (redo Step 2)
+- **"Smoke test preview" step fails with 401** → Protection bypass not working (redo Step 1)
 - **"Smoke test preview" step fails with other errors** → check if the preview URL is correct in the logs
 - **"Create issue on failure" step fails** → the `permissions` block should fix this; if not, check that GITHUB_TOKEN has issue write access
 
@@ -173,17 +134,17 @@ CI passes → Deploy triggers → Preview deploys → Smoke tests pass → Produ
 
 ---
 
-### Step 5: Hand back to Claude Code
+### Step 4: Hand back to Claude Code
 
-Once Steps 1-4 are done, start a new Claude Code session and say:
+Once Steps 1-3 are done, start a new Claude Code session and say:
 
-> "Secrets and metrics are configured. GitHub Actions deploy is verified.
+> "GitHub Actions deploy is verified.
 > Run the full pipeline on main, review quality (target score: 388+),
 > approve if quality passes, and push to deploy."
 
 **What Claude Code will do autonomously:**
 
-1. `npm run ingest:force` — pick up your new metrics
+1. `npm run ingest:force` — re-ingest career data
 2. `npm run generate:force` — generate resume with v2.1 prompt (~$3.86, ~11 min)
 3. `npm run compare` — section-by-section diff against current approved resume
 4. Quality score check — target is **388+** (matching or exceeding current v2.0)
