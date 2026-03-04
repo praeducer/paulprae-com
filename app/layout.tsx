@@ -8,9 +8,12 @@ const careerData = loadCareerData();
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://paulprae.com"),
-  title: "Paul Prae — Principal AI Engineer & Solutions Architect",
+  title: {
+    default: "Paul Prae — AI Career Assistant | paulprae.com",
+    template: "%s | paulprae.com",
+  },
   description:
-    "Building AI agents that ship AI products. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
+    "Chat with an AI assistant about Paul Prae's career. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "32x32" },

@@ -1,0 +1,266 @@
+"use client";
+
+import { useState, useMemo, useCallback } from "react";
+import Link from "next/link";
+import {
+  AssistantRuntimeProvider,
+  ThreadPrimitive,
+  MessagePrimitive,
+  ComposerPrimitive,
+  ActionBarPrimitive,
+} from "@assistant-ui/react";
+import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
+import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
+import type { TextMessagePart } from "@assistant-ui/react";
+import ModeToggle from "./ModeToggle";
+import QuickActions from "./QuickActions";
+
+// ─── Markdown Text Wrapper ──────────────────────────────────────────────────
+
+/** Wraps MarkdownTextPrimitive to match the TextMessagePartComponent interface */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function MarkdownText(_props: TextMessagePart & { status: Record<string, unknown> }) {
+  return <MarkdownTextPrimitive />;
+}
+
+// ─── Custom Thread Components ───────────────────────────────────────────────
+
+function UserMessage() {
+  return (
+    <MessagePrimitive.Root className="flex justify-end">
+      <div className="max-w-[85%] rounded-2xl bg-blue-600 px-4 py-2.5 text-sm text-white">
+        <MessagePrimitive.Content
+          components={{
+            Text: ({ text }) => <p className="whitespace-pre-wrap">{text}</p>,
+          }}
+        />
+      </div>
+    </MessagePrimitive.Root>
+  );
+}
+
+function AssistantMessage() {
+  return (
+    <MessagePrimitive.Root className="flex justify-start group">
+      <div className="max-w-[85%] space-y-2">
+        <div className="rounded-2xl bg-slate-100 px-4 py-2.5 text-sm text-slate-900 dark:bg-slate-800 dark:text-slate-100">
+          <MessagePrimitive.Content
+            components={{
+              Text: MarkdownText,
+            }}
+          />
+        </div>
+        <ActionBarPrimitive.Root className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          <ActionBarPrimitive.Copy asChild>
+            <button
+              type="button"
+              className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:hover:bg-slate-800 dark:hover:text-slate-300"
+              aria-label="Copy message"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="h-4 w-4"
+              >
+                <path d="M7 3.5A1.5 1.5 0 0 1 8.5 2h3.879a1.5 1.5 0 0 1 1.06.44l3.122 3.12a1.5 1.5 0 0 1 .439 1.061V11.5A1.5 1.5 0 0 1 15.5 13H14v-2h1.5V7H13a1 1 0 0 1-1-1V3.5H8.5V5H7V3.5Z" />
+                <path d="M4.5 6A1.5 1.5 0 0 0 3 7.5v9A1.5 1.5 0 0 0 4.5 18h7a1.5 1.5 0 0 0 1.5-1.5V7.5A1.5 1.5 0 0 0 11.5 6h-7Z" />
+              </svg>
+            </button>
+          </ActionBarPrimitive.Copy>
+          <ActionBarPrimitive.Reload asChild>
+            <button
+              type="button"
+              className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:hover:bg-slate-800 dark:hover:text-slate-300"
+              aria-label="Regenerate response"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="h-4 w-4"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H4.598a.75.75 0 0 0-.75.75v3.634a.75.75 0 0 0 1.5 0v-2.033l.312.311a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm-10.625-2.85a5.5 5.5 0 0 1 9.201-2.466l.312.312H11.767a.75.75 0 0 0 0 1.5h3.634a.75.75 0 0 0 .75-.75V3.536a.75.75 0 0 0-1.5 0v2.033l-.312-.312A7 7 0 0 0 2.627 8.396a.75.75 0 0 0 1.449.389l.61.789Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </ActionBarPrimitive.Reload>
+        </ActionBarPrimitive.Root>
+      </div>
+    </MessagePrimitive.Root>
+  );
+}
+
+function ChatComposer() {
+  return (
+    <ComposerPrimitive.Root className="flex items-end gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <ComposerPrimitive.Input
+        placeholder="Ask about Paul's experience..."
+        className="min-h-[40px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder:text-slate-500"
+        autoFocus
+      />
+      <ComposerPrimitive.Send asChild>
+        <button
+          type="submit"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:opacity-40 disabled:hover:bg-blue-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+          aria-label="Send message"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="h-4 w-4"
+          >
+            <path d="M3.105 2.288a.75.75 0 0 0-.826.95l1.414 4.926A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086l-1.414 4.926a.75.75 0 0 0 .826.95 28.897 28.897 0 0 0 15.293-7.155.75.75 0 0 0 0-1.114A28.897 28.897 0 0 0 3.105 2.288Z" />
+          </svg>
+        </button>
+      </ComposerPrimitive.Send>
+    </ComposerPrimitive.Root>
+  );
+}
+
+// ─── Main Chat Component ────────────────────────────────────────────────────
+
+export default function ChatHome() {
+  const [mode, setMode] = useState<"chat" | "tools">("chat");
+
+  // Create transport with mode in body — transport is recreated when mode changes
+  const transport = useMemo(
+    () =>
+      new AssistantChatTransport({
+        api: "/api/chat",
+        body: { mode },
+      }),
+    [mode],
+  );
+
+  const runtime = useChatRuntime({ transport });
+
+  // Quick action handler — appends a message to the thread
+  const handleQuickAction = useCallback(
+    (prompt: string) => {
+      runtime.thread.append({
+        role: "user",
+        content: [{ type: "text", text: prompt }],
+      });
+    },
+    [runtime],
+  );
+
+  return (
+    <AssistantRuntimeProvider runtime={runtime}>
+      <div className="flex h-dvh flex-col">
+        {/* Header */}
+        <header className="shrink-0 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95">
+          <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-3">
+            <div className="flex items-center gap-3">
+              <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">paulprae.com</h1>
+              <ModeToggle mode={mode} onModeChange={setMode} />
+            </div>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/resume"
+                className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              >
+                View Resume
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="h-3.5 w-3.5"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5 10a.75.75 0 0 1 .75-.75h6.638L10.23 7.29a.75.75 0 1 1 1.04-1.08l3.5 3.25a.75.75 0 0 1 0 1.08l-3.5 3.25a.75.75 0 1 1-1.04-1.08l2.158-1.96H5.75A.75.75 0 0 1 5 10Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </Link>
+              <a
+                href="/Paul-Prae-Resume.pdf"
+                download
+                className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                aria-label="Download resume as PDF"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="h-3.5 w-3.5"
+                  aria-hidden="true"
+                >
+                  <path d="M10 3a.75.75 0 0 1 .75.75v7.69l2.72-2.72a.75.75 0 1 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06 0l-4-4a.75.75 0 1 1 1.06-1.06l2.72 2.72V3.75A.75.75 0 0 1 10 3Z" />
+                  <path d="M3.75 14a.75.75 0 0 1 .75.75v1.5h11v-1.5a.75.75 0 0 1 1.5 0v1.5A1.5 1.5 0 0 1 15.5 17.25h-11A1.5 1.5 0 0 1 3 15.75v-1.5a.75.75 0 0 1 .75-.75Z" />
+                </svg>
+                PDF
+              </a>
+            </div>
+          </div>
+        </header>
+
+        {/* Chat Thread */}
+        <ThreadPrimitive.Root className="flex min-h-0 flex-1 flex-col">
+          <ThreadPrimitive.Viewport className="flex flex-1 flex-col overflow-y-auto">
+            <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6">
+              {/* Welcome / Empty State */}
+              <ThreadPrimitive.Empty>
+                <div className="flex flex-1 flex-col items-center justify-center py-12">
+                  <div className="mb-6 text-center">
+                    <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+                      {mode === "chat" ? "Ask me about Paul's career" : "Job Search Tools"}
+                    </h2>
+                    <p className="mt-2 max-w-md text-sm text-slate-500 dark:text-slate-400">
+                      {mode === "chat"
+                        ? "I can answer questions about Paul Prae's experience, skills, and career background. Everything I share is grounded in his actual career data."
+                        : "Generate tailored outreach, interview prep, and application content. All grounded in Paul's real career data and optimized for each platform."}
+                    </p>
+                  </div>
+                  <QuickActions mode={mode} onAction={handleQuickAction} />
+                </div>
+              </ThreadPrimitive.Empty>
+
+              {/* Messages */}
+              <ThreadPrimitive.Messages
+                components={{
+                  UserMessage,
+                  AssistantMessage,
+                }}
+              />
+            </div>
+
+            {/* Scroll anchor + Composer */}
+            <ThreadPrimitive.ViewportFooter className="sticky bottom-0">
+              <div className="mx-auto w-full max-w-3xl px-6 pb-4">
+                <ThreadPrimitive.ScrollToBottom asChild>
+                  <button
+                    type="button"
+                    className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
+                    aria-label="Scroll to bottom"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="h-4 w-4"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 3a.75.75 0 0 1 .75.75v10.638l3.96-4.158a.75.75 0 1 1 1.08 1.04l-5.25 5.5a.75.75 0 0 1-1.08 0l-5.25-5.5a.75.75 0 1 1 1.08-1.04l3.96 4.158V3.75A.75.75 0 0 1 10 3Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </ThreadPrimitive.ScrollToBottom>
+                <ChatComposer />
+              </div>
+            </ThreadPrimitive.ViewportFooter>
+          </ThreadPrimitive.Viewport>
+        </ThreadPrimitive.Root>
+      </div>
+    </AssistantRuntimeProvider>
+  );
+}
