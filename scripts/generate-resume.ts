@@ -94,37 +94,69 @@ function stripEmpty(obj: unknown): unknown {
   return obj;
 }
 
+// ─── Company Data Loader ────────────────────────────────────────────────────
+// Loads verified company metrics from data/sources/knowledge/career/companies.json
+
+function loadCompanyData(): unknown[] {
+  const companiesPath = path.join(PATHS.knowledgeDir, "career", "companies.json");
+  if (!fs.existsSync(companiesPath)) return [];
+  try {
+    return JSON.parse(fs.readFileSync(companiesPath, "utf-8"));
+  } catch {
+    return [];
+  }
+}
+
 // ─── Build User Message ──────────────────────────────────────────────────────
-// Structures career data into labeled sections with compact JSON to minimize
-// token usage while preserving all data needed for resume generation.
+// Structures career data into XML-tagged documents for clear source separation.
+// This prevents the AI from accidentally conflating facts across data sources.
 
 function buildUserMessage(careerData: CareerData): string {
   const { knowledge, ...coreData } = careerData;
+  const companyData = loadCompanyData();
 
-  // Strip empty fields and use compact JSON (no indentation) to save ~20% tokens
+  // Strip empty fields and use compact JSON to save tokens
   const compactCore = JSON.stringify(stripEmpty(coreData));
+  const compactCompanies = JSON.stringify(stripEmpty(companyData));
 
   const sections: string[] = [
-    "Generate a professional resume from this career data. Apply all formatting rules and quality criteria from your instructions.",
+    "Generate a professional resume from the career data below. Apply all formatting, grounding, and quality rules from your instructions.",
     "",
-    "## Core Career Data",
+    "CRITICAL REMINDER: Before writing each position's bullet points, verify that every fact and metric belongs to THAT specific company and role. Never merge facts across companies.",
     "",
-    "This is the structured career history — positions, education, profile, certifications, projects, and publications. Use this as the primary factual source.",
-    "",
+    "<documents>",
+    '<document index="1">',
+    "<source>career-data.json — Core career history (positions, education, profile, certifications, projects, publications)</source>",
+    "<document_content>",
     compactCore,
+    "</document_content>",
+    "</document>",
   ];
+
+  if (companyData.length > 0) {
+    sections.push(
+      '<document index="2">',
+      "<source>companies.json — Verified company facts with timestamped metrics. When a company has a 'metrics' field, use THOSE numbers (not approximations from other sources).</source>",
+      "<document_content>",
+      compactCompanies,
+      "</document_content>",
+      "</document>",
+    );
+  }
 
   if (knowledge.length > 0) {
     const compactKnowledge = JSON.stringify(stripEmpty(knowledge));
     sections.push(
-      "",
-      "## Supplementary Knowledge Base",
-      "",
-      "These are curated context entries providing additional detail — achievements with quantified metrics, domain expertise narratives, brand voice guidelines, and strategic positioning context. Use these to enrich position bullet points with specific impacts, metrics, and STAR-method narratives. When knowledge entries reference specific positions (via relatedPositions), integrate that context into those roles' bullets. Do not fabricate — only use data provided here.",
-      "",
+      `<document index="${companyData.length > 0 ? "3" : "2"}">`,
+      "<source>knowledge-base — Supplementary context: achievements with quantified metrics, domain expertise, STAR-method narratives. Entries with 'SCOPE BOUNDARY' markers contain mandatory constraints about what work was/was NOT done in specific roles. Entries with 'confidence: verified' are authoritative. Entries with 'relatedPositions' map to specific roles.</source>",
+      "<document_content>",
       compactKnowledge,
+      "</document_content>",
+      "</document>",
     );
   }
+
+  sections.push("</documents>");
 
   return sections.join("\n");
 }
@@ -266,6 +298,50 @@ function validateResumeOutput(markdown: string, careerData: CareerData): string[
       warnings.push(
         `Position "${posTitle}" has ${bullets.length} bullets but zero quantified metrics (numbers, percentages, dollar amounts)`,
       );
+    }
+  }
+
+  // Cross-entity conflation detection: check if company-specific metrics
+  // appear in bullets for a different company's position
+  const companyMetricPatterns: { company: string; pattern: RegExp; metric: string }[] = [
+    {
+      company: "Arine",
+      pattern: /50M\+\s*(?:health plan\s*)?members/i,
+      metric: "50M+ members (Arine has >30M)",
+    },
+    {
+      company: "Arine",
+      pattern: /ML\s+pipelines?.*(?:clinical|health\s*plan|member)/i,
+      metric: "ML pipelines at Arine (Paul does data ops, not ML)",
+    },
+    {
+      company: "Arine",
+      pattern: /30\+\s*health\s*plans/i,
+      metric: "30+ health plans (verified: 45+)",
+    },
+  ];
+
+  for (const { company, pattern, metric } of companyMetricPatterns) {
+    if (pattern.test(markdown)) {
+      warnings.push(
+        `Potential conflation/stale data: "${metric}" — verify against ${company} company data`,
+      );
+    }
+  }
+
+  // Resume cliche detection
+  const cliches = [
+    "track record",
+    "proven ability",
+    "results-driven",
+    "passionate about",
+    "seasoned professional",
+    "go-to person",
+    "thought leader",
+  ];
+  for (const cliche of cliches) {
+    if (markdown.toLowerCase().includes(cliche)) {
+      warnings.push(`Resume contains cliche phrasing: "${cliche}"`);
     }
   }
 
@@ -597,6 +673,7 @@ export const _testExports = {
   formatMarkdown,
   shouldSkipGenerate,
   stripEmpty,
+  loadCompanyData,
   generate,
 };
 

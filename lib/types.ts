@@ -129,6 +129,12 @@ export interface KnowledgeEntry {
   tags?: string[];
   /** Company or role names this entry relates to (for merging with positions) */
   relatedPositions?: string[];
+  /** ISO date (YYYY-MM) when this fact was last verified */
+  asOf?: string;
+  /** Source URL or description for fact verification */
+  source?: string;
+  /** Confidence level: "verified" (official source), "self-reported" (from Paul), "estimated" (inferred) */
+  confidence?: "verified" | "self-reported" | "estimated";
 }
 
 // ─── B. Normalized CareerData ────────────────────────────────────────────────

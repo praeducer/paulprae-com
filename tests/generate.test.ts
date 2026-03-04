@@ -63,12 +63,12 @@ describe("SYSTEM_PROMPT", () => {
 
   it("contains all required sections (brand voice, format, knowledge strategy, output)", () => {
     const requiredSections = [
-      "Brand Voice Guidelines",
+      "<brand_voice>",
       "Professional Summary",
       "Professional Experience",
       "Education",
       "Technical Skills",
-      "Knowledge Base Integration Strategy",
+      "<knowledge_base_strategy>",
       "Output ONLY the Markdown resume content",
       "Section Priority Weighting",
       "expert conversation test",
@@ -81,6 +81,20 @@ describe("SYSTEM_PROMPT", () => {
     }
   });
 
+  it("contains grounding rules to prevent hallucination", () => {
+    const groundingRules = [
+      "<grounding_rules>",
+      "Entity-Scope Binding",
+      "Role-Work Alignment",
+      "Temporal Freshness",
+      "Cross-Reference Prohibition",
+      "SCOPE BOUNDARY",
+    ];
+    for (const rule of groundingRules) {
+      expect(SYSTEM_PROMPT).toContain(rule);
+    }
+  });
+
   it("is long enough for prompt caching (>1024 tokens ≈ 4000 chars)", () => {
     // Anthropic prompt caching requires >1024 tokens. System prompt is ~2000 tokens.
     expect(SYSTEM_PROMPT.length).toBeGreaterThan(4000);
@@ -90,22 +104,23 @@ describe("SYSTEM_PROMPT", () => {
 // ─── User Message Construction ──────────────────────────────────────────────
 
 describe("buildUserMessage", () => {
-  it("includes core career data section", () => {
+  it("includes core career data in XML document structure", () => {
     const msg = buildUserMessage(SAMPLE_CAREER_DATA);
-    expect(msg).toContain("## Core Career Data");
-    expect(msg).toContain("primary factual source");
+    expect(msg).toContain("<documents>");
+    expect(msg).toContain("career-data.json");
+    expect(msg).toContain("<document_content>");
   });
 
   it("includes knowledge base section when entries exist", () => {
     const msg = buildUserMessage(SAMPLE_CAREER_DATA);
-    expect(msg).toContain("## Supplementary Knowledge Base");
-    expect(msg).toContain("curated context entries");
+    expect(msg).toContain("knowledge-base");
+    expect(msg).toContain("SCOPE BOUNDARY");
   });
 
   it("excludes knowledge base section when empty", () => {
     const noKnowledge = { ...SAMPLE_CAREER_DATA, knowledge: [] };
     const msg = buildUserMessage(noKnowledge);
-    expect(msg).not.toContain("## Supplementary Knowledge Base");
+    expect(msg).not.toContain("knowledge-base");
   });
 
   it("includes position data in JSON", () => {
@@ -122,10 +137,11 @@ describe("buildUserMessage", () => {
 
   it("separates knowledge from core data (not duplicated)", () => {
     const msg = buildUserMessage(SAMPLE_CAREER_DATA);
-    // Core data JSON should not contain knowledge entries as a top-level key
-    const coreSection = msg.split("## Supplementary Knowledge Base")[0];
-    // Find the JSON block in the core section and parse it
-    const jsonMatch = coreSection.match(/\{[\s\S]*\}/);
+    // The first document (career-data.json) should not contain knowledge entries
+    const firstDocEnd = msg.indexOf("</document_content>");
+    const firstDocContent = msg.substring(0, firstDocEnd);
+    // Find the JSON block in the first document section and parse it
+    const jsonMatch = firstDocContent.match(/\{[\s\S]*\}/);
     expect(jsonMatch).toBeTruthy();
     const coreJson = JSON.parse(jsonMatch![0]);
     expect(coreJson).not.toHaveProperty("knowledge");
@@ -248,7 +264,7 @@ describe("few-shot examples", () => {
   });
 
   it("SYSTEM_PROMPT includes few-shot examples when enabled", () => {
-    expect(SYSTEM_PROMPT).toContain("Examples of Strong vs Weak Position Bullets");
+    expect(SYSTEM_PROMPT).toContain("Examples of Grounded vs Ungrounded Position Bullets");
     expect(SYSTEM_PROMPT).toContain("Weak:");
     expect(SYSTEM_PROMPT).toContain("Strong:");
   });
@@ -264,8 +280,8 @@ describe("few-shot examples", () => {
     expect(SYSTEM_PROMPT).toContain("Fortune 500 consulting firm");
   });
 
-  it("includes leadership/management transformation example", () => {
-    expect(SYSTEM_PROMPT).toContain("structured mentorship programs");
+  it("includes scope-appropriate bullet example", () => {
+    expect(SYSTEM_PROMPT).toContain("Scope-Appropriate Bullets");
   });
 
   it("loading without few-shot excludes examples", () => {
@@ -496,11 +512,13 @@ describe("stripEmpty", () => {
 describe("buildUserMessage — compact format", () => {
   it("uses compact JSON (no indentation)", () => {
     const msg = buildUserMessage(SAMPLE_CAREER_DATA);
-    // Compact JSON has no newlines within the JSON block
-    const coreSection = msg.split("## Supplementary Knowledge Base")[0];
-    const jsonStart = coreSection.indexOf("{");
-    const jsonEnd = coreSection.lastIndexOf("}");
-    const jsonBlock = coreSection.slice(jsonStart, jsonEnd + 1);
+    // Extract core career JSON from first <document_content> block
+    const firstDocStart = msg.indexOf("<document_content>");
+    const firstDocEnd = msg.indexOf("</document_content>");
+    const docContent = msg.slice(firstDocStart, firstDocEnd);
+    const jsonStart = docContent.indexOf("{");
+    const jsonEnd = docContent.lastIndexOf("}");
+    const jsonBlock = docContent.slice(jsonStart, jsonEnd + 1);
     // Compact JSON should not have leading whitespace + key pattern
     expect(jsonBlock).not.toMatch(/\n\s{2,}"/);
   });
@@ -541,10 +559,13 @@ describe("buildUserMessage — compact format", () => {
       positions: [{ ...SAMPLE_CAREER_DATA.positions[0], description: "" }],
     };
     const msg = buildUserMessage(dataWithEmpties);
-    // Parse the core JSON to verify empty description was stripped
-    const jsonStart = msg.indexOf("{");
-    const jsonEnd = msg.indexOf("## Supplementary") - 1;
-    const jsonBlock = msg.slice(jsonStart, jsonEnd).trim();
+    // Extract core career JSON from first <document_content> block
+    const firstDocStart = msg.indexOf("<document_content>");
+    const firstDocEnd = msg.indexOf("</document_content>");
+    const docContent = msg.slice(firstDocStart + "<document_content>".length, firstDocEnd);
+    const jsonStart = docContent.indexOf("{");
+    const jsonEnd = docContent.lastIndexOf("}");
+    const jsonBlock = docContent.slice(jsonStart, jsonEnd + 1).trim();
     const parsed = JSON.parse(jsonBlock);
     // First position should not have 'description' key
     expect(parsed.positions[0]).not.toHaveProperty("description");

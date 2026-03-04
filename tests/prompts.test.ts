@@ -38,10 +38,11 @@ describe("loadPrompt — resume-writer", () => {
   });
 
   it("system prompt contains core instructions", () => {
-    expect(prompt.systemPrompt).toContain("Brand Voice Guidelines");
-    expect(prompt.systemPrompt).toContain("Resume Format");
-    expect(prompt.systemPrompt).toContain("Quality Rules");
-    expect(prompt.systemPrompt).toContain("Output Instructions");
+    expect(prompt.systemPrompt).toContain("<brand_voice>");
+    expect(prompt.systemPrompt).toContain("<resume_format>");
+    expect(prompt.systemPrompt).toContain("<quality_rules>");
+    expect(prompt.systemPrompt).toContain("<output_instructions>");
+    expect(prompt.systemPrompt).toContain("<grounding_rules>");
   });
 
   it("system prompt includes few-shot examples when config.includeFewShot is true", () => {

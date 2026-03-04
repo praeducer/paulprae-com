@@ -46,7 +46,7 @@ jobs:
 
       - name: Install typst
         run: |
-          TYPST_VERSION=$(curl -sL https://api.github.com/repos/typst/typst/releases/latest | grep '"tag_name"' | head -1 | cut -d'"' -f4)
+          TYPST_VERSION="v0.13.1"
           TYPST_URL="https://github.com/typst/typst/releases/download/${TYPST_VERSION}/typst-x86_64-unknown-linux-musl.tar.xz"
           curl -fsSL "$TYPST_URL" -o /tmp/typst.tar.xz
           tar -xf /tmp/typst.tar.xz -C /tmp
@@ -63,7 +63,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Auto-approve staging
-        if: ${{ github.event.inputs.auto_approve == 'true' || github.event_name == 'schedule' }}
+        if: ${{ github.event.inputs.auto_approve == 'true' }}
         run: npm run approve:force
 
       - name: Export to PDF and DOCX

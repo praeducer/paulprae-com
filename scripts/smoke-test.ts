@@ -167,40 +167,52 @@ async function checkDownload(
   expectedContentType: string,
   minSizeKB: number,
 ): Promise<SmokeResult> {
-  try {
-    const res = await fetchWithTimeout(`${BASE_URL}/${filename}`);
-    if (!res.ok) {
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const res = await fetchWithTimeout(`${BASE_URL}/${filename}`);
+      if (!res.ok) {
+        if (attempt < MAX_RETRIES) {
+          await sleep(RETRY_DELAY_MS);
+          continue;
+        }
+        return {
+          name: `${label} download`,
+          passed: false,
+          detail: `HTTP ${res.status}`,
+        };
+      }
+
+      const contentType = res.headers.get("content-type") || "";
+      const body = await res.arrayBuffer();
+      const sizeKB = Math.round(body.byteLength / 1024);
+      const issues: string[] = [];
+
+      if (!contentType.includes(expectedContentType)) {
+        issues.push(`content-type: ${contentType} (expected ${expectedContentType})`);
+      }
+      if (sizeKB < minSizeKB) {
+        issues.push(`size: ${sizeKB} KB (expected >= ${minSizeKB} KB)`);
+      }
+
+      return {
+        name: `${label} download`,
+        passed: issues.length === 0,
+        detail: issues.length === 0 ? `HTTP 200, ${sizeKB} KB, ${contentType}` : issues.join("; "),
+      };
+    } catch (err) {
+      if (attempt < MAX_RETRIES) {
+        await sleep(RETRY_DELAY_MS);
+        continue;
+      }
       return {
         name: `${label} download`,
         passed: false,
-        detail: `HTTP ${res.status}`,
+        detail: `fetch failed: ${err instanceof Error ? err.message : String(err)}`,
       };
     }
-
-    const contentType = res.headers.get("content-type") || "";
-    const body = await res.arrayBuffer();
-    const sizeKB = Math.round(body.byteLength / 1024);
-    const issues: string[] = [];
-
-    if (!contentType.includes(expectedContentType)) {
-      issues.push(`content-type: ${contentType} (expected ${expectedContentType})`);
-    }
-    if (sizeKB < minSizeKB) {
-      issues.push(`size: ${sizeKB} KB (expected >= ${minSizeKB} KB)`);
-    }
-
-    return {
-      name: `${label} download`,
-      passed: issues.length === 0,
-      detail: issues.length === 0 ? `HTTP 200, ${sizeKB} KB, ${contentType}` : issues.join("; "),
-    };
-  } catch (err) {
-    return {
-      name: `${label} download`,
-      passed: false,
-      detail: `fetch failed: ${err instanceof Error ? err.message : String(err)}`,
-    };
   }
+
+  return { name: `${label} download`, passed: false, detail: "unexpected error" };
 }
 
 async function checkHttpsRedirect(): Promise<SmokeResult> {
@@ -248,6 +260,7 @@ async function checkSecurityHeaders(): Promise<SmokeResult> {
       { header: "x-frame-options" },
       { header: "x-content-type-options" },
       { header: "referrer-policy" },
+      { header: "content-security-policy", pattern: /default-src/ },
     ];
 
     const missing: string[] = [];
@@ -359,4 +372,5 @@ export const _testExports = {
   checkHttpsRedirect,
   checkSecurityHeaders,
   fetchWithTimeout,
+  main,
 };

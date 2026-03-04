@@ -1,21 +1,36 @@
-## Examples of Strong vs Weak Position Bullets
+## Examples of Grounded vs Ungrounded Position Bullets
 
-Weak: "Worked on machine learning projects"
-Strong: "Designed and deployed 3 production ML models serving 50M+ health plan members, reducing manual clinical review time by 40% and generating $2M+ in annual value"
+### Cross-Entity Conflation (the most critical error to avoid)
 
-Weak: "Led a team of engineers"
-Strong: "Led cross-functional team of 8 engineers delivering HIPAA-compliant AI agents across 45+ health plans, reducing manual data operations by 60%"
+BAD: "Built ML pipelines for clinical decision support covering 50M+ health plan members"
+WHY BAD: Merges ML pipeline work (done at NeuroLex/Slalom) with health plan member count (Arine's metric). Creates a false impression.
 
-Weak: "Responsible for data pipeline development"
-Strong: "Architected real-time data pipeline processing 500M+ clinical records daily, achieving 99.9% uptime and reducing processing latency from 4 hours to 12 minutes"
+GOOD: "Managed enterprise data platform on Snowflake and AWS, processing petabytes of healthcare data from hundreds of sources supporting Arine's medication-optimization platform (45+ health plans, >30M client members)"
+WHY GOOD: Describes work actually done at Arine using Arine's verified metrics. Data operations, not ML pipelines.
 
-Weak: "Helped healthcare clients with AI solutions"
-Strong: "Architected AI and analytics solutions for healthcare and life science clients at a Fortune 500 consulting firm, enabling population health insights from clinical, behavioral, and genomic data across FedRAMP and HIPAA-compliant environments"
+### Single-Entity Attribution
 
-Weak: "Managed engineering team and mentored junior engineers"
-Strong: "Built and led cross-functional teams of 5-8 engineers, data scientists, and analysts; established hiring pipelines, delivered coaching to 15+ engineers, and achieved 93% client-reported performance improvement through structured mentorship programs"
+BAD: "Led AI teams delivering enterprise solutions across healthcare, driving outcomes for 50M+ members"
+WHY BAD: Vague attribution — which company? Which team? "50M+ members" from where?
+
+GOOD: "Led AI and analytics solution development at a Fortune 500 consulting firm ($9B+ revenue), designing products that harnessed clinical, behavioral, and genomic data for population health and predictive medicine across FedRAMP and HIPAA-compliant environments"
+WHY GOOD: Single company (Booz Allen), company metrics from company data ($9B+ revenue), specific work scope.
+
+### Scope-Appropriate Bullets
+
+BAD: "Architected ML models and data pipelines for healthcare voice computing and clinical decision support"
+WHY BAD: Conflates NeuroLex work (voice computing/ML) with other roles (clinical decision support at Slalom/Arine).
+
+GOOD: "Architected automated ML pipelines for healthcare voice computing — collecting, cleaning, training, and deploying models processing text and audio data for neurodegenerative disease prediction"
+WHY GOOD: All within NeuroLex's scope — voice computing, neurodegenerative disease, ML pipelines. No borrowed metrics.
 
 ## Examples of Strong vs Weak Phrasing
+
+Weak: "Worked on machine learning projects"
+Strong: "Delivered 7+ client engagements generating $2M+ in revenue, including a statewide behavioral health demand forecasting system across Georgia"
+
+Weak: "Led a team of engineers"
+Strong: "Led cross-functional team of engineers, data scientists, and domain experts to deliver AI solutions addressing algorithmic bias and data privacy risks in regulated healthcare settings"
 
 Weak: "progressive engineering leadership spanning data operations"
 Strong: "engineering leadership across data operations"
@@ -23,11 +38,16 @@ Strong: "engineering leadership across data operations"
 Weak: "holistic AI transformation methodology"
 Strong: "AI transformation strategy"
 
-Weak: "synergistic delivery framework for enterprise clients"
-Strong: "delivery framework for enterprise clients"
-
 Weak: "transformational pipeline architecture enabling next-generation insights"
 Strong: "pipeline architecture supporting real-time analytics"
 
-Weak: "full-spectrum technology orchestration capabilities"
-Strong: "end-to-end technical execution"
+## Examples of Resume Cliches to Avoid
+
+BAD: "Track record of delivering enterprise solutions" — too casual, sounds like a template
+GOOD: "13+ years building production AI systems for healthcare, life sciences, and financial services" — specific, quantified
+
+BAD: "Proven ability to drive results in fast-paced environments"
+GOOD: "Grew AI consulting business to $1.4M ARR from a $40K investment"
+
+BAD: "Passionate about leveraging cutting-edge AI"
+GOOD: "Currently building healthcare AI infrastructure and multi-agent systems at Arine"
