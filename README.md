@@ -65,7 +65,7 @@ You can develop and deploy the website without touching the pipeline, and vice v
 | Linting       | ESLint 9 + eslint-config-next + Prettier + husky + lint-staged |
 | Testing       | Vitest (245+ unit and integration tests)                       |
 | Analytics     | Vercel Analytics + Speed Insights (no cookies)                 |
-| Deployment    | Vercel (free tier, auto-deploy from GitHub)                    |
+| Deployment    | Vercel via GitHub Actions CI/CD                                |
 | Dev Tooling   | Claude Code CLI + Cursor                                       |
 
 ## Getting Started
@@ -246,7 +246,7 @@ Hot-reload is enabled — edit any `.tsx`, `.css`, or `.ts` file and the browser
 | ---------------------- | -------------------------------------- | ------------------------------------ |
 | Change CSS/layout      | Edit `app/globals.css` or `.tsx` files | Hot-reloads on `localhost:3000`      |
 | Preview resume changes | `npm run generate && npm run approve`  | Then refresh browser                 |
-| Run tests              | `npm test`                             | 245+ tests, ~300ms                   |
+| Run tests              | `npm test`                             | 315+ tests, ~300ms                   |
 | Check before push      | `npm run check`                        | Full CI-equivalent + data validation |
 
 ### Repeating on a Fresh Machine
@@ -274,27 +274,26 @@ The knowledge base (`data/sources/knowledge/`) is committed to git and transfers
 
 ## Deployment
 
-The site uses a three-environment setup with Vercel:
+The site deploys through GitHub Actions (Vercel Git integration is disabled):
 
-| Environment       | Branch      | URL                                  | Deploys on      |
-| ----------------- | ----------- | ------------------------------------ | --------------- |
-| Local dev         | any         | `localhost:3000`                     | `npm run dev`   |
-| Preview / Staging | PR branches | `*.vercel.app`                       | Push to PR      |
-| Production        | `main`      | [paulprae.com](https://paulprae.com) | Merge to `main` |
+| Environment       | Branch | URL                                  | Trigger                          |
+| ----------------- | ------ | ------------------------------------ | -------------------------------- |
+| Local dev         | any    | `localhost:3000`                     | `npm run dev`                    |
+| Preview / Staging | `main` | `*.vercel.app`                       | CI passes → Deploy workflow      |
+| Production        | `main` | [paulprae.com](https://paulprae.com) | Smoke test passes → auto-promote |
 
-AI generation happens **locally** — Vercel only runs `next build` against committed files (no API keys needed on the server). Every pull request gets an automatic Vercel preview deploy for testing.
+AI generation happens **locally** — Vercel only runs `next build` against committed files (no API keys needed on the Vercel build server).
 
 ```
-Local: npm run pipeline → ingest → generate → export → build
-       git push origin feature/my-change → open PR
-Vercel: PR preview deploy → review → merge to main → production deploy
+Push to main → CI (ci.yml): lint, format, test, build, validate
+            → Deploy (deploy.yml): preview → smoke test → promote to production → smoke test
 ```
 
 1. Run the pipeline locally: `npm run pipeline`
 2. Commit generated files: `git add data/generated/ public/Paul-Prae-Resume.* && git commit`
-3. Push and open a PR (CI runs lint, format, test, build; Vercel deploys preview)
-4. Review the preview deploy, then merge to `main`
-5. Production updates within ~60 seconds at [paulprae.com](https://paulprae.com)
+3. Push to `main` (CI runs lint, format, test, build automatically)
+4. If CI passes, Deploy workflow: preview → smoke test (6 checks) → promote → production smoke
+5. Production updates within ~2 minutes at [paulprae.com](https://paulprae.com)
 
 Custom-domain DNS operations are documented in [docs/domain-dns-runbook.md](docs/domain-dns-runbook.md).
 

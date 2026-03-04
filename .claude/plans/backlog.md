@@ -10,6 +10,19 @@ Only actionable coding/documentation tasks belong here.
 - [ ] Add pipeline metrics output (`tokens`, `cost`, `latency`, artifact sizes) to a gitignored metrics file.
 - [ ] Add optional JSON Resume export from `career-data.json`.
 
+## Cost Optimization (moved from iterative-dev-qa.md Round 4)
+
+Current generation cost: ~$2.90 per run (Claude Opus 4.6, max effort, ~453s).
+
+Options to evaluate in order:
+
+1. **Reduce thinking effort from "max" to "high":** May save 30-50% on output tokens. Run A/B comparison with `npm run compare --judge` to measure quality delta.
+2. **Try Sonnet 4.6 instead of Opus 4.6:** ~10x cheaper. Run A/B comparison. If quality is within 5%, switch default to Sonnet and reserve Opus for final/production generations.
+3. **Reduce max_tokens from 128K to 16K:** The resume is ~8K chars. 128K is excessive headroom. Even 16K provides 2x the needed space.
+4. **Verify prompt caching:** Already implemented. Check `cache_read_input_tokens` in generation telemetry to confirm it's working.
+
+Acceptance criteria: quality score must stay ≥395 for any optimization to be accepted.
+
 ## Phase 2 Remaining (tracked in phase2a/2b/2c plans)
 
 > These are NOT duplicated here — see the individual plan files for full details and status.

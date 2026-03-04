@@ -1,7 +1,7 @@
 # Human Steps — Legacy Action Items
 
-> **SUPERSEDED** by `human-steps-v2.1.md` (CI/CD — COMPLETE) and `human-steps-phase2.md` (Phase 2 setup).
-> These remaining items are lower-priority DNS/monitoring tasks that can be done at any time.
+> **Status:** Low-priority DNS/monitoring tasks. Can be done at any time.
+> CI/CD setup is fully complete. Phase 2 setup steps are in `human-steps-phase2.md`.
 
 ## DNS: Update A Record at DreamHost
 
