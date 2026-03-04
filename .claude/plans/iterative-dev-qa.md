@@ -1,8 +1,10 @@
 # Iterative Dev/QA Plan — Post v2.0 Deployment
 
-## Status: Ready for implementation
+## Status: ROUNDS 2-3 COMPLETE ✅ | Round 1 moved | Round 4 deferred
 
 Generated: 2026-03-04 | Based on: v2.0 production deployment observations
+Updated: 2026-03-04 — Rounds 2-3 implemented in PR #17 + subsequent commits. Round 1 (knowledge
+base enrichment) moved to `data-model-and-knowledge-base.md`. Round 4 (cost optimization) deferred.
 
 ---
 
@@ -169,11 +171,14 @@ For each option, generate 2-3 resumes and compare quality scores. Accept only if
 
 ## Implementation Order
 
-| Round                        | Effort     | Blocked on                      | Priority                      |
-| ---------------------------- | ---------- | ------------------------------- | ----------------------------- |
-| 1. Knowledge Base Enrichment | Medium     | Paul providing metrics          | High — biggest quality impact |
-| 2. CI/CD Fixes               | Low-Medium | Paul configuring GitHub secrets | High — deploys are broken     |
-| 3. Prompt Fine-Tuning        | Low        | Round 1 data                    | Medium — incremental quality  |
-| 4. Cost Optimization         | Low        | Nothing                         | Low — nice to have            |
+| Round                        | Effort     | Status                                                  |
+| ---------------------------- | ---------- | ------------------------------------------------------- |
+| 1. Knowledge Base Enrichment | Medium     | ➡️ Moved to `data-model-and-knowledge-base.md`          |
+| 2. CI/CD Fixes               | Low-Medium | ✅ DONE — secrets configured, deploy workflow working   |
+| 3. Prompt Fine-Tuning        | Low        | ✅ DONE — PR #17 (action verbs, Tier 1 scope, location) |
+| 4. Cost Optimization         | Low        | Deferred — not blocking Phase 2 work                    |
 
-Rounds 2 and 3 can proceed in parallel. Round 1 requires user input. Round 4 is independent.
+**Round 2 details:** All 5 GitHub secrets set, Vercel protection bypass configured, `--scope` flag fix for
+`vercel promote`, full CI/CD chain verified (CI → preview → smoke → promote → production smoke). Issues #16-#23 closed.
+
+**Round 3 details:** System prompt v2.0 with grounding rules, action verb threshold at 75%, location validation added.

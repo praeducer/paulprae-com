@@ -8,6 +8,19 @@
 > **Human steps:** See `human-steps-phase2.md` Steps 5-6 (env vars, post-deploy verification)
 > **Authoritative redesign plan:** `docs/phase2-redesign-plan.md`
 
+### Phase 1 CI/CD Foundation (Already Working)
+
+These items were completed during v2.1 and do NOT need to be redone in Plan 2C:
+
+- **GitHub secrets configured:** VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, VERCEL_AUTOMATION_BYPASS_SECRET, ANTHROPIC_API_KEY — all 5 set as repository secrets
+- **Deploy workflow (deploy.yml) is working:** CI → preview → smoke test (6/6) → promote → production smoke — fully verified
+- **Vercel authentication bypass:** Protection Bypass for Automation configured; smoke test sends `x-vercel-protection-bypass` header automatically
+- **`--scope` flag:** Both `vercel deploy` and `vercel promote` use `--scope="${VERCEL_ORG_ID}"` for correct team scoping
+- **Pipeline workflow (pipeline.yml):** ANTHROPIC_API_KEY secret set; monthly cron + manual dispatch enabled
+- **Git integration is OFF:** `vercel.json: git.deploymentEnabled: false` — all deploys go through GitHub Actions
+
+Plan 2C only needs to UPDATE the existing working config for Phase 2 (remove static export, add new routes, update CSP, etc.), not set up CI/CD from scratch.
+
 ### Claude Code Execution Notes
 
 ```
