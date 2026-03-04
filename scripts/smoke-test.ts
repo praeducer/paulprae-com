@@ -90,7 +90,7 @@ async function checkHomepage(): Promise<SmokeResult> {
     const html = await res.text();
     const missing: string[] = [];
     if (!/Paul Prae/i.test(html)) missing.push("name");
-    if (!/Professional Summary/i.test(html)) missing.push("summary section");
+    if (!/AI Career Assistant/i.test(html)) missing.push("chat interface");
     if (missing.length > 0) {
       return {
         name: "Homepage",
@@ -310,6 +310,65 @@ async function checkSecurityHeaders(): Promise<SmokeResult> {
   }
 }
 
+async function checkResumePage(): Promise<SmokeResult> {
+  try {
+    const res = await fetchWithTimeout(`${BASE_URL}/resume`);
+    if (!res.ok) {
+      return { name: "Resume page", passed: false, detail: `HTTP ${res.status}` };
+    }
+    const html = await res.text();
+    const missing: string[] = [];
+    if (!/Paul Prae/i.test(html)) missing.push("name");
+    if (!/Professional Summary/i.test(html)) missing.push("summary section");
+    if (missing.length > 0) {
+      return {
+        name: "Resume page",
+        passed: false,
+        detail: `missing content: ${missing.join(", ")}`,
+      };
+    }
+    return {
+      name: "Resume page",
+      passed: true,
+      detail: `HTTP 200, content verified (${Math.round(html.length / 1024)} KB)`,
+    };
+  } catch (err) {
+    return {
+      name: "Resume page",
+      passed: false,
+      detail: `fetch failed: ${err instanceof Error ? err.message : String(err)}`,
+    };
+  }
+}
+
+async function checkChatApiValidation(): Promise<SmokeResult> {
+  try {
+    const res = await fetchWithTimeout(`${BASE_URL}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    if (res.status === 400) {
+      return {
+        name: "Chat API validation",
+        passed: true,
+        detail: "400 on invalid input (expected)",
+      };
+    }
+    return {
+      name: "Chat API validation",
+      passed: false,
+      detail: `expected 400, got HTTP ${res.status}`,
+    };
+  } catch (err) {
+    return {
+      name: "Chat API validation",
+      passed: false,
+      detail: `fetch failed: ${err instanceof Error ? err.message : String(err)}`,
+    };
+  }
+}
+
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
@@ -329,6 +388,8 @@ async function main(): Promise<void> {
 
   const results: SmokeResult[] = await Promise.all([
     checkHomepage(),
+    checkResumePage(),
+    checkChatApiValidation(),
     checkResumeHash(),
     checkDownload("PDF", `${RESUME_FILE_BASE}.pdf`, "application/pdf", 10),
     checkDownload(
@@ -383,6 +444,8 @@ if (isDirectRun("smoke-test")) {
 
 export const _testExports = {
   checkHomepage,
+  checkResumePage,
+  checkChatApiValidation,
   checkResumeHash,
   checkDownload,
   checkHttpsRedirect,
