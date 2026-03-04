@@ -1,12 +1,20 @@
 import { anthropic } from "@ai-sdk/anthropic";
-import { streamText, convertToModelMessages, type UIMessage } from "ai";
+import {
+  streamText,
+  generateText,
+  convertToModelMessages,
+  tool,
+  stepCountIs,
+  type UIMessage,
+} from "ai";
+import { z } from "zod";
 import { buildSystemPrompt } from "../../../lib/agent/context";
 
 // Vercel Fluid Compute: explicit timeout for streaming chat responses.
 // Pro plan default is 300s with Fluid Compute, but we set 60s as a
 // sensible ceiling for Sonnet chat. The /api/resume route (Sprint 2)
 // will use maxDuration = 300 for Opus generation.
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 // ─── Rate Limiting (Upstash — optional, graceful fallback) ──────────────────
 
@@ -42,7 +50,7 @@ async function initRateLimit() {
 
 const promptCache = new Map<string, string>();
 
-function getSystemPrompt(mode: "chat" | "tools"): string {
+function getSystemPrompt(mode: "chat" | "tools" | "resume-generator"): string {
   const cached = promptCache.get(mode);
   if (cached) return cached;
 
@@ -99,6 +107,64 @@ export async function POST(request: Request) {
   // Convert UIMessages to ModelMessages for the language model
   const modelMessages = await convertToModelMessages(messages);
 
+  // Define tools for chat mode only
+  const chatTools =
+    validMode === "chat"
+      ? {
+          generate_tailored_resume: tool({
+            description:
+              "Generate a tailored version of Paul Prae's resume optimized for a specific job description. Use when a recruiter provides a JD or asks for a customized resume.",
+            inputSchema: z.object({
+              jobDescription: z
+                .string()
+                .describe("The job description or role requirements to tailor the resume for"),
+              emphasisAreas: z
+                .array(z.string())
+                .optional()
+                .describe(
+                  "Specific areas to emphasize (e.g., 'AI/ML', 'healthcare', 'leadership')",
+                ),
+            }),
+            execute: async ({ jobDescription, emphasisAreas }) => {
+              const resumeSystemPrompt = getSystemPrompt("resume-generator");
+              const userPrompt = emphasisAreas?.length
+                ? `Generate a tailored resume for this job description:\n\n${jobDescription}\n\nEmphasize these areas: ${emphasisAreas.join(", ")}`
+                : `Generate a tailored resume for this job description:\n\n${jobDescription}`;
+
+              const { text } = await generateText({
+                model: anthropic("claude-sonnet-4-6"),
+                system: resumeSystemPrompt,
+                prompt: userPrompt,
+                maxOutputTokens: 4096,
+                temperature: 0.3,
+              });
+
+              return {
+                resume: text,
+                downloadLinks: {
+                  pdf: "/Paul-Prae-Resume.pdf",
+                  docx: "/Paul-Prae-Resume.docx",
+                  md: "/Paul-Prae-Resume.md",
+                  web: "/resume",
+                },
+                note: "This is a tailored version. Paul's standard resume is available via the download links above.",
+              };
+            },
+          }),
+          get_resume_links: tool({
+            description:
+              "Get download links for Paul Prae's resume in various formats. Use when someone asks to download or view the resume.",
+            inputSchema: z.object({}),
+            execute: async () => ({
+              pdf: "/Paul-Prae-Resume.pdf",
+              docx: "/Paul-Prae-Resume.docx",
+              md: "/Paul-Prae-Resume.md",
+              web: "/resume",
+            }),
+          }),
+        }
+      : undefined;
+
   // Stream response using AI SDK 6
   try {
     const result = streamText({
@@ -107,6 +173,8 @@ export async function POST(request: Request) {
       messages: modelMessages,
       maxOutputTokens: 4096,
       temperature: 0.7,
+      tools: chatTools,
+      stopWhen: chatTools ? stepCountIs(3) : stepCountIs(1),
     });
 
     return result.toUIMessageStreamResponse();
