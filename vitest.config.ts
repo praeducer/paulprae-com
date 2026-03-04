@@ -7,7 +7,6 @@ export default defineConfig({
     environment: "node",
     include: ["tests/**/*.test.{ts,tsx}"],
     exclude: ["node_modules", "out", ".next"],
-    environmentMatchGlobs: [["tests/**/*.test.tsx", "jsdom"]],
     testTimeout: 30_000,
     // Silence console.log/warn from pipeline scripts during tests
     silent: false,

@@ -1,0 +1,80 @@
+/**
+ * context.test.ts — Tests for the career context builder.
+ *
+ * Tests cover: career context loading, system prompt building for all modes,
+ * and the stripEmpty utility function.
+ *
+ * Run: npm test -- tests/context.test.ts
+ */
+
+import { describe, it, expect } from "vitest";
+import { loadCareerContext, buildSystemPrompt, stripEmpty } from "../lib/agent/context";
+
+// ─── loadCareerContext ──────────────────────────────────────────────────────
+
+describe("loadCareerContext", () => {
+  it("returns non-null with profile name Paul Prae", () => {
+    const ctx = loadCareerContext();
+    expect(ctx).not.toBeNull();
+    expect(ctx!.careerData.profile.name).toBe("Paul Prae");
+  });
+
+  it("includes knowledge base files", () => {
+    const ctx = loadCareerContext();
+    expect(ctx).not.toBeNull();
+    expect(ctx!.audienceFrameworks).toBeTruthy();
+  });
+});
+
+// ─── buildSystemPrompt ──────────────────────────────────────────────────────
+
+describe("buildSystemPrompt", () => {
+  it("chat mode contains Paul Prae and Grounding Rules", () => {
+    const prompt = buildSystemPrompt("chat");
+    expect(prompt).not.toBeNull();
+    expect(prompt).toContain("Paul Prae");
+    expect(prompt).toContain("Grounding Rules");
+  });
+
+  it("tools mode contains Platform Constraints", () => {
+    const prompt = buildSystemPrompt("tools");
+    expect(prompt).not.toBeNull();
+    expect(prompt).toContain("Platform Constraints");
+  });
+
+  it("resume-generator mode contains tailoring content", () => {
+    const prompt = buildSystemPrompt("resume-generator");
+    expect(prompt).not.toBeNull();
+    expect(prompt!.toLowerCase()).toMatch(/tailor/);
+  });
+});
+
+// ─── stripEmpty ─────────────────────────────────────────────────────────────
+
+describe("stripEmpty", () => {
+  it("removes null and undefined values", () => {
+    expect(stripEmpty({ a: null, b: undefined, c: "hello" })).toEqual({ c: "hello" });
+  });
+
+  it("removes empty strings", () => {
+    expect(stripEmpty({ a: "", b: "ok" })).toEqual({ b: "ok" });
+  });
+
+  it("handles nested objects", () => {
+    expect(stripEmpty({ a: { b: null, c: "yes" }, d: { e: "" } })).toEqual({
+      a: { c: "yes" },
+    });
+  });
+
+  it("handles empty arrays", () => {
+    expect(stripEmpty({ a: [], b: [1, 2] })).toEqual({ b: [1, 2] });
+  });
+
+  it("returns undefined for completely empty objects", () => {
+    expect(stripEmpty({ a: null, b: "" })).toBeUndefined();
+  });
+
+  it("preserves non-empty values", () => {
+    expect(stripEmpty({ a: 0, b: false })).toEqual({ a: 0, b: false });
+  });
+});

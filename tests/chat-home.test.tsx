@@ -1,0 +1,84 @@
+/**
+ * chat-home.test.tsx — Tests for the ChatHome component.
+ *
+ * Mocks assistant-ui primitives to test rendering without a runtime.
+ *
+ * Run: npm test -- tests/chat-home.test.tsx
+ *
+ * @vitest-environment jsdom
+ */
+
+import { describe, it, expect, vi } from "vitest";
+import type { ReactNode } from "react";
+
+// Mock assistant-ui modules before importing the component
+vi.mock("@assistant-ui/react", () => {
+  const Passthrough = ({ children }: { children?: ReactNode }) => <>{children}</>;
+  return {
+    AssistantRuntimeProvider: Passthrough,
+    ThreadPrimitive: {
+      Root: Passthrough,
+      Viewport: Passthrough,
+      Empty: Passthrough,
+      Messages: () => null,
+      ViewportFooter: Passthrough,
+      ScrollToBottom: Passthrough,
+    },
+    MessagePrimitive: {
+      Root: Passthrough,
+      Content: () => null,
+    },
+    ComposerPrimitive: {
+      Root: ({ children }: { children?: ReactNode }) => <form>{children}</form>,
+      Input: (props: { placeholder?: string }) => (
+        <input placeholder={props.placeholder} aria-label="chat input" />
+      ),
+      Send: Passthrough,
+    },
+    ActionBarPrimitive: {
+      Root: Passthrough,
+      Copy: Passthrough,
+      Reload: Passthrough,
+    },
+  };
+});
+
+vi.mock("@assistant-ui/react-ai-sdk", () => ({
+  useChatRuntime: () => ({
+    thread: { append: vi.fn() },
+  }),
+  AssistantChatTransport: vi.fn(),
+}));
+
+vi.mock("@assistant-ui/react-markdown", () => ({
+  MarkdownTextPrimitive: () => null,
+}));
+
+import { render } from "@testing-library/react";
+import ChatHome from "../app/components/ChatHome";
+
+describe("ChatHome", () => {
+  it("chat mode renders Paul Prae heading and title", () => {
+    const { getByText } = render(<ChatHome mode="chat" />);
+    expect(getByText("Paul Prae")).toBeTruthy();
+    expect(getByText("Principal AI Engineer & Solutions Architect")).toBeTruthy();
+  });
+
+  it("tools mode renders Job Search Tools heading", () => {
+    const { getByText } = render(<ChatHome mode="tools" />);
+    expect(getByText("Job Search Tools")).toBeTruthy();
+  });
+
+  it("renders composer placeholder", () => {
+    const { container } = render(<ChatHome mode="chat" />);
+    const input = container.querySelector('input[placeholder*="experience"]');
+    expect(input).toBeTruthy();
+  });
+
+  it("renders View Resume link", () => {
+    const { getByText } = render(<ChatHome mode="chat" />);
+    const link = getByText("View Resume");
+    expect(link).toBeTruthy();
+    expect(link.closest("a")?.getAttribute("href")).toBe("/resume");
+  });
+});
