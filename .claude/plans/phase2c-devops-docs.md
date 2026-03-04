@@ -99,13 +99,21 @@ Configure in Vercel dashboard (Settings → Environment Variables):
 
 > **Changed from original plan:** Env vars are `UPSTASH_REDIS_REST_*` (not `KV_REST_API_*`). No `@vercel/kv` — uses `@upstash/redis` directly.
 
-### Step 3: CI/CD Pipeline Updates (`.github/workflows/ci.yml`)
+### Step 3: CI/CD Pipeline Updates
 
-Key changes:
+**`.github/workflows/ci.yml`** — Key changes:
 
 - Build output validation: `.next/` directory (not `out/`)
 - Validate routes: `/`, `/resume`, `/api/chat` all present in build output
 - No changes to test/lint/format steps
+
+**`.github/workflows/deploy.yml`** — Key changes:
+
+- Smoke test currently checks for Phase 1 static content (resume text on `/`)
+- Phase 2 changes: `/` becomes chat interface, resume moves to `/resume`
+- Update smoke test expectations: check `/resume` for resume content, check `/` for chat UI
+- Add `/api/chat` health check (POST with test message, expect 200 or stream response)
+- Keep existing bypass header logic (`x-vercel-protection-bypass`) — already working
 
 ```yaml
 - name: Validate build output

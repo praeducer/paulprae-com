@@ -2,7 +2,8 @@
 
 Tasks requiring manual action or Vercel dashboard configuration. Complements the AI-executable plans (phase2a/b/c).
 
-> **Prerequisites:** Complete the v2.1 human steps first (secrets, metrics, deploy verification).
+> **Prerequisites:** v2.1 human steps are **COMPLETE** ✅ (secrets configured, deploy verified, CI/CD working).
+> `ANTHROPIC_API_KEY` is already set as a GitHub secret (will be available to Vercel functions after Phase 2 deploys).
 > **Sequence:** Steps 1-3 can happen in any order (parallelizable). Steps 4-5 after code merges to main.
 
 ---
@@ -52,6 +53,10 @@ Phase 2 requires Vercel Pro for Fluid Compute (800s function duration for Opus r
 ## Step 4: Add Vercel Environment Variables
 
 After `feat/phase2-implementation` branch merges to main:
+
+> **Note:** `ANTHROPIC_API_KEY` is already set as a **GitHub Actions secret** (for the pipeline workflow).
+> It also needs to be set as a **Vercel environment variable** (for runtime function access).
+> These are different systems — GitHub secrets are for CI, Vercel env vars are for deployed functions.
 
 1. Go to: Vercel → paulprae-com project → **Settings** → **Environment Variables**
 2. Add `ANTHROPIC_API_KEY` for Production + Preview (same key from `.env.local`)

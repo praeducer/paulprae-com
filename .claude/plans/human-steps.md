@@ -2,11 +2,14 @@
 
 Tasks that require manual action outside of code.
 
+> **v2.1 CI/CD human steps are COMPLETE** — see `human-steps-v2.1.md` for details.
+> These remaining items are lower-priority DNS/monitoring tasks.
+
 ## DNS: Update A Record at DreamHost
 
-**Status:** Pending.
-Last checked 2026-03-03 from local resolver (`getent ahostsv4 paulprae.com`): apex still resolves to `216.198.79.1`.
-Site still serves via Vercel, but Vercel recommends `76.76.21.21` for optimal routing and SSL behavior.
+**Status:** Pending (low priority — site works fine on current IP).
+Last checked 2026-03-04: site resolves and serves via Vercel (HTTP 200).
+Vercel recommends `76.76.21.21` for optimal routing and SSL behavior.
 CNAME for www is already correct (cname.vercel-dns.com).
 
 **Steps:**
