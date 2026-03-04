@@ -124,13 +124,13 @@ describe("checkPublicDownloads", () => {
 // ─── checkBuildOutput ────────────────────────────────────────────────────────
 
 describe("checkBuildOutput", () => {
-  const indexPath = path.join(process.cwd(), "out", "index.html");
-  const buildExists = fs.existsSync(indexPath);
+  const buildIdPath = path.join(process.cwd(), ".next", "BUILD_ID");
+  const buildExists = fs.existsSync(buildIdPath);
 
-  it.skipIf(!buildExists)("passes when build output exists with expected content", () => {
+  it.skipIf(!buildExists)("passes when build output exists", () => {
     const result = checkBuildOutput();
     expect(result.passed).toBe(true);
-    expect(result.detail).toContain("out/index.html valid");
+    expect(result.detail).toContain("BUILD_ID present");
   });
 
   it.skipIf(buildExists)("fails gracefully when no build output", () => {
