@@ -12,6 +12,10 @@ const CHAT_ACTIONS = [
     prompt: "What are Paul's strongest technical skills and areas of expertise?",
   },
   { label: "Recent experience", prompt: "Tell me about Paul's most recent work experience." },
+  {
+    label: "Tailored resume",
+    prompt: "I'd like a tailored version of Paul's resume. I'll share the job description.",
+  },
   { label: "Download resume", prompt: "Where can I download Paul's resume?" },
 ];
 
