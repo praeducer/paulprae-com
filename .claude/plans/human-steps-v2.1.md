@@ -62,17 +62,37 @@ After merging, delete the `feat/v2.1-quality-infra` branch (GitHub offers this b
 
 ---
 
+### Step 2: Add Protection Bypass for Automation (3 minutes)
+
+**Do this before Step 1** — you need the generated secret value before you can add it to GitHub.
+
+Go to: https://vercel.com/praeducers-projects/paulprae-com/settings/deployment-protection
+
+**What you see in the UI and what to do:**
+
+- **Vercel Authentication** (toggle ON, "Standard Protection") — **leave this as-is.** This is what protects preview URLs from the public. Do NOT toggle it off — on the Hobby plan that toggle applies to all deployments with no "preview-only" option.
+- **Protection Bypass for Automation** — scroll to this section and click **`+ Add`**
+- Vercel generates a secret — **copy it immediately** (you won't see it again after leaving the page)
+- Click Save
+
+**Why this works:** The smoke test script now reads `VERCEL_AUTOMATION_BYPASS_SECRET` and sends it as an `x-vercel-protection-bypass` header on every request. Vercel lets CI through the auth wall. Production (paulprae.com) is unaffected — the custom domain isn't preview-protected.
+
+**Risk:** Anyone with this secret can view protected preview URLs. It's only stored in GitHub secrets, never committed. If it leaks, regenerate it in Vercel (old one is instantly invalidated).
+
+---
+
 ### Step 1: Configure GitHub Secrets (5 minutes)
 
 Go to: https://github.com/praeducer/paulprae-com/settings/secrets/actions
 
 Click **"New repository secret"** for each:
 
-| Secret              | Value                              | Where to find it                                    |
-| ------------------- | ---------------------------------- | --------------------------------------------------- |
-| `VERCEL_TOKEN`      | _(create a new token)_             | https://vercel.com/account/tokens → "Create" button |
-| `VERCEL_ORG_ID`     | `team_EZa7yDGXuubGA4VpNUccqrgM`    | Your local `.vercel/project.json` (gitignored)      |
-| `VERCEL_PROJECT_ID` | `prj_XGIlmRtsRVSzfqETwwuos3G3elUT` | Your local `.vercel/project.json` (gitignored)      |
+| Secret                            | Value                              | Where to find it                                                  |
+| --------------------------------- | ---------------------------------- | ----------------------------------------------------------------- |
+| `VERCEL_TOKEN`                    | _(create a new token)_             | https://vercel.com/account/tokens → "Create" button               |
+| `VERCEL_ORG_ID`                   | `team_EZa7yDGXuubGA4VpNUccqrgM`    | Your local `.vercel/project.json` (gitignored)                    |
+| `VERCEL_PROJECT_ID`               | `prj_XGIlmRtsRVSzfqETwwuos3G3elUT` | Your local `.vercel/project.json` (gitignored)                    |
+| `VERCEL_AUTOMATION_BYPASS_SECRET` | _(generated in Step 2)_            | Vercel → Deployment Protection → Protection Bypass for Automation |
 
 **Optional but recommended:**
 
@@ -81,20 +101,6 @@ Click **"New repository secret"** for each:
 | `ANTHROPIC_API_KEY` | _(your Claude API key from .env.local)_ | Enables Pipeline workflow: monthly auto-regeneration + manual trigger from GitHub Actions UI |
 
 **Risk:** If you paste the wrong Vercel token, deploys will fail with auth errors. You'll catch this in Step 4 — easy to fix by updating the secret.
-
----
-
-### Step 2: Disable Vercel Deployment Protection (2 minutes)
-
-Go to: https://vercel.com → paulprae-com project → **Settings** → **Deployment Protection**
-
-Change the setting so preview deployments are **not** behind authentication.
-
-**Why:** The deploy workflow runs smoke tests (`npm run smoke`) against the preview URL _before_ promoting to production. If Deployment Protection is on, those smoke tests get HTTP 401 and the deploy halts — production never updates even though the build is fine.
-
-**Best option for a public portfolio site:** Set to **"Disabled"** or **"Only Production Deployments"**.
-
-**Risk:** Without Deployment Protection, anyone with a preview URL can view it. Since paulprae.com is a public resume site, this is a non-issue.
 
 ---
 
@@ -193,11 +199,11 @@ Once Steps 1-4 are done, start a new Claude Code session and say:
 
 ### All 3 GitHub Actions workflows
 
-| Workflow     | File         | Trigger                                       | Secrets needed                                 | Current status      |
-| ------------ | ------------ | --------------------------------------------- | ---------------------------------------------- | ------------------- |
-| **CI**       | ci.yml       | Push to main, PRs to main                     | None                                           | Working             |
-| **Deploy**   | deploy.yml   | CI success on main (`workflow_run`)           | VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID | Broken (no secrets) |
-| **Pipeline** | pipeline.yml | Manual dispatch, monthly cron (1st, 9 AM UTC) | ANTHROPIC_API_KEY                              | Not tested          |
+| Workflow     | File         | Trigger                                       | Secrets needed                                                                  | Current status      |
+| ------------ | ------------ | --------------------------------------------- | ------------------------------------------------------------------------------- | ------------------- |
+| **CI**       | ci.yml       | Push to main, PRs to main                     | None                                                                            | Working             |
+| **Deploy**   | deploy.yml   | CI success on main (`workflow_run`)           | VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, VERCEL_AUTOMATION_BYPASS_SECRET | Broken (no secrets) |
+| **Pipeline** | pipeline.yml | Manual dispatch, monthly cron (1st, 9 AM UTC) | ANTHROPIC_API_KEY                                                               | Not tested          |
 
 ### Vercel configuration
 

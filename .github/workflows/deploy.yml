@@ -5,9 +5,10 @@
 # If preview smoke fails, production is untouched — no rollback needed.
 #
 # Required secrets:
-#   VERCEL_TOKEN      — from https://vercel.com/account/tokens
-#   VERCEL_ORG_ID     — from .vercel/project.json → orgId
-#   VERCEL_PROJECT_ID — from .vercel/project.json → projectId
+#   VERCEL_TOKEN                    — from https://vercel.com/account/tokens
+#   VERCEL_ORG_ID                   — from .vercel/project.json → orgId
+#   VERCEL_PROJECT_ID               — from .vercel/project.json → projectId
+#   VERCEL_AUTOMATION_BYPASS_SECRET — from Vercel project → Settings → Deployment Protection → Protection Bypass for Automation
 
 name: Deploy
 
@@ -74,6 +75,7 @@ jobs:
         env:
           SMOKE_TEST_URL: ${{ steps.preview.outputs.url }}
           SMOKE_WAIT_SECONDS: "10"
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       - name: Promote to production
         run: vercel promote "${{ steps.preview.outputs.url }}" --yes --token="${VERCEL_TOKEN}"

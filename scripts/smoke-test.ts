@@ -35,6 +35,15 @@ interface SmokeResult {
 
 const BASE_URL = (process.env.SMOKE_TEST_URL || "https://paulprae.com").replace(/\/$/, "");
 
+/**
+ * Vercel Deployment Protection bypass secret.
+ * When set, all requests include x-vercel-protection-bypass header so CI
+ * can smoke-test protected preview deployments. Set via
+ * VERCEL_AUTOMATION_BYPASS_SECRET GitHub secret → deploy.yml env.
+ * See: https://vercel.com/docs/security/deployment-protection/methods-to-bypass-deployment-protection/protection-bypass-for-automation
+ */
+const VERCEL_BYPASS_SECRET = process.env.VERCEL_AUTOMATION_BYPASS_SECRET || "";
+
 /** Retry delay for checks that may need CDN propagation time. */
 const RETRY_DELAY_MS = 5_000;
 const MAX_RETRIES = 3;
@@ -48,6 +57,13 @@ async function fetchWithTimeout(
   const { timeout = 15_000, ...fetchOptions } = options;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
+
+  // Inject bypass header when testing protected preview deployments
+  if (VERCEL_BYPASS_SECRET) {
+    const existing = (fetchOptions.headers as Record<string, string>) || {};
+    fetchOptions.headers = { ...existing, "x-vercel-protection-bypass": VERCEL_BYPASS_SECRET };
+  }
+
   try {
     return await fetch(url, { ...fetchOptions, signal: controller.signal });
   } finally {
