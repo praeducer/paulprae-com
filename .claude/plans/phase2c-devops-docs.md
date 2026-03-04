@@ -2,51 +2,117 @@
 
 > **Status:** NOT STARTED. Blocked on Plan 2A/2B Sprint 2 completion.
 > **Sequence:** Plan 2A (backend) → Plan 2B (frontend) → Plan 2C (this)
-> **Branch:** `feat/phase2c-devops` (or continue on `feat/phase2-implementation`)
-> **Depends on:** Plan 2A + 2B (needs to know all routes, env vars, dependencies)
-> **Blocks:** Nothing — final plan in sequence
-> **Human steps:** See `human-steps-phase2.md` Steps 5-6 (env vars, post-deploy verification)
+> **Branch:** Continue on `feat/phase2-implementation` (no separate branch — keeps the merge atomic)
+> **Depends on:** Plan 2A + 2B Sprint 1 (COMPLETE), Sprint 2+ (NOT started)
+> **Blocks:** Nothing — final plan in sequence. Must be done BEFORE merging feature branch to main.
+> **Human steps:** See `human-steps-phase2.md` Steps 1-4 (Vercel Pro, Upstash, AI Gateway, env vars)
 > **Authoritative redesign plan:** `docs/phase2-redesign-plan.md`
 
-### Phase 1 CI/CD Foundation (Already Working)
+---
+
+## Phase 1 CI/CD Foundation (Already Working ✅)
 
 These items were completed during v2.1 and do NOT need to be redone in Plan 2C:
 
 - **GitHub secrets configured:** VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, VERCEL_AUTOMATION_BYPASS_SECRET, ANTHROPIC_API_KEY — all 5 set as repository secrets
-- **Deploy workflow (deploy.yml) is working:** CI → preview → smoke test (6/6) → promote → production smoke — fully verified
+- **Deploy workflow (deploy.yml) is working:** CI → preview → smoke test (6/6) → promote → production smoke — fully verified (all green as of 2026-03-04)
+- **Production smoke wait:** 30s delay after promote for CDN cache invalidation (fixed from 15s, issue #24)
 - **Vercel authentication bypass:** Protection Bypass for Automation configured; smoke test sends `x-vercel-protection-bypass` header automatically
 - **`--scope` flag:** Both `vercel deploy` and `vercel promote` use `--scope="${VERCEL_ORG_ID}"` for correct team scoping
 - **Pipeline workflow (pipeline.yml):** ANTHROPIC_API_KEY secret set; monthly cron + manual dispatch enabled
 - **Git integration is OFF:** `vercel.json: git.deploymentEnabled: false` — all deploys go through GitHub Actions
+- **Issue auto-creation on failure:** deploy.yml creates a GitHub issue with commit SHA, preview URL, and run link
 
-Plan 2C only needs to UPDATE the existing working config for Phase 2 (remove static export, add new routes, update CSP, etc.), not set up CI/CD from scratch.
+Plan 2C only needs to UPDATE the existing working config for Phase 2 (remove static export, update smoke tests, update CSP, etc.), not set up CI/CD from scratch.
+
+### Known Issue on Feature Branch
+
+The feature branch CI currently fails at the "Validate build output" step:
+
+```
+test -f out/index.html  →  FAILS because Phase 2 uses .next/ not out/
+```
+
+This is expected and will be resolved by Step 3 of this plan.
 
 ### Claude Code Execution Notes
 
 ```
-"Execute Plan 2C: update vercel.json, CI workflow, release-check script, CLAUDE.md, README.md,
-and TDD. Run npm run check to verify. Commit after each step."
+"Execute Plan 2C on feat/phase2-implementation: update vercel.json, next.config.ts, CI workflow,
+smoke-test.ts, release-check.ts, sitemap, CLAUDE.md, README.md, and TDD. Run npm test after each
+step. Commit after each step."
 ```
 
-- This plan is mostly config/docs changes — lower risk than 2A/2B
-- Run `npm run check` (full release checklist) as final verification
+- This plan is mostly config/docs/script changes — lower risk than 2A/2B
+- Run `npm test` after each step to catch regressions
+- Run `npm run check` as final verification (after updating the check script itself)
 - CLAUDE.md updates are critical — they affect all future Claude Code sessions
 
 ---
 
 ## Objective
 
-Update all deployment configuration, CI/CD pipelines, security headers, and documentation to support the Phase 2 server-rendered Next.js app with API routes, chat homepage (`/`), resume page (`/resume`), and Vercel Fluid Compute.
+Update all deployment configuration, CI/CD pipelines, smoke tests, security headers, and documentation to support the Phase 2 server-rendered Next.js app with:
+
+- **`/`** — AI chat interface (dynamic, client component)
+- **`/resume`** — Professional resume (static pre-render, server component)
+- **`/api/chat`** — Streaming chat API (Vercel Fluid Compute, 800s max duration)
+- **Vercel Fluid Compute** — Pro plan required for long-running AI responses
+
+---
+
+## Current State → Target State
+
+| Config Area             | Phase 1 (Current on `main`)                     | Phase 2 (Target)                                  |
+| ----------------------- | ----------------------------------------------- | ------------------------------------------------- |
+| `next.config.ts`        | `output: 'export'` (static HTML)                | No output config (server-rendered)                |
+| `vercel.json` framework | `"framework": null` (static)                    | Removed — Vercel auto-detects Next.js             |
+| `vercel.json` output    | `"outputDirectory": "out"`                      | Removed — Vercel uses `.next/` default            |
+| Build output            | `out/index.html` (single page)                  | `.next/` (server app with routes)                 |
+| Routes                  | `/` (resume)                                    | `/` (chat), `/resume` (resume), `/api/chat`       |
+| CI build validation     | `test -f out/index.html`                        | `test -d .next` + route validation                |
+| Smoke test homepage     | Checks for "Paul Prae" + "Professional Summary" | Checks for chat UI markers                        |
+| Smoke test resume       | N/A (was homepage)                              | New check on `/resume` for resume content         |
+| CSP `connect-src`       | `'self'`                                        | `'self'` (sufficient for same-origin `/api/chat`) |
 
 ---
 
 ## Implementation Steps
 
-### Step 1: Vercel Configuration (`vercel.json`)
+### Step 1: Next.js Configuration (`next.config.ts`)
+
+> **Note:** This change was already made on the feature branch in Sprint 1.
+> Verify it's correct and no additional config is needed.
+
+```typescript
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  // Phase 2: dynamic rendering enabled for API routes (/api/chat)
+  // Resume page uses generateStaticParams for static pre-rendering
+};
+
+export default nextConfig;
+```
+
+**Key change:** Removing `output: 'export'` is the single most important Phase 2 config change. It enables:
+
+- API routes (`app/api/chat/route.ts`)
+- Dynamic server-side rendering
+- Vercel Fluid Compute for long-running functions
+
+**Verify:** Already done on feature branch. No additional action needed.
+
+### Step 2: Vercel Configuration (`vercel.json`)
+
+> **Critical:** The feature branch `vercel.json` currently still has `"framework": null"` and `"outputDirectory": "out"` — these are Phase 1 settings that conflict with the removed `output: 'export'`. This step fixes that.
 
 ```json
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": false
+  },
   "buildCommand": "npm run build",
   "cleanUrls": true,
   "trailingSlash": false,
@@ -64,7 +130,7 @@ Update all deployment configuration, CI/CD pipelines, security headers, and docu
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://paulprae.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
         }
       ]
     },
@@ -79,123 +145,289 @@ Update all deployment configuration, CI/CD pipelines, security headers, and docu
 }
 ```
 
-**Key changes from Phase 1:**
+**Changes from Phase 1:**
 
-- **Remove** `"framework": null` — let Vercel auto-detect Next.js
-- **Remove** `"outputDirectory": "out"` — Vercel manages `.next/` output
-- **Update** CSP `connect-src` to allow `'self'` API calls from the chat page
-- **Add** `/api/*` headers: `Cache-Control: no-store` to prevent caching of AI responses
+| Change                                       | Reason                                                                    |
+| -------------------------------------------- | ------------------------------------------------------------------------- |
+| Remove `"framework": null`                   | Let Vercel auto-detect Next.js for proper server-rendered builds          |
+| Remove `"outputDirectory": "out"`            | Vercel uses `.next/` by default for Next.js apps                          |
+| Keep `"git": { "deploymentEnabled": false }` | All deploys still go through GitHub Actions                               |
+| Keep `"buildCommand": "npm run build"`       | Same build command works for both phases                                  |
+| Add `/api/*` header block                    | `Cache-Control: no-store` prevents CDN caching of AI responses            |
+| Keep `connect-src 'self'` as-is              | `'self'` already covers same-origin `/api/chat` calls — no changes needed |
 
-### Step 2: Environment Variables on Vercel
+**Why NOT add `https://paulprae.com` to `connect-src`:** The `'self'` directive matches the origin of the page. Since the chat page and API are on the same origin, `'self'` already permits the connection. Adding the full URL is redundant.
 
-Configure in Vercel dashboard (Settings → Environment Variables):
+### Step 3: CI Workflow Updates (`.github/workflows/ci.yml`)
 
-| Variable                   | Environments        | Purpose                          |
-| -------------------------- | ------------------- | -------------------------------- |
-| `ANTHROPIC_API_KEY`        | Production, Preview | Claude API access for chat route |
-| `AI_GATEWAY_API_KEY`       | Production, Preview | Vercel AI Gateway (optional)     |
-| `UPSTASH_REDIS_REST_URL`   | Production, Preview | Upstash Redis for rate limiting  |
-| `UPSTASH_REDIS_REST_TOKEN` | Production, Preview | Upstash Redis auth token         |
+Update the build output validation step:
 
-> **Changed from original plan:** Env vars are `UPSTASH_REDIS_REST_*` (not `KV_REST_API_*`). No `@vercel/kv` — uses `@upstash/redis` directly.
+**Before (Phase 1):**
 
-### Step 3: CI/CD Pipeline Updates
+```yaml
+- name: Validate build output
+  run: test -f out/index.html || { echo "::error::out/index.html not found"; exit 1; }
+```
 
-**`.github/workflows/ci.yml`** — Key changes:
-
-- Build output validation: `.next/` directory (not `out/`)
-- Validate routes: `/`, `/resume`, `/api/chat` all present in build output
-- No changes to test/lint/format steps
-
-**`.github/workflows/deploy.yml`** — Key changes:
-
-- Smoke test currently checks for Phase 1 static content (resume text on `/`)
-- Phase 2 changes: `/` becomes chat interface, resume moves to `/resume`
-- Update smoke test expectations: check `/resume` for resume content, check `/` for chat UI
-- Add `/api/chat` health check (POST with test message, expect 200 or stream response)
-- Keep existing bypass header logic (`x-vercel-protection-bypass`) — already working
+**After (Phase 2):**
 
 ```yaml
 - name: Validate build output
   run: |
     test -d .next || { echo "::error::.next/ directory not found"; exit 1; }
-    # Verify resume page was pre-rendered
+    # Verify resume page was pre-rendered (static optimization)
     test -f .next/server/app/resume.html || echo "::warning::resume.html not pre-rendered"
 ```
 
-### Step 4: Release Check Script Updates
+**What stays the same:** All other CI steps (checkout, setup-node, npm ci, validate:docs, lint, format, test, build, check:quick) are unchanged.
 
-Update `scripts/release-check.ts`:
+### Step 4: Smoke Test Updates (`scripts/smoke-test.ts`)
 
-- Change build output validation from `out/` to `.next/`
-- Add check that `/api/chat` route exists
-- Verify both `/` and `/resume` routes are present
+This is the most critical deployment-pipeline change. The current 6 smoke checks need updating because `/` is now a chat interface, not a resume page.
 
-### Step 5: Sitemap and Robots
+**Current checks → Phase 2 updates:**
 
-Update `public/sitemap.xml`:
+| #   | Current Check                                                | Phase 2 Change                                                                      |
+| --- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| 1   | Homepage: HTTP 200, has "Paul Prae" + "Professional Summary" | **Split:** Homepage checks for chat UI markers; new Resume check for resume content |
+| 2   | Resume MD hash: matches local file                           | **Unchanged** — download URL path is the same                                       |
+| 3   | PDF download: 200, correct content-type, ≥10 KB              | **Unchanged**                                                                       |
+| 4   | DOCX download: 200, correct content-type, ≥5 KB              | **Unchanged**                                                                       |
+| 5   | HTTPS redirect                                               | **Unchanged**                                                                       |
+| 6   | Security headers: 5 headers verified                         | **Unchanged**                                                                       |
 
-```xml
-<url><loc>https://paulprae.com/</loc></url>
-<url><loc>https://paulprae.com/resume</loc></url>
+**New check architecture (7 checks):**
+
+```typescript
+// Check 1: Chat homepage — verify the chat interface loads
+async function checkChatHomepage(): Promise<SmokeResult> {
+  const res = await fetchWithTimeout(BASE_URL);
+  if (!res.ok) return { name: "Chat homepage", passed: false, detail: `HTTP ${res.status}` };
+  const html = await res.text();
+  const markers = [
+    { label: "page title", pattern: /Paul Prae/i },
+    { label: "chat UI", pattern: /Ask About Paul|chat|assistant/i },
+    { label: "meta description", pattern: /<meta[^>]*description/i },
+  ];
+  // ... validate markers
+}
+
+// Check 2: Resume page — verify resume content on /resume
+async function checkResumePage(): Promise<SmokeResult> {
+  const res = await fetchWithTimeout(`${BASE_URL}/resume`);
+  if (!res.ok) return { name: "Resume page", passed: false, detail: `HTTP ${res.status}` };
+  const html = await res.text();
+  const markers = [
+    { label: "name", pattern: /Paul Prae/i },
+    { label: "Professional Summary", pattern: /Professional Summary/i },
+    { label: "download link", pattern: /\.pdf/i },
+  ];
+  // ... validate markers
+}
+
+// Checks 3-7: Resume MD hash, PDF download, DOCX download, HTTPS redirect, Security headers
+// (unchanged from current implementation)
 ```
 
-### Step 6: Documentation Updates
+**Key decisions:**
 
-#### CLAUDE.md Changes
+- Chat homepage markers are intentionally loose (`chat|assistant`) to avoid coupling smoke tests to specific UI text
+- Resume page check uses the SAME markers as the current homepage check — just against `/resume`
+- Download URLs don't change — PDFs are still served from `public/` at the root
+- No `/api/chat` smoke check — the API requires `ANTHROPIC_API_KEY` which would add cost per deploy. The preview smoke verifies the route exists implicitly (the chat page would show errors if the API were broken).
+
+### Step 5: Release Check Script Updates (`scripts/release-check.ts`)
+
+Update `checkBuildOutput()` for Phase 2's `.next/` output:
+
+**Before (Phase 1):**
+
+```typescript
+function checkBuildOutput(): CheckResult {
+  const indexPath = path.join(ROOT, "out", "index.html");
+  // Checks: file exists, size > 10KB, content markers (Paul Prae, Professional Summary, .pdf, meta description)
+}
+```
+
+**After (Phase 2):**
+
+```typescript
+function checkBuildOutput(): CheckResult {
+  const nextDir = path.join(ROOT, ".next");
+  const issues: string[] = [];
+
+  if (!fs.existsSync(nextDir)) {
+    issues.push(".next/ directory not found (run build first)");
+  } else {
+    // Verify resume page was pre-rendered (static optimization)
+    const resumePath = path.join(nextDir, "server", "app", "resume.html");
+    if (!fileExists(resumePath)) {
+      issues.push("resume.html not pre-rendered");
+    } else {
+      const html = fs.readFileSync(resumePath, "utf-8");
+      const markers = [
+        { label: "name", pattern: /Paul Prae/i },
+        { label: "Professional Summary", pattern: /Professional Summary/i },
+        { label: "download link", pattern: /\.pdf/i },
+      ];
+      for (const marker of markers) {
+        if (!marker.pattern.test(html)) {
+          issues.push(`missing in resume: ${marker.label}`);
+        }
+      }
+    }
+  }
+  // ...
+}
+```
+
+**What stays the same:**
+
+- `checkDataFiles()` — unchanged (career-data.json + resume.md)
+- `checkResumeQuality()` — unchanged (reads from approved resume markdown)
+- `checkPublicDownloads()` — unchanged (PDF/DOCX/MD hash sync)
+- `checkLint()`, `checkFormat()`, `checkTests()`, `checkDocs()` — unchanged
+
+### Step 6: Sitemap Update (`public/sitemap.xml`)
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://paulprae.com/</loc>
+    <lastmod>2026-03-XX</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://paulprae.com/resume</loc>
+    <lastmod>2026-03-XX</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+</urlset>
+```
+
+**Changes:** Add `/resume` route. Update `lastmod` dates to reflect Phase 2 deploy date. No changes to `robots.txt` — default behavior is correct.
+
+### Step 7: Documentation Updates
+
+#### Already Completed ✅ (done during v2.1 sessions)
+
+These doc updates were made on `main` and are already synced to the feature branch:
+
+| File               | Change                                                                               | Status  |
+| ------------------ | ------------------------------------------------------------------------------------ | ------- |
+| CLAUDE.md          | Phase 2 status, test count (315+), new dependencies, env vars, human steps reference | ✅ Done |
+| .env.local.example | Phase 2 runtime env vars (Upstash, AI Gateway)                                       | ✅ Done |
+| README.md          | Test count (315+), deployment section rewritten for GitHub Actions CI/CD             | ✅ Done |
+| CONTRIBUTING.md    | Test count (315+)                                                                    | ✅ Done |
+
+#### Still Needed (do during Plan 2C execution)
+
+**CLAUDE.md additional changes:**
 
 | Section           | Change                                                                          |
 | ----------------- | ------------------------------------------------------------------------------- |
-| Project Overview  | Update phase to "Phase 2 — Interactive Career Platform"                         |
 | Tech Stack        | Add: AI SDK 6, @ai-sdk/anthropic, @assistant-ui/react, @upstash/redis           |
 | File Organization | Add `lib/agent/`, `lib/prompts/`, `app/api/`, `app/resume/`                     |
-| Critical Rules #2 | Remove static export rule. Note: resume page is still statically optimized      |
-| Critical Rules #3 | Move AI SDK from "do NOT install" to tech stack. Keep Supabase/Neo4j as Phase 3 |
+| Critical Rules #2 | Remove static export rule; note resume page is still statically optimized       |
+| Critical Rules #3 | Move AI SDK from "do NOT install" to tech stack; keep Supabase/Neo4j as Phase 3 |
 | Common Commands   | Add `npm run dev` for chat testing                                              |
-| Phase 2 Preview   | Convert to "Phase 2 (Current)" with implemented features                        |
 
-#### README.md Changes
+**README.md additional changes:**
 
 | Section      | Change                                                     |
 | ------------ | ---------------------------------------------------------- |
-| Overview     | Update Phase 2 from "planned" to "current"                 |
 | Architecture | Add server-side architecture (API routes + Fluid Compute)  |
 | Tech Stack   | Add AI SDK 6, @assistant-ui/react, Upstash Redis           |
 | Routes       | Document `/` (chat), `/resume` (resume), `/api/chat` (API) |
-| Deployment   | Update for server-rendered deployment                      |
 
-#### Technical Design Document (`docs/technical-design-document.md`)
+**Technical Design Document (`docs/technical-design-document.md`):**
 
-Key updates needed:
+| Section        | Change                                                  |
+| -------------- | ------------------------------------------------------- |
+| §3.1 Routes    | `/chat` → `/` for chat, add `/resume` for resume        |
+| §3.2 Stack     | `@vercel/kv` → `@upstash/redis`                         |
+| §3.8 Client    | `useChat` → `@assistant-ui/react` with `useChatRuntime` |
+| §3.9 Structure | `packages/` → `lib/` flat structure                     |
+| Stack table    | Add `@assistant-ui/react`                               |
 
-- §3.1: `/chat` → `/` for chat, add `/resume` for resume
-- §3.2: `@vercel/kv` → `@upstash/redis`
-- §3.8 Client: `useChat` → `@assistant-ui/react` with `useChatRuntime`
-- §3.9: `packages/` → `lib/` flat structure
-- Add `@assistant-ui/react` to stack table
+### Step 8: CORS and Security Verification
 
-### Step 7: CORS and Security
+- **CSP `connect-src 'self'`** already allows same-origin API calls — no changes needed
+- **API routes validate** `Content-Type: application/json` in route.ts (already implemented in Sprint 1)
+- **Rate limiting** via Upstash Redis protects against abuse (graceful fallback when env vars absent)
+- **No CORS headers needed** — chat page and API are same-origin
+- **`/api/*` headers** add `Cache-Control: no-store` (Step 2) — prevents CDN caching AI responses
+- **Vercel Speed Insights:** Monitor `va.vercel-scripts.com` 503 errors (observed in Phase 1 QA; see `human-steps.md`)
 
-- Verify CSP `connect-src` allows same-origin API calls
-- API routes validate `Content-Type: application/json`
-- Rate limiting via Upstash protects against abuse
-- No CORS headers needed (same-origin)
+---
+
+## Merge & Deploy Strategy
+
+The Phase 2 merge is a coordinated transition — both CI/CD and application code change simultaneously.
+
+### Approach: Atomic Merge
+
+All Plan 2C changes are committed on the feature branch alongside the Sprint 1 code. The PR merges everything at once. This works because:
+
+1. **CI runs against the branch** — the updated `ci.yml` validates `.next/` on the feature branch (fixes the known CI failure)
+2. **Deploy workflow triggers after merge** — by the time `deploy.yml` runs on main, the smoke test code is already updated
+3. **No intermediate broken state** — there's no window where old smoke tests run against new code
+
+### Pre-Merge Checklist
+
+Before merging `feat/phase2-implementation` → `main`:
+
+- [ ] All Plan 2C steps completed and committed on feature branch
+- [ ] `npm run build` succeeds (`.next/` output, not `out/`)
+- [ ] `npm test` — all tests pass
+- [ ] `npm run lint && npm run format:check` — clean
+- [ ] `npm run check` — release checklist passes (with updated Phase 2 checks)
+- [ ] Human steps 1-4 completed (Vercel Pro, Upstash, AI Gateway, env vars)
+- [ ] `ANTHROPIC_API_KEY` set as Vercel environment variable (not just GitHub secret)
+- [ ] PR #21 reviewed and approved
+
+### Post-Merge Deploy Sequence
+
+After merge to main:
+
+1. **CI workflow triggers** → lint, format, test, build (validates `.next/`), check
+2. **Deploy workflow triggers** (on CI success):
+   - `vercel deploy` → preview URL (Vercel auto-detects Next.js → server-rendered build)
+   - Preview smoke test (7 checks): chat homepage, resume page, downloads, HTTPS, headers
+   - `vercel promote` → production
+   - Production smoke test (30s wait → 7 checks)
+3. **Human step 5** → Post-deploy verification (see `human-steps-phase2.md`)
+
+### Rollback Plan
+
+If the deploy fails after merge:
+
+1. Production is untouched until smoke tests pass (preview → smoke → promote pattern)
+2. If preview smoke fails: production stays on Phase 1 — investigate and fix on the feature branch
+3. If production smoke fails after promote: revert the merge commit on main → CI/Deploy re-runs with Phase 1 code
+4. Manual fallback: `npx vercel rollback --yes --scope="${VERCEL_ORG_ID}" --token="${VERCEL_TOKEN}"`
 
 ---
 
 ## Verification Checklist
 
-- [ ] `npm run build` succeeds with new config
+- [ ] `npm run build` succeeds with `.next/` output
 - [ ] `npm test` — all tests pass
 - [ ] `npm run lint && npm run format:check` — clean
-- [ ] `npm run check` — full release checklist passes
+- [ ] `npm run check` — full release checklist passes (updated for Phase 2)
+- [ ] CI workflow passes on feature branch (validates `.next/`, not `out/`)
 - [ ] Vercel preview deployment works (both `/` and `/resume`)
-- [ ] Chat homepage (`/`) works in preview deploy
-- [ ] Resume page (`/resume`) renders correctly
-- [ ] API routes respond correctly in preview deploy
+- [ ] Chat homepage (`/`) loads with mode toggle and quick actions
+- [ ] Resume page (`/resume`) renders with downloads and navigation
+- [ ] API route responds correctly (`/api/chat` POST returns stream)
 - [ ] CSP headers don't block chat API calls
+- [ ] `/api/*` responses have `Cache-Control: no-store`
 - [ ] Sitemap includes both routes
 - [ ] All documentation is consistent and accurate
+- [ ] Smoke tests pass against preview deployment (7/7)
 
 ---
 
@@ -204,5 +436,8 @@ Key updates needed:
 - Agent core logic (Plan 2A — Sprint 1 COMPLETE)
 - API route implementation (Plan 2A — Sprint 1 COMPLETE)
 - Chat UI components (Plan 2B — Sprint 1 COMPLETE)
+- Agent tools, `/api/resume` route, AI Gateway integration (Plan 2A — Sprint 2+)
+- Platform-aware copy, character count, welcome message (Plan 2B — Sprint 2+)
+- Component/API route tests (Plans 2A/2B — Sprint 2+)
 - Supabase/pgvector (Phase 3)
 - Neo4j knowledge graph (Phase 3)
