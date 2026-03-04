@@ -4,7 +4,8 @@
 
 **paulprae.com** is an AI-powered career platform that positions Paul Prae as a Principal AI Engineer & Architect. The site generates professional resumes from structured career data using Claude AI, serves them as a responsive static site, and will evolve into an interactive platform with AI chat and dynamic resume generation.
 
-**Current Phase:** Phase 1 — AI-Generated Static Resume
+**Current Phase:** Phase 1 — AI-Generated Static Resume (stable, deployed)
+**Next Phase:** Phase 2 — Interactive Career Platform (Sprint 1 complete on `feat/phase2-implementation`)
 **Repository:** github.com/praeducer/paulprae-com
 **Live URL:** https://paulprae.com (also: paulprae-com-one.vercel.app)
 
@@ -111,22 +112,36 @@ See [README.md](README.md#5-run-the-pipeline) for the full command reference. Qu
 - `npm run build` — website only (reads committed data, no API key)
 - `npm run pipeline:full` — pipeline + build (convenience)
 - `npm run brand` — generate brand assets (OG image, favicons) if missing
-- `npm test` — run all 245+ tests
+- `npm test` — run all 315+ tests
 - `npm run check` — full pre-push release checklist (data + docs + lint + format + test + build + validate)
 - `npm run check:quick` — instant data file validation only
 - `npm run check:fix` — quick check + auto-fix stale public/ copies
 - `npm run validate:docs` — validate internal markdown links and required docs
 
-## Phase 2 Preview (Do Not Implement Yet)
+## Phase 2 — Interactive Career Platform (In Progress)
 
-Phase 2 will transform this into a full-stack platform:
+Phase 2 transforms this into a full-stack interactive platform. Sprint 1 is complete on `feat/phase2-implementation` (PR #21). Plans: `.claude/plans/phase2{a,b,c}-*.md`.
 
-- **Supabase** PostgreSQL database with pgvector for career data + embeddings
-- **Vercel AI SDK 6** with `@ai-sdk/anthropic` for streaming chat and resume generation
-- **AI chat interface** where recruiters ask questions about Paul's career (RAG over career data)
-- **Dynamic resume generation** tailored to specific job descriptions
-- **Supabase Auth** for admin-gated content management
-- Remove `output: 'export'` and switch to server-rendered Next.js
+**Architecture changes from Phase 1:**
+
+- Remove `output: 'export'` → server-rendered Next.js with API routes
+- `/` becomes AI chat interface, `/resume` serves the resume
+- `/api/chat` streaming endpoint via Vercel AI SDK 6 + Claude
+- Rate limiting via Upstash Redis
+
+**New dependencies (Phase 2 only — not on main):**
+
+- `ai` + `@ai-sdk/anthropic` — Vercel AI SDK 6 for streaming chat
+- `@assistant-ui/react` + `@assistant-ui/react-ai-sdk` — Chat UI components
+- `@upstash/redis` + `@upstash/ratelimit` — Rate limiting
+
+**New env vars (Phase 2 runtime — set on Vercel, not just GitHub Actions):**
+
+- `ANTHROPIC_API_KEY` — Claude API access for chat route (already set as GitHub Actions secret)
+- `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` — Rate limiting
+- `AI_GATEWAY_API_KEY` — Vercel AI Gateway (optional)
+
+**Human setup required before Phase 2 deploy:** See `.claude/plans/human-steps-phase2.md`
 
 ## Phase 3 Preview (Do Not Implement Yet)
 
