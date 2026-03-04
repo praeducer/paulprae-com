@@ -2,7 +2,7 @@
 
 Only actionable coding/documentation tasks belong here.
 
-> Last reconciled: 2026-03-04 against `main` and `.claude/plans/agent-api.md`.
+> Last reconciled: 2026-03-04 against `main` and `.claude/plans/phase2{a,b,c}-*.md`.
 
 ## Pipeline Enhancements
 
@@ -10,14 +10,14 @@ Only actionable coding/documentation tasks belong here.
 - [ ] Add pipeline metrics output (`tokens`, `cost`, `latency`, artifact sizes) to a gitignored metrics file.
 - [ ] Add optional JSON Resume export from `career-data.json`.
 
-> **Moved to agent-api.md:** Tailored resume generation (`--job-url`, `--job-text`) — now part of the agent's `generateResume()` + CLI flags.
+> **Moved to phase2a-backend-agent-api.md:** Tailored resume generation (`--job-url`, `--job-text`) — now part of the agent's `generateResume()` + CLI flags.
 
 ## Phase 2 Preparation
 
 - [ ] Add reusable UI component foundation for chat/resume tooling in `components/`.
 - [ ] Add configurable knowledge path constants only when structured retrieval is implemented.
 
-> **Moved to agent-api.md:** Knowledge schema standardization, knowledge-base audit tests.
+> **Moved to phase2a-backend-agent-api.md:** Knowledge schema standardization, knowledge-base audit tests.
 
 ## UX Enhancements (deferred from Phase 1 review)
 
