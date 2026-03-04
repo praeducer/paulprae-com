@@ -208,14 +208,35 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
               <ThreadPrimitive.Empty>
                 <div className="flex flex-1 flex-col items-center justify-center py-12">
                   <div className="mb-6 text-center">
-                    <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-                      {mode === "chat" ? "Ask me about Paul's career" : "Job Search Tools"}
-                    </h2>
-                    <p className="mt-2 max-w-md text-sm text-slate-500 dark:text-slate-400">
-                      {mode === "chat"
-                        ? "I can answer questions about Paul Prae's experience, skills, and career background. Everything I share is grounded in his actual career data."
-                        : "Generate tailored outreach, interview prep, and application content. All grounded in Paul's real career data and optimized for each platform."}
-                    </p>
+                    {mode === "chat" ? (
+                      <>
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                          Paul Prae
+                        </h2>
+                        <p className="mt-1 text-sm font-medium text-blue-600 dark:text-blue-400">
+                          Principal AI Engineer &amp; Solutions Architect
+                        </p>
+                        <p className="mt-3 max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                          15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500
+                          across healthcare, life science, and insurance. Currently building AI
+                          agents and data platforms at Arine.
+                        </p>
+                        <p className="mt-2 max-w-lg text-xs text-slate-400 dark:text-slate-500">
+                          Ask about Paul&apos;s experience, download his resume, or request a
+                          tailored resume for your open role.
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+                          Job Search Tools
+                        </h2>
+                        <p className="mt-2 max-w-md text-sm text-slate-500 dark:text-slate-400">
+                          Generate tailored outreach, interview prep, and application content. All
+                          grounded in Paul&apos;s real career data and optimized for each platform.
+                        </p>
+                      </>
+                    )}
                   </div>
                   <QuickActions mode={mode} onAction={handleQuickAction} />
                 </div>
