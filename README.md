@@ -3,46 +3,55 @@
 [![CI](https://github.com/praeducer/paulprae-com/actions/workflows/ci.yml/badge.svg)](https://github.com/praeducer/paulprae-com/actions/workflows/ci.yml)
 [![Deploy](https://github.com/praeducer/paulprae-com/actions/workflows/deploy.yml/badge.svg)](https://github.com/praeducer/paulprae-com/actions/workflows/deploy.yml)
 
-A professional career platform that uses AI to generate, tailor, and present Paul Prae's experience as a Principal AI Engineer & Architect. Built with Next.js 16, TypeScript, and Claude AI.
+A professional career platform with an AI chat assistant that helps recruiters explore Paul Prae's experience, download resumes, and request tailored resumes for specific roles. Built with Next.js 16, Vercel AI SDK 6, and Claude.
 
 ## Overview
 
 This project evolves across three phases:
 
-1. **Phase 1 (Current):** AI-generated static resume — LinkedIn data + knowledge base fed to Claude, rendered as a styled static site on Vercel
-2. **Phase 2:** Full-stack interactive platform — AI chat interface for recruiters, dynamic resume generation tailored to job descriptions, RAG over career data via Supabase + pgvector
-3. **Phase 3:** Knowledge-graph-augmented AI — Neo4j career graph, AI agents with tool-calling, n8n automation pipelines
+1. **Phase 1:** AI-generated resume pipeline — LinkedIn data + knowledge base fed to Claude, rendered as styled HTML
+2. **Phase 2 (Current):** AI chat platform — interactive recruiter Q&A, tailored resume generation via tool-calling, job search content tools
+3. **Phase 3:** Knowledge-graph-augmented AI — Neo4j career graph, AI agents, n8n automation pipelines
 
-## Phase 1: AI-Generated Static Resume
+## Routes
 
-The current phase implements an automated pipeline:
+| Route       | Description                                                                     |
+| ----------- | ------------------------------------------------------------------------------- |
+| `/`         | AI chat interface — recruiter Q&A, resume downloads, tailored resume generation |
+| `/resume`   | Static resume page with section navigation                                      |
+| `/tools`    | Job search content tools (cover letters, LinkedIn messages, etc.) — noindex     |
+| `/api/chat` | Streaming chat API with tool-calling (Sonnet 4.6)                               |
+
+## Resume Pipeline
+
+The pipeline generates career data and resume outputs:
 
 ```
-LinkedIn CSV Export → Ingestion Script → Claude API → Markdown Resume → Next.js Static Site → Vercel CDN
+LinkedIn CSV Export → Ingestion Script → Claude API → Markdown Resume → PDF/DOCX Export
 ```
 
 1. **Ingest** LinkedIn data exports and knowledge base JSONs into a unified career data file
 2. **Generate** a professional Markdown resume by calling Claude Opus 4.6 with structured career data + brand guidelines
 3. **Export** the Markdown resume to PDF (via Pandoc + Typst) and DOCX (via Pandoc)
-4. **Build** a responsive static site with Next.js that renders the Markdown resume
-5. **Deploy** automatically to Vercel on every push to `main`
+4. **Build** the Next.js site (reads committed resume data at build time)
+5. **Deploy** to Vercel on merge to `main`
 
 ## Architecture
 
-The project has two independent workflows connected only by committed data files:
+The project has two independent workflows connected by committed data files:
 
 ```
 ┌─────────────────────────────┬──────────────────────────────┐
-│   Resume Pipeline           │   Website Development        │
-│   (local-only)              │   (standard web workflow)    │
+│   Resume Pipeline           │   Website + Chat             │
+│   (local-only)              │   (server-rendered)          │
 ├─────────────────────────────┼──────────────────────────────┤
 │ npm run pipeline            │ npm run dev / npm run build  │
-│ Requires: API key,          │ Requires: Node.js only       │
-│   pandoc, typst             │                              │
+│ Requires: API key,          │ Requires: Node.js +          │
+│   pandoc, typst             │   ANTHROPIC_API_KEY (chat)   │
 │ Outputs: career-data.json,  │ Reads: committed data files  │
-│   resume .md, PDF, DOCX     │ Outputs: static HTML (out/)  │
-│ Frequency: When career      │ Frequency: Any UI/style      │
-│   data changes              │   change                     │
+│   resume .md, PDF, DOCX     │ Streams: /api/chat responses │
+│ Frequency: When career      │ Frequency: Any code change   │
+│   data changes              │                              │
 └──────────────┬──────────────┴──────────────────────────────┘
                │ committed to git
                ▼
@@ -50,20 +59,23 @@ The project has two independent workflows connected only by committed data files
        data/generated/Paul-Prae-Resume.md
 ```
 
-You can develop and deploy the website without touching the pipeline, and vice versa. The website gracefully handles missing pipeline outputs with a placeholder message.
+The pipeline and website are independent. You can develop the website without the pipeline. The chat API requires `ANTHROPIC_API_KEY` at runtime.
 
 ## Tech Stack
 
 | Layer         | Technology                                                     |
 | ------------- | -------------------------------------------------------------- |
 | Framework     | Next.js 16 (App Router, TypeScript, Turbopack)                 |
+| AI Chat       | Vercel AI SDK 6 (`ai` + `@ai-sdk/anthropic`) + Claude Sonnet   |
+| Chat UI       | `@assistant-ui/react` + `@assistant-ui/react-ai-sdk`           |
 | Styling       | Tailwind CSS 4.x                                               |
 | Markdown      | react-markdown + remark-gfm                                    |
-| AI Generation | Anthropic Claude API (Opus 4.6)                                |
+| AI Generation | Anthropic Claude API (Opus 4.6) for resume pipeline            |
+| Rate Limiting | Upstash Redis (`@upstash/ratelimit`)                           |
 | Validation    | Zod (schema validation)                                        |
 | Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF)                              |
 | Linting       | ESLint 9 + eslint-config-next + Prettier + husky + lint-staged |
-| Testing       | Vitest (245+ unit and integration tests)                       |
+| Testing       | Vitest + Testing Library (330+ tests)                          |
 | Analytics     | Vercel Analytics + Speed Insights (no cookies)                 |
 | Deployment    | Vercel via GitHub Actions CI/CD                                |
 | Dev Tooling   | Claude Code CLI + Cursor                                       |

@@ -48,7 +48,7 @@ Deliver a fast, shareable professional site at `https://paulprae.com` that prese
 
 ## 3. Phase 2 Architecture (In Progress)
 
-> **Implementation status:** Sprint 1 complete on `feat/phase2-implementation` branch. See `docs/phase2-redesign-plan.md` for the authoritative redesign plan with user stories, QA strategy, and sprint breakdown.
+> **Implementation status:** Sprint 2 in progress on `feat/phase2-implementation` branch. Sprint 1 delivered chat homepage, resume page, tools page, and streaming API. Sprint 2 adds tool-calling for tailored resume generation. See `docs/phase2-redesign-plan.md` for the redesign plan.
 
 Phase 2 transforms the static site into an interactive career platform with a chat-first homepage and job search tools. The architecture adds server-side capabilities while preserving the existing resume pipeline.
 
@@ -101,17 +101,15 @@ Browser
   │
   ├── GET /resume  ───────────→ Static pre-render (Vercel CDN, instant)
   │
-  ├── POST /api/chat  ────────→ Fluid Compute function (maxDuration: 60)
-  │     │                        Model: claude-sonnet-4-6
-  │     │                        Pattern: streamText → toUIMessageStreamResponse → SSE
-  │     │                        Mode param switches system prompt (chat vs tools)
-  │     └── Career data + knowledge base in system prompt with prompt caching
-  │         (90K tokens cached, 10x cheaper after first turn)
-  │
-  └── POST /api/resume  ──────→ Fluid Compute function (maxDuration: 300) [Sprint 2+]
-        │                        Model: claude-opus-4-6
-        │                        Pattern: generateText with adaptive thinking
-        └── Tailored resume generation from job descriptions
+  └── POST /api/chat  ────────→ Fluid Compute function (maxDuration: 120)
+        │                        Model: claude-sonnet-4-6
+        │                        Pattern: streamText → toUIMessageStreamResponse → SSE
+        │                        Mode param switches system prompt (chat vs tools)
+        ├── Career data + knowledge base in system prompt with prompt caching
+        │   (90K tokens cached, 10x cheaper after first turn)
+        └── Tool-calling (chat mode only, maxSteps: 3):
+              ├── generate_tailored_resume: JD → Sonnet → tailored resume markdown
+              └── get_resume_links: returns PDF/DOCX/MD/web download URLs
 ```
 
 ### 3.5 Prompt caching strategy

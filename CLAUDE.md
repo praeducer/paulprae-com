@@ -2,36 +2,41 @@
 
 ## Project Overview
 
-**paulprae.com** is an AI-powered career platform that positions Paul Prae as a Principal AI Engineer & Architect. The site generates professional resumes from structured career data using Claude AI, serves them as a responsive static site, and will evolve into an interactive platform with AI chat and dynamic resume generation.
+**paulprae.com** is an AI-powered career platform that positions Paul Prae as a Principal AI Engineer & Architect. The site features an AI chat assistant for recruiter Q&A, tailored resume generation, and job search tools — all grounded in structured career data.
 
-**Current Phase:** Phase 1 — AI-Generated Static Resume (stable, deployed)
-**Next Phase:** Phase 2 — Interactive Career Platform (Sprint 1 complete on `feat/phase2-implementation`)
+**Current Phase:** Phase 2 — AI Chat Platform (Sprint 2 on `feat/phase2-implementation`)
 **Repository:** github.com/praeducer/paulprae-com
 **Live URL:** https://paulprae.com (also: paulprae-com-one.vercel.app)
 
-## Tech Stack (Phase 1)
+## Tech Stack
 
-See [README.md](README.md#tech-stack) for the full tech stack. Key versions: Next.js 16.1.x, Tailwind CSS 4.x, Vitest 4.x, ESLint 9, Prettier 3.x. AI generation via `@anthropic-ai/sdk` (Claude Opus 4.6). Resume export via Pandoc + Typst (system binaries).
+See [README.md](README.md#tech-stack) for the full tech stack. Key versions: Next.js 16.1.x, Tailwind CSS 4.x, Vitest 4.x, ESLint 9, Prettier 3.x. AI generation via `@anthropic-ai/sdk` (Claude Opus 4.6). Resume export via Pandoc + Typst (system binaries). Chat: Vercel AI SDK 6 (`ai` + `@ai-sdk/anthropic`), `@assistant-ui/react` for UI. Rate limiting: `@upstash/redis` + `@upstash/ratelimit`.
 
 ## Key Conventions
 
 - **App Router** — all routes use the `app/` directory (not `pages/`)
 - **Server components by default** — only use `"use client"` when client interactivity is required
 - **TypeScript strict mode** — no `any` types, strict null checks enabled
-- **Static export** — `output: 'export'` in next.config.ts. No API routes, no SSR in Phase 1
+- **Server-rendered** — Next.js with API routes and streaming. No `output: 'export'`
 - **Tailwind CSS only** — no CSS modules, no styled-components
-- **Single-page site** — Phase 1 is one page (app/page.tsx) rendering the generated resume
+- **Routes:** `/` (chat), `/resume` (static resume), `/tools` (noindex), `/api/chat` (streaming)
 
 ## File Organization
 
 ```
 app/                   → Next.js App Router pages and layouts
+app/api/chat/          → Streaming chat API route (AI SDK 6 + Claude)
+app/components/        → Chat UI components (ChatHome, QuickActions)
+app/resume/            → Resume page with section nav
+app/tools/             → Job search tools page (noindex)
 data/sources/linkedin/ → LinkedIn CSV exports (gitignored — raw exports may contain unparsed columns)
-data/sources/knowledge/→ Knowledge base JSONs (committed — recruiter-facing content for Phase 2 RAG)
+data/sources/knowledge/→ Knowledge base JSONs (committed — recruiter-facing content for RAG)
 data/generated/        → Pipeline outputs: career-data.json + Paul-Prae-Resume.md (committed), PDF + DOCX (gitignored)
 scripts/               → Pipeline scripts (ingest, generate, export, brand) + resume-pdf.typ stylesheet
 lib/                   → Shared utilities: config, types, markdown, career-data, ui-utils, script-utils
-tests/                 → Unit and integration tests (Vitest)
+lib/agent/             → Career context builder for chat system prompts
+lib/prompts/           → System prompt templates (career-chat, job-tools, resume-generator)
+tests/                 → Unit, integration, and component tests (Vitest + Testing Library)
 public/                → Static assets (OG image, favicons, resume downloads) committed for Vercel
 docs/                  → Technical documentation (TDD, dev environment, MCP, browser prompts)
 .mcp.json              → MCP config for Claude Code (project root; see docs/mcp-setup.md)
@@ -42,19 +47,14 @@ docs/                  → Technical documentation (TDD, dev environment, MCP, b
 
 1. **data/generated/Paul-Prae-Resume.md is GENERATED** — To change resume output, edit `scripts/generate-resume.ts` (the prompt, formatting instructions, or data processing). Never edit the resume markdown directly — it gets overwritten by the pipeline. The filename is derived from `career-data.json` (profile.name → "Paul-Prae-Resume").
 
-2. **Static export mode** — Phase 1 uses `output: 'export'`. This means:
-   - No API routes (`app/api/` will not work)
-   - No server-side rendering at request time
-   - No middleware
-   - All data must be available at build time
+2. **Server-rendered mode** — The site uses server-rendered Next.js with API routes. The `/api/chat` route streams responses via Vercel AI SDK 6. The `/resume` page reads committed markdown at build time.
 
-3. **Minimal dependencies for Phase 1** — Do NOT install:
-   - shadcn/ui (not needed for a single static page)
-   - Supabase or @supabase/ssr (Phase 2)
-   - Vercel AI SDK or @ai-sdk/anthropic (Phase 2)
+3. **Minimal dependencies** — Do NOT install:
+   - shadcn/ui (not needed — using assistant-ui + Tailwind)
+   - Supabase or @supabase/ssr (Phase 3)
    - Any database drivers or ORMs
 
-4. **Environment variables** — `ANTHROPIC_API_KEY` in `.env.local` (never committed). Used only by build scripts, not by the Next.js runtime.
+4. **Environment variables** — `ANTHROPIC_API_KEY` in `.env.local` (never committed). Used by both build scripts and the `/api/chat` runtime. `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` for rate limiting (optional in dev).
 
 5. **Data committal policy** — All pipeline data is recruiter-facing content, so most is committed to git for portability across machines. Only LinkedIn CSV raw exports are gitignored (may contain unparsed columns). Knowledge base JSONs, career-data.json, and the resume markdown are all committed. PDF/DOCX in `data/generated/` are gitignored as regenerable binary artifacts, but copies in `public/` (PDF, DOCX, MD) are committed so Vercel can serve them as downloads. **Principle:** if data can't be public, it shouldn't be in the data model — this pipeline generates content sent to strangers.
 
@@ -86,7 +86,7 @@ The build pipeline transforms raw career data into a deployed site:
 3. npm run compare   → Interactive section-by-section review (optional: --judge for LLM scoring)
 4. npm run approve   → Promote staging → Paul-Prae-Resume.md (approved/live)
 5. npm run export    → Pandoc + Typst convert → Paul-Prae-Resume.pdf + .docx
-6. npm run build     → Next.js reads approved resume at build time → static HTML in out/
+6. npm run build     → Next.js reads approved resume at build time → .next/ output
 7. git push          → Vercel auto-deploys from main branch
 ```
 
@@ -108,40 +108,34 @@ The build pipeline transforms raw career data into a deployed site:
 
 See [README.md](README.md#5-run-the-pipeline) for the full command reference. Quick shortcuts:
 
+- `npm run dev` — local development server with hot reload
 - `npm run pipeline` — full pipeline: ingest → generate → export (no build)
 - `npm run build` — website only (reads committed data, no API key)
 - `npm run pipeline:full` — pipeline + build (convenience)
 - `npm run brand` — generate brand assets (OG image, favicons) if missing
-- `npm test` — run all 315+ tests
+- `npm test` — run all 330+ tests
 - `npm run check` — full pre-push release checklist (data + docs + lint + format + test + build + validate)
 - `npm run check:quick` — instant data file validation only
 - `npm run check:fix` — quick check + auto-fix stale public/ copies
 - `npm run validate:docs` — validate internal markdown links and required docs
 
-## Phase 2 — Interactive Career Platform (In Progress)
+## Phase 2 — AI Chat Platform (Active)
 
-Phase 2 transforms this into a full-stack interactive platform. Sprint 1 is complete on `feat/phase2-implementation` (PR #21). Plans: `.claude/plans/phase2{a,b,c}-*.md`.
+Phase 2 is the current platform on `feat/phase2-implementation`. Chat-first homepage with AI career assistant, tailored resume generation via tool-calling, and job search content tools.
 
-**Architecture changes from Phase 1:**
+**Key features:**
 
-- Remove `output: 'export'` → server-rendered Next.js with API routes
-- `/` becomes AI chat interface, `/resume` serves the resume
-- `/api/chat` streaming endpoint via Vercel AI SDK 6 + Claude
-- Rate limiting via Upstash Redis
+- `/` — AI chat with recruiter-focused Q&A and tailored resume generation
+- `/resume` — Static resume page with section navigation
+- `/tools` — Job search content tools (cover letters, LinkedIn messages, etc., noindex)
+- `/api/chat` — Streaming chat endpoint with tool-calling (AI SDK 6 + Claude Sonnet)
 
-**New dependencies (Phase 2 only — not on main):**
+**Runtime env vars (set on Vercel):**
 
-- `ai` + `@ai-sdk/anthropic` — Vercel AI SDK 6 for streaming chat
-- `@assistant-ui/react` + `@assistant-ui/react-ai-sdk` — Chat UI components
-- `@upstash/redis` + `@upstash/ratelimit` — Rate limiting
+- `ANTHROPIC_API_KEY` — Claude API access for chat + tool-calling
+- `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` — Rate limiting (optional in dev)
 
-**New env vars (Phase 2 runtime — set on Vercel, not just GitHub Actions):**
-
-- `ANTHROPIC_API_KEY` — Claude API access for chat route (already set as GitHub Actions secret)
-- `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` — Rate limiting
-- `AI_GATEWAY_API_KEY` — Vercel AI Gateway (optional)
-
-**Human setup required before Phase 2 deploy:** See `.claude/plans/human-steps-phase2.md`
+**Human setup required before deploy:** See `.claude/plans/human-steps-phase2.md`
 
 ## Phase 3 Preview (Do Not Implement Yet)
 
