@@ -4,6 +4,21 @@
 > **Branch:** `feat/phase2c-devops` from `feat/phase2b-frontend` (or `main` after 2B merges)
 > **Depends on:** Plan 2A (knows what env vars, routes exist), Plan 2B (knows all pages/routes)
 > **Blocks:** Nothing — final plan in sequence
+> **Human steps:** See `human-steps-phase2.md` Steps 5-6 (env vars, post-deploy verification)
+
+### Claude Code Execution Notes
+
+This plan is optimized for autonomous execution by Claude Code:
+
+```
+"Execute Plan 2C: create feat/phase2c-devops branch, update vercel.json, update CI workflow,
+update release-check script, update CLAUDE.md, README.md, and TDD. Run npm run check to verify."
+```
+
+- This plan is mostly config/docs changes — lower risk than 2A/2B
+- Run `npm run check` (full release checklist) as final verification
+- CLAUDE.md updates are critical — they affect all future Claude Code sessions
+- After merging, human must do Steps 5-6 (Vercel dashboard config)
 
 ---
 

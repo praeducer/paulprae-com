@@ -4,6 +4,22 @@
 > **Branch:** `feat/phase2a-backend` from `main` → merge via PR
 > **Depends on:** Nothing (first in sequence)
 > **Blocks:** Plan 2B (frontend needs API routes), Plan 2C (devops needs new config)
+> **Human steps:** See `human-steps-phase2.md` Steps 1-3 (Vercel Pro, Upstash KV, AI Gateway)
+
+### Claude Code Execution Notes
+
+This plan is optimized for autonomous execution by Claude Code. To run it:
+
+```
+"Execute Plan 2A: create feat/phase2a-backend branch, install deps, extract career-data package,
+build agent core, create API routes, add tests. Commit after each step. Run npm test and npm run build
+to verify after each step."
+```
+
+- Each step is independent and verifiable — commit after each
+- Existing `lib/` files become re-exports (no import breakage)
+- All code examples use real API signatures (AI SDK 6, not pseudocode)
+- Run `npm test` after every step to catch regressions immediately
 
 ---
 
@@ -39,15 +55,25 @@ Use `ai@6.x` + `@ai-sdk/anthropic` for all API route handlers. This gives us:
 - Anthropic built-in tools (web search, code execution) if needed later
 - Provider-agnostic model switching
 
-### Vercel AI Gateway
+### Vercel AI Gateway (Recommended Default)
 
-Use `@ai-sdk/gateway` for model routing. Benefits:
+Use `@ai-sdk/gateway` as the **primary model interface** rather than calling `@ai-sdk/anthropic` directly. The Gateway wraps the same Anthropic provider but adds production infrastructure for free:
 
-- Unified API key management (`AI_GATEWAY_API_KEY` env var)
+- Unified API key management (`AI_GATEWAY_API_KEY` env var — single key for all providers)
 - Zero markup on token costs + $5/mo free credit
-- Built-in observability (latency, tokens, errors per call)
-- Budget controls per project
+- Built-in observability (latency, tokens, errors per call) — visible in Vercel dashboard
+- Budget controls and spend alerts per project
 - Failover/retry across providers
+- Hot-swap models from the dashboard without code changes (e.g., benchmark Sonnet vs Haiku for chat)
+
+```typescript
+import { createGateway } from "@ai-sdk/gateway";
+const gateway = createGateway({ apiKey: process.env.AI_GATEWAY_API_KEY });
+const chatModel = gateway("anthropic/claude-sonnet-4-6");
+const resumeModel = gateway("anthropic/claude-opus-4-6");
+```
+
+**Fallback:** If AI Gateway is not configured, fall back to direct `@ai-sdk/anthropic` provider. This keeps local development simple (only `ANTHROPIC_API_KEY` needed).
 
 ### Model Routing
 
@@ -404,3 +430,6 @@ Fallback: in-memory `Map<string, number[]>` for local development.
 - Vercel config changes (Plan 2C)
 - CLAUDE.md / README / TDD updates (Plan 2C)
 - Modal deployment (dropped entirely)
+- Database-backed RAG (Phase 3 — current career data fits in prompt cache; Supabase + pgvector deferred)
+- Vercel MCP Servers for agent tool access (Phase 3)
+- Background ingest via Vercel Cron (Phase 3)

@@ -4,6 +4,21 @@
 > **Branch:** `feat/phase2b-frontend` from `feat/phase2a-backend` (or `main` after 2A merges)
 > **Depends on:** Plan 2A (API routes must exist at `/api/chat` and `/api/resume`)
 > **Blocks:** Plan 2C (devops needs to know all routes for CSP/CI updates)
+> **Human steps:** See `human-steps-phase2.md` Step 4 (v0 prototyping — optional, can run in parallel)
+
+### Claude Code Execution Notes
+
+This plan is optimized for autonomous execution by Claude Code:
+
+```
+"Execute Plan 2B: create feat/phase2b-frontend branch, build chat page components,
+add navigation, add styling, add tests. Commit after each step."
+```
+
+- If v0 has already generated a scaffold PR, start from that branch and refine
+- All component code uses AI SDK 6 APIs (`sendMessage`, `status`, `parts[]`)
+- Test with `npm run dev` after building components — verify `/chat` renders
+- Mock the transport layer in tests, don't hit real API routes
 
 ---
 
@@ -40,7 +55,18 @@ Each `UIMessage` carries a `.parts` array. The UI must render each part type:
 
 ### No Component Library
 
-Per CLAUDE.md: no shadcn/ui for Phase 1/2. All components are hand-built with Tailwind CSS. This keeps the dependency count minimal and the code portfolio-worthy.
+Per CLAUDE.md: no shadcn/ui for Phase 1/2. All components are hand-built with Tailwind CSS. This keeps the dependency count minimal and the code portfolio-worthy — the open-source code is part of the career portfolio.
+
+### Development Workflow: v0 for Rapid Prototyping
+
+[v0](https://v0.app) can accelerate chat UI development as a complementary tool alongside Claude Code and Cursor:
+
+- Use v0 to rapidly prototype chat layouts, message bubble designs, and mobile-responsive patterns
+- Generate Tailwind CSS + React component scaffolds, then refine in the IDE
+- v0 integrates with the Vercel deploy pipeline for instant preview deploys during iteration
+- Not a dependency — purely a workflow accelerator for UI/UX iteration
+
+**Pattern:** Prototype in v0 → export to repo → refine with Claude Code/Cursor → deploy.
 
 ### Dedicated Page (Not Floating Widget)
 

@@ -306,9 +306,11 @@ Implementation tracked in `.claude/plans/phase2a-backend-agent-api.md`, `phase2b
 
 ### Phase 3 (Future)
 
-- Supabase PostgreSQL + pgvector for career data embeddings and RAG
+- Supabase PostgreSQL + pgvector for career data embeddings and database-backed RAG
 - Neo4j AuraDB knowledge graph (Person → Role → Company → Project → Skill → Outcome)
 - Claude Agent SDK for autonomous multi-step reasoning agents
+- Vercel MCP Servers for agent tool access (DB queries, vector search, external APIs)
+- Background ingest via Vercel Cron + Route Handlers for automated data refresh
 - n8n automation workflows for data ingestion and enrichment
 
 ## 9. Non-goals
