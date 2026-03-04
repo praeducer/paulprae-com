@@ -1,31 +1,32 @@
 # Plan 2A: Backend — Career Agent Core + API Routes
 
+> **Status:** Sprint 1 COMPLETE on `feat/phase2-implementation`. Sprint 2+ remaining.
 > **Sequence:** Plan 2A (this) → Plan 2B (frontend) → Plan 2C (devops)
-> **Branch:** `feat/phase2a-backend` from `main` → merge via PR
+> **Branch:** `feat/phase2-implementation` (combined 2A+2B Sprint 1 work)
 > **Depends on:** Nothing (first in sequence)
 > **Blocks:** Plan 2B (frontend needs API routes), Plan 2C (devops needs new config)
-> **Human steps:** See `human-steps-phase2.md` Steps 1-3 (Vercel Pro, Upstash KV, AI Gateway)
+> **Human steps:** See `human-steps-phase2.md` Steps 1-3 (Vercel Pro, Upstash Redis, AI Gateway)
+> **Authoritative redesign plan:** `docs/phase2-redesign-plan.md` (merged plan with full user stories, QA strategy, sprint breakdown)
 
 ### Claude Code Execution Notes
 
-This plan is optimized for autonomous execution by Claude Code. To run it:
+This plan is optimized for autonomous execution by Claude Code. To run remaining work:
 
 ```
-"Execute Plan 2A: create feat/phase2a-backend branch, install deps, extract career-data package,
-build agent core, create API routes, add tests. Commit after each step. Run npm test and npm run build
-to verify after each step."
+"Continue Phase 2 implementation on feat/phase2-implementation branch. Read docs/phase2-redesign-plan.md
+for full context. Sprint 1 backend work is complete — focus on Sprint 2 items: agent tools, /api/resume
+route, resume-generator prompt. Run npm test and npm run build after each step."
 ```
 
-- Each step is independent and verifiable — commit after each
-- Existing `lib/` files become re-exports (no import breakage)
-- All code examples use real API signatures (AI SDK 6, not pseudocode)
+- The feature branch has 1 commit with Sprint 1 work (builds, 315 tests pass, lint clean)
+- All code uses real AI SDK 6 API signatures verified against actual type definitions
 - Run `npm test` after every step to catch regressions immediately
 
 ---
 
 ## Objective
 
-Extract the AI generation logic from CLI scripts into a reusable agent package, stand up Next.js API routes for chat and resume generation, and remove the static-export constraint. The frontend (Plan 2B) and deployment config (Plan 2C) are handled in subsequent plans.
+Build Next.js API routes for chat and resume generation, powered by a career context loader that assembles system prompts from career data + knowledge base files. Remove the static-export constraint. The frontend (Plan 2B) and deployment config (Plan 2C) are handled in subsequent plans.
 
 ---
 
@@ -33,47 +34,37 @@ Extract the AI generation logic from CLI scripts into a reusable agent package, 
 
 ### Drop Modal — Use Vercel Fluid Compute
 
-The original plan called for a Modal container to host the agent. This is wrong for this workload:
+The original plan called for a Modal container. This was dropped:
 
-- Modal requires Python functions — language mismatch with our TypeScript codebase
-- We are proxying to Anthropic's API, not running custom inference — Modal's GPU infra adds zero value
-- Vercel Pro ($20/mo) with Fluid Compute supports 800-second function durations, more than enough for Opus resume generation (30-60s)
-- Eliminates an entire deployment platform, billing relationship, and network hop
+- Modal requires Python — language mismatch with TypeScript codebase
+- We proxy to Anthropic's API, not running custom inference — Modal's GPU infra adds zero value
+- Vercel Pro ($20/mo) with Fluid Compute supports 800s function duration
+- Eliminates an entire deployment platform, billing, and network hop
 
 **Decision:** All AI workloads run as Next.js API routes on Vercel Fluid Compute.
 
 ### Vercel AI SDK 6 (not raw Anthropic SDK)
 
-Use `ai@6.x` + `@ai-sdk/anthropic` for all API route handlers. This gives us:
+Use `ai@6.x` + `@ai-sdk/anthropic` for all API route handlers:
 
-- `streamText()` with built-in SSE response formatting
-- `ToolLoopAgent` class for multi-step tool use
-- `stopWhen(stepCountIs(n))` for bounded agent loops
+- `streamText()` with built-in SSE response formatting via `toUIMessageStreamResponse()`
+- `convertToModelMessages()` to convert `UIMessage[]` (from client) to model-compatible format
 - Prompt caching via `providerOptions.anthropic.cacheControl`
 - Extended thinking via `providerOptions.anthropic.thinking`
-- Structured outputs for resume JSON validation
-- Anthropic built-in tools (web search, code execution) if needed later
 - Provider-agnostic model switching
+
+> **Note:** The original plan referenced `ToolLoopAgent` and `stopWhen(stepCountIs(n))`. The Sprint 1 implementation uses plain `streamText()` — agent tools (generate_resume, etc.) will be added in Sprint 2 using AI SDK 6's tool-calling pattern.
 
 ### Vercel AI Gateway (Recommended Default)
 
-Use `@ai-sdk/gateway` as the **primary model interface** rather than calling `@ai-sdk/anthropic` directly. The Gateway wraps the same Anthropic provider but adds production infrastructure for free:
+Use `@ai-sdk/gateway` as the **primary model interface** rather than calling `@ai-sdk/anthropic` directly. Benefits:
 
-- Unified API key management (`AI_GATEWAY_API_KEY` env var — single key for all providers)
-- Zero markup on token costs + $5/mo free credit
-- Built-in observability (latency, tokens, errors per call) — visible in Vercel dashboard
-- Budget controls and spend alerts per project
-- Failover/retry across providers
-- Hot-swap models from the dashboard without code changes (e.g., benchmark Sonnet vs Haiku for chat)
+- Unified API key management (`AI_GATEWAY_API_KEY` env var)
+- Built-in observability (latency, tokens, errors) in Vercel dashboard
+- Budget controls and spend alerts
+- Hot-swap models from dashboard without code changes
 
-```typescript
-import { createGateway } from "@ai-sdk/gateway";
-const gateway = createGateway({ apiKey: process.env.AI_GATEWAY_API_KEY });
-const chatModel = gateway("anthropic/claude-sonnet-4-6");
-const resumeModel = gateway("anthropic/claude-opus-4-6");
-```
-
-**Fallback:** If AI Gateway is not configured, fall back to direct `@ai-sdk/anthropic` provider. This keeps local development simple (only `ANTHROPIC_API_KEY` needed).
+**Fallback:** Current implementation uses `@ai-sdk/anthropic` directly. AI Gateway integration is a Sprint 2+ enhancement.
 
 ### Model Routing
 
@@ -83,280 +74,201 @@ const resumeModel = gateway("anthropic/claude-opus-4-6");
 | Resume generation              | `claude-opus-4-6`   | Highest quality, $5/$25 per MTok |
 | Intent classification (future) | `claude-haiku-4-5`  | $1/$5 per MTok                   |
 
+### Rate Limiting: Why Upstash Redis (Not Supabase)
+
+The project uses `@upstash/redis` + `@upstash/ratelimit` for distributed rate limiting. This was evaluated against alternatives:
+
+| Option                                  | Verdict        | Why                                                                                                                                                                 |
+| --------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@upstash/redis` + `@upstash/ratelimit` | **Winner**     | Purpose-built sliding window algorithms, edge-compatible HTTP client, 1-5ms latency, Vercel's official recommended approach                                         |
+| `@vercel/kv`                            | **Eliminated** | Deprecated/sunset in 2025. Vercel removed it from dashboard; redirects to Upstash directly                                                                          |
+| Supabase PostgreSQL                     | **Not viable** | Read replicas can't write rate counters, 5-20ms latency, no edge runtime compatibility, no library support. Supabase's own docs recommend Upstash for rate limiting |
+| In-memory `Map`                         | **Dev only**   | State not shared across serverless instances, lost on cold starts. Used as graceful fallback when Upstash env vars not configured                                   |
+
+**Provider strategy:** Minimal 3-provider stack: **Vercel** (hosting) + **Supabase** (database + auth + pgvector in Phase 3) + **Upstash** (rate limiting only). Upstash Vector is NOT used — pgvector handles vector search in Phase 3.
+
 ### Prompt Caching Strategy
 
-Career data (~90K tokens) goes in the system prompt with `cache_control: { type: "ephemeral" }` (5-min TTL). Cost impact:
+Career data (~90K tokens) goes in the system prompt with `cache_control: { type: "ephemeral" }` (5-min TTL):
 
 - Cache write: 1.25x base input ($3.75/MTok for Sonnet)
 - Cache read: 0.1x base input ($0.30/MTok for Sonnet)
-- First message: ~$0.34 (cache creation)
-- Subsequent messages: ~$0.03 each (cache read + small output)
 - 10-message conversation: ~$0.60
+
+### Two System Prompt Modes
+
+The chat API accepts a `mode` parameter that switches between two system prompts:
+
+| Prompt                  | Mode               | Purpose                                         |
+| ----------------------- | ------------------ | ----------------------------------------------- |
+| `career-chat.system.md` | `"chat"` (default) | Recruiter Q&A, third-person voice               |
+| `job-tools.system.md`   | `"tools"`          | Content generation for Paul, first-person voice |
+
+A third prompt (`resume-generator.system.md`) will power the separate `/api/resume` route in Sprint 2.
+
+---
+
+## File Structure (Actual Implementation)
+
+> **Important:** The original plan referenced `packages/agent/` and `packages/career-data/` monorepo structure. The actual implementation uses a flat `lib/` structure — simpler, no path aliases needed.
+
+```
+lib/
+├── agent/
+│   └── context.ts          # buildCareerContext(), buildSystemPrompt(), CareerContext interface
+├── prompts/
+│   ├── career-chat.system.md   # Recruiter Q&A system prompt (grounding rules G1-G8)
+│   ├── job-tools.system.md     # Content generation system prompt (STAR, AIDA, PAS, BAB)
+│   └── resume-writer.system.md # Existing pipeline prompt (unchanged)
+├── career-data.ts          # loadCareerData() — existing, unchanged
+├── config.ts               # PATHS, RESUME_FILE_BASE — existing, unchanged
+├── types.ts                # CareerData types — existing, unchanged
+└── ...
+
+app/
+├── api/
+│   └── chat/
+│       └── route.ts        # POST handler: mode switching, rate limiting, streaming
+└── ...
+```
 
 ---
 
 ## Implementation Steps
 
-### Step 1: Dependencies + Config
+### Step 1: Dependencies + Config — COMPLETE ✅
 
-**New dependencies:**
+**Installed dependencies:**
 
 ```bash
-npm install ai @ai-sdk/anthropic @ai-sdk/react @ai-sdk/gateway @upstash/ratelimit @vercel/kv
+npm install ai @ai-sdk/anthropic @ai-sdk/react @assistant-ui/react @assistant-ui/react-ai-sdk @assistant-ui/react-markdown @upstash/ratelimit @upstash/redis
 ```
 
-| Package              | Purpose                                                    |
-| -------------------- | ---------------------------------------------------------- |
-| `ai@^6.0`            | Vercel AI SDK 6 core (streamText, ToolLoopAgent, stopWhen) |
-| `@ai-sdk/anthropic`  | Claude provider (caching, thinking, built-in tools)        |
-| `@ai-sdk/react`      | React hooks (useChat) — installed here, used in Plan 2B    |
-| `@ai-sdk/gateway`    | Vercel AI Gateway provider                                 |
-| `@upstash/ratelimit` | Distributed rate limiting                                  |
-| `@vercel/kv`         | Serverless KV store for rate limit state                   |
+| Package              | Purpose                                                              |
+| -------------------- | -------------------------------------------------------------------- |
+| `ai@^6.0`            | Vercel AI SDK 6 core (streamText, convertToModelMessages, UIMessage) |
+| `@ai-sdk/anthropic`  | Claude provider                                                      |
+| `@ai-sdk/react`      | React hooks (used by assistant-ui transport layer)                   |
+| `@upstash/ratelimit` | Distributed rate limiting                                            |
+| `@upstash/redis`     | Redis client for rate limit state                                    |
 
-**Update `next.config.ts`:**
+> **Changed from original plan:** `@vercel/kv` → `@upstash/redis` (direct Upstash client, no Vercel KV wrapper needed). `@ai-sdk/gateway` deferred to Sprint 2+.
+
+**Updated `next.config.ts`:**
 
 ```typescript
 const nextConfig: NextConfig = {
-  // output: "export" — REMOVED for Phase 2 (API routes require server runtime)
-  // Resume page auto-detected as static by Next.js and pre-rendered at build time
+  // Phase 2: removed output: 'export' for API routes + dynamic rendering
+  // Resume page auto-detected as static by Next.js
 };
 ```
 
-**Update `tsconfig.json`** — add path aliases:
+### Step 2: Career Context Loader (`lib/agent/context.ts`) — COMPLETE ✅
 
-```jsonc
-{
-  "compilerOptions": {
-    "paths": {
-      "@paulprae/agent": ["./packages/agent/src/index.ts"],
-      "@paulprae/agent/*": ["./packages/agent/src/*"],
-      "@paulprae/career-data": ["./packages/career-data/src/index.ts"],
-      "@paulprae/career-data/*": ["./packages/career-data/src/*"],
-    },
-  },
-}
-```
+> **Changed from original plan:** Not extracted to `packages/career-data/` — lives in `lib/agent/context.ts`.
 
-**Create directory skeleton:**
+Loads and assembles all data needed for system prompts:
 
-```
-packages/agent/src/
-packages/agent/prompts/
-packages/agent/tests/
-packages/career-data/src/
-packages/career-data/tests/
-```
+- `career-data.json` — structured career data
+- 5 knowledge base files: `platform-constraints.json`, `message-templates.json`, `writing-formulas.json`, `audience-frameworks.json`, `communication-styles.json`
 
-**Verification:** `npm test` — all existing tests pass. `npm run build` — succeeds without `output: 'export'`.
+Key exports:
 
----
+- `loadCareerContext(): CareerContext` — loads all data, caches on first call
+- `buildSystemPrompt(mode: "chat" | "tools"): string` — reads markdown template, injects data via template placeholders
+- `stripEmpty(obj)` — removes null/empty fields to save tokens
 
-### Step 2: Extract Career Data Package (`packages/career-data/`)
+Template placeholders: `{{CAREER_DATA}}`, `{{AUDIENCE_FRAMEWORKS}}`, `{{PLATFORM_CONSTRAINTS}}`, `{{WRITING_FORMULAS}}`, `{{MESSAGE_TEMPLATES}}`, `{{COMMUNICATION_STYLES}}`
 
-Move shared types, config, and data loading into a reusable package.
+### Step 3: System Prompts — COMPLETE ✅
 
-| Source                                    | Target                               | Content                                                   |
-| ----------------------------------------- | ------------------------------------ | --------------------------------------------------------- |
-| `lib/types.ts` (CareerData types)         | `packages/career-data/src/types.ts`  | CareerData, CareerProfile, CareerPosition, KnowledgeEntry |
-| `lib/config.ts` (PATHS, RESUME_FILE_BASE) | `packages/career-data/src/config.ts` | File paths, resume naming                                 |
-| `lib/career-data.ts`                      | `packages/career-data/src/loader.ts` | `loadCareerData()`                                        |
+**`lib/prompts/career-chat.system.md`:**
 
-**Keep originals as re-exports** during migration (no breaking changes):
+- Role: Paul Prae's career assistant (third-person)
+- Grounding rules G1-G8 preserved from resume writer
+- Audience framework data injected via template
+- Career data embedded in prompt for caching
+
+**`lib/prompts/job-tools.system.md`:**
+
+- Role: Paul's job search content generator (first-person)
+- Platform constraints, writing formulas (STAR, AIDA, PAS, BAB), message templates injected
+- Content type instructions for cover letters, LinkedIn, emails, STAR answers, elevator pitches
+
+### Step 4: Chat API Route (`app/api/chat/route.ts`) — COMPLETE ✅
 
 ```typescript
-// lib/types.ts
-export * from "@paulprae/career-data/types";
-// ... plus remaining types not moved
-```
-
-**Tests:** Port relevant tests from `tests/config.test.ts` → `packages/career-data/tests/`.
-
-**Verification:** All existing imports resolve. All tests pass.
-
----
-
-### Step 3: Build Agent Core (`packages/agent/`)
-
-#### 3.1 Context Builder (`packages/agent/src/context.ts`)
-
-Extract from `scripts/generate-resume.ts`:
-
-- `stripEmpty()` — remove null/empty fields to save tokens
-- `loadCompanyData()` — load knowledge base company entries
-- `buildCareerDocuments()` — format career data as XML-tagged documents
-
-**Interface:**
-
-```typescript
-export interface CareerContext {
-  careerData: CareerData;
-  companyData: CompanyEntry[];
-  documentsXml: string;
-  estimatedTokens: number;
-}
-
-export function buildCareerContext(): CareerContext;
-```
-
-**Key design:** Career documents go in the system prompt (not user message) to enable prompt caching across multi-turn conversations.
-
-#### 3.2 Agent Prompts
-
-**`packages/agent/prompts/career-chat.system.md`:**
-
-- Role: Paul Prae's career assistant
-- Grounding: Only answer from provided career data. Cite specific positions/companies.
-- Tone: Professional, helpful, concise. Third-person about Paul.
-- Include contact info and resume download links.
-- Handle off-topic questions gracefully.
-
-**`packages/agent/prompts/resume-generator.system.md`:**
-
-- Adapted from existing `lib/prompts/resume-writer.system.md` (v2.0)
-- All 8 grounding rules (G1-G8) preserved
-- All 10 quality rules preserved
-- New: `<job_description_instructions>` section for tailoring to JDs
-- Few-shot examples from `resume-writer.few-shot.md`
-
-#### 3.3 Agent Definition (`packages/agent/src/career-agent.ts`)
-
-Use the **Vercel AI SDK 6 `ToolLoopAgent`** pattern:
-
-```typescript
-import { ToolLoopAgent, stepCountIs } from "ai";
+// Actual implementation pattern (simplified)
 import { anthropic } from "@ai-sdk/anthropic";
-
-export const chatAgent = new ToolLoopAgent({
-  model: anthropic("claude-sonnet-4-6"),
-  instructions: chatSystemPrompt,
-  tools: {
-    generate_resume: {
-      description: "Generate a custom resume tailored to a job description",
-      inputSchema: z.object({
-        jobDescription: z.string(),
-        emphasisAreas: z.array(z.string()).optional(),
-      }),
-      execute: async ({ jobDescription, emphasisAreas }) => {
-        // Calls Opus 4.6 for high-quality generation
-        return generateTailoredResume(jobDescription, emphasisAreas);
-      },
-    },
-    get_contact_info: {
-      description: "Get Paul's contact information",
-      inputSchema: z.object({}),
-      execute: async () => extractContactInfo(careerContext),
-    },
-  },
-  stopWhen: stepCountIs(5),
-});
-```
-
-**Model routing:** Chat uses Sonnet 4.6. The `generate_resume` tool internally calls Opus 4.6 via a separate `generateText()` call with structured outputs.
-
-**Prompt caching integration:**
-
-```typescript
-// System prompt with cached career data
-const systemBlocks = [
-  { type: "text" as const, text: agentPrompt },
-  {
-    type: "text" as const,
-    text: context.documentsXml,
-    providerOptions: {
-      anthropic: { cacheControl: { type: "ephemeral" } },
-    },
-  },
-];
-```
-
-#### 3.4 Resume Generation with Structured Outputs
-
-```typescript
-import { generateText } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
-
-export async function generateTailoredResume(jobDescription: string, emphasisAreas?: string[]) {
-  const result = await generateText({
-    model: anthropic("claude-opus-4-6"),
-    system: resumeSystemPrompt,
-    messages: [
-      {
-        role: "user",
-        content: buildResumeUserMessage(careerContext, jobDescription, emphasisAreas),
-      },
-    ],
-    providerOptions: {
-      anthropic: {
-        thinking: { type: "adaptive" },
-        cacheControl: { type: "ephemeral" },
-      },
-    },
-    maxOutputTokens: 8_192,
-  });
-
-  return {
-    markdown: result.text,
-    usage: result.usage,
-  };
-}
-```
-
-#### 3.5 Config (`lib/config.ts` additions)
-
-```typescript
-export const AGENT = {
-  chatModel: "claude-sonnet-4-6" as const,
-  resumeModel: "claude-opus-4-6" as const,
-  chatMaxTokens: 4_096,
-  resumeMaxTokens: 8_192,
-  maxAgentSteps: 5,
-  rateLimitPerMinute: 20,
-} as const;
-```
-
----
-
-### Step 4: API Routes
-
-#### 4.1 Chat Route (`app/api/chat/route.ts`)
-
-```typescript
-import { streamText, convertToModelMessages, UIMessage } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
-import { buildCareerContext } from "@paulprae/agent/context";
-import { loadPrompt } from "@/lib/prompts/loader";
-
-export const maxDuration = 60; // Vercel Fluid Compute timeout
-
-const context = buildCareerContext(); // Loaded once at cold start
-const chatPrompt = loadPrompt("career-chat");
+import { streamText, convertToModelMessages, type UIMessage } from "ai";
+import { buildSystemPrompt } from "../../../lib/agent/context";
 
 export async function POST(request: Request) {
-  // Rate limiting (see step 5)
-  const { messages }: { messages: UIMessage[] } = await request.json();
+  // Rate limiting (Upstash, graceful fallback when env vars not set)
+  const { messages, mode } = await request.json();
+  const systemPrompt = getSystemPrompt(mode === "tools" ? "tools" : "chat");
+  const modelMessages = await convertToModelMessages(messages);
 
   const result = streamText({
     model: anthropic("claude-sonnet-4-6"),
-    system: [
-      { type: "text", text: chatPrompt.content },
-      {
-        type: "text",
-        text: context.documentsXml,
-        providerOptions: {
-          anthropic: { cacheControl: { type: "ephemeral" } },
-        },
-      },
-    ],
-    messages: await convertToModelMessages(messages),
-    maxOutputTokens: 4_096,
+    system: systemPrompt,
+    messages: modelMessages,
+    maxOutputTokens: 4096,
+    temperature: 0.7,
   });
-
   return result.toUIMessageStreamResponse();
 }
 ```
 
-#### 4.2 Resume Route (`app/api/resume/route.ts`)
+**Key AI SDK 6 patterns used:**
+
+- `UIMessage[]` from client → `convertToModelMessages()` → model-compatible format
+- `streamText()` → `result.toUIMessageStreamResponse()` for SSE streaming
+- `maxOutputTokens` (not `maxTokens` — renamed in v6)
+
+### Step 5: Rate Limiting — COMPLETE ✅ (with graceful fallback)
+
+```typescript
+// Upstash rate limiting with fallback for local dev
+let ratelimit = null;
+async function initRateLimit() {
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    const { Ratelimit } = await import("@upstash/ratelimit");
+    const { Redis } = await import("@upstash/redis");
+    const redis = new Redis({ url: ..., token: ... });
+    return new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(20, "60 s") });
+  }
+  return { limit: async () => ({ success: true }) }; // Passthrough for local dev
+}
+```
+
+> **Changed from original plan:** Uses `@upstash/redis` directly instead of `@vercel/kv`. Graceful fallback when env vars not configured (returns `success: true`).
+
+---
+
+## Remaining Work (Sprint 2+)
+
+### Step 6: Agent Tools — NOT STARTED
+
+Add tools to the chat agent for enhanced interactions:
+
+```typescript
+const agentTools = {
+  generate_resume: {
+    /* Calls Opus 4.6 for tailored resume generation */
+  },
+  get_resume_links: {
+    /* Returns download URLs for PDF/DOCX/MD */
+  },
+  get_platform_constraints: {
+    /* Returns char limits for a given platform */
+  },
+};
+```
+
+These will use AI SDK 6's tool-calling pattern with `streamText({ tools: ... })`.
+
+### Step 7: Resume Generation Route (`app/api/resume/route.ts`) — NOT STARTED
 
 Separate route for long-running Opus generation:
 
@@ -365,71 +277,77 @@ export const maxDuration = 300; // 5 minutes for Opus generation
 
 export async function POST(request: Request) {
   const { jobDescription, emphasisAreas } = await request.json();
-  // ... call generateTailoredResume(), return streamed result
+  // Call Opus 4.6 with adaptive thinking
+  // Stream result back to client
 }
 ```
 
-#### 4.3 Rate Limiting (`packages/agent/src/rate-limit.ts`)
+### Step 8: AI Gateway Integration — NOT STARTED
 
-Production rate limiting with Upstash + Vercel KV:
+Replace direct `@ai-sdk/anthropic` calls with `@ai-sdk/gateway`:
 
 ```typescript
-import { Ratelimit } from "@upstash/ratelimit";
-import kv from "@vercel/kv";
-
-export const chatRateLimit = new Ratelimit({
-  redis: kv,
-  limiter: Ratelimit.slidingWindow(20, "60 s"),
-});
+import { createGateway } from "@ai-sdk/gateway";
+const gateway = createGateway({ apiKey: process.env.AI_GATEWAY_API_KEY });
+const chatModel = gateway("anthropic/claude-sonnet-4-6");
 ```
 
-Fallback: in-memory `Map<string, number[]>` for local development.
+### Step 9: Prompt Caching Optimization — NOT STARTED
+
+Current implementation passes system prompt as a single string. Optimize to use block-level caching:
+
+```typescript
+system: [
+  { type: "text", text: chatPrompt },
+  {
+    type: "text",
+    text: careerDataXml,
+    providerOptions: { anthropic: { cacheControl: { type: "ephemeral" } } },
+  },
+],
+```
+
+### Step 10: Tests — PARTIALLY COMPLETE
+
+| Test                                       | Status         |
+| ------------------------------------------ | -------------- |
+| Existing 315 tests                         | ✅ All pass    |
+| `lib/agent/context.ts` unit tests          | ❌ Not written |
+| API route tests (mode, rate limit, errors) | ❌ Not written |
+| System prompt loading tests                | ❌ Not written |
 
 ---
 
-### Step 5: Tests
+## Environment Variables
 
-| Test File                                   | Coverage                                                     |
-| ------------------------------------------- | ------------------------------------------------------------ |
-| `packages/agent/tests/context.test.ts`      | buildCareerContext(), buildCareerDocuments(), stripEmpty()   |
-| `packages/agent/tests/career-agent.test.ts` | Agent definition, tool schemas, model routing                |
-| `packages/career-data/tests/loader.test.ts` | loadCareerData(), config paths                               |
-| `tests/agent-api.test.ts`                   | API routes: POST/GET methods, rate limiting, response format |
+| Variable                   | Where                 | Purpose                         | Status                        |
+| -------------------------- | --------------------- | ------------------------------- | ----------------------------- |
+| `ANTHROPIC_API_KEY`        | `.env.local` + Vercel | Claude API access               | Required for live testing     |
+| `AI_GATEWAY_API_KEY`       | Vercel only           | Vercel AI Gateway (optional)    | Sprint 2+                     |
+| `UPSTASH_REDIS_REST_URL`   | Vercel only           | Upstash Redis for rate limiting | Sprint 2+ (graceful fallback) |
+| `UPSTASH_REDIS_REST_TOKEN` | Vercel only           | Upstash Redis auth              | Sprint 2+ (graceful fallback) |
 
-**Verification:** All existing tests pass. New tests pass. `npm run build` succeeds.
-
----
-
-## Environment Variables (New)
-
-| Variable             | Where                 | Purpose                                              |
-| -------------------- | --------------------- | ---------------------------------------------------- |
-| `ANTHROPIC_API_KEY`  | `.env.local` + Vercel | Claude API access                                    |
-| `AI_GATEWAY_API_KEY` | Vercel only           | Vercel AI Gateway (optional, enhances observability) |
-| `KV_REST_API_URL`    | Vercel only           | Upstash KV for rate limiting                         |
-| `KV_REST_API_TOKEN`  | Vercel only           | Upstash KV auth                                      |
+> **Changed from original plan:** Env vars are `UPSTASH_REDIS_REST_*` (not `KV_REST_API_*`).
 
 ---
 
 ## Risk Mitigation
 
-| Risk                                      | Impact | Mitigation                                                                                           |
-| ----------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------- |
-| Removing `output: 'export'` breaks Vercel | High   | Resume page auto-detected as static by Next.js. Verify with `npm run build` + Vercel preview deploy. |
-| Career context exceeds token limits       | Low    | `stripEmpty()` compresses to ~90K tokens. Well within 200K standard window.                          |
-| Cost explosion from chat abuse            | Medium | Rate limit 20 req/min/IP. Sonnet pricing ($3/$15). Prompt caching (10x cheaper after turn 1).        |
-| Existing pipeline breaks                  | High   | Scripts NOT modified — agent extracts (copies) functions. Pipeline works independently.              |
+| Risk                                      | Impact | Mitigation                                                     |
+| ----------------------------------------- | ------ | -------------------------------------------------------------- |
+| Removing `output: 'export'` breaks Vercel | High   | ✅ Verified: `npm run build` succeeds, routes present          |
+| Career context exceeds token limits       | Low    | `stripEmpty()` compresses data. Well within 200K window.       |
+| Cost explosion from chat abuse            | Medium | Rate limit 20 req/min/IP. Graceful fallback for local dev.     |
+| Existing pipeline breaks                  | High   | ✅ Verified: pipeline scripts NOT modified, all 315 tests pass |
 
 ---
 
 ## What This Plan Does NOT Cover
 
-- Chat UI components (Plan 2B)
-- Navigation changes (Plan 2B)
+- Chat UI components (Plan 2B — Sprint 1 COMPLETE)
+- Navigation changes (Plan 2B — Sprint 1 COMPLETE)
 - CI/CD workflow updates (Plan 2C)
 - Vercel config changes (Plan 2C)
 - CLAUDE.md / README / TDD updates (Plan 2C)
-- Modal deployment (dropped entirely)
-- Database-backed RAG (Phase 3 — current career data fits in prompt cache; Supabase + pgvector deferred)
-- Vercel MCP Servers for agent tool access (Phase 3)
-- Background ingest via Vercel Cron (Phase 3)
+- Database-backed RAG (Phase 3 — career data fits in prompt cache)
+- Supabase Auth for tools mode gating (Phase 3)

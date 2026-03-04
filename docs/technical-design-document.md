@@ -46,31 +46,34 @@ Deliver a fast, shareable professional site at `https://paulprae.com` that prese
 - Generated resume markdown is an artifact; source-of-truth logic is in generation scripts.
 - Recruiter-facing data is versioned in git; raw LinkedIn exports remain local/gitignored.
 
-## 3. Phase 2 Architecture (Planned)
+## 3. Phase 2 Architecture (In Progress)
 
-Phase 2 transforms the static site into an interactive career platform with an AI chat interface. The architecture adds server-side capabilities while preserving the existing resume pipeline.
+> **Implementation status:** Sprint 1 complete on `feat/phase2-implementation` branch. See `docs/phase2-redesign-plan.md` for the authoritative redesign plan with user stories, QA strategy, and sprint breakdown.
+
+Phase 2 transforms the static site into an interactive career platform with a chat-first homepage and job search tools. The architecture adds server-side capabilities while preserving the existing resume pipeline.
 
 ### 3.1 Runtime model
 
 - **Frontend:** Next.js App Router with mixed static/dynamic rendering
-- **Resume page (`/`):** Statically pre-rendered at build time (unchanged behavior)
-- **Chat page (`/chat`):** Server component with client-side chat interface
+- **Chat homepage (`/`):** Client component with `@assistant-ui/react` chat interface
+- **Resume page (`/resume`):** Statically pre-rendered at build time (extracted from Phase 1 homepage)
 - **API routes:** Next.js API routes on Vercel Fluid Compute
-- **AI runtime:** Vercel AI SDK 6 calling Anthropic's API directly
+- **AI runtime:** Vercel AI SDK 6 calling Anthropic's API via `@ai-sdk/anthropic`
 - **Hosting:** Vercel Pro with Fluid Compute (server-rendered Next.js)
 
 ### 3.2 Core stack (Phase 2 additions)
 
-| Layer           | Technology                          | Purpose                           |
-| --------------- | ----------------------------------- | --------------------------------- |
-| AI SDK          | Vercel AI SDK 6 (`ai@^6.0`)         | streamText, ToolLoopAgent, SSE    |
-| Claude provider | `@ai-sdk/anthropic`                 | Prompt caching, extended thinking |
-| Chat hooks      | `@ai-sdk/react`                     | useChat v6 (sendMessage, parts)   |
-| AI Gateway      | `@ai-sdk/gateway`                   | Unified routing, observability    |
-| Rate limiting   | `@upstash/ratelimit` + `@vercel/kv` | Distributed rate limiting         |
-| Chat model      | Claude Sonnet 4.6                   | Fast Q&A ($3/$15 per MTok)        |
-| Resume model    | Claude Opus 4.6                     | Quality generation ($5/$25)       |
-| Compute         | Vercel Fluid Compute (Pro)          | Up to 800s function duration      |
+| Layer           | Technology                              | Purpose                                           |
+| --------------- | --------------------------------------- | ------------------------------------------------- |
+| AI SDK          | Vercel AI SDK 6 (`ai@^6.0`)             | streamText, convertToModelMessages, UIMessage     |
+| Claude provider | `@ai-sdk/anthropic`                     | Prompt caching, extended thinking                 |
+| Chat UI         | `@assistant-ui/react` + `react-ai-sdk`  | Radix-primitive chat components, AI SDK transport |
+| Markdown        | `@assistant-ui/react-markdown`          | Rich markdown rendering in chat messages          |
+| AI Gateway      | `@ai-sdk/gateway` (Sprint 2+)           | Unified routing, observability                    |
+| Rate limiting   | `@upstash/ratelimit` + `@upstash/redis` | Distributed rate limiting                         |
+| Chat model      | Claude Sonnet 4.6                       | Fast Q&A ($3/$15 per MTok)                        |
+| Resume model    | Claude Opus 4.6                         | Quality generation ($5/$25)                       |
+| Compute         | Vercel Fluid Compute (Pro)              | Up to 800s function duration                      |
 
 ### 3.3 Why NOT Modal
 
@@ -92,18 +95,23 @@ Vercel Fluid Compute handles the entire workload:
 ```
 Browser
   │
-  ├── GET /  ─────────────────→ Static pre-render (Vercel CDN, instant)
+  ├── GET /  ─────────────────→ Chat homepage (client component, @assistant-ui/react)
+  │     │                        useChatRuntime → AssistantChatTransport → /api/chat
+  │     └── Two modes: "Ask About Paul" (chat) / "Job Search Tools" (tools)
+  │
+  ├── GET /resume  ───────────→ Static pre-render (Vercel CDN, instant)
   │
   ├── POST /api/chat  ────────→ Fluid Compute function (maxDuration: 60)
   │     │                        Model: claude-sonnet-4-6
-  │     │                        Pattern: streamText → SSE → useChat
-  │     └── Career data in system prompt with prompt caching
+  │     │                        Pattern: streamText → toUIMessageStreamResponse → SSE
+  │     │                        Mode param switches system prompt (chat vs tools)
+  │     └── Career data + knowledge base in system prompt with prompt caching
   │         (90K tokens cached, 10x cheaper after first turn)
   │
-  └── POST /api/resume  ──────→ Fluid Compute function (maxDuration: 300)
+  └── POST /api/resume  ──────→ Fluid Compute function (maxDuration: 300) [Sprint 2+]
         │                        Model: claude-opus-4-6
         │                        Pattern: generateText with adaptive thinking
-        └── Structured outputs for validated resume JSON
+        └── Tailored resume generation from job descriptions
 ```
 
 ### 3.5 Prompt caching strategy
@@ -137,65 +145,92 @@ Career data (~90K tokens after `stripEmpty()` compression) is placed in the syst
 **Server (API route):**
 
 ```typescript
-import { streamText, convertToModelMessages } from "ai";
+import { streamText, convertToModelMessages, type UIMessage } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
+import { buildSystemPrompt } from "../../../lib/agent/context";
+
+const body = (await request.json()) as { messages: UIMessage[]; mode?: "chat" | "tools" };
+const systemPrompt = buildSystemPrompt(body.mode === "tools" ? "tools" : "chat");
+const modelMessages = await convertToModelMessages(body.messages);
 
 const result = streamText({
   model: anthropic("claude-sonnet-4-6"),
-  system: [
-    { type: "text", text: chatPrompt },
-    {
-      type: "text",
-      text: careerDataXml,
-      providerOptions: { anthropic: { cacheControl: { type: "ephemeral" } } },
-    },
-  ],
-  messages: await convertToModelMessages(messages),
+  system: systemPrompt,
+  messages: modelMessages,
+  maxOutputTokens: 4096, // Note: renamed from maxTokens in AI SDK 6
 });
 
-return result.toUIMessageStreamResponse();
+return result.toUIMessageStreamResponse(); // Note: renamed from toDataStreamResponse in AI SDK 6
 ```
 
-**Client (React):**
+**Client (React — using @assistant-ui/react):**
 
 ```typescript
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
+import { AssistantRuntimeProvider } from "@assistant-ui/react";
+import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
+import { ThreadPrimitive, MessagePrimitive, ComposerPrimitive } from "@assistant-ui/react";
 
-const { messages, sendMessage, status } = useChat({
-  transport: new DefaultChatTransport({ api: "/api/chat" }),
-});
-// Messages expose .parts[] (text, reasoning, tool-invocation, source-url)
+// Create transport with mode parameter
+const transport = useMemo(
+  () => new AssistantChatTransport({ api: "/api/chat", body: { mode } }),
+  [mode],
+);
+const runtime = useChatRuntime({ transport });
+
+// Render with Radix-style primitives
+<AssistantRuntimeProvider runtime={runtime}>
+  <ThreadPrimitive.Root>
+    <ThreadPrimitive.Viewport>
+      <ThreadPrimitive.Messages components={{ UserMessage, AssistantMessage }} />
+    </ThreadPrimitive.Viewport>
+  </ThreadPrimitive.Root>
+</AssistantRuntimeProvider>
 ```
 
-### 3.9 Package organization
+### 3.9 File organization (Phase 2 additions)
+
+> **Note:** The original plan referenced a `packages/` monorepo structure. The actual implementation uses a flat `lib/` structure — simpler, no path aliases or npm workspaces needed.
 
 ```
-packages/
-├── agent/                    # Career agent core
-│   ├── src/
-│   │   ├── career-agent.ts   # ToolLoopAgent definition
-│   │   ├── context.ts        # Career context builder (extracted from generate-resume.ts)
-│   │   ├── tools.ts          # Agent tool definitions (generate_resume, get_contact_info)
-│   │   ├── rate-limit.ts     # Upstash rate limiting
-│   │   └── index.ts
-│   ├── prompts/
-│   │   ├── career-chat.system.md
-│   │   └── resume-generator.system.md
-│   └── tests/
-│
-└── career-data/              # Shared types + loaders
-    ├── src/
-    │   ├── types.ts           # CareerData, CareerProfile, etc.
-    │   ├── loader.ts          # loadCareerData()
-    │   ├── config.ts          # PATHS, RESUME_FILE_BASE
-    │   └── index.ts
-    └── tests/
+lib/
+├── agent/
+│   └── context.ts              # buildCareerContext(), buildSystemPrompt(), stripEmpty()
+├── prompts/
+│   ├── career-chat.system.md   # Recruiter Q&A prompt (grounding rules G1-G8)
+│   ├── job-tools.system.md     # Content generation prompt (STAR, AIDA, PAS, BAB)
+│   └── resume-writer.system.md # Existing pipeline prompt (unchanged)
+├── career-data.ts              # loadCareerData() — existing, unchanged
+├── config.ts                   # PATHS, RESUME_FILE_BASE — existing, unchanged
+└── types.ts                    # CareerData types — existing, unchanged
+
+app/
+├── page.tsx                    # Chat homepage (imports ChatHome)
+├── resume/
+│   ├── page.tsx                # Resume page (extracted from Phase 1 homepage)
+│   └── components/
+│       ├── SectionNav.tsx      # Section navigation bar
+│       └── BackToTop.tsx       # Back-to-top button
+├── components/
+│   ├── ChatHome.tsx            # Main chat client component ("use client")
+│   ├── ModeToggle.tsx          # Ask About Paul / Job Tools toggle
+│   └── QuickActions.tsx        # Mode-specific action chips
+├── api/chat/route.ts           # POST handler: mode switching, rate limiting, streaming
+└── layout.tsx                  # Updated metadata for multi-page site
 ```
 
-Packages use TypeScript path aliases (`@paulprae/agent`, `@paulprae/career-data`), not npm workspaces. Imports resolve directly to source files. No publish step needed.
+Existing `lib/` files (types, config, career-data) are unchanged — the agent context loader imports from them directly.
 
-### 3.10 Security model
+### 3.10 Rate limiting: why Upstash Redis
+
+Rate limiting uses `@upstash/redis` + `@upstash/ratelimit` (sliding window, 20 req/min/IP). This was chosen over alternatives:
+
+- **`@vercel/kv`** — deprecated/sunset in 2025, no longer available
+- **Supabase PostgreSQL** — read replicas can't write counters, no edge compatibility, no library. Supabase's own docs recommend Upstash for this use case
+- **In-memory** — not shared across serverless instances; used only as dev fallback
+
+Provider strategy: **Vercel** (hosting) + **Supabase** (database + auth + pgvector) + **Upstash** (rate limiting only). Upstash Vector is NOT used — pgvector handles vector search in Phase 3.
+
+### 3.11 Security model
 
 - API routes are server-side only — `ANTHROPIC_API_KEY` never exposed to client
 - Rate limiting: 20 requests/minute per IP via Upstash (distributed, works across Vercel regions)
@@ -263,13 +298,13 @@ Supporting commands:
 
 ### 6.4 Phase 2 deployment changes
 
-| Aspect                | Phase 1               | Phase 2                                                      |
-| --------------------- | --------------------- | ------------------------------------------------------------ |
-| Vercel framework      | `null` (static files) | Auto-detected Next.js                                        |
-| Output directory      | `out/`                | `.next/` (managed by Vercel)                                 |
-| Build output          | Static HTML only      | Static pages + serverless functions                          |
-| Environment variables | None on Vercel        | `ANTHROPIC_API_KEY`, `KV_*`, optionally `AI_GATEWAY_API_KEY` |
-| Compute               | CDN only              | CDN + Fluid Compute (Pro plan)                               |
+| Aspect                | Phase 1               | Phase 2                                                                      |
+| --------------------- | --------------------- | ---------------------------------------------------------------------------- |
+| Vercel framework      | `null` (static files) | Auto-detected Next.js                                                        |
+| Output directory      | `out/`                | `.next/` (managed by Vercel)                                                 |
+| Build output          | Static HTML only      | Static pages + serverless functions                                          |
+| Environment variables | None on Vercel        | `ANTHROPIC_API_KEY`, `UPSTASH_REDIS_REST_*`, optionally `AI_GATEWAY_API_KEY` |
+| Compute               | CDN only              | CDN + Fluid Compute (Pro plan)                                               |
 
 ## 7. Quality Strategy
 
@@ -293,20 +328,25 @@ Supporting commands:
 
 AI-generated static resume: LinkedIn data + knowledge base → Claude → Markdown → Next.js static site → Vercel CDN.
 
-### Phase 2 (Planned — see §3)
+### Phase 2 (In Progress — see §3)
 
-Interactive career platform:
+Interactive career platform with chat-first homepage:
 
-- AI chat interface for recruiters (Sonnet 4.6, streaming)
-- Tailored resume generation from job descriptions (Opus 4.6)
-- Vercel AI SDK 6 with prompt caching
+- Chat homepage (`/`) with two modes: "Ask About Paul" (recruiter Q&A) and "Job Search Tools" (content generation)
+- Resume page (`/resume`) — extracted from Phase 1 homepage
+- AI chat via `@assistant-ui/react` primitives with AI SDK 6 transport
+- Tailored resume generation from job descriptions (Opus 4.6) — Sprint 2+
+- Vercel AI SDK 6 with streaming (`toUIMessageStreamResponse`)
 - Vercel Fluid Compute for serverless AI functions
 
+**Sprint 1 complete** on `feat/phase2-implementation` branch (builds, 315 tests pass).
 Implementation tracked in `.claude/plans/phase2a-backend-agent-api.md`, `phase2b-frontend-chat.md`, `phase2c-devops-docs.md`.
+Authoritative redesign plan: `docs/phase2-redesign-plan.md`.
 
 ### Phase 3 (Future)
 
-- Supabase PostgreSQL + pgvector for career data embeddings and database-backed RAG
+- Supabase PostgreSQL + pgvector/pgvectorscale for career data embeddings and database-backed RAG (NOT Upstash Vector — data co-location, no sync needed, pgvectorscale benchmarks show 28x lower p95 latency vs Pinecone)
+- Supabase Auth for admin-gated tools mode (optional)
 - Neo4j AuraDB knowledge graph (Person → Role → Company → Project → Skill → Outcome)
 - Claude Agent SDK for autonomous multi-step reasoning agents
 - Vercel MCP Servers for agent tool access (DB queries, vector search, external APIs)
@@ -327,7 +367,7 @@ Implementation tracked in `.claude/plans/phase2a-backend-agent-api.md`, `phase2b
 - No database (career data loaded from committed files, not a DB)
 - No separate backend platform (no Modal, no AWS Lambda — Vercel handles everything)
 - No user authentication (chat is public, no login required)
-- No component library (Tailwind CSS only, hand-built components)
+- No component library beyond `@assistant-ui/react` (Tailwind CSS for all custom styling)
 
 ## 10. References
 

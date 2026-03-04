@@ -1,273 +1,260 @@
-# Plan 2B: Frontend — Chat Interface + Navigation
+# Plan 2B: Frontend — Chat-First Homepage + Resume Route
 
+> **Status:** Sprint 1 COMPLETE on `feat/phase2-implementation`. Sprint 2+ remaining.
 > **Sequence:** Plan 2A (backend) → Plan 2B (this) → Plan 2C (devops)
-> **Branch:** `feat/phase2b-frontend` from `feat/phase2a-backend` (or `main` after 2A merges)
-> **Depends on:** Plan 2A (API routes must exist at `/api/chat` and `/api/resume`)
+> **Branch:** `feat/phase2-implementation` (combined 2A+2B Sprint 1 work)
+> **Depends on:** Plan 2A (API routes must exist at `/api/chat`)
 > **Blocks:** Plan 2C (devops needs to know all routes for CSP/CI updates)
-> **Human steps:** See `human-steps-phase2.md` Step 4 (v0 prototyping — optional, can run in parallel)
+> **Authoritative redesign plan:** `docs/phase2-redesign-plan.md` (merged plan with full user stories, QA strategy)
 
 ### Claude Code Execution Notes
 
 This plan is optimized for autonomous execution by Claude Code:
 
 ```
-"Execute Plan 2B: create feat/phase2b-frontend branch, build chat page components,
-add navigation, add styling, add tests. Commit after each step."
+"Continue Phase 2 frontend work on feat/phase2-implementation branch. Read docs/phase2-redesign-plan.md
+for full context including user stories. Sprint 1 frontend is complete — focus on Sprint 2+ items:
+welcome message, platform-aware copy, character count, /api/resume integration."
 ```
 
-- If v0 has already generated a scaffold PR, start from that branch and refine
-- All component code uses AI SDK 6 APIs (`sendMessage`, `status`, `parts[]`)
-- Test with `npm run dev` after building components — verify `/chat` renders
-- Mock the transport layer in tests, don't hit real API routes
+- The feature branch builds, 315 tests pass, lint clean
+- All components use `@assistant-ui/react` primitives (NOT pre-built `<Thread />`)
+- Test with `npm run dev` — verify `/` renders chat, `/resume` renders resume
+- Mock the transport layer in component tests
 
 ---
 
 ## Objective
 
-Build the recruiter-facing chat interface at `/chat` using Vercel AI SDK 6's `useChat` hook. Add navigation between the resume page and chat page. All styling via Tailwind CSS per project convention.
+Build a chat-first homepage at `/` using `@assistant-ui/react` primitives, move the resume to `/resume`, and add bidirectional navigation. Two modes: "Ask About Paul" (recruiter Q&A) and "Job Search Tools" (content generation).
 
 ---
 
 ## Architecture Decisions
 
-### AI SDK 6 `useChat` (v6 API)
+### @assistant-ui/react (NOT hand-rolled)
 
-The `useChat` hook in `@ai-sdk/react` v6 has breaking changes from v4:
+> **Changed from original plan:** The original Plan 2B specified hand-rolled chat UI with `useChat` from `@ai-sdk/react`. The redesign uses `@assistant-ui/react` — a Radix-primitive-based chat component library that integrates natively with AI SDK 6.
 
-| v4 (old plan)                                 | v6 (this plan)                                                         |
-| --------------------------------------------- | ---------------------------------------------------------------------- |
-| `append(message)`                             | `sendMessage({ text })`                                                |
-| `input` / `handleInputChange` managed by hook | `useState` managed by component                                        |
-| `isLoading` boolean                           | `status: 'submitted' \| 'streaming' \| 'ready' \| 'error'`             |
-| `message.content` string                      | `message.parts[]` array (text, reasoning, tool-invocation, source-url) |
-| `maxSteps` on client                          | `stopWhen` on server (Plan 2A)                                         |
-| implicit transport                            | `transport: new DefaultChatTransport({ api })`                         |
+**Why the change:**
 
-### Message Parts Rendering
+- Handles streaming, markdown, code blocks, auto-scroll, copy, retry — all built-in
+- Radix-primitive architecture allows deep customization without fighting the library
+- `@assistant-ui/react-ai-sdk` provides `useChatRuntime` that wraps AI SDK transport
+- MIT licensed, actively maintained, has explicit AI SDK v6 examples
+- Works with existing Tailwind — no shadcn/ui initialization needed
 
-Each `UIMessage` carries a `.parts` array. The UI must render each part type:
+**Key implementation detail:** The library exposes primitives (ThreadPrimitive, MessagePrimitive, ComposerPrimitive, ActionBarPrimitive), NOT a pre-built `<Thread />` component. The implementation builds custom UI from these primitives.
 
-- `text` — markdown content (use `react-markdown`)
-- `reasoning` — collapsible thinking block (for Opus resume generation)
-- `tool-invocation` — show tool call in progress
-- `tool-result` — show tool output
-- `source-url` — clickable citation link
+### Route Restructuring
 
-### No Component Library
+> **Changed from original plan:** Original Plan 2B put chat at `/chat`. The redesign makes chat the homepage (`/`) and moves resume to `/resume`.
 
-Per CLAUDE.md: no shadcn/ui for Phase 1/2. All components are hand-built with Tailwind CSS. This keeps the dependency count minimal and the code portfolio-worthy — the open-source code is part of the career portfolio.
+| Route      | Content                               | Rendering                            |
+| ---------- | ------------------------------------- | ------------------------------------ |
+| `/` (home) | Chat interface with mode toggle       | Dynamic (client component)           |
+| `/resume`  | Full resume (moved from original `/`) | Static pre-render (server component) |
 
-### Development Workflow: v0 for Rapid Prototyping
+### Two Modes on Homepage
 
-[v0](https://v0.app) can accelerate chat UI development as a complementary tool alongside Claude Code and Cursor:
+| Mode               | Audience             | System Prompt            | Default    |
+| ------------------ | -------------------- | ------------------------ | ---------- |
+| "Ask About Paul"   | Recruiters, visitors | Third-person career Q&A  | Yes        |
+| "Job Search Tools" | Paul (site owner)    | First-person content gen | Via toggle |
 
-- Use v0 to rapidly prototype chat layouts, message bubble designs, and mobile-responsive patterns
-- Generate Tailwind CSS + React component scaffolds, then refine in the IDE
-- v0 integrates with the Vercel deploy pipeline for instant preview deploys during iteration
-- Not a dependency — purely a workflow accelerator for UI/UX iteration
+No authentication needed — tools mode is a simple toggle.
 
-**Pattern:** Prototype in v0 → export to repo → refine with Claude Code/Cursor → deploy.
+---
 
-### Dedicated Page (Not Floating Widget)
+## File Structure (Actual Implementation)
 
-The chat lives at `/chat` as a full-page experience. Recruiters arrive from a CTA on the resume page. This gives maximum screen real estate for conversation and resume preview.
+```
+app/
+├── page.tsx                           # Chat homepage (imports ChatHome)
+├── resume/
+│   ├── page.tsx                       # Resume page (extracted from old page.tsx)
+│   └── components/
+│       ├── SectionNav.tsx             # Section navigation bar
+│       └── BackToTop.tsx              # Back-to-top button
+├── components/
+│   ├── ChatHome.tsx                   # Main chat client component ("use client")
+│   ├── ModeToggle.tsx                 # Ask About Paul / Job Tools toggle
+│   └── QuickActions.tsx               # Mode-specific action chips
+├── api/chat/route.ts                  # Chat API (see Plan 2A)
+└── layout.tsx                         # Updated metadata for multi-page site
+```
 
 ---
 
 ## Implementation Steps
 
-### Step 1: Chat Page Server Component (`app/chat/page.tsx`)
+### Step 1: Route Restructure — COMPLETE ✅
+
+**`app/resume/page.tsx`** — Full extraction of original `app/page.tsx`:
+
+- Same server component pattern (reads markdown at build time)
+- Has own `Metadata` export for `/resume`
+- Imports SectionNav and BackToTop from `app/resume/components/`
+- Added "Chat with AI" navigation link in header (with chat icon SVG)
+
+**`app/page.tsx`** — New chat homepage:
 
 ```typescript
 import type { Metadata } from "next";
-import ChatInterface from "./components/ChatInterface";
+import ChatHome from "./components/ChatHome";
 
 export const metadata: Metadata = {
-  title: "Chat with Paul's AI Assistant | paulprae.com",
-  description: "Ask questions about Paul Prae's experience, skills, and career history.",
+  title: "Paul Prae — AI Career Assistant | paulprae.com",
+  description: "Chat with an AI assistant about Paul Prae's career...",
 };
 
-export default function ChatPage() {
-  return (
-    <main className="mx-auto max-w-3xl px-4 py-8">
-      <ChatInterface />
-    </main>
-  );
+export default function Home() {
+  return <ChatHome />;
 }
 ```
 
-### Step 2: Chat Client Components
+### Step 2: Chat Client Component (`app/components/ChatHome.tsx`) — COMPLETE ✅
 
-```
-app/chat/
-  page.tsx                    # Server component (metadata)
-  components/
-    ChatInterface.tsx         # "use client" — useChat hook, mode state
-    MessageList.tsx           # Message rendering with parts
-    MessageBubble.tsx         # Individual message with part-type rendering
-    ChatInput.tsx             # Auto-resizing textarea
-    ModeSelector.tsx          # "Ask about Paul" / "Generate Resume" tabs
-```
-
-#### ChatInterface.tsx (main client component)
+Uses `@assistant-ui/react` primitives (not pre-built Thread):
 
 ```typescript
 "use client";
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
-import { useState } from "react";
+import { AssistantRuntimeProvider } from "@assistant-ui/react";
+import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
+import { AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
+import { ThreadPrimitive, MessagePrimitive, ComposerPrimitive, ActionBarPrimitive } from "@assistant-ui/react";
+import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
 
-export default function ChatInterface() {
-  const [mode, setMode] = useState<"chat" | "resume">("chat");
-  const [input, setInput] = useState("");
+export default function ChatHome() {
+  const [mode, setMode] = useState<"chat" | "tools">("chat");
 
-  const { messages, sendMessage, status, stop, error } = useChat({
-    transport: new DefaultChatTransport({
-      api: mode === "resume" ? "/api/resume" : "/api/chat",
-    }),
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || status !== "ready") return;
-    sendMessage({ text: input });
-    setInput("");
-  };
+  const transport = useMemo(
+    () => new AssistantChatTransport({ api: "/api/chat", body: { mode } }),
+    [mode],
+  );
+  const runtime = useChatRuntime({ transport });
 
   return (
-    <div className="flex h-[calc(100vh-200px)] flex-col">
-      <ModeSelector mode={mode} onModeChange={setMode} />
-      <MessageList messages={messages} status={status} />
-      {error && <ErrorBanner error={error} />}
-      <ChatInput
-        input={input}
-        onChange={setInput}
-        onSubmit={handleSubmit}
-        isDisabled={status !== "ready"}
-        mode={mode}
-      />
-    </div>
+    <AssistantRuntimeProvider runtime={runtime}>
+      {/* Header with mode toggle, View Resume link, PDF download */}
+      <ThreadPrimitive.Root>
+        <ThreadPrimitive.Viewport>
+          <ThreadPrimitive.Empty>{/* Welcome state + QuickActions */}</ThreadPrimitive.Empty>
+          <ThreadPrimitive.Messages components={{ UserMessage, AssistantMessage }} />
+          <ThreadPrimitive.ViewportFooter>
+            <ThreadPrimitive.ScrollToBottom />
+            <ChatComposer />
+          </ThreadPrimitive.ViewportFooter>
+        </ThreadPrimitive.Viewport>
+      </ThreadPrimitive.Root>
+    </AssistantRuntimeProvider>
   );
 }
 ```
 
-#### MessageBubble.tsx (part-aware rendering)
+**Key API patterns discovered during implementation:**
+
+- `useChatRuntime` takes `{ transport }`, NOT `{ api, body }` directly
+- Must create `AssistantChatTransport` explicitly with `{ api, body }` and pass as transport
+- `useMemo` on transport, keyed on `mode`, so it recreates when mode changes
+- `MarkdownTextPrimitive` has different props than `TextMessagePartComponent` — requires a wrapper function
+
+### Step 3: Mode Toggle (`app/components/ModeToggle.tsx`) — COMPLETE ✅
+
+Tab-style toggle with `role="tablist"` accessibility:
+
+- "Ask About Paul" tab (default)
+- "Job Tools" tab
+
+### Step 4: Quick Actions (`app/components/QuickActions.tsx`) — COMPLETE ✅
+
+Mode-specific action chips:
+
+**Chat mode (4 chips):** "What does Paul do?", "AI/ML experience", "Healthcare work", "Download resume"
+
+**Tools mode (8 chips):** Cover Letter, LinkedIn Connection, LinkedIn InMail, Email Intro, Thank You Note, Follow-Up, STAR Answer, Elevator Pitch
+
+### Step 5: Navigation — COMPLETE ✅
+
+| From               | To                 | Element                                               |
+| ------------------ | ------------------ | ----------------------------------------------------- |
+| Homepage (`/`)     | Resume (`/resume`) | "View Resume →" link in chat header                   |
+| Homepage (`/`)     | Resume PDF         | "PDF ↓" download button in chat header                |
+| Resume (`/resume`) | Homepage (`/`)     | "Chat with AI ←" link with chat icon in resume header |
+
+### Step 6: Layout Metadata (`app/layout.tsx`) — COMPLETE ✅
 
 ```typescript
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-
-function MessageBubble({ message }: { message: UIMessage }) {
-  return (
-    <div className={message.role === "user" ? "chat-message-user" : "chat-message-assistant"}>
-      {message.parts.map((part, i) => {
-        switch (part.type) {
-          case "text":
-            return <ReactMarkdown key={i} remarkPlugins={[remarkGfm]}>{part.text}</ReactMarkdown>;
-          case "reasoning":
-            return (
-              <details key={i} className="text-sm text-slate-500">
-                <summary>Thinking...</summary>
-                <pre className="whitespace-pre-wrap">{part.text}</pre>
-              </details>
-            );
-          case "tool-invocation":
-            return <ToolCallIndicator key={i} toolName={part.toolName} />;
-          case "source-url":
-            return <Citation key={i} url={part.url} title={part.title} />;
-          default:
-            return null;
-        }
-      })}
-    </div>
-  );
-}
+title: { default: "Paul Prae — AI Career Assistant | paulprae.com", template: "%s | paulprae.com" },
+description: "Chat with an AI assistant about Paul Prae's career...",
 ```
-
-### Step 3: Styling
-
-All Tailwind CSS. Add chat-specific utilities to `app/globals.css`:
-
-```css
-/* Chat message bubbles */
-.chat-message-user {
-  @apply rounded-2xl bg-blue-50 px-4 py-3 dark:bg-blue-950;
-}
-.chat-message-assistant {
-  @apply rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-900;
-}
-```
-
-Design principles:
-
-- Clean, minimal UI that showcases the AI conversation quality
-- Responsive (mobile-first) — recruiters may view on phones
-- Dark mode support via Tailwind's `dark:` variants
-- Streaming indicator (pulsing dot or typing animation)
-- Auto-scroll to latest message
-
-### Step 4: Navigation
-
-Add bidirectional navigation between resume and chat:
-
-**Resume page (`app/page.tsx`):**
-
-- Add "Chat with AI" CTA button/link in the header alongside Email/LinkedIn/GitHub
-- Style as a prominent action (not just another link) — this is the portfolio differentiator
-
-**Chat page header:**
-
-- "Back to Resume" link
-- Paul's name/title as heading
-- Brief description: "Ask me anything about Paul's career"
-
-**Root layout (`app/layout.tsx`):**
-
-- Update metadata for multi-page site
-- Add consistent nav bar if needed (or keep page-specific headers)
-
-### Step 5: Chat UX Polish
-
-- **Welcome message:** Pre-populated assistant message with suggested questions:
-  - "What is Paul's experience with AI/ML?"
-  - "Tell me about his healthcare work"
-  - "What programming languages does he use?"
-- **Resume mode UX:** When in "Generate Resume" mode, show a textarea for pasting a job description instead of a chat input
-- **Streaming indicator:** Animated dots or cursor while `status === 'streaming'`
-- **Error handling:** Retry button on error, rate limit message when 429'd
-- **Mobile:** Full-screen chat on small screens, keyboard-aware input positioning
 
 ---
 
-## Tests
+## Remaining Work (Sprint 2+)
 
-| Test                             | Coverage                                        |
-| -------------------------------- | ----------------------------------------------- |
-| `tests/chat-components.test.tsx` | ChatInterface, MessageList, ChatInput rendering |
-| `tests/chat-page.test.tsx`       | /chat page metadata, server component rendering |
+### Welcome Message with Suggested Questions — NOT STARTED
 
-**Note:** `useChat` tests should mock the transport layer, not hit real API routes. Test that messages render correctly for each part type.
+Currently uses `ThreadPrimitive.Empty` with `QuickActions`. Enhance with a proper welcome message summarizing Paul's value proposition (user story R1).
+
+### Platform-Aware Copy-to-Clipboard — NOT STARTED
+
+Every AI response in tools mode needs a copy button:
+
+- LinkedIn connection: strip markdown → plain text, show char count
+- Email: preserve basic formatting, separate subject/body copy
+- STAR answer: full markdown copy + section-level copy
+- Cover letter: "Copy as plain text" + "Copy as Markdown"
+
+Use assistant-ui's `ActionBarPrimitive` to add custom copy actions.
+
+### Character Count Display — NOT STARTED
+
+Show real-time character count sourced from `platform-constraints.json` when in tools mode.
+
+### Resume Generation UI — NOT STARTED
+
+- Integration with `/api/resume` route (Plan 2A Step 7)
+- Progress indicator for Opus 4.6 generation (30-60s)
+- Preview generated resume inline in chat
+
+### Component Tests — NOT STARTED
+
+| Test                         | Status                                            |
+| ---------------------------- | ------------------------------------------------- |
+| `tests/chat-home.test.tsx`   | ❌ ChatHome component, mode toggle, quick actions |
+| `tests/resume-page.test.tsx` | ❌ Resume page rendering                          |
+
+### Cleanup — NOT STARTED
+
+- [ ] Delete old `app/components/SectionNav.tsx` and `app/components/BackToTop.tsx` (dead code after move to `app/resume/components/`)
 
 ---
 
 ## Verification Checklist
 
-- [ ] `npm run dev` → visit `/chat` → send message → streaming response renders
-- [ ] Mode toggle switches between chat and resume generation
-- [ ] Resume page has "Chat" navigation link
-- [ ] Chat page has "Back to Resume" link
-- [ ] Mobile responsive — chat usable on phone-width viewport
+- [x] `npm run dev` → visit `/` → chat UI renders with mode toggle and quick actions
+- [x] `npm run dev` → visit `/resume` → resume renders with downloads
+- [x] Resume page has "Chat with AI" navigation link
+- [x] Chat page has "View Resume" navigation link
+- [x] `npm test` — all 315 tests pass
+- [x] `npm run build` — builds successfully (all routes present)
+- [x] TypeScript passes (`tsc --noEmit` — 0 errors)
+- [x] ESLint passes (0 errors)
+- [ ] Mode toggle switches between chat and tools modes (needs live API test)
+- [ ] Send message → streaming response renders (needs `ANTHROPIC_API_KEY`)
+- [ ] Mobile responsive — chat usable on 375px viewport
 - [ ] Dark mode renders correctly
-- [ ] Error state shows retry option
-- [ ] `npm test` — all tests pass
-- [ ] `npm run build` — builds successfully
+- [ ] Platform-aware copy buttons work in tools mode
+- [ ] Character count shows for tools mode outputs
 
 ---
 
 ## What This Plan Does NOT Cover
 
-- API route implementation (Plan 2A)
-- Agent logic, prompt engineering (Plan 2A)
-- Rate limiting backend (Plan 2A)
+- API route implementation (Plan 2A — Sprint 1 COMPLETE)
+- Agent logic, system prompts (Plan 2A — Sprint 1 COMPLETE)
+- Rate limiting backend (Plan 2A — Sprint 1 COMPLETE)
 - CI/CD changes, vercel.json updates (Plan 2C)
 - Documentation updates (Plan 2C)
+- Supabase Auth for tools mode gating (Phase 3)

@@ -1,38 +1,35 @@
 # Plan 2C: DevOps — CI/CD, Deployment Config, Documentation
 
+> **Status:** NOT STARTED. Blocked on Plan 2A/2B Sprint 2 completion.
 > **Sequence:** Plan 2A (backend) → Plan 2B (frontend) → Plan 2C (this)
-> **Branch:** `feat/phase2c-devops` from `feat/phase2b-frontend` (or `main` after 2B merges)
-> **Depends on:** Plan 2A (knows what env vars, routes exist), Plan 2B (knows all pages/routes)
+> **Branch:** `feat/phase2c-devops` (or continue on `feat/phase2-implementation`)
+> **Depends on:** Plan 2A + 2B (needs to know all routes, env vars, dependencies)
 > **Blocks:** Nothing — final plan in sequence
 > **Human steps:** See `human-steps-phase2.md` Steps 5-6 (env vars, post-deploy verification)
+> **Authoritative redesign plan:** `docs/phase2-redesign-plan.md`
 
 ### Claude Code Execution Notes
 
-This plan is optimized for autonomous execution by Claude Code:
-
 ```
-"Execute Plan 2C: create feat/phase2c-devops branch, update vercel.json, update CI workflow,
-update release-check script, update CLAUDE.md, README.md, and TDD. Run npm run check to verify."
+"Execute Plan 2C: update vercel.json, CI workflow, release-check script, CLAUDE.md, README.md,
+and TDD. Run npm run check to verify. Commit after each step."
 ```
 
 - This plan is mostly config/docs changes — lower risk than 2A/2B
 - Run `npm run check` (full release checklist) as final verification
 - CLAUDE.md updates are critical — they affect all future Claude Code sessions
-- After merging, human must do Steps 5-6 (Vercel dashboard config)
 
 ---
 
 ## Objective
 
-Update all deployment configuration, CI/CD pipelines, security headers, and documentation to support the Phase 2 server-rendered Next.js app with API routes, chat page, and Vercel Fluid Compute.
+Update all deployment configuration, CI/CD pipelines, security headers, and documentation to support the Phase 2 server-rendered Next.js app with API routes, chat homepage (`/`), resume page (`/resume`), and Vercel Fluid Compute.
 
 ---
 
 ## Implementation Steps
 
 ### Step 1: Vercel Configuration (`vercel.json`)
-
-Major changes required now that the site is server-rendered:
 
 ```json
 {
@@ -71,9 +68,8 @@ Major changes required now that the site is server-rendered:
 
 **Key changes from Phase 1:**
 
-- **Remove** `"framework": null` — let Vercel auto-detect Next.js (required for serverless functions)
+- **Remove** `"framework": null` — let Vercel auto-detect Next.js
 - **Remove** `"outputDirectory": "out"` — Vercel manages `.next/` output
-- **Remove** `"git": { "deploymentEnabled": false }` — re-enable Git-triggered deploys (or keep manual if preferred)
 - **Update** CSP `connect-src` to allow `'self'` API calls from the chat page
 - **Add** `/api/*` headers: `Cache-Control: no-store` to prevent caching of AI responses
 
@@ -81,126 +77,88 @@ Major changes required now that the site is server-rendered:
 
 Configure in Vercel dashboard (Settings → Environment Variables):
 
-| Variable             | Environments        | Purpose                                  |
-| -------------------- | ------------------- | ---------------------------------------- |
-| `ANTHROPIC_API_KEY`  | Production, Preview | Claude API access for chat/resume routes |
-| `AI_GATEWAY_API_KEY` | Production, Preview | Vercel AI Gateway (optional)             |
-| `KV_REST_API_URL`    | Production, Preview | Upstash KV for rate limiting             |
-| `KV_REST_API_TOKEN`  | Production, Preview | Upstash KV auth token                    |
+| Variable                   | Environments        | Purpose                          |
+| -------------------------- | ------------------- | -------------------------------- |
+| `ANTHROPIC_API_KEY`        | Production, Preview | Claude API access for chat route |
+| `AI_GATEWAY_API_KEY`       | Production, Preview | Vercel AI Gateway (optional)     |
+| `UPSTASH_REDIS_REST_URL`   | Production, Preview | Upstash Redis for rate limiting  |
+| `UPSTASH_REDIS_REST_TOKEN` | Production, Preview | Upstash Redis auth token         |
 
-**Security:** These are server-side only (used in API routes, never exposed to client). Vercel encrypts them at rest.
-
-**Upstash setup:** Create a free Upstash Redis instance at upstash.com, or provision via Vercel's KV integration (Vercel Dashboard → Storage → Create → KV). The Vercel integration auto-populates `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
+> **Changed from original plan:** Env vars are `UPSTASH_REDIS_REST_*` (not `KV_REST_API_*`). No `@vercel/kv` — uses `@upstash/redis` directly.
 
 ### Step 3: CI/CD Pipeline Updates (`.github/workflows/ci.yml`)
 
+Key changes:
+
+- Build output validation: `.next/` directory (not `out/`)
+- Validate routes: `/`, `/resume`, `/api/chat` all present in build output
+- No changes to test/lint/format steps
+
 ```yaml
-name: CI
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
-jobs:
-  ci:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Validate documentation
-        run: npm run validate:docs
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Format check
-        run: npm run format:check
-
-      - name: Test
-        run: npm test
-
-      - name: Build
-        run: npm run build
-
-      - name: Validate data and resume quality
-        run: npm run check:quick -- --ci
-
-      - name: Validate build output
-        run: |
-          # Phase 2: Next.js server build outputs to .next/, not out/
-          test -d .next || { echo "::error::.next/ directory not found"; exit 1; }
-          # Verify static pages were pre-rendered
-          test -f .next/server/app/index.html || echo "::warning::index.html not pre-rendered (may be dynamic)"
+- name: Validate build output
+  run: |
+    test -d .next || { echo "::error::.next/ directory not found"; exit 1; }
+    # Verify resume page was pre-rendered
+    test -f .next/server/app/resume.html || echo "::warning::resume.html not pre-rendered"
 ```
 
-**Key change:** Build output validation switches from `out/index.html` to `.next/` directory. The resume page should still be statically pre-rendered by Next.js even without `output: 'export'`.
-
-### Step 4: Deployment Workflow (`.github/workflows/deploy.yml`)
-
-If the deploy workflow references static output, update it similarly. The Vercel GitHub integration handles deployment automatically — the workflow may only need to run smoke tests after deploy.
-
-### Step 5: Release Check Script Updates
+### Step 4: Release Check Script Updates
 
 Update `scripts/release-check.ts`:
 
 - Change build output validation from `out/` to `.next/`
-- Add check for required environment variables in Vercel (can verify via `vercel env ls` or skip in CI)
-- Add check that `/api/chat` route exists in the build output
+- Add check that `/api/chat` route exists
+- Verify both `/` and `/resume` routes are present
+
+### Step 5: Sitemap and Robots
+
+Update `public/sitemap.xml`:
+
+```xml
+<url><loc>https://paulprae.com/</loc></url>
+<url><loc>https://paulprae.com/resume</loc></url>
+```
 
 ### Step 6: Documentation Updates
 
 #### CLAUDE.md Changes
 
-| Section           | Change                                                                           |
-| ----------------- | -------------------------------------------------------------------------------- |
-| Project Overview  | Update phase to "Phase 2 — Interactive Career Platform"                          |
-| Tech Stack        | Add: AI SDK 6, @ai-sdk/anthropic, @ai-sdk/react, @ai-sdk/gateway                 |
-| File Organization | Add `packages/`, `app/chat/`, `app/api/` directories                             |
-| Critical Rules #2 | Remove static export rule, note that resume page is still statically optimized   |
-| Critical Rules #3 | Move AI SDK from "do NOT install" to tech stack. Keep Supabase/Neo4j as Phase 3. |
-| Data Pipeline     | Add note about API routes using career data at runtime                           |
-| Common Commands   | Add `npm run dev` chat testing instructions                                      |
-| Phase 2 Preview   | Convert to "Phase 2 (Current)" with implemented features                         |
-| Phase 3 Preview   | Keep as-is                                                                       |
+| Section           | Change                                                                          |
+| ----------------- | ------------------------------------------------------------------------------- |
+| Project Overview  | Update phase to "Phase 2 — Interactive Career Platform"                         |
+| Tech Stack        | Add: AI SDK 6, @ai-sdk/anthropic, @assistant-ui/react, @upstash/redis           |
+| File Organization | Add `lib/agent/`, `lib/prompts/`, `app/api/`, `app/resume/`                     |
+| Critical Rules #2 | Remove static export rule. Note: resume page is still statically optimized      |
+| Critical Rules #3 | Move AI SDK from "do NOT install" to tech stack. Keep Supabase/Neo4j as Phase 3 |
+| Common Commands   | Add `npm run dev` for chat testing                                              |
+| Phase 2 Preview   | Convert to "Phase 2 (Current)" with implemented features                        |
 
 #### README.md Changes
 
-| Section           | Change                                                                   |
-| ----------------- | ------------------------------------------------------------------------ |
-| Overview          | Update Phase 2 from "planned" to "current"                               |
-| Architecture      | Add server-side architecture diagram (API routes + Vercel Fluid Compute) |
-| Tech Stack        | Add AI SDK 6, Vercel AI Gateway                                          |
-| Getting Started   | Add `ANTHROPIC_API_KEY` needed for Vercel (not just local pipeline)      |
-| Deployment        | Update for server-rendered deployment (no more `framework: null`)        |
-| Project Structure | Add `packages/`, `app/chat/`, `app/api/`                                 |
+| Section      | Change                                                     |
+| ------------ | ---------------------------------------------------------- |
+| Overview     | Update Phase 2 from "planned" to "current"                 |
+| Architecture | Add server-side architecture (API routes + Fluid Compute)  |
+| Tech Stack   | Add AI SDK 6, @assistant-ui/react, Upstash Redis           |
+| Routes       | Document `/` (chat), `/resume` (resume), `/api/chat` (API) |
+| Deployment   | Update for server-rendered deployment                      |
 
 #### Technical Design Document (`docs/technical-design-document.md`)
 
-Full rewrite of sections 2, 7, 8 to reflect Phase 2 architecture. See separate TDD update (being done alongside this plan).
+Key updates needed:
 
-#### New Documentation
-
-| File                         | Content                                                                                             |
-| ---------------------------- | --------------------------------------------------------------------------------------------------- |
-| `docs/agent-architecture.md` | Agent system design: context caching, model routing, tool use, ToolLoopAgent pattern, cost analysis |
+- §3.1: `/chat` → `/` for chat, add `/resume` for resume
+- §3.2: `@vercel/kv` → `@upstash/redis`
+- §3.8 Client: `useChat` → `@assistant-ui/react` with `useChatRuntime`
+- §3.9: `packages/` → `lib/` flat structure
+- Add `@assistant-ui/react` to stack table
 
 ### Step 7: CORS and Security
 
-- Verify CSP `connect-src` allows API calls from the same origin
-- API routes should validate `Content-Type: application/json`
-- Rate limiting protects against abuse (implemented in Plan 2A)
-- No CORS headers needed (same-origin API calls)
+- Verify CSP `connect-src` allows same-origin API calls
+- API routes validate `Content-Type: application/json`
+- Rate limiting via Upstash protects against abuse
+- No CORS headers needed (same-origin)
 
 ---
 
@@ -210,32 +168,20 @@ Full rewrite of sections 2, 7, 8 to reflect Phase 2 architecture. See separate T
 - [ ] `npm test` — all tests pass
 - [ ] `npm run lint && npm run format:check` — clean
 - [ ] `npm run check` — full release checklist passes
-- [ ] Vercel preview deployment works (both `/` and `/chat`)
-- [ ] Resume page (`/`) still renders correctly and is statically optimized
-- [ ] Chat page (`/chat`) works in preview deploy
+- [ ] Vercel preview deployment works (both `/` and `/resume`)
+- [ ] Chat homepage (`/`) works in preview deploy
+- [ ] Resume page (`/resume`) renders correctly
 - [ ] API routes respond correctly in preview deploy
 - [ ] CSP headers don't block chat API calls
-- [ ] Smoke tests pass against preview URL
+- [ ] Sitemap includes both routes
 - [ ] All documentation is consistent and accurate
-
----
-
-## Post-Merge: Vercel Dashboard Setup
-
-Manual steps after merging to `main`:
-
-1. Add environment variables (ANTHROPIC*API_KEY, KV*\*, optionally AI_GATEWAY_API_KEY)
-2. Provision Upstash KV via Vercel Storage integration
-3. Verify Vercel auto-detects Next.js framework (should happen automatically)
-4. Run smoke test against production URL
-5. Monitor first few chat conversations for cost/performance
 
 ---
 
 ## What This Plan Does NOT Cover
 
-- Agent core logic (Plan 2A)
-- API route implementation (Plan 2A)
-- Chat UI components (Plan 2B)
+- Agent core logic (Plan 2A — Sprint 1 COMPLETE)
+- API route implementation (Plan 2A — Sprint 1 COMPLETE)
+- Chat UI components (Plan 2B — Sprint 1 COMPLETE)
 - Supabase/pgvector (Phase 3)
 - Neo4j knowledge graph (Phase 3)
