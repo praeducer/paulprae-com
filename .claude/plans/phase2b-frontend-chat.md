@@ -13,20 +13,24 @@ This plan is optimized for autonomous execution by Claude Code:
 
 ```
 "Continue Phase 2 frontend work on feat/phase2-implementation branch. Read docs/phase2-redesign-plan.md
-for full context including user stories. Sprint 1 frontend is complete — focus on Sprint 2+ items:
-welcome message, platform-aware copy, character count, /api/resume integration."
+for full context including user stories. Sprint 1 is complete — focus on Sprint 2 items:
+1. Welcome message enhancement (elegant, memorable, focused on recruiter audience)
+2. Tailored resume generation (inline in chat, Opus 4.6, recruiter feature)
+3. Component tests (iterative, agile — site always in working state)
+4. Cleanup (delete dead components)"
 ```
 
 - The feature branch builds, 315 tests pass, lint clean
 - All components use `@assistant-ui/react` primitives (NOT pre-built `<Thread />`)
-- Test with `npm run dev` — verify `/` renders chat, `/resume` renders resume
+- Two routes share `ChatHome` component: `/` (chat) and `/tools` (Paul's tools, noindex)
+- Test with `npm run dev` — verify `/` renders chat, `/tools` renders tools, `/resume` renders resume
 - Mock the transport layer in component tests
 
 ---
 
 ## Objective
 
-Build a chat-first homepage at `/` using `@assistant-ui/react` primitives, move the resume to `/resume`, and add bidirectional navigation. Two modes: "Ask About Paul" (recruiter Q&A) and "Job Search Tools" (content generation).
+Build a chat-first homepage at `/` using `@assistant-ui/react` primitives that serves as a **single unified experience** for recruiters, hiring managers, and potential teammates. The chat handles Q&A, resume downloads, and content generation (including tailored resumes). A separate `/tools` route (unlisted, noindex) provides Paul's personal job search tools. The original resume is served at `/resume` with bidirectional navigation.
 
 ---
 
@@ -52,17 +56,18 @@ Build a chat-first homepage at `/` using `@assistant-ui/react` primitives, move 
 
 | Route      | Content                               | Rendering                            |
 | ---------- | ------------------------------------- | ------------------------------------ |
-| `/` (home) | Chat interface with mode toggle       | Dynamic (client component)           |
+| `/` (home) | Chat interface (recruiter Q&A)        | Dynamic (client component)           |
+| `/tools`   | Job search tools (semi-secret)        | Dynamic (client component, noindex)  |
 | `/resume`  | Full resume (moved from original `/`) | Static pre-render (server component) |
 
-### Two Modes on Homepage
+### Two Modes via Separate Routes
 
-| Mode               | Audience             | System Prompt            | Default    |
-| ------------------ | -------------------- | ------------------------ | ---------- |
-| "Ask About Paul"   | Recruiters, visitors | Third-person career Q&A  | Yes        |
-| "Job Search Tools" | Paul (site owner)    | First-person content gen | Via toggle |
+| Mode               | Route    | Audience             | System Prompt            |
+| ------------------ | -------- | -------------------- | ------------------------ |
+| "Ask About Paul"   | `/`      | Recruiters, visitors | Third-person career Q&A  |
+| "Job Search Tools" | `/tools` | Paul (site owner)    | First-person content gen |
 
-No authentication needed — tools mode is a simple toggle.
+No authentication needed — `/tools` is unlisted (noindex) but accessible by URL. Both routes share the same `ChatHome` component with a `mode` prop.
 
 ---
 
@@ -70,15 +75,17 @@ No authentication needed — tools mode is a simple toggle.
 
 ```
 app/
-├── page.tsx                           # Chat homepage (imports ChatHome)
+├── page.tsx                           # Chat homepage — <ChatHome /> (default chat mode)
+├── tools/
+│   └── page.tsx                       # Job search tools — <ChatHome mode="tools" /> (noindex)
 ├── resume/
 │   ├── page.tsx                       # Resume page (extracted from old page.tsx)
 │   └── components/
 │       ├── SectionNav.tsx             # Section navigation bar
 │       └── BackToTop.tsx              # Back-to-top button
 ├── components/
-│   ├── ChatHome.tsx                   # Main chat client component ("use client")
-│   ├── ModeToggle.tsx                 # Ask About Paul / Job Tools toggle
+│   ├── ChatHome.tsx                   # Shared chat client component ("use client", accepts mode prop)
+│   ├── ModeToggle.tsx                 # (Legacy — kept but unused, toggle removed from UI)
 │   └── QuickActions.tsx               # Mode-specific action chips
 ├── api/chat/route.ts                  # Chat API (see Plan 2A)
 └── layout.tsx                         # Updated metadata for multi-page site
@@ -120,14 +127,16 @@ Uses `@assistant-ui/react` primitives (not pre-built Thread):
 ```typescript
 "use client";
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
-import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
-import { AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
+import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 import { ThreadPrimitive, MessagePrimitive, ComposerPrimitive, ActionBarPrimitive } from "@assistant-ui/react";
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
 
-export default function ChatHome() {
-  const [mode, setMode] = useState<"chat" | "tools">("chat");
+interface ChatHomeProps {
+  mode?: "chat" | "tools";
+}
 
+export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
+  // Mode comes from the route: `/` passes "chat", `/tools` passes "tools"
   const transport = useMemo(
     () => new AssistantChatTransport({ api: "/api/chat", body: { mode } }),
     [mode],
@@ -136,7 +145,7 @@ export default function ChatHome() {
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      {/* Header with mode toggle, View Resume link, PDF download */}
+      {/* Header with View Resume link, PDF download */}
       <ThreadPrimitive.Root>
         <ThreadPrimitive.Viewport>
           <ThreadPrimitive.Empty>{/* Welcome state + QuickActions */}</ThreadPrimitive.Empty>
@@ -158,19 +167,17 @@ export default function ChatHome() {
 - Must create `AssistantChatTransport` explicitly with `{ api, body }` and pass as transport
 - `useMemo` on transport, keyed on `mode`, so it recreates when mode changes
 - `MarkdownTextPrimitive` has different props than `TextMessagePartComponent` — requires a wrapper function
+- Mode is a **prop** (not state) — each route renders `<ChatHome mode="..." />`, no toggle needed
 
-### Step 3: Mode Toggle (`app/components/ModeToggle.tsx`) — COMPLETE ✅
+### Step 3: Mode Toggle (`app/components/ModeToggle.tsx`) — SUPERSEDED
 
-Tab-style toggle with `role="tablist"` accessibility:
-
-- "Ask About Paul" tab (default)
-- "Job Tools" tab
+Originally a tab-style toggle. **Replaced by route-based mode switching** — `/` for chat, `/tools` for tools. `ModeToggle.tsx` still exists in the codebase but is unused and can be deleted during cleanup.
 
 ### Step 4: Quick Actions (`app/components/QuickActions.tsx`) — COMPLETE ✅
 
 Mode-specific action chips:
 
-**Chat mode (4 chips):** "What does Paul do?", "AI/ML experience", "Healthcare work", "Download resume"
+**Chat mode (4 chips):** "What does Paul do?", "Key skills", "Recent experience", "Download resume"
 
 **Tools mode (8 chips):** Cover Letter, LinkedIn Connection, LinkedIn InMail, Email Intro, Thank You Note, Follow-Up, STAR Answer, Elevator Pitch
 
@@ -191,19 +198,56 @@ description: "Chat with an AI assistant about Paul Prae's career...",
 
 ---
 
+## Design Decisions (Finalized)
+
+### Tools Mode: Route-Based Separation — RESOLVED ✅
+
+Tools mode lives at `/tools` as a separate route (noindex). Recruiters visiting `/` only see the unified chat experience. Both routes share the same `ChatHome` component with a `mode` prop.
+
+### Unified Recruiter Experience — DECIDED
+
+The main chat at `/` is a **single unified UI** for recruiters, hiring managers, and potential teammates. It handles:
+
+- Career Q&A (existing)
+- Resume downloads (existing)
+- **Tailored resume generation** (Sprint 2) — recruiters commonly ask for custom resumes for specific JDs. This happens inline in the chat thread, not in a separate panel.
+
+The `/tools` route is Paul's **personal workspace** for outreach content generation (cover letters, LinkedIn messages, etc.) — features recruiters don't need.
+
+### Welcome Message — DECIDED
+
+The empty state should be **more elaborate but elegant**. Focus on serving the target audience (recruiters, HMs, potential teammates) exactly what they need. Make the experience fun and memorable. No fluff — just what makes Paul stand out.
+
+### Chat Always Present — DECIDED
+
+Chat is the primary interface and should always be present. Content generation (like tailored resumes) appears **inline in the chat thread** — not in a separate panel. Users can always trivially return to chatting.
+
+---
+
 ## Remaining Work (Sprint 2+)
 
-### Welcome Message with Suggested Questions — NOT STARTED
+### Welcome Message Enhancement — NOT STARTED
 
-Currently uses `ThreadPrimitive.Empty` with `QuickActions`. Enhance with a proper welcome message summarizing Paul's value proposition (user story R1).
+**Priority: HIGH.** Replace the current minimal `ThreadPrimitive.Empty` state with an elegant, memorable welcome that:
 
-### Frame "Job Search Tools" Mode for Public Visitors — NOT STARTED
+- Summarizes Paul's value proposition for the target audience
+- Includes suggested questions as quick action chips (already exists)
+- Makes a strong first impression — fun and memorable, not generic
+- Stays focused: exactly what recruiters/HMs need, nothing more
 
-Recruiters seeing "Job Search Tools" may be confused. Add framing copy that presents it as a portfolio showcase (e.g., "See the AI tools Paul built to automate his job search") rather than an internal utility. Consider whether to keep it publicly visible or hide behind `?mode=tools` URL parameter.
+### Tailored Resume Generation — NOT STARTED
+
+**Priority: HIGH.** Recruiters commonly request custom resumes for specific JDs. This is a core feature of the unified `/` experience, not a tools-mode feature.
+
+- Agent tool in `/api/chat` that generates a tailored resume via Opus 4.6
+- Content appears inline in the chat thread (chat is always present)
+- Progress indicator for generation (30-60s)
+- Download links for PDF/DOCX/MD formats in the response
+- Quick action chip: "Generate tailored resume" (add to chat mode chips)
 
 ### Platform-Aware Copy-to-Clipboard — NOT STARTED
 
-Every AI response in tools mode needs a copy button:
+Every AI response in `/tools` mode needs platform-aware copy:
 
 - LinkedIn connection: strip markdown → plain text, show char count
 - Email: preserve basic formatting, separate subject/body copy
@@ -214,30 +258,27 @@ Use assistant-ui's `ActionBarPrimitive` to add custom copy actions.
 
 ### Character Count Display — NOT STARTED
 
-Show real-time character count sourced from `platform-constraints.json` when in tools mode.
-
-### Resume Generation UI — NOT STARTED
-
-- Integration with `/api/resume` route (Plan 2A Step 7)
-- Progress indicator for Opus 4.6 generation (30-60s)
-- Preview generated resume inline in chat
+Show real-time character count sourced from `platform-constraints.json` when in `/tools` mode.
 
 ### Component Tests — NOT STARTED
 
-| Test                         | Status                                            |
-| ---------------------------- | ------------------------------------------------- |
-| `tests/chat-home.test.tsx`   | ❌ ChatHome component, mode toggle, quick actions |
-| `tests/resume-page.test.tsx` | ❌ Resume page rendering                          |
+**Priority: HIGH.** Test iteratively as features are built (agile — site always in working state).
+
+| Test                         | Status                                          |
+| ---------------------------- | ----------------------------------------------- |
+| `tests/chat-home.test.tsx`   | ❌ ChatHome component, quick actions, mode prop |
+| `tests/resume-page.test.tsx` | ❌ Resume page rendering                        |
 
 ### Cleanup — NOT STARTED
 
 - [ ] Delete old `app/components/SectionNav.tsx` and `app/components/BackToTop.tsx` (dead code after move to `app/resume/components/`)
+- [ ] Delete `app/components/ModeToggle.tsx` (toggle removed from UI, mode is now route-driven)
 
 ---
 
 ## Verification Checklist
 
-- [x] `npm run dev` → visit `/` → chat UI renders with mode toggle and quick actions
+- [x] `npm run dev` → visit `/` → chat UI renders with quick actions
 - [x] `npm run dev` → visit `/resume` → resume renders with downloads
 - [x] Resume page has "Chat with AI" navigation link
 - [x] Chat page has "View Resume" navigation link
@@ -245,12 +286,13 @@ Show real-time character count sourced from `platform-constraints.json` when in 
 - [x] `npm run build` — builds successfully (all routes present)
 - [x] TypeScript passes (`tsc --noEmit` — 0 errors)
 - [x] ESLint passes (0 errors)
-- [ ] Mode toggle switches between chat and tools modes (needs live API test)
+- [ ] `/tools` route renders with tools-mode quick actions (needs live test)
 - [ ] Send message → streaming response renders (needs `ANTHROPIC_API_KEY`)
 - [ ] Mobile responsive — chat usable on 375px viewport
 - [ ] Dark mode renders correctly
-- [ ] Platform-aware copy buttons work in tools mode
-- [ ] Character count shows for tools mode outputs
+- [ ] Tailored resume generation works inline in chat (Sprint 2)
+- [ ] Platform-aware copy buttons work in `/tools` mode (Sprint 2+)
+- [ ] Character count shows for `/tools` mode outputs (Sprint 2+)
 
 ---
 

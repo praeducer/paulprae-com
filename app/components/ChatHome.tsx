@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useMemo, useCallback } from "react";
 import Link from "next/link";
 import {
   AssistantRuntimeProvider,
@@ -12,7 +12,6 @@ import {
 import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
 import type { TextMessagePart } from "@assistant-ui/react";
-import ModeToggle from "./ModeToggle";
 import QuickActions from "./QuickActions";
 
 // ─── Markdown Text Wrapper ──────────────────────────────────────────────────
@@ -124,9 +123,11 @@ function ChatComposer() {
 
 // ─── Main Chat Component ────────────────────────────────────────────────────
 
-export default function ChatHome() {
-  const [mode, setMode] = useState<"chat" | "tools">("chat");
+interface ChatHomeProps {
+  mode?: "chat" | "tools";
+}
 
+export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
   // Create transport with mode in body — transport is recreated when mode changes
   const transport = useMemo(
     () =>
@@ -156,10 +157,7 @@ export default function ChatHome() {
         {/* Header */}
         <header className="shrink-0 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95">
           <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-3">
-            <div className="flex items-center gap-3">
-              <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">paulprae.com</h1>
-              <ModeToggle mode={mode} onModeChange={setMode} />
-            </div>
+            <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">paulprae.com</h1>
             <div className="flex items-center gap-2">
               <Link
                 href="/resume"
