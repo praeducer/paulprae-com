@@ -6,7 +6,17 @@
     "size": "startup",
     "type": "employer",
     "website": "https://www.arine.io",
-    "description": "Healthcare technology platform focused on medication management and clinical decision support."
+    "description": "Healthcare technology platform focused on medication management and clinical decision support.",
+    "metrics": {
+      "healthPlans": "45+",
+      "clientMembersTouched": ">30 million",
+      "recommendationsAnnually": ">40 million",
+      "partnerships": "5 national health plans, 7 Blues Plans, 2 national PBMs",
+      "recognition": "Inc. 5000 #236 overall, #5 in AI",
+      "outcomes": ">10% decrease in total cost of care, 40% reduction in hospitalizations"
+    },
+    "metricsAsOf": "2026-03",
+    "metricsSource": "https://www.arine.io"
   },
   {
     "id": "booz-allen-hamilton",
@@ -15,7 +25,13 @@
     "size": "enterprise",
     "type": "employer",
     "website": "https://www.boozallen.com",
-    "description": "Global management consulting, technology, and engineering firm providing services to government and commercial clients."
+    "description": "Global management consulting, technology, and engineering firm providing services to government and commercial clients.",
+    "metrics": {
+      "employees": "27,000+",
+      "revenue": "$9B+"
+    },
+    "metricsAsOf": "2025-01",
+    "metricsSource": "https://www.boozallen.com"
   },
   {
     "id": "modular-earth",
