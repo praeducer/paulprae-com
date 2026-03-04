@@ -93,11 +93,12 @@ export function loadCareerContext(): CareerContext | null {
 
 // ─── System Prompt Assembly ─────────────────────────────────────────────────
 
-type PromptMode = "chat" | "tools";
+type PromptMode = "chat" | "tools" | "resume-generator";
 
 const PROMPT_FILES: Record<PromptMode, string> = {
   chat: path.join(process.cwd(), "lib", "prompts", "career-chat.system.md"),
   tools: path.join(process.cwd(), "lib", "prompts", "job-tools.system.md"),
+  "resume-generator": path.join(process.cwd(), "lib", "prompts", "resume-generator.system.md"),
 };
 
 /**
