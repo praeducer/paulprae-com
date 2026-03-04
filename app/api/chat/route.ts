@@ -2,6 +2,12 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { streamText, convertToModelMessages, type UIMessage } from "ai";
 import { buildSystemPrompt } from "../../../lib/agent/context";
 
+// Vercel Fluid Compute: explicit timeout for streaming chat responses.
+// Pro plan default is 300s with Fluid Compute, but we set 60s as a
+// sensible ceiling for Sonnet chat. The /api/resume route (Sprint 2)
+// will use maxDuration = 300 for Opus generation.
+export const maxDuration = 60;
+
 // ─── Rate Limiting (Upstash — optional, graceful fallback) ──────────────────
 
 let ratelimit: { limit: (key: string) => Promise<{ success: boolean }> } | null = null;
@@ -19,9 +25,14 @@ async function initRateLimit() {
         prefix: "paulprae:chat",
       });
     } else {
+      // Local dev: no rate limiting when Upstash env vars are absent
       ratelimit = { limit: async () => ({ success: true }) };
     }
-  } catch {
+  } catch (err) {
+    // Production fallback: if Redis connection fails, allow requests through
+    // rather than killing the entire API. Anthropic's own rate limits and
+    // spending caps provide a secondary safety net.
+    console.warn("[rate-limit] Upstash Redis init failed, falling back to no rate limiting:", err);
     ratelimit = { limit: async () => ({ success: true }) };
   }
   return ratelimit;
@@ -75,19 +86,38 @@ export async function POST(request: Request) {
   const validMode = mode === "tools" ? "tools" : "chat";
 
   // Build system prompt with career data context
-  const systemPrompt = getSystemPrompt(validMode);
+  let systemPrompt: string;
+  try {
+    systemPrompt = getSystemPrompt(validMode);
+  } catch (err) {
+    console.error("[chat] Failed to build system prompt:", err);
+    return new Response("Service temporarily unavailable. Please try again later.", {
+      status: 503,
+    });
+  }
 
   // Convert UIMessages to ModelMessages for the language model
   const modelMessages = await convertToModelMessages(messages);
 
   // Stream response using AI SDK 6
-  const result = streamText({
-    model: anthropic("claude-sonnet-4-6"),
-    system: systemPrompt,
-    messages: modelMessages,
-    maxOutputTokens: 4096,
-    temperature: 0.7,
-  });
+  try {
+    const result = streamText({
+      model: anthropic("claude-sonnet-4-6"),
+      system: systemPrompt,
+      messages: modelMessages,
+      maxOutputTokens: 4096,
+      temperature: 0.7,
+    });
 
-  return result.toUIMessageStreamResponse();
+    return result.toUIMessageStreamResponse();
+  } catch (err) {
+    console.error("[chat] Anthropic API error:", err);
+    const status =
+      err instanceof Error && "status" in err ? (err as { status: number }).status : 500;
+    const message =
+      status === 529
+        ? "The AI service is temporarily overloaded. Please try again in a moment."
+        : "An error occurred while generating a response. Please try again.";
+    return new Response(message, { status: status >= 400 ? status : 500 });
+  }
 }

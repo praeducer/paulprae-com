@@ -50,6 +50,18 @@ Phase 2 requires Vercel Pro for Fluid Compute (800s function duration for Opus r
 
 ---
 
+## Step 3b: Set Anthropic API Spending Limits
+
+Configure a hard spending cap in the Anthropic Console to prevent billing spikes if rate limiting fails or traffic spikes unexpectedly.
+
+1. Go to: https://console.anthropic.com → **Settings** → **Limits**
+2. Set a monthly spending limit (e.g., $20-50/mo — sufficient for a portfolio site)
+3. Optionally configure email alerts at 50% and 80% of the limit
+
+**Why:** Defense in depth. The Upstash rate limiter is the primary protection, but Anthropic's own spending cap is a hard backstop that works regardless of your application code. The rate limiter gracefully falls back to allowing requests if Redis is unavailable — the spending cap ensures this can never cause a billing surprise.
+
+---
+
 ## Step 4: Add Vercel Environment Variables
 
 After `feat/phase2-implementation` branch merges to main:

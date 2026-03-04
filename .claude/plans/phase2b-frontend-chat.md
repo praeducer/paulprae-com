@@ -197,6 +197,10 @@ description: "Chat with an AI assistant about Paul Prae's career...",
 
 Currently uses `ThreadPrimitive.Empty` with `QuickActions`. Enhance with a proper welcome message summarizing Paul's value proposition (user story R1).
 
+### Frame "Job Search Tools" Mode for Public Visitors — NOT STARTED
+
+Recruiters seeing "Job Search Tools" may be confused. Add framing copy that presents it as a portfolio showcase (e.g., "See the AI tools Paul built to automate his job search") rather than an internal utility. Consider whether to keep it publicly visible or hide behind `?mode=tools` URL parameter.
+
 ### Platform-Aware Copy-to-Clipboard — NOT STARTED
 
 Every AI response in tools mode needs a copy button:

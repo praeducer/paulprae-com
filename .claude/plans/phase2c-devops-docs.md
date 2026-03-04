@@ -234,7 +234,7 @@ async function checkResumePage(): Promise<SmokeResult> {
 - Chat homepage markers are intentionally loose (`chat|assistant`) to avoid coupling smoke tests to specific UI text
 - Resume page check uses the SAME markers as the current homepage check — just against `/resume`
 - Download URLs don't change — PDFs are still served from `public/` at the root
-- No `/api/chat` smoke check — the API requires `ANTHROPIC_API_KEY` which would add cost per deploy. The preview smoke verifies the route exists implicitly (the chat page would show errors if the API were broken).
+- **New: `/api/chat` validation smoke check** — POST with empty JSON body `{}` to `/api/chat` and assert HTTP 400 response. This proves the Vercel function deployed and is running without burning Anthropic API tokens (the route validates input before calling the LLM).
 
 ### Step 5: Release Check Script Updates (`scripts/release-check.ts`)
 
