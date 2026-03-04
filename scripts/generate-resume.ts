@@ -285,10 +285,9 @@ function validateResumeOutput(markdown: string, careerData: CareerData): string[
     const actionVerbPattern =
       /^- (?:Led|Architected|Built|Designed|Delivered|Developed|Established|Scaled|Reduced|Automated|Deployed|Implemented|Launched|Managed|Mentored|Optimized|Spearheaded|Transformed|Created|Drove|Engineered|Executed|Integrated|Migrated|Orchestrated|Pioneered|Streamlined)/;
     const actionBullets = bullets.filter((b) => actionVerbPattern.test(b));
-    const actionVerbPct = bullets.length > 0 ? actionBullets.length / bullets.length : 1;
-    if (bullets.length >= 2 && actionVerbPct < 0.75) {
+    if (bullets.length >= 2 && actionBullets.length < 2) {
       warnings.push(
-        `Position "${posTitle}" has ${actionBullets.length}/${bullets.length} bullets starting with action verbs (${Math.round(actionVerbPct * 100)}%, target ≥75%)`,
+        `Position "${posTitle}" has ${actionBullets.length}/${bullets.length} bullets starting with action verbs (recommend ≥2)`,
       );
     }
 
@@ -299,27 +298,6 @@ function validateResumeOutput(markdown: string, careerData: CareerData): string[
       warnings.push(
         `Position "${posTitle}" has ${bullets.length} bullets but zero quantified metrics (numbers, percentages, dollar amounts)`,
       );
-    }
-  }
-
-  // Location validation: check header uses profile.location, not a position location
-  if (careerData.profile?.location) {
-    const profileCity = careerData.profile.location.split(",")[0].trim();
-    const headerLine = markdown.split("\n").find((l) => l.startsWith("**"));
-    if (headerLine && !headerLine.includes(profileCity)) {
-      // Check if it uses a different city (likely from a position)
-      const positionCities = careerData.positions
-        .filter((p) => p.location)
-        .map((p) => p.location.split(",")[0].trim())
-        .filter((c) => c && c !== profileCity);
-      for (const city of positionCities) {
-        if (headerLine.includes(city)) {
-          warnings.push(
-            `Header location uses "${city}" (from a position) instead of "${profileCity}" (from profile.location)`,
-          );
-          break;
-        }
-      }
     }
   }
 

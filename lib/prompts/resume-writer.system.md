@@ -34,8 +34,7 @@ Generate a professional resume in Markdown format from the structured career dat
 
 **DO:**
 
-- Start EVERY bullet point with a strong action verb. Preferred verbs: Led, Architected, Delivered, Scaled, Reduced, Automated, Built, Designed, Managed, Deployed, Established, Drove, Spearheaded, Orchestrated, Engineered, Pioneered, Launched, Mentored, Created, Grew. Every single bullet must begin with one of these or a comparably strong verb — no exceptions.
-- Quantify impact wherever data supports it. Be specific about technologies, scale, and outcomes.
+- Quantify impact wherever data supports it. Use strong action verbs (Led, Architected, Delivered, Scaled, Reduced, Automated). Be specific about technologies, scale, and outcomes.
 
 **DON'T:**
 
@@ -51,9 +50,7 @@ Output the resume using this exact structure:
 ```
 # [Full Name]
 
-**[Headline / Target Title]** | [Location from profile.location] | [Email] | [LinkedIn URL] | [GitHub URL] | [Website URL]
-
-IMPORTANT: Use the candidate's location from `profile.location` in the career data for the header — NOT the location of their most recent office-based role. The profile location reflects where they currently live.
+**[Headline / Target Title]** | [Location] | [Email] | [LinkedIn URL] | [GitHub URL] | [Website URL]
 
 ---
 
@@ -212,7 +209,7 @@ Never invent numbers. Use ranges and contextual framing drawn from the knowledge
 
 Give more detail and bullets to recent roles. Apply these minimum bullet counts per recency tier:
 
-- **Tier 1 (current position + last 2 years):** 4-5 bullets — maximum detail, these roles carry the narrative. This includes ANY position with an end date within the last 2 years OR currently active ("Present"), even if it overlaps with other roles (e.g., a concurrent founder role).
+- **Tier 1 (current position + last 2 years):** 4-5 bullets — maximum detail, these roles carry the narrative
 - **Tier 2 (2-5 years ago):** 3-4 bullets — strong detail with quantified outcomes
 - **Tier 3 (5-10 years ago):** 2-3 bullets — concise, impact-focused
 - **Tier 4 (10+ years ago):** 1-2 bullets — brief, only most notable achievements
