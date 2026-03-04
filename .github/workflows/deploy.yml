@@ -25,6 +25,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      contents: read
+      issues: write
     environment:
       name: production
       url: https://paulprae.com
@@ -51,10 +54,13 @@ jobs:
       - name: Deploy preview
         id: preview
         run: |
-          DEPLOY_URL=$(vercel deploy --prebuilt --yes --token="${VERCEL_TOKEN}" 2>&1 | grep -oP 'https://[^\s]+\.vercel\.app')
+          # Deploy to Vercel (builds remotely — no --prebuilt needed)
+          OUTPUT=$(vercel deploy --yes --token="${VERCEL_TOKEN}" 2>&1)
+          echo "$OUTPUT"
+          DEPLOY_URL=$(echo "$OUTPUT" | grep -oP 'https://[^\s]+\.vercel\.app' | head -1)
           if [ -z "$DEPLOY_URL" ]; then
-            # Fallback: deploy without --prebuilt (builds on Vercel)
-            DEPLOY_URL=$(vercel deploy --yes --token="${VERCEL_TOKEN}" 2>&1 | grep -oP 'https://[^\s]+\.vercel\.app')
+            echo "::error::Failed to extract deployment URL from Vercel output"
+            exit 1
           fi
           echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
           echo "Preview deployed: $DEPLOY_URL"

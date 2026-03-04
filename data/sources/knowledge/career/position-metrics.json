@@ -25,6 +25,36 @@
   },
   {
     "category": "achievement",
+    "title": "TReNDS Center — COINSTAC Neuroinformatics Platform",
+    "content": "Tech lead and architect for COINSTAC, an open-source software suite enabling collaborative, decentralized neuroimaging and genomics research. COINSTAC uses differential privacy algorithms to protect Personal Health Information (PHI) during multi-site analysis. Built GPU-focused compute infrastructure for deep learning workloads. Led AWS cloud architecture improvements and container orchestration to reduce deployment complexity. Advised leadership on product roadmap, mission, and vision. Contributed to translational research efforts and authored technical whitepapers. Supported commercialization through SBIR grant writing, open-source contributor recruitment, and industry partnerships. SCOPE BOUNDARY: Paul was tech lead and architect at TReNDS Center. He designed and built the data platform and cloud infrastructure for COINSTAC. He did NOT personally develop the neuroscience ML models — the research scientists did that. Paul's role was platform architecture, DevOps, and engineering leadership.",
+    "tags": ["neuroinformatics", "open-source", "aws", "gpu", "differential-privacy", "coinstac"],
+    "relatedPositions": ["Neuroinformatics Data Platform Architect at TReNDS Center"],
+    "asOf": "2023-09",
+    "source": "position description + trendscenter.org",
+    "confidence": "verified"
+  },
+  {
+    "category": "achievement",
+    "title": "NeuroLex Labs — Healthcare Voice Computing Platform",
+    "content": "Senior AI engineer building voice computing software for the prediction and prevention of neurodegenerative diseases. Architected automated ML pipelines that collected, cleaned, trained, and deployed models processing text and audio data. Drove TDD implementation across the engineering team — introducing regression, functional, load, and integration testing practices. Mentored fellows in the Tribe fellowship program focused on predicting neurodegenerative diseases using voice biomarkers. Evangelized the company and recruited technical team members. Collaborated with executive leadership, researchers, and customers to design features and products. SCOPE BOUNDARY: Paul built ML pipelines and voice computing applications at NeuroLex Labs. This is where his ML model development work happened — not at Arine (where he does data ops).",
+    "tags": ["voice-computing", "ml-pipelines", "healthcare", "tdd", "mentorship", "neurodegenerative"],
+    "relatedPositions": ["Senior AI Engineer at NeuroLex Labs"],
+    "asOf": "2020-05",
+    "source": "position description + neurolex.ai",
+    "confidence": "verified"
+  },
+  {
+    "category": "achievement",
+    "title": "Hyperbloom — AI Consulting Business",
+    "content": "Founded and operated Hyperbloom, an IT services and consulting business delivering cloud-based AI and data solutions across healthcare, life science, and financial services industries. Led cross-functional teams of sales coordinators, account managers, and solutions architects through the full sales cycle. Grew the business to $1.4M ARR from a $40K initial investment. Built strategic partnerships with research organizations, technology vendors, and consulting firms. Trained engineers on entrepreneurship and mission-driven technology development. Developed product incubation programs supporting new AI ventures. Recruited and retained mission-driven technologists. Operated the business for 5+ years (2020-2025).",
+    "tags": ["entrepreneurship", "ai-consulting", "healthcare", "sales", "leadership", "startup"],
+    "relatedPositions": ["Chief AI Officer, Founder at Hyperbloom"],
+    "asOf": "2025-09",
+    "source": "position description + hyperbloom.ai",
+    "confidence": "verified"
+  },
+  {
+    "category": "achievement",
     "title": "Slalom Consulting — Multi-Engagement Analytics Practice",
     "content": "Delivered 7+ client engagements over 2.5 years at Slalom Consulting, a modern consulting firm with 12,000+ employees. Key engagements included: (1) Behavioral healthcare service review application generating $2M+ in consulting revenue, (2) Statewide demand forecasting of behavioral health crisis services across dozens of facilities in Georgia, (3) Solution assessment comparing Azure Bot Service to Amazon Lex for a Fortune 100 insurance company, (4) Multiple public presentations on Azure Machine Learning, AI democratization, and cloud bot architecture. Recognized nationally as a subject matter expert in NLP and machine learning. Known as a domain expert in public sector, healthcare, digital marketing, and AI.",
     "tags": ["consulting", "analytics", "healthcare", "presentations", "nlp", "azure"],
