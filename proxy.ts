@@ -24,9 +24,9 @@ function isAllowedOrigin(origin: string | null): boolean {
   return false;
 }
 
-// ─── Middleware ───────────────────────────────────────────────────────────────
+// ─── Proxy ──────────────────────────────────────────────────────────────────
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const origin = request.headers.get("origin");
 

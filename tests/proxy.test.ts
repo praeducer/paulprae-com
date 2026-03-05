@@ -1,7 +1,7 @@
 /**
- * middleware.test.ts — Tests for Next.js middleware (CORS, origin validation, security headers).
+ * proxy.test.ts — Tests for Next.js proxy (CORS, origin validation, security headers).
  *
- * Run: npm test -- tests/middleware.test.ts
+ * Run: npm test -- tests/proxy.test.ts
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
