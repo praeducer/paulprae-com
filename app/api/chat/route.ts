@@ -67,6 +67,11 @@ function getSystemPrompt(mode: "chat" | "tools" | "resume-generator"): string {
 
 // ─── Route Handler ──────────────────────────────────────────────────────────
 
+// ─── Request Limits ─────────────────────────────────────────────────────────
+
+const MAX_MESSAGES = 50;
+const MAX_BODY_BYTES = 100_000; // 100 KB
+
 export async function POST(request: Request) {
   // Rate limiting
   const rl = await initRateLimit();
@@ -79,16 +84,39 @@ export async function POST(request: Request) {
     });
   }
 
+  // Check Content-Length before reading body
+  const contentLength = request.headers.get("content-length");
+  if (contentLength && parseInt(contentLength, 10) > MAX_BODY_BYTES) {
+    return new Response("Request body too large", { status: 413 });
+  }
+
   // Parse request body — AI SDK 6 client sends UIMessage[] with parts[]
-  const body = (await request.json()) as {
+  let body: { messages?: unknown; mode?: unknown };
+  try {
+    const rawText = await request.text();
+    if (rawText.length > MAX_BODY_BYTES) {
+      return new Response("Request body too large", { status: 413 });
+    }
+    body = JSON.parse(rawText);
+  } catch {
+    return new Response("Invalid JSON in request body", { status: 400 });
+  }
+
+  if (body === null || typeof body !== "object") {
+    return new Response("Request body must be a JSON object", { status: 400 });
+  }
+
+  const { messages, mode } = body as {
     messages: UIMessage[];
     mode?: "chat" | "tools";
   };
 
-  const { messages, mode } = body;
-
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return new Response("Messages array is required", { status: 400 });
+  }
+
+  if (messages.length > MAX_MESSAGES) {
+    return new Response(`Too many messages (max ${MAX_MESSAGES})`, { status: 400 });
   }
 
   const validMode = mode === "tools" ? "tools" : "chat";
