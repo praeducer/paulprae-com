@@ -37,6 +37,7 @@
     "lint:fix": "eslint --cache --cache-location .next/cache/eslint/ --fix .",
     "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,json,css,md}\"",
+    "test:e2e": "playwright test",
     "smoke": "tsx scripts/smoke-test.ts",
     "deploy:setup": "bash scripts/setup-branch-protection.sh",
     "check": "tsx scripts/release-check.ts",
@@ -70,6 +71,7 @@
     "**/*.{ts,tsx,js,mjs,json,css,md}": "prettier --write"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4.2.1",
     "@tailwindcss/typography": "^0.5.19",
     "@testing-library/jest-dom": "^6.9.1",
