@@ -37,18 +37,18 @@ Deliver a fast, shareable professional site at `https://paulprae.com` that prese
 | Validation         | Zod                                   |
 | Testing            | Vitest                                |
 | Export             | Pandoc (DOCX) + Typst (PDF)           |
-| Deployment         | Vercel (static)                       |
+| Deployment         | Vercel (server-rendered + API routes) |
 
 ### 2.3 Constraints and guardrails
 
-- Site must remain static-export compatible in Phase 1.
+- Site must remain static-export compatible in Phase 1 only.
 - No server runtime secrets are needed in Vercel for generation.
 - Generated resume markdown is an artifact; source-of-truth logic is in generation scripts.
 - Recruiter-facing data is versioned in git; raw LinkedIn exports remain local/gitignored.
 
 ## 3. Phase 2 Architecture (In Progress)
 
-> **Implementation status:** Sprint 2 in progress on `feat/phase2-implementation` branch. Sprint 1 delivered chat homepage, resume page, tools page, and streaming API. Sprint 2 adds tool-calling for tailored resume generation. See `docs/phase2-redesign-plan.md` for the redesign plan.
+> **Implementation status:** Sprint 2 complete on `feat/phase2-implementation` branch. Sprint 1 delivered chat homepage, resume page, tools page, and streaming API. Sprint 2 added tool-calling for tailored resume generation, security hardening, and rate limiting. See `docs/phase2-redesign-plan.md` for the redesign plan.
 
 Phase 2 transforms the static site into an interactive career platform with a chat-first homepage and job search tools. The architecture adds server-side capabilities while preserving the existing resume pipeline.
 

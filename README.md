@@ -75,7 +75,7 @@ The pipeline and website are independent. You can develop the website without th
 | Validation    | Zod (schema validation)                                          |
 | Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF)                                |
 | Linting       | ESLint 9 + eslint-config-next + Prettier + husky + lint-staged   |
-| Testing       | Vitest + Testing Library (341 tests) + Playwright E2E (11 tests) |
+| Testing       | Vitest + Testing Library (360 tests) + Playwright E2E (11 tests) |
 | Analytics     | Vercel Analytics + Speed Insights (no cookies)                   |
 | Deployment    | Vercel via GitHub Actions CI/CD                                  |
 | Dev Tooling   | Claude Code CLI + Cursor                                         |
@@ -334,15 +334,15 @@ paulprae-com/
 
 ## Roadmap
 
-### Phase 2: Full-Stack Interactive Platform (Weeks 2-6)
+### Phase 2: AI Chat Platform (Complete)
 
-- Supabase PostgreSQL database with pgvector for career data and embeddings
-- AI chat interface where recruiters can ask questions about Paul's career
-- Dynamic resume generation tailored to specific job descriptions
-- Admin dashboard for managing career content
-- Supabase Auth for admin access
+- AI chat homepage where recruiters can ask questions about Paul's career
+- Tool-calling for tailored resume generation from job descriptions
+- Job search content tools (cover letters, LinkedIn messages, etc.)
+- Streaming API with Claude Sonnet via Vercel AI SDK 6
+- Rate limiting, CORS, prompt injection defenses, security headers
 
-### Phase 3: Knowledge-Graph-Augmented AI (Weeks 7-12+)
+### Phase 3: Knowledge-Graph-Augmented AI (Preview — Not Started)
 
 - Neo4j knowledge graph capturing career relationships (skills → projects → roles → outcomes)
 - AI agent with tool-calling (graph queries, vector search, web research)

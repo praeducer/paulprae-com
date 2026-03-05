@@ -36,6 +36,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Security and middleware test suite (origin validation, headers, prompt defenses)
 - Vercel AI Gateway integration with direct Anthropic fallback for local dev
 - Character counter in chat composer (appears at 75% of 4K limit)
+- Renamed middleware.ts → proxy.ts for Next.js 16 compatibility
+- Added `"framework": "nextjs"` to vercel.json (fixes 404 on preview deployments)
+- Removed duplicate security headers from proxy (vercel.json handles at CDN level)
 
 ### Removed
 

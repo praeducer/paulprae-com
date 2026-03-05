@@ -63,6 +63,10 @@
 - [x] AI Gateway integration — `@ai-sdk/gateway` with direct Anthropic fallback
 - [x] Security headers in middleware (works in dev + production)
 - [x] QA fixes: aria-label, canonical URL, node prop leak, poweredByHeader
+- [x] Renamed middleware.ts → proxy.ts for Next.js 16 compatibility
+- [x] Added `"framework": "nextjs"` to vercel.json (fixes 404 on Vercel preview)
+- [x] Removed `cleanUrls`/`trailingSlash` from vercel.json (conflicts with App Router)
+- [x] Removed duplicate security headers from proxy.ts (vercel.json handles at CDN)
 
 ---
 

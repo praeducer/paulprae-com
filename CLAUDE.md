@@ -10,7 +10,7 @@
 
 ## Tech Stack
 
-See [README.md](README.md#tech-stack) for the full tech stack. Key versions: Next.js 16.1.x, Tailwind CSS 4.x, Vitest 4.x, ESLint 9, Prettier 3.x. AI generation via `@anthropic-ai/sdk` (Claude Opus 4.6). Resume export via Pandoc + Typst (system binaries). Chat: Vercel AI SDK 6 (`ai` + `@ai-sdk/anthropic`), `@assistant-ui/react` for UI. Rate limiting: `@upstash/redis` + `@upstash/ratelimit`.
+See [README.md](README.md#tech-stack) for the full tech stack. Key versions: Next.js 16.1.x, Tailwind CSS 4.x, Vitest 4.x, ESLint 9, Prettier 3.x. AI generation via `@anthropic-ai/sdk` (Claude Opus 4.6). Resume export via Pandoc + Typst (system binaries). Chat: Vercel AI SDK 6 (`ai` + `@ai-sdk/anthropic` + `@ai-sdk/gateway`), `@assistant-ui/react` for UI. Rate limiting: `@upstash/redis` + `@upstash/ratelimit`.
 
 ## Key Conventions
 
@@ -37,6 +37,7 @@ lib/                   → Shared utilities: config, types, markdown, career-dat
 lib/agent/             → Career context builder for chat system prompts
 lib/prompts/           → System prompt templates (career-chat, job-tools, resume-generator)
 tests/                 → Unit, integration, and component tests (Vitest + Testing Library)
+proxy.ts               → Next.js 16 proxy (CORS + origin validation for API routes)
 public/                → Static assets (OG image, favicons, resume downloads) committed for Vercel
 docs/                  → Technical documentation (TDD, dev environment, MCP, browser prompts)
 .mcp.json              → MCP config for Claude Code (project root; see docs/mcp-setup.md)
@@ -113,7 +114,7 @@ See [README.md](README.md#5-run-the-pipeline) for the full command reference. Qu
 - `npm run build` — website only (reads committed data, no API key)
 - `npm run pipeline:full` — pipeline + build (convenience)
 - `npm run brand` — generate brand assets (OG image, favicons) if missing
-- `npm test` — run all 340+ unit/component tests
+- `npm test` — run all 360 unit/component tests
 - `npm run test:e2e` — Playwright E2E tests (11 smoke tests)
 - `npm run check` — full pre-push release checklist (data + docs + lint + format + test + build + validate)
 - `npm run check:quick` — instant data file validation only

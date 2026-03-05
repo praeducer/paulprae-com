@@ -26,7 +26,7 @@ This policy covers:
 
 ### API Protection
 
-- **Origin validation** — Middleware blocks cross-origin requests to `/api/chat` from unauthorized domains
+- **Origin validation** — Proxy (proxy.ts) blocks cross-origin requests to `/api/chat` from unauthorized domains
 - **Rate limiting** — Upstash Redis sliding window (20 req/min per IP) with in-memory fallback when Redis is unavailable
 - **Input validation** — Request body size (100KB), message count (50), per-message content length (4K chars), Content-Type enforcement
 - **Tool input limits** — Job descriptions capped at 10K chars, emphasis areas at 200 chars each (max 10)
