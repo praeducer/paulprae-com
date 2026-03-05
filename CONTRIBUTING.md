@@ -93,7 +93,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/) style:
 
 [optional body explaining why, not what]
 
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>   # if AI-assisted
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>   # if AI-assisted
 ```
 
 **Types:** `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `style`, `design`
@@ -138,8 +138,8 @@ Or run individual checks:
 ```bash
 npm run lint          # ESLint
 npm run format:check  # Prettier
-npm test              # Vitest (315+ tests)
-npm run build         # Next.js static export
+npm test              # Vitest (330+ tests)
+npm run build         # Next.js build
 ```
 
 CI runs lint, format, test, build, and build output validation on every PR. All must pass to merge.

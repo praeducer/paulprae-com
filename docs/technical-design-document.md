@@ -124,16 +124,16 @@ Career data (~90K tokens after `stripEmpty()` compression) is placed in the syst
 
 ### 3.6 Model routing
 
-| Use case                      | Model               | Why                                                           |
-| ----------------------------- | ------------------- | ------------------------------------------------------------- |
-| Chat Q&A                      | `claude-sonnet-4-6` | Fast, cheap, sufficient quality for career Q&A                |
-| Resume generation             | `claude-opus-4-6`   | Highest quality with adaptive thinking for complex formatting |
-| Future: intent classification | `claude-haiku-4-5`  | Sub-second, $1/$5 per MTok                                    |
+| Use case                      | Model               | Why                                                                |
+| ----------------------------- | ------------------- | ------------------------------------------------------------------ |
+| Chat Q&A                      | `claude-sonnet-4-6` | Fast, cheap, sufficient quality for career Q&A                     |
+| Tailored resume (tool call)   | `claude-sonnet-4-6` | Same model as chat; fast turnaround for recruiter-facing tool call |
+| Pipeline resume generation    | `claude-opus-4-6`   | Highest quality for the canonical resume artifact                  |
+| Future: intent classification | `claude-haiku-4-5`  | Sub-second, $1/$5 per MTok                                         |
 
 ### 3.7 Key Anthropic API features used
 
 - **Prompt caching** (GA) — `cache_control: { type: "ephemeral" }` on system prompt blocks
-- **Adaptive thinking** (Opus 4.6) — `thinking: { type: "adaptive" }` for resume generation
 - **Structured outputs** (GA) — guaranteed JSON schema conformance for resume data
 - **Search results / citations** (GA) — natural citations when answering from career data
 - **Compaction API** (beta, Opus 4.6) — server-side context summarization for long conversations
@@ -266,7 +266,7 @@ Pipeline order:
 1. `npm run ingest` -> parse CSV/knowledge inputs into `career-data.json`
 2. `npm run generate` -> generate Markdown resume from structured data
 3. `npm run export` -> produce PDF/DOCX artifacts from Markdown
-4. `npm run build` -> Next.js build (Phase 1: static export to `out/`; Phase 2: server build to `.next/`)
+4. `npm run build` -> Next.js server build to `.next/`
 5. push to `main` -> Vercel builds and deploys
 
 Supporting commands:
@@ -326,19 +326,20 @@ Supporting commands:
 
 AI-generated static resume: LinkedIn data + knowledge base → Claude → Markdown → Next.js static site → Vercel CDN.
 
-### Phase 2 (In Progress — see §3)
+### Phase 2 (Complete — see §3)
 
 Interactive career platform with chat-first homepage:
 
-- Chat homepage (`/`) with two modes: "Ask About Paul" (recruiter Q&A) and "Job Search Tools" (content generation)
+- Chat homepage (`/`) — recruiter Q&A with AI career assistant
 - Resume page (`/resume`) — extracted from Phase 1 homepage
+- Tools page (`/tools`) — job search content tools (noindex)
 - AI chat via `@assistant-ui/react` primitives with AI SDK 6 transport
-- Tailored resume generation from job descriptions (Opus 4.6) — Sprint 2+
+- Tool-calling: `generate_tailored_resume` and `get_resume_links` (chat mode only)
 - Vercel AI SDK 6 with streaming (`toUIMessageStreamResponse`)
-- Vercel Fluid Compute for serverless AI functions
+- Vercel Fluid Compute for serverless AI functions (maxDuration: 120s)
 
-**Sprint 1 complete** on `feat/phase2-implementation` branch (builds, 315 tests pass).
-Implementation tracked in `.claude/plans/phase2a-backend-agent-api.md`, `phase2b-frontend-chat.md`, `phase2c-devops-docs.md`.
+**Sprint 1+2 complete** on `feat/phase2-implementation` branch (337 tests pass).
+Implementation plans archived in `.claude/plans/archive/`.
 Authoritative redesign plan: `docs/phase2-redesign-plan.md`.
 
 ### Phase 3 (Future)
@@ -371,9 +372,10 @@ Authoritative redesign plan: `docs/phase2-redesign-plan.md`.
 
 - `README.md` (setup, pipeline, deployment)
 - `CLAUDE.md` (project memory and guardrails)
-- `.claude/plans/phase2a-backend-agent-api.md` (backend implementation plan)
-- `.claude/plans/phase2b-frontend-chat.md` (frontend implementation plan)
-- `.claude/plans/phase2c-devops-docs.md` (devops implementation plan)
+- `.claude/plans/archive/phase2a-backend-agent-api.md` (backend implementation plan — completed)
+- `.claude/plans/archive/phase2b-frontend-chat.md` (frontend implementation plan — completed)
+- `.claude/plans/archive/phase2c-devops-docs.md` (devops implementation plan — completed)
+- `.claude/plans/remaining-work.md` (pre-merge checklist and remaining enhancements)
 - `docs/domain-dns-runbook.md` (domain DNS operations)
 - `docs/linux-dev-environment-setup.md` (Linux/WSL setup)
 - `docs/windows-dev-environment-setup.md` (Windows setup)
