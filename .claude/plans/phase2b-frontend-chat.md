@@ -1,6 +1,6 @@
 # Plan 2B: Frontend — Chat-First Homepage + Resume Route
 
-> **Status:** Sprint 1 COMPLETE on `feat/phase2-implementation`. Sprint 2+ remaining.
+> **Status:** Sprint 1+2 COMPLETE on `feat/phase2-implementation`. Only platform-aware copy and character count remain (nice-to-have).
 > **Sequence:** Plan 2A (backend) → Plan 2B (this) → Plan 2C (devops)
 > **Branch:** `feat/phase2-implementation` (combined 2A+2B Sprint 1 work)
 > **Depends on:** Plan 2A (API routes must exist at `/api/chat`)
@@ -226,26 +226,15 @@ Chat is the primary interface and should always be present. Content generation (
 
 ## Remaining Work (Sprint 2+)
 
-### Welcome Message Enhancement — NOT STARTED
+### Welcome Message Enhancement — COMPLETE ✅ (Sprint 2)
 
-**Priority: HIGH.** Replace the current minimal `ThreadPrimitive.Empty` state with an elegant, memorable welcome that:
+Replaced minimal empty state with recruiter-focused welcome: Paul's name/title, career summary, CTA for tailored resumes. Tools mode retains its own description.
 
-- Summarizes Paul's value proposition for the target audience
-- Includes suggested questions as quick action chips (already exists)
-- Makes a strong first impression — fun and memorable, not generic
-- Stays focused: exactly what recruiters/HMs need, nothing more
+### Tailored Resume Generation — COMPLETE ✅ (Sprint 2)
 
-### Tailored Resume Generation — NOT STARTED
+Implemented as tool-calling within `/api/chat` (not a separate route). `generate_tailored_resume` tool takes JD + optional emphasis areas, calls Sonnet with `resume-generator.system.md`. "Tailored resume" quick action chip added (5th chat chip). Content appears inline in chat thread.
 
-**Priority: HIGH.** Recruiters commonly request custom resumes for specific JDs. This is a core feature of the unified `/` experience, not a tools-mode feature.
-
-- Agent tool in `/api/chat` that generates a tailored resume via Opus 4.6
-- Content appears inline in the chat thread (chat is always present)
-- Progress indicator for generation (30-60s)
-- Download links for PDF/DOCX/MD formats in the response
-- Quick action chip: "Generate tailored resume" (add to chat mode chips)
-
-### Platform-Aware Copy-to-Clipboard — NOT STARTED
+### Platform-Aware Copy-to-Clipboard — NOT STARTED (nice-to-have)
 
 Every AI response in `/tools` mode needs platform-aware copy:
 
@@ -260,19 +249,19 @@ Use assistant-ui's `ActionBarPrimitive` to add custom copy actions.
 
 Show real-time character count sourced from `platform-constraints.json` when in `/tools` mode.
 
-### Component Tests — NOT STARTED
+### Component Tests — COMPLETE ✅ (Sprint 2)
 
-**Priority: HIGH.** Test iteratively as features are built (agile — site always in working state).
+| Test                           | Status                                       |
+| ------------------------------ | -------------------------------------------- |
+| `tests/chat-home.test.tsx`     | ✅ Welcome message, modes, UI                |
+| `tests/quick-actions.test.tsx` | ✅ Chip counts, click handlers               |
+| `tests/context.test.ts`        | ✅ Context loading, prompt modes, stripEmpty |
+| `tests/chat-api.test.ts`       | ✅ Input validation (400 responses)          |
 
-| Test                         | Status                                          |
-| ---------------------------- | ----------------------------------------------- |
-| `tests/chat-home.test.tsx`   | ❌ ChatHome component, quick actions, mode prop |
-| `tests/resume-page.test.tsx` | ❌ Resume page rendering                        |
+### Cleanup — COMPLETE ✅ (Sprint 2)
 
-### Cleanup — NOT STARTED
-
-- [ ] Delete old `app/components/SectionNav.tsx` and `app/components/BackToTop.tsx` (dead code after move to `app/resume/components/`)
-- [ ] Delete `app/components/ModeToggle.tsx` (toggle removed from UI, mode is now route-driven)
+- [x] Deleted `app/components/SectionNav.tsx` and `app/components/BackToTop.tsx` (dead copies)
+- [x] Deleted `app/components/ModeToggle.tsx` (replaced by route-based mode)
 
 ---
 

@@ -1,6 +1,6 @@
 # Plan 2A: Backend — Career Agent Core + API Routes
 
-> **Status:** Sprint 1 COMPLETE on `feat/phase2-implementation`. Sprint 2+ remaining.
+> **Status:** Sprint 1+2 COMPLETE on `feat/phase2-implementation`. Only AI Gateway and prompt caching optimization remain.
 > **Sequence:** Plan 2A (this) → Plan 2B (frontend) → Plan 2C (devops)
 > **Branch:** `feat/phase2-implementation` (combined 2A+2B Sprint 1 work)
 > **Depends on:** Nothing (first in sequence)
@@ -248,73 +248,37 @@ async function initRateLimit() {
 
 ## Remaining Work (Sprint 2+)
 
-### Step 6: Agent Tools — NOT STARTED
+### Step 6: Agent Tools — COMPLETE ✅ (Sprint 2)
 
-Add tools to the chat agent for enhanced interactions:
+Tool-calling added to `/api/chat` (chat mode only) using AI SDK 6's `tool()` + `streamText({ tools, stopWhen })`:
 
-```typescript
-const agentTools = {
-  generate_resume: {
-    /* Calls Opus 4.6 for tailored resume generation */
-  },
-  get_resume_links: {
-    /* Returns download URLs for PDF/DOCX/MD */
-  },
-  get_platform_constraints: {
-    /* Returns char limits for a given platform */
-  },
-};
-```
+- `generate_tailored_resume` — takes `jobDescription` + optional `emphasisAreas`, calls Sonnet via `generateText()` with `resume-generator.system.md`, returns tailored markdown + download links
+- `get_resume_links` — returns PDF/DOCX/MD/web download URLs
 
-These will use AI SDK 6's tool-calling pattern with `streamText({ tools: ... })`.
+> **Changed from plan:** No separate `/api/resume` route. Tool-calling within `/api/chat` is simpler — the model decides when to invoke tools based on conversation context. `maxDuration` bumped to 120s to accommodate tool execution. `get_platform_constraints` deferred (not needed for MVP).
 
-### Step 7: Resume Generation Route (`app/api/resume/route.ts`) — NOT STARTED
+### Step 7: Resume Generation Route — SUPERSEDED
 
-Separate route for long-running Opus generation:
+Folded into Step 6 as a tool within `/api/chat`. No separate `/api/resume` route needed.
 
-```typescript
-export const maxDuration = 300; // 5 minutes for Opus generation
+### Step 8: AI Gateway Integration — NOT STARTED (optional)
 
-export async function POST(request: Request) {
-  const { jobDescription, emphasisAreas } = await request.json();
-  // Call Opus 4.6 with adaptive thinking
-  // Stream result back to client
-}
-```
+Replace direct `@ai-sdk/anthropic` calls with `@ai-sdk/gateway`. Low priority — direct Anthropic calls work well and AI Gateway adds complexity without clear benefit at current scale.
 
-### Step 8: AI Gateway Integration — NOT STARTED
+### Step 9: Prompt Caching Optimization — NOT STARTED (optional)
 
-Replace direct `@ai-sdk/anthropic` calls with `@ai-sdk/gateway`:
+Current implementation passes system prompt as a single string. Could optimize to use block-level caching with `providerOptions.anthropic.cacheControl`. Worth measuring actual cache hit rates before optimizing.
 
-```typescript
-import { createGateway } from "@ai-sdk/gateway";
-const gateway = createGateway({ apiKey: process.env.AI_GATEWAY_API_KEY });
-const chatModel = gateway("anthropic/claude-sonnet-4-6");
-```
+### Step 10: Tests — COMPLETE ✅ (Sprint 2)
 
-### Step 9: Prompt Caching Optimization — NOT STARTED
-
-Current implementation passes system prompt as a single string. Optimize to use block-level caching:
-
-```typescript
-system: [
-  { type: "text", text: chatPrompt },
-  {
-    type: "text",
-    text: careerDataXml,
-    providerOptions: { anthropic: { cacheControl: { type: "ephemeral" } } },
-  },
-],
-```
-
-### Step 10: Tests — PARTIALLY COMPLETE
-
-| Test                                       | Status         |
-| ------------------------------------------ | -------------- |
-| Existing 315 tests                         | ✅ All pass    |
-| `lib/agent/context.ts` unit tests          | ❌ Not written |
-| API route tests (mode, rate limit, errors) | ❌ Not written |
-| System prompt loading tests                | ❌ Not written |
+| Test                                         | Status                            |
+| -------------------------------------------- | --------------------------------- |
+| Existing 315 tests                           | ✅ All pass                       |
+| `lib/agent/context.ts` unit tests            | ✅ `tests/context.test.ts`        |
+| API route tests (validation, error handling) | ✅ `tests/chat-api.test.ts`       |
+| QuickActions component tests                 | ✅ `tests/quick-actions.test.tsx` |
+| ChatHome component tests                     | ✅ `tests/chat-home.test.tsx`     |
+| Total: 337 tests passing                     | ✅                                |
 
 ---
 

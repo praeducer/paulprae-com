@@ -3,8 +3,17 @@
 Tasks requiring manual action or Vercel dashboard configuration. Complements the AI-executable plans (phase2a/b/c).
 
 > **Prerequisites:** v2.1 human steps are **COMPLETE** ✅ (secrets configured, deploy verified, CI/CD working).
-> `ANTHROPIC_API_KEY` is already set as a GitHub secret (will be available to Vercel functions after Phase 2 deploys).
-> **Sequence:** Steps 1-3 can happen in any order (parallelizable). Steps 4-5 after code merges to main.
+> **Code status:** Sprint 2 COMPLETE on `feat/phase2-implementation` (337 tests, builds clean). Ready for human setup + merge.
+> **Sequence:** Steps 1-4 before merge. Step 5 after merge.
+>
+> **Known completed (per user confirmation):**
+>
+> - [x] Step 1: Vercel Pro upgrade — DONE (Fluid Compute enabled)
+> - [x] Step 3b: Anthropic spending limits — DONE
+> - [x] Step 4: `ANTHROPIC_API_KEY` on Vercel — DONE
+> - [x] Vercel spending limits — DONE
+> - [ ] Step 2: Upstash Redis — NOT YET DONE (rate limiting will use graceful fallback until provisioned)
+> - [ ] Step 5: Post-deploy verification — blocked on merge
 
 ---
 

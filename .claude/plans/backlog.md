@@ -2,7 +2,7 @@
 
 Only actionable coding/documentation tasks belong here.
 
-> Last reconciled: 2026-03-04 against `feat/phase2-implementation` branch and `.claude/plans/phase2{a,b,c}-*.md`.
+> Last reconciled: 2026-03-04 against `feat/phase2-implementation` branch (Sprint 2 complete, 337 tests).
 
 ## Pipeline Enhancements
 
@@ -23,21 +23,27 @@ Options to evaluate in order:
 
 Acceptance criteria: quality score must stay ≥395 for any optimization to be accepted.
 
-## Phase 2 Remaining (tracked in phase2a/2b/2c plans)
+## Phase 2 Remaining (low priority / nice-to-have)
 
-> These are NOT duplicated here — see the individual plan files for full details and status.
-> Summary of what's left after Sprint 1:
-
-- [ ] Agent tools: `get_resume_links`, `get_platform_constraints`, `generate_resume` (Plan 2A Step 6)
-- [ ] `/api/resume` route for tailored resume generation with Opus 4.6 (Plan 2A Step 7)
-- [ ] AI Gateway integration (Plan 2A Step 8)
-- [ ] Prompt caching optimization with block-level cache control (Plan 2A Step 9)
-- [ ] Unit tests for `lib/agent/context.ts`, API route, and ChatHome component (Plans 2A/2B)
+- [ ] AI Gateway integration — replace direct `@ai-sdk/anthropic` with `@ai-sdk/gateway` (Plan 2A Step 8)
+- [ ] Block-level prompt caching optimization with `cacheControl` (Plan 2A Step 9)
 - [ ] Platform-aware copy-to-clipboard in tools mode (Plan 2B)
 - [ ] Character count display for tools mode (Plan 2B)
-- [ ] Welcome message with suggested questions (Plan 2B)
-- [ ] Delete dead `app/components/SectionNav.tsx` and `BackToTop.tsx` after move (Plan 2B)
-- [ ] vercel.json, CI/CD, sitemap, documentation updates (Plan 2C — full plan)
+
+## Phase 2 Completed (Sprint 2)
+
+- [x] Agent tools: `generate_tailored_resume`, `get_resume_links` in `/api/chat` (Plan 2A Step 6)
+- [x] Resume generator system prompt + PromptMode extension (Plan 2A)
+- [x] Welcome message enhancement with recruiter value proposition (Plan 2B)
+- [x] "Tailored resume" quick action chip (Plan 2B)
+- [x] Component/API tests: context, QuickActions, ChatHome, chat-api (Plans 2A/2B)
+- [x] Dead component cleanup: SectionNav, BackToTop, ModeToggle (Plan 2B)
+- [x] vercel.json: remove static export config, add API headers + CSP (Plan 2C)
+- [x] CI workflow: validate .next/BUILD_ID (Plan 2C)
+- [x] Smoke tests: resume page + chat API validation checks (Plan 2C)
+- [x] Release check: .next/BUILD_ID output (Plan 2C)
+- [x] Sitemap: add /resume route (Plan 2C)
+- [x] Documentation: CLAUDE.md, README, TDD updates (Plan 2C)
 
 ## UX Enhancements (deferred from Phase 1 review)
 
