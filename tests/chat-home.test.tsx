@@ -40,6 +40,8 @@ vi.mock("@assistant-ui/react", () => {
       Copy: Passthrough,
       Reload: Passthrough,
     },
+    useComposer: (selector?: (state: { text: string }) => unknown) =>
+      selector ? selector({ text: "" }) : { text: "" },
   };
 });
 

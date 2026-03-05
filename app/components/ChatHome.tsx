@@ -8,11 +8,14 @@ import {
   MessagePrimitive,
   ComposerPrimitive,
   ActionBarPrimitive,
+  useComposer,
 } from "@assistant-ui/react";
 import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
 import type { TextMessagePart } from "@assistant-ui/react";
 import QuickActions from "./QuickActions";
+
+const MAX_MESSAGE_CHARS = 4_000;
 
 // ─── Markdown Text Wrapper ──────────────────────────────────────────────────
 
@@ -93,31 +96,59 @@ function AssistantMessage() {
   );
 }
 
+/** Character counter shown inside the composer when approaching the limit. */
+function CharacterCounter() {
+  const textLength = useComposer((c) => c.text.length);
+
+  // Only show when past 75% of the limit
+  if (textLength < MAX_MESSAGE_CHARS * 0.75) return null;
+
+  const remaining = MAX_MESSAGE_CHARS - textLength;
+  const color =
+    remaining <= 0
+      ? "text-red-500 dark:text-red-400"
+      : remaining <= 200
+        ? "text-amber-500 dark:text-amber-400"
+        : "text-slate-400 dark:text-slate-500";
+
+  return (
+    <span className={`select-none text-[10px] tabular-nums ${color}`} aria-live="polite">
+      {remaining.toLocaleString()}
+    </span>
+  );
+}
+
 function ChatComposer() {
   return (
-    <ComposerPrimitive.Root className="flex items-end gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-      <ComposerPrimitive.Input
-        placeholder="Ask about Paul's experience..."
-        className="min-h-[40px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder:text-slate-500"
-        aria-label="Chat message"
-        autoFocus
-      />
-      <ComposerPrimitive.Send asChild>
-        <button
-          type="submit"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:opacity-40 disabled:hover:bg-blue-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
-          aria-label="Send message"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="h-4 w-4"
+    <ComposerPrimitive.Root className="flex flex-col gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div className="flex items-end gap-2">
+        <ComposerPrimitive.Input
+          placeholder="Ask about Paul's experience..."
+          className="min-h-[40px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder:text-slate-500"
+          aria-label="Chat message"
+          maxLength={MAX_MESSAGE_CHARS}
+          autoFocus
+        />
+        <ComposerPrimitive.Send asChild>
+          <button
+            type="submit"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:opacity-40 disabled:hover:bg-blue-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+            aria-label="Send message"
           >
-            <path d="M3.105 2.288a.75.75 0 0 0-.826.95l1.414 4.926A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086l-1.414 4.926a.75.75 0 0 0 .826.95 28.897 28.897 0 0 0 15.293-7.155.75.75 0 0 0 0-1.114A28.897 28.897 0 0 0 3.105 2.288Z" />
-          </svg>
-        </button>
-      </ComposerPrimitive.Send>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="h-4 w-4"
+            >
+              <path d="M3.105 2.288a.75.75 0 0 0-.826.95l1.414 4.926A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086l-1.414 4.926a.75.75 0 0 0 .826.95 28.897 28.897 0 0 0 15.293-7.155.75.75 0 0 0 0-1.114A28.897 28.897 0 0 0 3.105 2.288Z" />
+            </svg>
+          </button>
+        </ComposerPrimitive.Send>
+      </div>
+      <div className="flex justify-end px-2">
+        <CharacterCounter />
+      </div>
     </ComposerPrimitive.Root>
   );
 }
