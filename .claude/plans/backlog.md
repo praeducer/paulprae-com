@@ -2,7 +2,7 @@
 
 Only actionable coding/documentation tasks belong here.
 
-> Last reconciled: 2026-03-04 against `feat/phase2-implementation` branch (Sprint 2 complete, 337 tests).
+> Last reconciled: 2026-03-04 against `feat/phase2-implementation` branch (Sprint 2 + hardening complete, 341 unit + 11 E2E tests).
 
 ## Pipeline Enhancements
 
@@ -26,11 +26,11 @@ Acceptance criteria: quality score must stay ≥395 for any optimization to be a
 ## Phase 2 Remaining (low priority / nice-to-have)
 
 - [ ] AI Gateway integration — replace direct `@ai-sdk/anthropic` with `@ai-sdk/gateway` (Plan 2A Step 8)
-- [ ] Block-level prompt caching optimization with `cacheControl` (Plan 2A Step 9)
+- [x] ~~Block-level prompt caching~~ — implemented via `providerOptions.anthropic.cacheControl` on chat route
 - [ ] Platform-aware copy-to-clipboard in tools mode (Plan 2B)
 - [ ] Character count display for tools mode (Plan 2B)
 
-## Phase 2 Completed (Sprint 2)
+## Phase 2 Completed (Sprint 2 + Hardening)
 
 - [x] Agent tools: `generate_tailored_resume`, `get_resume_links` in `/api/chat` (Plan 2A Step 6)
 - [x] Resume generator system prompt + PromptMode extension (Plan 2A)
@@ -44,6 +44,12 @@ Acceptance criteria: quality score must stay ≥395 for any optimization to be a
 - [x] Release check: .next/BUILD_ID output (Plan 2C)
 - [x] Sitemap: add /resume route (Plan 2C)
 - [x] Documentation: CLAUDE.md, README, TDD updates (Plan 2C)
+- [x] Chat API hardening: JSON parse safety, 100KB body limit, 50 msg limit (GPT-5.3 review)
+- [x] Anthropic prompt caching on chat/resume-generator routes (GPT-5.3 review)
+- [x] Stale static export references removed from docs (GPT-5.3 review)
+- [x] Legacy out/ test block removed (GPT-5.3 review)
+- [x] CHANGELOG.md + SECURITY.md added (GPT-5.3 review)
+- [x] Playwright E2E tests: 11 smoke tests (GPT-5.3 review + user request)
 
 ## UX Enhancements (deferred from Phase 1 review)
 

@@ -138,7 +138,8 @@ Or run individual checks:
 ```bash
 npm run lint          # ESLint
 npm run format:check  # Prettier
-npm test              # Vitest (330+ tests)
+npm test              # Vitest (341 tests)
+npm run test:e2e      # Playwright E2E (11 tests)
 npm run build         # Next.js build
 ```
 
