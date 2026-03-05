@@ -21,10 +21,10 @@ Deliver a fast, shareable professional site at `https://paulprae.com` that prese
 
 ### 2.1 Runtime model
 
-- **Frontend:** Next.js App Router static site (`output: 'export'`)
-- **Backend at request time:** none (no API routes, no SSR)
-- **Build-time AI:** Claude API invoked locally by scripts
-- **Hosting:** Vercel static hosting from `out/`
+- **Frontend:** Next.js App Router (server-rendered with static pre-rendering for `/resume`)
+- **Backend:** `/api/chat` streaming endpoint via AI SDK 6 + Claude
+- **Build-time AI:** Claude API invoked locally by pipeline scripts
+- **Hosting:** Vercel with Fluid Compute (Pro plan) — `.next/` output
 
 ### 2.2 Core stack (implemented)
 

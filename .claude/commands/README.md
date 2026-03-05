@@ -6,4 +6,4 @@ Custom slash commands for Claude Code. Use for frequent, manual workflows.
 - **Scope:** Project-wide
 - **Format:** One `.md` file per command with optional frontmatter (`description`, `allowed-tools`)
 
-Example: `/deploy-vercel` → build and deploy the resume static site to Vercel.
+Example: `/deploy-vercel` → build and deploy paulprae.com to Vercel.

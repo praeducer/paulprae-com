@@ -120,10 +120,11 @@ The workflow also runs on a monthly schedule (1st of each month at 9 AM UTC) to 
 
 ## Vercel Configuration
 
-- **Framework:** `null` (static site served from `out/`)
+- **Framework:** Auto-detected Next.js (server-rendered with API routes)
 - **Build command:** `npm run build`
-- **Output directory:** `out`
-- **Auto-deploy:** Vercel's Git integration may still fire, but the GitHub Actions deploy is the source of truth. To prevent double-builds, set Vercel Project Settings → Git → Ignored Build Step to `exit 0`.
+- **Output directory:** `.next/` (managed by Vercel)
+- **Compute:** Fluid Compute (Pro plan) — streaming AI responses via `/api/chat`
+- **Auto-deploy:** Vercel's Git integration deploys on push to `main`. Preview deploys on PR branches.
 
 ## Monitoring
 
