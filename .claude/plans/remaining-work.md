@@ -1,22 +1,21 @@
 # Remaining Work — Phase 2 Merge & Beyond
 
-> **Status:** Phase 2 code complete (Sprint 1+2 + hardening). Pending: human setup, live testing, merge.
-> **Branch:** `feat/phase2-implementation` (341 unit tests + 11 E2E, builds clean, lint/format pass)
+> **Status:** Phase 2 code complete (Sprint 1+2 + hardening + security). Ready for live testing and merge.
+> **Branch:** `feat/phase2-implementation` (360 unit tests + 11 E2E, builds clean, lint/format pass)
 > **PR:** #21 (DRAFT)
 
 ---
 
 ## Pre-Merge Checklist
 
-These must be done before merging `feat/phase2-implementation` to `main`.
-
-### Human Steps (manual)
+### Human Steps (all critical infra complete)
 
 - [x] Vercel Pro upgrade ($20/mo) — Fluid Compute enabled
 - [x] `ANTHROPIC_API_KEY` set on Vercel (Production + Preview)
 - [x] Anthropic spending limits configured
 - [x] Vercel spending limits configured
-- [x] **Provision Upstash Redis** — `upstash-kv-redis-rest-paulprae-com` provisioned via Vercel KV integration. Env vars (`KV_REST_API_URL`, `KV_REST_API_TOKEN`) set on Vercel (Production + Preview) and in `.env.development.local`. Rate limiting verified: 20 req/min/IP with 429 responses.
+- [x] Upstash Redis provisioned — `upstash-kv-redis-rest-paulprae-com` via Vercel KV integration. Rate limiting verified: 20 req/min/IP with 429 responses
+- [x] AI Gateway configured — enabled on Vercel project, OIDC auth active. Provides observability, budget controls, model routing
 - [ ] **Live end-to-end test** — `npm run dev` with `ANTHROPIC_API_KEY` in `.env.local`:
   - [ ] `/` — chat renders, send a message, streaming response works
   - [ ] "Tailored resume" chip — triggers tool-calling, returns formatted resume
@@ -37,12 +36,13 @@ These must be done before merging `feat/phase2-implementation` to `main`.
 
 - [ ] Verify deploy workflow: CI → preview → smoke test → promote → production smoke
 - [ ] Post-deploy verification per `human-steps-phase2.md` Step 5
+- [ ] Verify AI Gateway logs calls in Vercel dashboard → AI → Gateway
 - [ ] Monitor costs for first few days (Vercel AI → Usage, Anthropic Console)
 - [ ] Update `package.json` version to `2.0.0`
 
 ---
 
-## Completed (Hardening Pass)
+## Completed (Security + Hardening Pass)
 
 - [x] Chat API hardened — JSON parse try-catch, 100KB body limit, 50 message limit
 - [x] Anthropic prompt caching enabled (`providerOptions.anthropic.cacheControl`)
@@ -50,7 +50,19 @@ These must be done before merging `feat/phase2-implementation` to `main`.
 - [x] Legacy `out/` test block removed from pipeline.test.ts
 - [x] CHANGELOG.md and SECURITY.md added
 - [x] Playwright E2E tests (11 tests: pages, navigation, API, chat interaction)
-- [x] Chat API tests expanded (3 → 10 cases)
+- [x] Chat API tests expanded (3 → 14 cases)
+- [x] Origin validation middleware — CORS blocking for unauthorized domains
+- [x] In-memory rate limiter fallback — fail-safe when Redis unavailable
+- [x] Per-message content validation (4K chars) + total input budget
+- [x] Content-Type enforcement (415 for non-JSON)
+- [x] Prompt injection defenses (S1-S5) in all system prompts
+- [x] XML delimiters in tool-calling for untrusted input isolation
+- [x] Zod schema limits on tool inputs
+- [x] Character counter in chat composer (appears at 75% of limit)
+- [x] Upstash Redis integration (KV*REST_API*_ + UPSTASH*REDIS_REST*_ support)
+- [x] AI Gateway integration — `@ai-sdk/gateway` with direct Anthropic fallback
+- [x] Security headers in middleware (works in dev + production)
+- [x] QA fixes: aria-label, canonical URL, node prop leak, poweredByHeader
 
 ---
 
@@ -58,13 +70,12 @@ These must be done before merging `feat/phase2-implementation` to `main`.
 
 ### Tools Mode UX
 
-- [ ] **Platform-aware copy-to-clipboard** — strip markdown for LinkedIn, separate subject/body for email, section-level copy for STAR answers.
-- [ ] **Character count display** — show real-time count sourced from `platform-constraints.json` when in `/tools` mode.
+- [ ] **Platform-aware copy-to-clipboard** — strip markdown for LinkedIn, separate subject/body for email
+- [ ] **Character count display** — show real-time count sourced from `platform-constraints.json` in `/tools` mode
 
-### Infrastructure Optimization
+### Infrastructure
 
-- [ ] **AI Gateway integration** — replace direct `@ai-sdk/anthropic` with `@ai-sdk/gateway` for unified observability and budget controls.
-- [ ] **CI route validation** — add `test -d .next/server/app/resume` to CI to verify specific routes exist in build output.
+- [ ] **CI route validation** — add `test -d .next/server/app/resume` to verify specific routes exist in build output
 
 ### Pipeline Cost Optimization
 

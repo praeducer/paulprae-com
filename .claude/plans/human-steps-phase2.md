@@ -2,88 +2,77 @@
 
 Tasks requiring manual action or Vercel dashboard configuration. Complements the AI-executable plans (phase2a/b/c).
 
-> **Prerequisites:** v2.1 human steps are **COMPLETE** ✅ (secrets configured, deploy verified, CI/CD working).
-> **Code status:** Sprint 2 COMPLETE on `feat/phase2-implementation` (337 tests, builds clean). Ready for human setup + merge.
-> **Sequence:** Steps 1-4 before merge. Step 5 after merge.
->
-> **Known completed (per user confirmation):**
+> **All critical infrastructure steps are COMPLETE.** Only live E2E testing and merge steps remain.
 >
 > - [x] Step 1: Vercel Pro upgrade — DONE (Fluid Compute enabled)
+> - [x] Step 2: Upstash Redis — DONE (`upstash-kv-redis-rest-paulprae-com` via Vercel KV, rate limiting verified)
+> - [x] Step 3: AI Gateway — DONE (enabled on Vercel project, OIDC auth, code integrated)
 > - [x] Step 3b: Anthropic spending limits — DONE
-> - [x] Step 4: `ANTHROPIC_API_KEY` on Vercel — DONE
+> - [x] Step 4: Vercel environment variables — DONE (ANTHROPIC*API_KEY, KV_REST_API*\*, VERCEL_OIDC_TOKEN)
 > - [x] Vercel spending limits — DONE
-> - [ ] Step 2: Upstash Redis — NOT YET DONE (rate limiting will use graceful fallback until provisioned)
 > - [ ] Step 5: Post-deploy verification — blocked on merge
+> - [ ] Step 6: DNS A record — low priority, deferred
 
 ---
 
-## Step 1: Upgrade to Vercel Pro ($20/mo)
+## Step 1: Upgrade to Vercel Pro ($20/mo) — DONE
 
 Phase 2 requires Vercel Pro for Fluid Compute (800s function duration for Opus resume generation).
-
-1. Go to: https://vercel.com/account/billing
-2. Upgrade to Pro plan ($20/month)
-3. Verify: Dashboard shows "Pro" badge
 
 **Why:** Hobby plan has a 10-second function timeout — Opus resume generation takes 30-60 seconds.
 
 ---
 
-## Step 2: Provision Upstash Redis for Rate Limiting
+## Step 2: Provision Upstash Redis for Rate Limiting — DONE
 
-> **Changed from original plan:** Uses Upstash Redis directly (`@upstash/redis`), not Vercel KV (`@vercel/kv`). Env var names are `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+Provisioned `upstash-kv-redis-rest-paulprae-com` via Vercel KV integration.
 
-1. Go to: https://console.upstash.com (or Vercel Dashboard → Storage → Create → KV/Redis)
-2. Create a free Redis database (10,000 requests/day — sufficient for a portfolio site)
-3. Copy the REST URL and REST Token
-4. Add to Vercel: Settings → Environment Variables:
-   - `UPSTASH_REDIS_REST_URL` (Production + Preview)
-   - `UPSTASH_REDIS_REST_TOKEN` (Production + Preview)
-5. Verify: Both vars exist for Production and Preview environments
+**Env vars set (Vercel Production + Preview + `.env.development.local`):**
 
-**Why:** Distributed rate limiting across Vercel's serverless function instances. The implementation gracefully falls back to no rate limiting when these env vars are absent (safe for local dev).
+- `KV_REST_API_URL`
+- `KV_REST_API_TOKEN`
+- `KV_REST_API_READ_ONLY_TOKEN`
+- `KV_URL`
+- `REDIS_URL`
 
----
+**Code supports both naming conventions:** `KV_REST_API_*` (Vercel integration) and `UPSTASH_REDIS_REST_*` (direct Upstash). `Redis.fromEnv()` auto-detects both.
 
-## Step 3: Configure AI Gateway (Optional but Recommended)
-
-1. Go to: https://vercel.com → paulprae-com project → **AI** → **Gateway**
-2. Enable AI Gateway for the project
-3. Copy the generated `AI_GATEWAY_API_KEY`
-4. Add as environment variable: Settings → Environment Variables → `AI_GATEWAY_API_KEY` (Production + Preview)
-5. Set budget alerts: AI → Gateway → Budget → Set monthly alert threshold (e.g., $10)
-
-**Benefits:** Zero-markup model routing, per-call observability, budget controls, hot-swap models from dashboard.
-
-**Note:** Current implementation uses `@ai-sdk/anthropic` directly. AI Gateway integration is a Sprint 2+ code change (see Plan 2A Step 8). Setting up the gateway now means it's ready when the code is updated.
+**Verified:** Rate limiting active — 429 responses after 20 req/min exceeded.
 
 ---
 
-## Step 3b: Set Anthropic API Spending Limits
+## Step 3: Configure AI Gateway — DONE
 
-Configure a hard spending cap in the Anthropic Console to prevent billing spikes if rate limiting fails or traffic spikes unexpectedly.
+AI Gateway enabled on Vercel project. Code integrated via `@ai-sdk/gateway`.
 
-1. Go to: https://console.anthropic.com → **Settings** → **Limits**
-2. Set a monthly spending limit (e.g., $20-50/mo — sufficient for a portfolio site)
-3. Optionally configure email alerts at 50% and 80% of the limit
+**How it works:**
 
-**Why:** Defense in depth. The Upstash rate limiter is the primary protection, but Anthropic's own spending cap is a hard backstop that works regardless of your application code. The rate limiter gracefully falls back to allowing requests if Redis is unavailable — the spending cap ensures this can never cause a billing surprise.
+- On Vercel: Gateway is auto-authenticated via `VERCEL_OIDC_TOKEN` (no separate key needed)
+- Locally: Falls back to direct `@ai-sdk/anthropic` (uses `ANTHROPIC_API_KEY`)
+- Model routing: `gateway("anthropic/claude-sonnet-4-6")` → Vercel AI Gateway → Anthropic
+
+**Benefits active:**
+
+- Per-call observability in Vercel Dashboard → AI → Gateway
+- Budget alerts and spending controls
+- Model hot-swap from dashboard without code changes
+- Unified logging across providers
 
 ---
 
-## Step 4: Add Vercel Environment Variables
+## Step 3b: Anthropic API Spending Limits — DONE
 
-After `feat/phase2-implementation` branch merges to main:
+Hard spending cap configured in Anthropic Console.
 
-> **Note:** `ANTHROPIC_API_KEY` is already set as a **GitHub Actions secret** (for the pipeline workflow).
-> It also needs to be set as a **Vercel environment variable** (for runtime function access).
-> These are different systems — GitHub secrets are for CI, Vercel env vars are for deployed functions.
+---
 
-1. Go to: Vercel → paulprae-com project → **Settings** → **Environment Variables**
-2. Add `ANTHROPIC_API_KEY` for Production + Preview (same key from `.env.local`)
-3. Verify Upstash vars from Step 2 are present
-4. Verify AI Gateway key from Step 3 is present (if configured)
-5. Trigger a deploy and verify `/api/chat` responds
+## Step 4: Vercel Environment Variables — DONE
+
+All required env vars configured for Production + Preview:
+
+- `ANTHROPIC_API_KEY` — Claude API access
+- `KV_REST_API_URL` / `KV_REST_API_TOKEN` — Upstash Redis rate limiting
+- `VERCEL_OIDC_TOKEN` — AI Gateway authentication (auto-set by Vercel)
 
 ---
 
@@ -91,21 +80,22 @@ After `feat/phase2-implementation` branch merges to main:
 
 After Phase 2 code deploys to production:
 
-1. Visit https://paulprae.com — verify chat homepage loads with mode toggle
+1. Visit https://paulprae.com — verify chat homepage loads
 2. Visit https://paulprae.com/resume — verify resume page loads with downloads
 3. Send a test message: "What is Paul's experience with AI?"
 4. Verify streaming response renders correctly
-5. Toggle to "Job Tools" mode and test a quick action
-6. Navigate from chat → resume and resume → chat
-7. Check Vercel dashboard → Functions → verify function execution
-8. Check Vercel dashboard → AI Gateway → verify calls are logged (if configured)
-9. Monitor costs for the first few days (Vercel AI → Usage)
+5. Test "Tailored resume" chip — should trigger tool-calling
+6. Test "Download resume" chip — should return links
+7. Navigate from chat → resume and resume → chat
+8. Check Vercel dashboard → Functions → verify function execution
+9. Check Vercel dashboard → AI → Gateway → verify calls are logged
+10. Monitor costs for the first few days
 
 ---
 
 ## Step 6: Update DNS A Record (Carried Forward from v2.1)
 
-**Status:** Still pending.
+**Status:** Still pending (low priority).
 
 1. Log in to panel.dreamhost.com
 2. Navigate to Domains → DNS Records

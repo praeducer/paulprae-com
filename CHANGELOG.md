@@ -34,6 +34,8 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Zod schema limits on tool inputs (job description 10K chars, emphasis areas capped)
 - Security headers in middleware (X-Content-Type-Options, X-Frame-Options, etc.)
 - Security and middleware test suite (origin validation, headers, prompt defenses)
+- Vercel AI Gateway integration with direct Anthropic fallback for local dev
+- Character counter in chat composer (appears at 75% of 4K limit)
 
 ### Removed
 

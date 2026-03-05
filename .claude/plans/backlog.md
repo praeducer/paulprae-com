@@ -25,7 +25,7 @@ Acceptance criteria: quality score must stay ≥395 for any optimization to be a
 
 ## Phase 2 Remaining (low priority / nice-to-have)
 
-- [ ] AI Gateway integration — replace direct `@ai-sdk/anthropic` with `@ai-sdk/gateway` (Plan 2A Step 8)
+- [x] ~~AI Gateway integration~~ — `@ai-sdk/gateway` with direct Anthropic fallback for local dev
 - [x] ~~Block-level prompt caching~~ — implemented via `providerOptions.anthropic.cacheControl` on chat route
 - [ ] Platform-aware copy-to-clipboard in tools mode (Plan 2B)
 - [ ] Character count display for tools mode (Plan 2B)

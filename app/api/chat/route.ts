@@ -1,4 +1,5 @@
 import { anthropic } from "@ai-sdk/anthropic";
+import { gateway } from "@ai-sdk/gateway";
 import {
   streamText,
   generateText,
@@ -6,6 +7,7 @@ import {
   tool,
   stepCountIs,
   type UIMessage,
+  type LanguageModel,
 } from "ai";
 import { z } from "zod";
 import { buildSystemPrompt } from "../../../lib/agent/context";
@@ -14,6 +16,20 @@ import { buildSystemPrompt } from "../../../lib/agent/context";
 // Pro plan default is 300s with Fluid Compute, but we set 120s as a
 // sensible ceiling for Sonnet chat + tool-calling.
 export const maxDuration = 120;
+
+// ─── Model Provider ─────────────────────────────────────────────────────────
+// Use Vercel AI Gateway when configured (production/preview on Vercel).
+// Falls back to direct @ai-sdk/anthropic when no gateway key is available
+// (local dev with only ANTHROPIC_API_KEY).
+
+const useGateway = !!(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN);
+
+function getModel(modelId: string): LanguageModel {
+  if (useGateway) {
+    return gateway(`anthropic/${modelId}`) as LanguageModel;
+  }
+  return anthropic(modelId) as LanguageModel;
+}
 
 // ─── Request Limits ─────────────────────────────────────────────────────────
 
@@ -284,7 +300,7 @@ ${jobDescription}
 </job_description>`;
 
               const { text } = await generateText({
-                model: anthropic("claude-sonnet-4-6"),
+                model: getModel("claude-sonnet-4-6"),
                 system: resumeSystemPrompt,
                 prompt: userPrompt,
                 maxOutputTokens: 4096,
@@ -328,7 +344,7 @@ ${jobDescription}
   // the cached prompt at ~90% cost reduction.
   try {
     const result = streamText({
-      model: anthropic("claude-sonnet-4-6"),
+      model: getModel("claude-sonnet-4-6"),
       system: systemPrompt,
       messages: modelMessages,
       maxOutputTokens: 4096,
@@ -344,13 +360,15 @@ ${jobDescription}
 
     return result.toUIMessageStreamResponse();
   } catch (err) {
-    console.error("[chat] Anthropic API error:", err);
+    console.error(`[chat] ${useGateway ? "Gateway" : "Anthropic"} API error:`, err);
     const status =
       err instanceof Error && "status" in err ? (err as { status: number }).status : 500;
     const message =
-      status === 529
-        ? "The AI service is temporarily overloaded. Please try again in a moment."
-        : "An error occurred while generating a response. Please try again.";
+      status === 429
+        ? "The AI service is rate limited. Please try again in a moment."
+        : status === 529
+          ? "The AI service is temporarily overloaded. Please try again in a moment."
+          : "An error occurred while generating a response. Please try again.";
     return new Response(message, { status: status >= 400 ? status : 500 });
   }
 }
