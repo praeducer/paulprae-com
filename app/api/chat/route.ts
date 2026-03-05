@@ -236,6 +236,14 @@ export async function POST(request: Request) {
 
   const validMode = mode === "tools" ? "tools" : "chat";
 
+  // Validate API credentials before attempting to stream.
+  // streamText() is lazy — errors surface asynchronously in the stream,
+  // causing the UI to show an empty bubble instead of an error message.
+  if (!useGateway && !process.env.ANTHROPIC_API_KEY) {
+    console.error("[chat] ANTHROPIC_API_KEY is not set");
+    return new Response("AI service is not configured. Please try again later.", { status: 503 });
+  }
+
   // Build system prompt with career data context
   let systemPrompt: string;
   try {
@@ -359,9 +367,14 @@ ${jobDescription}
           cacheControl: { type: "ephemeral" },
         },
       },
+      onError({ error }) {
+        console.error(`[chat] Stream error:`, error);
+      },
     });
 
-    return result.toUIMessageStreamResponse();
+    return result.toUIMessageStreamResponse({
+      onError: () => "An error occurred while generating a response. Please try again.",
+    });
   } catch (err) {
     console.error(`[chat] ${useGateway ? "Gateway" : "Anthropic"} API error:`, err);
     const status =
