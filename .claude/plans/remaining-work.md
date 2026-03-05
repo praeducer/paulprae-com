@@ -16,7 +16,7 @@ These must be done before merging `feat/phase2-implementation` to `main`.
 - [x] `ANTHROPIC_API_KEY` set on Vercel (Production + Preview)
 - [x] Anthropic spending limits configured
 - [x] Vercel spending limits configured
-- [ ] **Provision Upstash Redis** — create free DB at https://console.upstash.com, add `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to Vercel env vars. Without this, rate limiting uses a no-op fallback (safe but unprotected).
+- [x] **Provision Upstash Redis** — `upstash-kv-redis-rest-paulprae-com` provisioned via Vercel KV integration. Env vars (`KV_REST_API_URL`, `KV_REST_API_TOKEN`) set on Vercel (Production + Preview) and in `.env.development.local`. Rate limiting verified: 20 req/min/IP with 429 responses.
 - [ ] **Live end-to-end test** — `npm run dev` with `ANTHROPIC_API_KEY` in `.env.local`:
   - [ ] `/` — chat renders, send a message, streaming response works
   - [ ] "Tailored resume" chip — triggers tool-calling, returns formatted resume

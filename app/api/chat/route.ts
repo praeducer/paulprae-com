@@ -72,7 +72,10 @@ if (typeof globalThis !== "undefined") {
 async function initRateLimit() {
   if (ratelimit !== null) return ratelimit;
   try {
-    if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    const hasRedisEnv =
+      (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) ||
+      (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+    if (hasRedisEnv) {
       const { Ratelimit } = await import("@upstash/ratelimit");
       const { Redis } = await import("@upstash/redis");
       ratelimit = new Ratelimit({
