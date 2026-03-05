@@ -1,8 +1,8 @@
 /**
  * chat-api.test.ts — Tests for the chat API route handler.
  *
- * Tests input validation and request hardening. Full streaming tests
- * require Anthropic API mocking and are covered by E2E tests.
+ * Tests input validation, request hardening, and security controls.
+ * Full streaming tests require Anthropic API mocking and are covered by E2E tests.
  *
  * Run: npm test -- tests/chat-api.test.ts
  */
@@ -98,5 +98,51 @@ describe("POST /api/chat", () => {
       ),
     );
     expect(res.status).toBe(413);
+  });
+
+  // ─── Content-Type Validation ──────────────────────────────────────────────
+
+  it("returns 415 for missing Content-Type header", async () => {
+    const req = new Request("http://localhost:3000/api/chat", {
+      method: "POST",
+      body: JSON.stringify({ messages: [{ id: "1", role: "user", content: "hi" }] }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(415);
+  });
+
+  it("returns 415 for wrong Content-Type", async () => {
+    const req = new Request("http://localhost:3000/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ messages: [{ id: "1", role: "user", content: "hi" }] }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(415);
+  });
+
+  // ─── Per-Message Content Length ───────────────────────────────────────────
+
+  it("returns 400 for a single message exceeding per-message limit", async () => {
+    const longContent = "x".repeat(5_000); // Exceeds MAX_MESSAGE_CHARS (4000)
+    const res = await POST(
+      makeRequest({
+        messages: [{ id: "1", role: "user", parts: [{ type: "text", text: longContent }] }],
+      }),
+    );
+    expect(res.status).toBe(400);
+    const text = await res.text();
+    expect(text).toContain("exceeds maximum length");
+  });
+
+  it("allows a message at exactly the per-message limit", async () => {
+    const content = "x".repeat(4_000); // Exactly MAX_MESSAGE_CHARS
+    const res = await POST(
+      makeRequest({
+        messages: [{ id: "1", role: "user", parts: [{ type: "text", text: content }] }],
+      }),
+    );
+    // Should pass validation (will fail later at Anthropic call, not at validation)
+    expect(res.status).not.toBe(400);
   });
 });

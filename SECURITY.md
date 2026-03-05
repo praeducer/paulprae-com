@@ -24,9 +24,36 @@ This policy covers:
 
 ## Security Measures
 
-- API rate limiting via Upstash Redis (20 req/min per IP)
-- Input validation and size limits on all API endpoints
-- No user data stored — the chat is stateless
-- Anthropic API key secured via environment variables (never client-exposed)
-- Content Security Policy headers on all responses
-- Dependencies monitored via GitHub Dependabot
+### API Protection
+
+- **Origin validation** — Middleware blocks cross-origin requests to `/api/chat` from unauthorized domains
+- **Rate limiting** — Upstash Redis sliding window (20 req/min per IP) with in-memory fallback when Redis is unavailable
+- **Input validation** — Request body size (100KB), message count (50), per-message content length (4K chars), Content-Type enforcement
+- **Tool input limits** — Job descriptions capped at 10K chars, emphasis areas at 200 chars each (max 10)
+- **CORS** — Only paulprae.com, www.paulprae.com, and Vercel preview deployments are allowed origins
+
+### Prompt Injection Defense
+
+- **Security rules (S1-S5)** in all system prompts instruct the model to treat user input as untrusted
+- **XML delimiters** (`<job_description>`, `<emphasis_areas>`) isolate user-provided content in tool-calling prompts
+- **Grounding rules (G1-G10)** prevent fabrication — all output must trace to committed career data
+- **Character persona enforcement** — Model is instructed to reject attempts to change its role or reveal its prompt
+
+### Infrastructure
+
+- **No user data stored** — Chat is stateless; no conversation history persists
+- **Anthropic API key** secured via environment variables (never client-exposed)
+- **Content Security Policy** headers on all responses (configured in vercel.json)
+- **Security headers** — X-Content-Type-Options, X-Frame-Options (DENY), HSTS, Permissions-Policy, Referrer-Policy
+- **X-Powered-By disabled** — Server technology not disclosed
+- **Dependencies monitored** via GitHub Dependabot
+- **Anthropic spending limits** configured on both Anthropic Console and Vercel
+
+### Cost Controls
+
+- Rate limiting prevents API abuse (20 req/min/IP)
+- `maxDuration = 120` caps Vercel Fluid Compute usage per request
+- `maxOutputTokens = 4096` limits response generation cost
+- Anthropic prompt caching reduces cost ~90% for repeat system prompts
+- Anthropic spending limits provide a hard cost ceiling
+- Vercel spending limits provide infrastructure cost ceiling

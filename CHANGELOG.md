@@ -25,6 +25,15 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Homepage from static resume to AI chat-first experience
 - Build output from static export (`out/`) to server-rendered (`.next/`)
 - Chat API hardened with JSON parse safety, size limits (100KB), message limits (50)
+- Origin validation middleware blocks cross-origin API abuse (CORS)
+- In-memory rate limiter fallback when Upstash Redis is unavailable
+- Per-message content length validation (4K chars) and total input budget
+- Content-Type enforcement (415 for non-JSON requests)
+- Prompt injection defenses in all system prompts (security rules S1-S5)
+- XML delimiters around user input in tool-calling to isolate untrusted data
+- Zod schema limits on tool inputs (job description 10K chars, emphasis areas capped)
+- Security headers in middleware (X-Content-Type-Options, X-Frame-Options, etc.)
+- Security and middleware test suite (origin validation, headers, prompt defenses)
 
 ### Removed
 

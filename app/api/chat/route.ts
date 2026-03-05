@@ -11,14 +11,63 @@ import { z } from "zod";
 import { buildSystemPrompt } from "../../../lib/agent/context";
 
 // Vercel Fluid Compute: explicit timeout for streaming chat responses.
-// Pro plan default is 300s with Fluid Compute, but we set 60s as a
-// sensible ceiling for Sonnet chat. The /api/resume route (Sprint 2)
-// will use maxDuration = 300 for Opus generation.
+// Pro plan default is 300s with Fluid Compute, but we set 120s as a
+// sensible ceiling for Sonnet chat + tool-calling.
 export const maxDuration = 120;
 
-// ─── Rate Limiting (Upstash — optional, graceful fallback) ──────────────────
+// ─── Request Limits ─────────────────────────────────────────────────────────
+
+const MAX_MESSAGES = 50;
+const MAX_BODY_BYTES = 100_000; // 100 KB
+const MAX_MESSAGE_CHARS = 4_000; // Per-message content limit (~1K tokens)
+const MAX_JOB_DESC_CHARS = 10_000; // Tool input: job description
+const MAX_EMPHASIS_ITEMS = 10; // Tool input: emphasis areas count
+const MAX_EMPHASIS_CHARS = 200; // Tool input: per emphasis area
+
+// ─── Rate Limiting (Upstash + in-memory fallback) ───────────────────────────
 
 let ratelimit: { limit: (key: string) => Promise<{ success: boolean }> } | null = null;
+
+/**
+ * In-memory sliding window rate limiter — used when Upstash Redis is
+ * unavailable. Protects against runaway costs even without external infra.
+ * Entries auto-expire after the window period.
+ */
+const memoryStore = new Map<string, number[]>();
+const MEMORY_WINDOW_MS = 60_000; // 1 minute
+const MEMORY_MAX_REQUESTS = 20;
+
+function memoryRateLimit(key: string): boolean {
+  const now = Date.now();
+  const timestamps = memoryStore.get(key) ?? [];
+  // Evict entries outside the window
+  const valid = timestamps.filter((t) => now - t < MEMORY_WINDOW_MS);
+  if (valid.length >= MEMORY_MAX_REQUESTS) {
+    memoryStore.set(key, valid);
+    return false;
+  }
+  valid.push(now);
+  memoryStore.set(key, valid);
+  return true;
+}
+
+// Periodic cleanup to prevent memory leaks (every 5 minutes)
+if (typeof globalThis !== "undefined") {
+  const cleanup = () => {
+    const now = Date.now();
+    for (const [key, timestamps] of memoryStore) {
+      const valid = timestamps.filter((t) => now - t < MEMORY_WINDOW_MS);
+      if (valid.length === 0) memoryStore.delete(key);
+      else memoryStore.set(key, valid);
+    }
+  };
+  // Use a global flag to avoid duplicate intervals across hot reloads
+  const globalRef = globalThis as unknown as { _rateLimitCleanup?: boolean };
+  if (!globalRef._rateLimitCleanup) {
+    globalRef._rateLimitCleanup = true;
+    setInterval(cleanup, 5 * 60_000).unref?.();
+  }
+}
 
 async function initRateLimit() {
   if (ratelimit !== null) return ratelimit;
@@ -33,15 +82,13 @@ async function initRateLimit() {
         prefix: "paulprae:chat",
       });
     } else {
-      // Local dev: no rate limiting when Upstash env vars are absent
-      ratelimit = { limit: async () => ({ success: true }) };
+      // Local dev / missing env vars: use in-memory rate limiter
+      ratelimit = { limit: async (key: string) => ({ success: memoryRateLimit(key) }) };
     }
   } catch (err) {
-    // Production fallback: if Redis connection fails, allow requests through
-    // rather than killing the entire API. Anthropic's own rate limits and
-    // spending caps provide a secondary safety net.
-    console.warn("[rate-limit] Upstash Redis init failed, falling back to no rate limiting:", err);
-    ratelimit = { limit: async () => ({ success: true }) };
+    // Redis init failed: fall back to in-memory rate limiter (not open access)
+    console.warn("[rate-limit] Upstash Redis init failed, using in-memory fallback:", err);
+    ratelimit = { limit: async (key: string) => ({ success: memoryRateLimit(key) }) };
   }
   return ratelimit;
 }
@@ -65,14 +112,47 @@ function getSystemPrompt(mode: "chat" | "tools" | "resume-generator"): string {
   return prompt;
 }
 
+// ─── Input Validation Helpers ───────────────────────────────────────────────
+
+/** Get character length of a single message's text content. */
+function messageTextLength(msg: UIMessage): number {
+  let total = 0;
+  if (Array.isArray(msg.parts)) {
+    for (const part of msg.parts) {
+      if (part.type === "text") total += part.text.length;
+    }
+  }
+  return total;
+}
+
+/** Estimate total user input size in characters across all messages. */
+function estimateInputChars(messages: UIMessage[]): number {
+  let total = 0;
+  for (const msg of messages) {
+    total += messageTextLength(msg);
+  }
+  return total;
+}
+
+/** Validate individual message content lengths. Returns error message or null. */
+function validateMessages(messages: UIMessage[]): string | null {
+  for (let i = 0; i < messages.length; i++) {
+    if (messageTextLength(messages[i]) > MAX_MESSAGE_CHARS) {
+      return `Message ${i + 1} exceeds maximum length (${MAX_MESSAGE_CHARS} characters)`;
+    }
+  }
+  return null;
+}
+
 // ─── Route Handler ──────────────────────────────────────────────────────────
 
-// ─── Request Limits ─────────────────────────────────────────────────────────
-
-const MAX_MESSAGES = 50;
-const MAX_BODY_BYTES = 100_000; // 100 KB
-
 export async function POST(request: Request) {
+  // Content-Type validation
+  const contentType = request.headers.get("content-type");
+  if (!contentType?.includes("application/json")) {
+    return new Response("Content-Type must be application/json", { status: 415 });
+  }
+
   // Rate limiting
   const rl = await initRateLimit();
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
@@ -119,6 +199,19 @@ export async function POST(request: Request) {
     return new Response(`Too many messages (max ${MAX_MESSAGES})`, { status: 400 });
   }
 
+  // Validate per-message content length
+  const msgError = validateMessages(messages);
+  if (msgError) {
+    return new Response(msgError, { status: 400 });
+  }
+
+  // Total input budget: prevent token amplification attacks
+  // 50 messages × 4000 chars = 200K chars max; reject obviously excessive input
+  const totalInputChars = estimateInputChars(messages);
+  if (totalInputChars > MAX_MESSAGES * MAX_MESSAGE_CHARS) {
+    return new Response("Total message content exceeds maximum allowed size", { status: 413 });
+  }
+
   const validMode = mode === "tools" ? "tools" : "chat";
 
   // Build system prompt with career data context
@@ -145,9 +238,21 @@ export async function POST(request: Request) {
             inputSchema: z.object({
               jobDescription: z
                 .string()
+                .max(
+                  MAX_JOB_DESC_CHARS,
+                  `Job description must be under ${MAX_JOB_DESC_CHARS} characters`,
+                )
                 .describe("The job description or role requirements to tailor the resume for"),
               emphasisAreas: z
-                .array(z.string())
+                .array(
+                  z
+                    .string()
+                    .max(
+                      MAX_EMPHASIS_CHARS,
+                      `Each emphasis area must be under ${MAX_EMPHASIS_CHARS} characters`,
+                    ),
+                )
+                .max(MAX_EMPHASIS_ITEMS, `Maximum ${MAX_EMPHASIS_ITEMS} emphasis areas`)
                 .optional()
                 .describe(
                   "Specific areas to emphasize (e.g., 'AI/ML', 'healthcare', 'leadership')",
@@ -155,9 +260,25 @@ export async function POST(request: Request) {
             }),
             execute: async ({ jobDescription, emphasisAreas }) => {
               const resumeSystemPrompt = getSystemPrompt("resume-generator");
+
+              // Wrap user input in XML delimiters to mitigate prompt injection.
+              // The model is instructed to treat content inside these tags as
+              // untrusted data, not as instructions.
               const userPrompt = emphasisAreas?.length
-                ? `Generate a tailored resume for this job description:\n\n${jobDescription}\n\nEmphasize these areas: ${emphasisAreas.join(", ")}`
-                : `Generate a tailored resume for this job description:\n\n${jobDescription}`;
+                ? `Generate a tailored resume for the following job description.
+
+<job_description>
+${jobDescription}
+</job_description>
+
+<emphasis_areas>
+${emphasisAreas.join(", ")}
+</emphasis_areas>`
+                : `Generate a tailored resume for the following job description.
+
+<job_description>
+${jobDescription}
+</job_description>`;
 
               const { text } = await generateText({
                 model: anthropic("claude-sonnet-4-6"),
