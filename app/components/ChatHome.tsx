@@ -99,6 +99,7 @@ function ChatComposer() {
       <ComposerPrimitive.Input
         placeholder="Ask about Paul's experience..."
         className="min-h-[40px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder:text-slate-500"
+        aria-label="Chat message"
         autoFocus
       />
       <ComposerPrimitive.Send asChild>

@@ -15,9 +15,12 @@ import SectionNav from "./components/SectionNav";
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "Paul Prae — Resume | Principal AI Engineer & Solutions Architect",
+  title: "Paul Prae — Resume | AI Engineer & Architect",
   description:
     "Building AI agents that ship AI products. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
+  alternates: {
+    canonical: "https://paulprae.com/resume",
+  },
   openGraph: {
     title: "Paul Prae — Resume | Principal AI Engineer & Solutions Architect",
     description:
@@ -153,7 +156,8 @@ export default function ResumePage() {
   // ─── Markdown component overrides ──────────────────────────────────────────
 
   const markdownComponents: Components = {
-    h2: ({ children, ...props }) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    h2: ({ children, node, ...props }) => {
       const id = slugify(String(children ?? ""));
       return (
         <h2 id={id} {...props}>
@@ -162,7 +166,8 @@ export default function ResumePage() {
       );
     },
 
-    a: ({ href, children, ...props }) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    a: ({ href, children, node, ...props }) => {
       const isExternal = href?.startsWith("http");
       return (
         <a
