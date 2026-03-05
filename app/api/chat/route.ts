@@ -165,6 +165,11 @@ export async function POST(request: Request) {
                 prompt: userPrompt,
                 maxOutputTokens: 4096,
                 temperature: 0.3,
+                providerOptions: {
+                  anthropic: {
+                    cacheControl: { type: "ephemeral" },
+                  },
+                },
               });
 
               return {
@@ -193,7 +198,10 @@ export async function POST(request: Request) {
         }
       : undefined;
 
-  // Stream response using AI SDK 6
+  // Stream response using AI SDK 6 with Anthropic prompt caching.
+  // The system prompt (~90K tokens of career data) is marked for ephemeral
+  // caching (5-min TTL). After the first request, subsequent turns reuse
+  // the cached prompt at ~90% cost reduction.
   try {
     const result = streamText({
       model: anthropic("claude-sonnet-4-6"),
@@ -203,6 +211,11 @@ export async function POST(request: Request) {
       temperature: 0.7,
       tools: chatTools,
       stopWhen: chatTools ? stepCountIs(3) : stepCountIs(1),
+      providerOptions: {
+        anthropic: {
+          cacheControl: { type: "ephemeral" },
+        },
+      },
     });
 
     return result.toUIMessageStreamResponse();
