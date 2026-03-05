@@ -12,8 +12,9 @@ const ALLOWED_ORIGINS = new Set([
 function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return true; // Same-origin requests (no Origin header)
   if (ALLOWED_ORIGINS.has(origin)) return true;
-  // Allow Vercel preview deployments
-  if (origin.endsWith(".vercel.app") && origin.includes("paulprae")) return true;
+  // Allow Vercel preview deployments (strict: must match project slug prefix)
+  if (/^https:\/\/paulprae(-com)?(-[a-z0-9]+)*-praeducers-projects\.vercel\.app$/.test(origin))
+    return true;
   // Allow localhost in development
   if (
     process.env.NODE_ENV === "development" &&
@@ -52,7 +53,10 @@ export function proxy(request: NextRequest) {
 
     // Only allow POST to API routes
     if (request.method !== "POST") {
-      return new NextResponse("Method Not Allowed", { status: 405 });
+      return new NextResponse("Method Not Allowed", {
+        status: 405,
+        headers: { Allow: "POST, OPTIONS" },
+      });
     }
   }
 
@@ -67,5 +71,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/((?!_next/static|_next/image|favicon).*)"],
+  matcher: ["/api/:path*"],
 };

@@ -51,7 +51,8 @@ describe("Origin validation logic", () => {
   function isAllowedOrigin(origin: string | null, isDev = false): boolean {
     if (!origin) return true;
     if (ALLOWED_ORIGINS.has(origin)) return true;
-    if (origin.endsWith(".vercel.app") && origin.includes("paulprae")) return true;
+    if (/^https:\/\/paulprae(-com)?(-[a-z0-9]+)*-praeducers-projects\.vercel\.app$/.test(origin))
+      return true;
     if (isDev && (origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:")))
       return true;
     return false;
@@ -70,7 +71,15 @@ describe("Origin validation logic", () => {
   });
 
   it("allows Vercel preview deployments", () => {
-    expect(isAllowedOrigin("https://feat-chat-paulprae-com.vercel.app")).toBe(true);
+    expect(isAllowedOrigin("https://paulprae-com-abc123-praeducers-projects.vercel.app")).toBe(
+      true,
+    );
+  });
+
+  it("allows Vercel branch alias deployments", () => {
+    expect(isAllowedOrigin("https://paulprae-com-git-feat-x-praeducers-projects.vercel.app")).toBe(
+      true,
+    );
   });
 
   it("blocks random external origins", () => {
@@ -79,6 +88,10 @@ describe("Origin validation logic", () => {
 
   it("blocks other Vercel apps not related to paulprae", () => {
     expect(isAllowedOrigin("https://some-other-app.vercel.app")).toBe(false);
+  });
+
+  it("blocks Vercel apps with paulprae in name but wrong project", () => {
+    expect(isAllowedOrigin("https://evil-paulprae-stealer.vercel.app")).toBe(false);
   });
 
   it("blocks localhost in production", () => {

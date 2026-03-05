@@ -174,7 +174,10 @@ export async function POST(request: Request) {
 
   // Rate limiting
   const rl = await initRateLimit();
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
+  const ip =
+    request.headers.get("x-real-ip") ??
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "anonymous";
   const { success } = await rl.limit(ip);
   if (!success) {
     return new Response("Too many requests. Please try again in a minute.", {
@@ -350,7 +353,7 @@ ${jobDescription}
       maxOutputTokens: 4096,
       temperature: 0.7,
       tools: chatTools,
-      stopWhen: chatTools ? stepCountIs(3) : stepCountIs(1),
+      stopWhen: chatTools ? stepCountIs(2) : stepCountIs(1),
       providerOptions: {
         anthropic: {
           cacheControl: { type: "ephemeral" },
