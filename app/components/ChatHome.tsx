@@ -12,15 +12,13 @@ import {
 } from "@assistant-ui/react";
 import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
-import type { TextMessagePart } from "@assistant-ui/react";
 import QuickActions from "./QuickActions";
-import { MAX_MESSAGE_CHARS } from "../../lib/constants";
+import { MAX_MESSAGE_CHARS, SITE_NAME, SITE_SUBTITLE, YEARS_EXPERIENCE } from "../../lib/constants";
 
 // ─── Markdown Text Wrapper ──────────────────────────────────────────────────
 
 /** Wraps MarkdownTextPrimitive to match the TextMessagePartComponent interface */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function MarkdownText(_props: TextMessagePart & { status: Record<string, unknown> }) {
+function MarkdownText() {
   return <MarkdownTextPrimitive />;
 }
 
@@ -56,7 +54,7 @@ function AssistantMessage() {
             }}
           />
         </div>
-        <ActionBarPrimitive.Root className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+        <ActionBarPrimitive.Root className="flex gap-1 opacity-100 sm:opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
           <ActionBarPrimitive.Copy asChild>
             <button
               type="button"
@@ -126,13 +124,17 @@ function CharacterCounter() {
 
 function ChatComposer() {
   return (
-    <ComposerPrimitive.Root className="flex flex-col gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+    <ComposerPrimitive.Root
+      className="flex flex-col gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+      aria-label="Chat with Paul's AI assistant"
+    >
       <div className="flex items-end gap-2">
         <ComposerPrimitive.Input
           placeholder="Ask about Paul's experience, or paste a job description..."
-          className="min-h-[40px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder:text-slate-500"
+          className="min-h-[40px] max-h-[40px] sm:max-h-[200px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:max-h-[200px] dark:text-slate-100 dark:placeholder:text-slate-500"
           aria-label="Chat message"
           maxLength={MAX_MESSAGE_CHARS}
+          rows={1}
           autoFocus
         />
         <ComposerPrimitive.Send asChild>
@@ -192,6 +194,14 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <div className="flex h-dvh flex-col">
+        {/* Skip navigation — off-screen until keyboard focus */}
+        <a
+          href="#chat-content"
+          className="absolute -top-full left-2 z-50 rounded bg-white px-4 py-2 text-sm text-slate-900 ring-2 ring-blue-500 focus-visible:top-2 focus-visible:outline-none dark:bg-slate-900 dark:text-slate-100"
+        >
+          Skip to chat content
+        </a>
+
         {/* Header — matches resume page header (Row 1) */}
         <header className="shrink-0 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95">
           <div className="mx-auto max-w-3xl px-6 py-3">
@@ -200,10 +210,10 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                 href="/"
                 className="text-xl font-bold text-slate-900 hover:text-slate-700 dark:text-slate-100 dark:hover:text-slate-300"
               >
-                Paul Prae
+                {SITE_NAME}
               </Link>
               <p className="hidden text-sm text-slate-500 sm:block dark:text-slate-400 truncate">
-                Principal AI Engineer &amp; Solutions Architect
+                {SITE_SUBTITLE}
               </p>
               <nav
                 className="ml-auto flex shrink-0 items-center gap-2"
@@ -247,90 +257,100 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
         </header>
 
         {/* Chat Thread */}
-        <ThreadPrimitive.Root className="flex min-h-0 flex-1 flex-col">
-          <ThreadPrimitive.Viewport className="flex flex-1 flex-col overflow-y-auto">
-            <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pt-5">
-              {/* Welcome / Empty State */}
-              <ThreadPrimitive.Empty>
-                <div className="flex flex-1 flex-col items-center justify-center py-12">
-                  <div className="mb-6 text-center">
-                    {mode === "chat" ? (
-                      <>
-                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                          Paul Prae
-                        </h2>
-                        <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
-                          Principal AI Engineer &amp; Solutions Architect
-                        </p>
-                        <p className="mt-3 max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-                          15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500
-                          across healthcare, life science, and insurance. Currently building AI
-                          agents and data platforms at Arine.
-                        </p>
-                        <p className="mt-2 max-w-lg text-xs text-slate-400 dark:text-slate-500">
-                          Ask about Paul&apos;s experience, download his resume, or request a
-                          tailored resume for your open role.
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                          Job Search Tools
-                        </h2>
-                        <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
-                          AI-powered content generation
-                        </p>
-                        <p className="mt-3 max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-                          Generate tailored outreach, interview prep, and application content. All
-                          grounded in Paul&apos;s real career data and optimized for each platform.
-                        </p>
-                      </>
-                    )}
+        <main
+          id="chat-content"
+          tabIndex={-1}
+          className="flex min-h-0 flex-1 flex-col focus:outline-none"
+        >
+          <ThreadPrimitive.Root className="flex min-h-0 flex-1 flex-col">
+            <ThreadPrimitive.Viewport className="flex flex-1 flex-col overflow-y-auto">
+              <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pt-5">
+                {/* Welcome / Empty State */}
+                <ThreadPrimitive.Empty>
+                  <div className="flex flex-1 flex-col items-center justify-center py-8 sm:py-12">
+                    <div className="mb-6 text-center">
+                      {mode === "chat" ? (
+                        <>
+                          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                            {SITE_NAME}
+                          </h1>
+                          <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+                            {SITE_SUBTITLE}
+                          </p>
+                          <p className="mt-3 max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                            {YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and
+                            Fortune 500 across healthcare, life science, and insurance. Currently
+                            building AI agents and data platforms at Arine.
+                          </p>
+                          <p className="mt-2 max-w-lg text-xs text-slate-400 dark:text-slate-500">
+                            Ask about Paul&apos;s experience, download his resume, or request a
+                            tailored resume for your open role.
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                            Job Search Tools
+                          </h1>
+                          <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+                            AI-powered content generation
+                          </p>
+                          <p className="mt-3 max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                            Generate tailored outreach, interview prep, and application content. All
+                            grounded in Paul&apos;s real career data and optimized for each
+                            platform.
+                          </p>
+                        </>
+                      )}
+                    </div>
+                    <QuickActions mode={mode} onAction={handleQuickAction} />
                   </div>
-                  <QuickActions mode={mode} onAction={handleQuickAction} />
-                </div>
-              </ThreadPrimitive.Empty>
+                </ThreadPrimitive.Empty>
 
-              {/* Messages */}
-              <ThreadPrimitive.Messages
-                components={{
-                  UserMessage,
-                  AssistantMessage,
-                }}
-              />
-            </div>
-
-            {/* Scroll anchor + Composer */}
-            <ThreadPrimitive.ViewportFooter className="sticky bottom-0">
-              <div className="mx-auto w-full max-w-3xl px-6 pb-4">
-                <ThreadPrimitive.ScrollToBottom asChild>
-                  <button
-                    type="button"
-                    className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:hidden dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
-                    aria-label="Scroll to bottom"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="h-4 w-4"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 3a.75.75 0 0 1 .75.75v10.638l3.96-4.158a.75.75 0 1 1 1.08 1.04l-5.25 5.5a.75.75 0 0 1-1.08 0l-5.25-5.5a.75.75 0 1 1 1.08-1.04l3.96 4.158V3.75A.75.75 0 0 1 10 3Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </ThreadPrimitive.ScrollToBottom>
-                <ChatComposer />
-                <p className="mt-1.5 text-center text-[10px] text-slate-400 dark:text-slate-500">
-                  paulprae.com &mdash; Built with Next.js, Claude AI, and Tailwind CSS
-                </p>
+                {/* Messages */}
+                <ThreadPrimitive.Messages
+                  components={{
+                    UserMessage,
+                    AssistantMessage,
+                  }}
+                />
               </div>
-            </ThreadPrimitive.ViewportFooter>
-          </ThreadPrimitive.Viewport>
-        </ThreadPrimitive.Root>
+
+              {/* Scroll anchor + Composer */}
+              <ThreadPrimitive.ViewportFooter className="sticky bottom-0">
+                <div className="mx-auto w-full max-w-3xl px-6 pb-4">
+                  <ThreadPrimitive.ScrollToBottom asChild>
+                    <button
+                      type="button"
+                      className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:hidden dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
+                      aria-label="Scroll to bottom"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="h-4 w-4"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 3a.75.75 0 0 1 .75.75v10.638l3.96-4.158a.75.75 0 1 1 1.08 1.04l-5.25 5.5a.75.75 0 0 1-1.08 0l-5.25-5.5a.75.75 0 1 1 1.08-1.04l3.96 4.158V3.75A.75.75 0 0 1 10 3Z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </ThreadPrimitive.ScrollToBottom>
+                  <ChatComposer />
+                </div>
+              </ThreadPrimitive.ViewportFooter>
+            </ThreadPrimitive.Viewport>
+          </ThreadPrimitive.Root>
+        </main>
+
+        <footer className="shrink-0 py-1.5 text-center">
+          <p className="text-xs text-slate-400 dark:text-slate-500">
+            paulprae.com &mdash; Built with Next.js, Claude AI, and Tailwind CSS
+          </p>
+        </footer>
       </div>
     </AssistantRuntimeProvider>
   );

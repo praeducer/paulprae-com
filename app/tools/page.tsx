@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description:
     "AI-powered job search tools built by Paul Prae. Generate tailored outreach, interview prep, and application content — all grounded in real career data.",
   robots: { index: false, follow: false },
+  alternates: {
+    canonical: null,
+  },
 };
 
 export default function ToolsPage() {

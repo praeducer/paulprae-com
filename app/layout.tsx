@@ -3,17 +3,25 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { loadCareerData } from "../lib/career-data";
+import {
+  SITE_NAME,
+  SITE_SUBTITLE,
+  SITE_URL,
+  SITE_DESCRIPTION,
+  SITE_OG_DESCRIPTION,
+} from "../lib/constants";
 
 const careerData = loadCareerData();
 
+const ogTitle = `${SITE_NAME} — ${SITE_SUBTITLE}`;
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://paulprae.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Paul Prae — AI Career Assistant | paulprae.com",
+    default: `${SITE_NAME} — AI Career Assistant | paulprae.com`,
     template: "%s | paulprae.com",
   },
-  description:
-    "Chat with an AI assistant about Paul Prae's career. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
+  description: SITE_DESCRIPTION,
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "32x32" },
@@ -22,36 +30,31 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "Paul Prae — Principal AI Engineer & Solutions Architect",
-    description:
-      "Building AI agents that ship AI products. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
+    title: ogTitle,
+    description: SITE_OG_DESCRIPTION,
     type: "website",
-    url: "https://paulprae.com",
-    siteName: "Paul Prae",
+    url: SITE_URL,
+    siteName: SITE_NAME,
     locale: "en_US",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Paul Prae — Principal AI Engineer & Solutions Architect",
+        alt: ogTitle,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Paul Prae — Principal AI Engineer & Solutions Architect",
-    description:
-      "Building AI agents that ship AI products. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
+    title: ogTitle,
+    description: SITE_OG_DESCRIPTION,
     images: ["/og-image.png"],
   },
   alternates: {
-    canonical: "https://paulprae.com",
+    canonical: SITE_URL,
   },
   manifest: "/manifest.json",
-  other: {
-    "theme-color": "#ffffff",
-  },
 };
 
 function PersonJsonLd() {
@@ -64,13 +67,13 @@ function PersonJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
-    "@id": "https://paulprae.com/#person",
+    "@id": `${SITE_URL}/#person`,
     name: profile.name,
-    url: profile.website || "https://paulprae.com",
-    image: "https://paulprae.com/og-image.png",
+    url: profile.website || SITE_URL,
+    image: `${SITE_URL}/og-image.png`,
     email: profile.email,
-    jobTitle: "Principal AI Engineer & Solutions Architect",
-    description: metadata.description,
+    jobTitle: SITE_SUBTITLE,
+    description: SITE_DESCRIPTION,
     sameAs: [profile.linkedin, "https://github.com/praeducer"].filter(Boolean),
     knowsAbout: careerData.skills.slice(0, 20),
     ...(recentPosition && {
@@ -104,6 +107,10 @@ function PersonJsonLd() {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+      </head>
       <body className="bg-white text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
         <PersonJsonLd />
         {children}

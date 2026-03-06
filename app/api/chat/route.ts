@@ -172,12 +172,15 @@ export async function POST(request: Request) {
     return new Response("Content-Type must be application/json", { status: 415 });
   }
 
-  // Rate limiting
+  // Rate limiting — IP extraction relies on Vercel's reverse proxy setting
+  // x-real-ip / x-forwarded-for headers. These are trustworthy on Vercel
+  // because the edge proxy controls the header chain.
   const rl = await initRateLimit();
+  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   const ip =
     request.headers.get("x-real-ip") ??
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    "anonymous";
+    forwarded ??
+    `anon-${(request.headers.get("user-agent") ?? "").slice(0, 32)}`;
   const { success } = await rl.limit(ip);
   if (!success) {
     return new Response("Too many requests. Please try again in a minute.", {

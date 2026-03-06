@@ -9,32 +9,33 @@ import { stripHtmlComments, stripHeaderBlock } from "../../lib/markdown";
 import { PATHS, RESUME_FILE_BASE } from "../../lib/config";
 import { loadCareerData } from "../../lib/career-data";
 import { slugify } from "../../lib/ui-utils";
+import { SITE_NAME, SITE_SUBTITLE, SITE_URL, SITE_OG_DESCRIPTION } from "../../lib/constants";
 import BackToTop from "./components/BackToTop";
 import SectionNav from "./components/SectionNav";
 
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
+const resumeTitle = `${SITE_NAME} — Resume | ${SITE_SUBTITLE}`;
+
 export const metadata: Metadata = {
-  title: "Paul Prae — Resume | Principal AI Engineer & Solutions Architect",
-  description:
-    "Building AI agents that ship AI products. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
+  title: resumeTitle,
+  description: SITE_OG_DESCRIPTION,
   alternates: {
-    canonical: "https://paulprae.com/resume",
+    canonical: `${SITE_URL}/resume`,
   },
   openGraph: {
-    title: "Paul Prae — Resume | Principal AI Engineer & Solutions Architect",
-    description:
-      "Building AI agents that ship AI products. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
+    title: resumeTitle,
+    description: SITE_OG_DESCRIPTION,
     type: "website",
-    url: "https://paulprae.com/resume",
-    siteName: "Paul Prae",
+    url: `${SITE_URL}/resume`,
+    siteName: SITE_NAME,
     locale: "en_US",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Paul Prae — Principal AI Engineer & Solutions Architect",
+        alt: `${SITE_NAME} — ${SITE_SUBTITLE}`,
       },
     ],
   },
@@ -202,7 +203,7 @@ export default function ResumePage() {
               {profile.name}
             </Link>
             <p className="hidden sm:block text-sm text-slate-500 dark:text-slate-400 truncate">
-              Principal AI Engineer &amp; Solutions Architect
+              {SITE_SUBTITLE}
             </p>
             <Link
               href="/"

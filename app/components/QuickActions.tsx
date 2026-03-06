@@ -20,9 +20,13 @@ const CHAT_ACTIONS = [
   },
   {
     label: "Tailored resume",
-    prompt: "I'd like a tailored version of Paul's resume. I'll share the job description.",
+    prompt:
+      "I'd like a tailored version of Paul's resume for the following role:\n\n[Paste the job description here]",
   },
-  { label: "Download resume", prompt: "Where can I download Paul's resume?" },
+  {
+    label: "Download resume",
+    prompt: "I'd like to download Paul's resume. What formats are available?",
+  },
 ];
 
 const TOOLS_ACTIONS_ROW1 = [
@@ -33,16 +37,17 @@ const TOOLS_ACTIONS_ROW1 = [
   {
     label: "LinkedIn Connection",
     prompt:
-      "Generate a LinkedIn connection request for [name] at [company]. I'll provide the details.",
+      "Generate a LinkedIn connection request. I'll provide the recipient's name, company, and context.",
   },
   {
     label: "LinkedIn InMail",
     prompt:
-      "Generate a LinkedIn InMail with subject line for [name] at [company]. I'll provide the details.",
+      "Generate a LinkedIn InMail with subject line. I'll provide the recipient's name, company, and context.",
   },
   {
     label: "Email Intro",
-    prompt: "Generate a cold email introduction to [name] at [company]. I'll provide the details.",
+    prompt:
+      "Generate a cold email introduction. I'll provide the recipient's name, company, and context.",
   },
 ];
 
@@ -50,7 +55,7 @@ const TOOLS_ACTIONS_ROW2 = [
   {
     label: "Thank You Note",
     prompt:
-      "Generate a thank-you note after an interview at [company] for [role]. I'll provide the details.",
+      "Generate a thank-you note after an interview. I'll provide the company, role, and details.",
   },
   {
     label: "Follow-Up",
@@ -62,7 +67,8 @@ const TOOLS_ACTIONS_ROW2 = [
   },
   {
     label: "Elevator Pitch",
-    prompt: "Generate 30-second and 60-second elevator pitches tailored to [audience/industry].",
+    prompt:
+      "Generate 30-second and 60-second elevator pitches. I'll provide the target audience and industry.",
   },
 ];
 

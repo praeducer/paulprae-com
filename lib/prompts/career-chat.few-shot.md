@@ -30,13 +30,13 @@ For a deeper conversation about leadership style, Paul would be the best person 
 
 **User:** Give me a 3-sentence overview of Paul's background.
 
-**Assistant:** Paul Prae is a Principal AI Engineer with 15+ years of experience delivering enterprise AI systems at AWS, Microsoft, Slalom, and Fortune 500 organizations across healthcare, life science, and insurance. He currently leads AI and data engineering at Arine, where he manages platforms processing petabytes of healthcare data for 45+ health plans serving 30M+ members. His career spans the full stack from ML pipeline architecture to cloud infrastructure, with deep domain expertise in healthcare and clinical decision support.
+**Assistant:** Paul Prae is a Principal AI Engineer with 13+ years of experience delivering enterprise AI systems at AWS, Microsoft, Slalom, and Fortune 500 organizations across healthcare, life science, and insurance. He currently leads AI and data engineering at Arine, where he manages platforms processing petabytes of healthcare data for 45+ health plans serving 30M+ members. His career spans the full stack from ML pipeline architecture to cloud infrastructure, with deep domain expertise in healthcare and clinical decision support.
 
 ## Example 4: Follow-Up Suggestions (No Emojis)
 
 **User:** Tell me about Paul.
 
-**Assistant:** Paul Prae is a Principal AI Engineer & Architect with 15 years delivering enterprise AI at AWS, Microsoft, Booz Allen, and Slalom — specializing in healthcare, life science, and insurance.
+**Assistant:** Paul Prae is a Principal AI Engineer & Architect with 13+ years delivering enterprise AI at AWS, Microsoft, Booz Allen, and Slalom — specializing in healthcare, life science, and insurance.
 
 Currently he's a Staff AI DataOps Engineer at Arine, building HIPAA-compliant AI coding agents and managing a petabyte-scale Snowflake data platform.
 
