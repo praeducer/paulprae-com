@@ -46,7 +46,7 @@ Deliver a fast, shareable professional site at `https://paulprae.com` that prese
 - Generated resume markdown is an artifact; source-of-truth logic is in generation scripts.
 - Recruiter-facing data is versioned in git; raw LinkedIn exports remain local/gitignored.
 
-## 3. Phase 2 Architecture (In Progress)
+## 3. Phase 2 Architecture (Complete)
 
 > **Implementation status:** Complete. Sprint 1 delivered chat homepage, resume page, tools page, and streaming API. Sprint 2 added tool-calling for tailored resume generation, security hardening, and rate limiting.
 
@@ -192,17 +192,25 @@ const runtime = useChatRuntime({ transport });
 ```
 lib/
 ├── agent/
-│   └── context.ts              # buildCareerContext(), buildSystemPrompt(), stripEmpty()
+│   └── context.ts              # buildCareerContext(), buildSystemPrompt()
 ├── prompts/
-│   ├── career-chat.system.md   # Recruiter Q&A prompt (grounding rules G1-G8)
+│   ├── loader.ts               # loadPrompt() — YAML frontmatter parser for prompt files
+│   ├── career-chat.system.md   # Recruiter Q&A prompt (grounding rules G1-G10)
+│   ├── career-chat.few-shot.md # Few-shot examples for chat tone/style
 │   ├── job-tools.system.md     # Content generation prompt (STAR, AIDA, PAS, BAB)
-│   └── resume-writer.system.md # Existing pipeline prompt (unchanged)
+│   ├── resume-generator.system.md # Tool-called resume generation prompt
+│   ├── resume-writer.system.md # Pipeline resume generation prompt
+│   ├── resume-writer.few-shot.md  # Few-shot examples for pipeline resume
+│   └── resume-writer.config.json  # Pipeline prompt configuration
+├── data-utils.ts               # stripEmpty() — shared by pipeline and chat
+├── constants.ts                # MAX_MESSAGE_CHARS — shared by client and server
 ├── career-data.ts              # loadCareerData() — existing, unchanged
 ├── config.ts                   # PATHS, RESUME_FILE_BASE — existing, unchanged
 └── types.ts                    # CareerData types — existing, unchanged
 
 app/
 ├── page.tsx                    # Chat homepage (imports ChatHome)
+├── tools/page.tsx              # Job search tools page (noindex)
 ├── resume/
 │   ├── page.tsx                # Resume page (extracted from Phase 1 homepage)
 │   └── components/
@@ -210,10 +218,11 @@ app/
 │       └── BackToTop.tsx       # Back-to-top button
 ├── components/
 │   ├── ChatHome.tsx            # Main chat client component ("use client")
-│   ├── ModeToggle.tsx          # Ask About Paul / Job Tools toggle
 │   └── QuickActions.tsx        # Mode-specific action chips
 ├── api/chat/route.ts           # POST handler: mode switching, rate limiting, streaming
 └── layout.tsx                  # Updated metadata for multi-page site
+
+proxy.ts                        # Next.js 16 proxy (CORS + origin validation)
 ```
 
 Existing `lib/` files (types, config, career-data) are unchanged — the agent context loader imports from them directly.

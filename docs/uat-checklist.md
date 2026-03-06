@@ -182,6 +182,6 @@ Test on a real phone or browser DevTools (375px width):
 | Performance         |       |       |
 | Cross-Browser       |       |       |
 
-**Tested by:** ******\_\_\_******
-**Date:** ******\_\_\_******
-**Deployment SHA:** ******\_\_\_******
+**Tested by:** **\*\***\_\_\_**\*\***
+**Date:** **\*\***\_\_\_**\*\***
+**Deployment SHA:** **\*\***\_\_\_**\*\***
