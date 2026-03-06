@@ -19,16 +19,19 @@ import { MAX_MESSAGE_CHARS } from "../../../lib/constants";
 export const maxDuration = 120;
 
 // ─── Model Provider ─────────────────────────────────────────────────────────
-// Use Vercel AI Gateway when configured (production/preview on Vercel).
-// Falls back to direct @ai-sdk/anthropic when no gateway key is available
-// (local dev with only ANTHROPIC_API_KEY).
+// Use Vercel AI Gateway only when explicitly configured via AI_GATEWAY_API_KEY.
+// VERCEL_OIDC_TOKEN is auto-injected by Vercel runtime but does NOT mean the
+// AI Gateway is configured for this project. Using it without setup causes
+// silent stream failures (empty response bubbles).
 
-const useGateway = !!(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN);
+const useGateway = !!process.env.AI_GATEWAY_API_KEY;
 
 function getModel(modelId: string): LanguageModel {
   if (useGateway) {
+    console.log(`[chat] Using AI Gateway for model: anthropic/${modelId}`);
     return gateway(`anthropic/${modelId}`) as LanguageModel;
   }
+  console.log(`[chat] Using direct Anthropic SDK for model: ${modelId}`);
   return anthropic(modelId) as LanguageModel;
 }
 
@@ -386,7 +389,13 @@ ${jobDescription}
         },
       },
       onError({ error }) {
-        console.error(`[chat] Stream error:`, error);
+        const errObj = error instanceof Error ? error : new Error(String(error));
+        console.error(
+          `[chat] Stream error (${useGateway ? "gateway" : "direct"}):`,
+          errObj.message,
+          errObj.cause ?? "",
+          errObj.stack ?? "",
+        );
       },
     });
 
