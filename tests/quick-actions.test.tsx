@@ -28,9 +28,9 @@ describe("QuickActions", () => {
   it("calls onAction with correct prompt on click", () => {
     const onAction = vi.fn();
     const { getByText } = render(<QuickActions mode="chat" onAction={onAction} />);
-    fireEvent.click(getByText("Key skills"));
+    fireEvent.click(getByText("Core expertise"));
     expect(onAction).toHaveBeenCalledWith(
-      "What are Paul's strongest technical skills and areas of expertise?",
+      "What are Paul's top 3 technical strengths with specific examples?",
     );
   });
 

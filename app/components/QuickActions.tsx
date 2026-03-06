@@ -6,12 +6,18 @@ interface QuickActionsProps {
 }
 
 const CHAT_ACTIONS = [
-  { label: "What does Paul do?", prompt: "What does Paul do? Give me a quick overview." },
   {
-    label: "Key skills",
-    prompt: "What are Paul's strongest technical skills and areas of expertise?",
+    label: "Quick overview",
+    prompt: "Give me a 3-sentence overview of Paul's background.",
   },
-  { label: "Recent experience", prompt: "Tell me about Paul's most recent work experience." },
+  {
+    label: "Core expertise",
+    prompt: "What are Paul's top 3 technical strengths with specific examples?",
+  },
+  {
+    label: "Recent work",
+    prompt: "What has Paul built most recently at Arine?",
+  },
   {
     label: "Tailored resume",
     prompt: "I'd like a tailored version of Paul's resume. I'll share the job description.",

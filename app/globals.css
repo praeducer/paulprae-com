@@ -14,6 +14,19 @@
   --header-height: 100px;
   --nav-height: 0px;
   --sticky-offset: calc(var(--header-height) + var(--nav-height));
+
+  /* Brand color tokens — single source of truth for interactive colors */
+  --brand-primary: #1e40af; /* blue-800: deep navy — headers, primary actions */
+  --brand-accent: #3b82f6; /* blue-500: accessible links and accents on light bg */
+  --user-bubble: #1d4ed8; /* blue-700: user message background (light) */
+  --user-bubble-dark: #1e40af; /* blue-800: user message background (dark) */
+  --focus-ring: #60a5fa; /* blue-400: visible on both light and dark */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brand-accent: #93c5fd; /* blue-300: passes WCAG AA on dark backgrounds */
+  }
 }
 
 html {

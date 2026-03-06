@@ -61,9 +61,9 @@ import ChatHome from "../app/components/ChatHome";
 
 describe("ChatHome", () => {
   it("chat mode renders Paul Prae heading and title", () => {
-    const { getByText } = render(<ChatHome mode="chat" />);
-    expect(getByText("Paul Prae")).toBeTruthy();
-    expect(getByText("Principal AI Engineer & Solutions Architect")).toBeTruthy();
+    const { getAllByText } = render(<ChatHome mode="chat" />);
+    expect(getAllByText("Paul Prae").length).toBeGreaterThanOrEqual(1);
+    expect(getAllByText(/Principal AI Engineer/).length).toBeGreaterThanOrEqual(1);
   });
 
   it("tools mode renders Job Search Tools heading", () => {

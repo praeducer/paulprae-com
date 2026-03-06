@@ -29,8 +29,8 @@ function MarkdownText(_props: TextMessagePart & { status: Record<string, unknown
 
 function UserMessage() {
   return (
-    <MessagePrimitive.Root className="flex justify-end">
-      <div className="max-w-[85%] rounded-2xl bg-blue-600 px-4 py-2.5 text-sm text-white">
+    <MessagePrimitive.Root className="flex justify-end mb-5">
+      <div className="max-w-[85%] rounded-2xl bg-blue-700 px-4 py-3 text-sm text-white dark:bg-blue-800">
         <MessagePrimitive.Content
           components={{
             Text: ({ text }) => <p className="whitespace-pre-wrap">{text}</p>,
@@ -43,9 +43,9 @@ function UserMessage() {
 
 function AssistantMessage() {
   return (
-    <MessagePrimitive.Root className="flex justify-start group">
-      <div className="max-w-[85%] space-y-2">
-        <div className="rounded-2xl bg-slate-100 px-4 py-2.5 text-sm text-slate-900 dark:bg-slate-800 dark:text-slate-100">
+    <MessagePrimitive.Root className="flex justify-start group mb-5">
+      <div className="max-w-[80%] space-y-2">
+        <div className="rounded-2xl bg-slate-100 px-5 py-4 text-sm leading-relaxed text-slate-900 prose prose-sm prose-slate max-w-none prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-li:my-0.5 dark:bg-slate-800/80 dark:text-slate-100 dark:prose-invert">
           <MessagePrimitive.Content
             components={{
               Text: MarkdownText,
@@ -56,7 +56,8 @@ function AssistantMessage() {
           <ActionBarPrimitive.Copy asChild>
             <button
               type="button"
-              className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:hover:bg-slate-800 dark:hover:text-slate-300"
+              title="Copy to clipboard"
+              className="rounded-md p-1.5 min-h-[32px] min-w-[32px] flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none dark:hover:bg-slate-800 dark:hover:text-slate-300"
               aria-label="Copy message"
             >
               <svg
@@ -73,7 +74,8 @@ function AssistantMessage() {
           <ActionBarPrimitive.Reload asChild>
             <button
               type="button"
-              className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:hover:bg-slate-800 dark:hover:text-slate-300"
+              title="Regenerate response"
+              className="rounded-md p-1.5 min-h-[32px] min-w-[32px] flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none dark:hover:bg-slate-800 dark:hover:text-slate-300"
               aria-label="Regenerate response"
             >
               <svg
@@ -123,7 +125,7 @@ function ChatComposer() {
     <ComposerPrimitive.Root className="flex flex-col gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-700 dark:bg-slate-900">
       <div className="flex items-end gap-2">
         <ComposerPrimitive.Input
-          placeholder="Ask about Paul's experience..."
+          placeholder="Ask about Paul's experience, or paste a job description..."
           className="min-h-[40px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder:text-slate-500"
           aria-label="Chat message"
           maxLength={MAX_MESSAGE_CHARS}
@@ -132,7 +134,7 @@ function ChatComposer() {
         <ComposerPrimitive.Send asChild>
           <button
             type="submit"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:opacity-40 disabled:hover:bg-blue-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-700 text-white transition-colors hover:bg-blue-600 disabled:opacity-40 disabled:hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none"
             aria-label="Send message"
           >
             <svg
@@ -189,7 +191,12 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
         {/* Header */}
         <header className="shrink-0 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95">
           <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-3">
-            <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">paulprae.com</h1>
+            <div>
+              <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">Paul Prae</h1>
+              <p className="hidden text-xs text-slate-500 sm:block dark:text-slate-400">
+                Principal AI Engineer &amp; Solutions Architect
+              </p>
+            </div>
             <div className="flex items-center gap-2">
               <Link
                 href="/resume"
@@ -245,7 +252,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                           Paul Prae
                         </h2>
-                        <p className="mt-1 text-sm font-medium text-blue-600 dark:text-blue-400">
+                        <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
                           Principal AI Engineer &amp; Solutions Architect
                         </p>
                         <p className="mt-3 max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400">
