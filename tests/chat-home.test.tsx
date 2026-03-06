@@ -77,9 +77,9 @@ describe("ChatHome", () => {
     expect(input).toBeTruthy();
   });
 
-  it("renders View Resume link", () => {
+  it("renders Resume link", () => {
     const { getByText } = render(<ChatHome mode="chat" />);
-    const link = getByText("View Resume");
+    const link = getByText("Resume");
     expect(link).toBeTruthy();
     expect(link.closest("a")?.getAttribute("href")).toBe("/resume");
   });

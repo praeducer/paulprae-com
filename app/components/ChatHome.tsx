@@ -196,29 +196,32 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
         <header className="shrink-0 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95">
           <div className="mx-auto max-w-3xl px-6 py-3">
             <div className="flex items-baseline gap-3">
-              <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Paul Prae</h1>
+              <Link
+                href="/"
+                className="text-xl font-bold text-slate-900 hover:text-slate-700 dark:text-slate-100 dark:hover:text-slate-300"
+              >
+                Paul Prae
+              </Link>
               <p className="hidden text-sm text-slate-500 sm:block dark:text-slate-400 truncate">
                 Principal AI Engineer &amp; Solutions Architect
               </p>
-              <div className="ml-auto flex shrink-0 items-center gap-2">
+              <nav
+                className="ml-auto flex shrink-0 items-center gap-2"
+                aria-label="Site navigation"
+              >
+                {mode === "tools" && (
+                  <Link
+                    href="/"
+                    className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                  >
+                    Chat with AI
+                  </Link>
+                )}
                 <Link
                   href="/resume"
                   className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                 >
-                  View Resume
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="h-3.5 w-3.5"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5 10a.75.75 0 0 1 .75-.75h6.638L10.23 7.29a.75.75 0 1 1 1.04-1.08l3.5 3.25a.75.75 0 0 1 0 1.08l-3.5 3.25a.75.75 0 1 1-1.04-1.08l2.158-1.96H5.75A.75.75 0 0 1 5 10Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  Resume
                 </Link>
                 <a
                   href="/Paul-Prae-Resume.pdf"
@@ -238,7 +241,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                   </svg>
                   PDF
                 </a>
-              </div>
+              </nav>
             </div>
           </div>
         </header>
