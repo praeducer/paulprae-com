@@ -123,6 +123,15 @@ export function buildSystemPrompt(mode: PromptMode): string | null {
     return null;
   }
 
+  // Load few-shot examples if available
+  const fewShotPath = promptPath.replace(".system.md", ".few-shot.md");
+  try {
+    const fewShot = fs.readFileSync(fewShotPath, "utf-8").trim();
+    if (fewShot) template += "\n\n" + fewShot;
+  } catch {
+    // No few-shot file — that's fine
+  }
+
   // Inject context into template placeholders
   const careerDataJson = JSON.stringify(stripEmpty(context.careerData), null, 2);
   const audienceJson = JSON.stringify(context.audienceFrameworks, null, 2);
