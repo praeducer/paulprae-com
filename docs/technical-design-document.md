@@ -338,7 +338,7 @@ Interactive career platform with chat-first homepage:
 - Vercel AI SDK 6 with streaming (`toUIMessageStreamResponse`)
 - Vercel Fluid Compute for serverless AI functions (maxDuration: 120s)
 
-**Sprint 1+2 complete** on `feat/phase2-implementation` branch (337 tests pass).
+**Sprint 1+2 complete** on `feat/phase2-implementation` branch.
 Implementation plans archived in `.claude/plans/archive/`.
 Authoritative redesign plan: `docs/phase2-redesign-plan.md`.
 
@@ -372,10 +372,8 @@ Authoritative redesign plan: `docs/phase2-redesign-plan.md`.
 
 - `README.md` (setup, pipeline, deployment)
 - `CLAUDE.md` (project memory and guardrails)
-- `.claude/plans/archive/phase2a-backend-agent-api.md` (backend implementation plan — completed)
-- `.claude/plans/archive/phase2b-frontend-chat.md` (frontend implementation plan — completed)
-- `.claude/plans/archive/phase2c-devops-docs.md` (devops implementation plan — completed)
-- `.claude/plans/remaining-work.md` (pre-merge checklist and remaining enhancements)
+- `.claude/plans/remaining-work.md` (pre-merge checklist)
+- `.claude/plans/backlog.md` (future enhancements)
 - `docs/domain-dns-runbook.md` (domain DNS operations)
 - `docs/linux-dev-environment-setup.md` (Linux/WSL setup)
 - `docs/windows-dev-environment-setup.md` (Windows setup)

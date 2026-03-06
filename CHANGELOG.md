@@ -39,6 +39,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Renamed middleware.ts → proxy.ts for Next.js 16 compatibility
 - Added `"framework": "nextjs"` to vercel.json (fixes 404 on preview deployments)
 - Removed duplicate security headers from proxy (vercel.json handles at CDN level)
+- Consolidated plan files: deleted 11 completed plans + 2 redundant docs (~3,800 lines removed)
 
 ### Removed
 

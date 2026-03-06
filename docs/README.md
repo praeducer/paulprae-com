@@ -9,6 +9,7 @@ This directory is organized by concern so each topic has one canonical home.
 | `linux-dev-environment-setup.md`   | Linux/WSL development setup and troubleshooting        |
 | `windows-dev-environment-setup.md` | Windows workstation setup and Dev Drive workflow       |
 | `devops.md`                        | Deployment, smoke tests, rollback, CI/CD configuration |
+| `ai-architecture.md`               | AI engineering decisions, model routing, cost analysis |
 | `mcp-setup.md`                     | MCP server configuration for Claude Code and Cursor    |
 | `../CONTRIBUTING.md`               | Development workflow, branching strategy, code quality |
 

@@ -63,22 +63,22 @@ The pipeline and website are independent. You can develop the website without th
 
 ## Tech Stack
 
-| Layer         | Technology                                                       |
-| ------------- | ---------------------------------------------------------------- |
-| Framework     | Next.js 16 (App Router, TypeScript, Turbopack)                   |
-| AI Chat       | Vercel AI SDK 6 (`ai` + `@ai-sdk/anthropic`) + Claude Sonnet     |
-| Chat UI       | `@assistant-ui/react` + `@assistant-ui/react-ai-sdk`             |
-| Styling       | Tailwind CSS 4.x                                                 |
-| Markdown      | react-markdown + remark-gfm                                      |
-| AI Generation | Anthropic Claude API (Opus 4.6) for resume pipeline              |
-| Rate Limiting | Upstash Redis (`@upstash/ratelimit`)                             |
-| Validation    | Zod (schema validation)                                          |
-| Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF)                                |
-| Linting       | ESLint 9 + eslint-config-next + Prettier + husky + lint-staged   |
-| Testing       | Vitest + Testing Library (360 tests) + Playwright E2E (11 tests) |
-| Analytics     | Vercel Analytics + Speed Insights (no cookies)                   |
-| Deployment    | Vercel via GitHub Actions CI/CD                                  |
-| Dev Tooling   | Claude Code CLI + Cursor                                         |
+| Layer         | Technology                                                     |
+| ------------- | -------------------------------------------------------------- |
+| Framework     | Next.js 16 (App Router, TypeScript, Turbopack)                 |
+| AI Chat       | Vercel AI SDK 6 (`ai` + `@ai-sdk/anthropic`) + Claude Sonnet   |
+| Chat UI       | `@assistant-ui/react` + `@assistant-ui/react-ai-sdk`           |
+| Styling       | Tailwind CSS 4.x                                               |
+| Markdown      | react-markdown + remark-gfm                                    |
+| AI Generation | Anthropic Claude API (Opus 4.6) for resume pipeline            |
+| Rate Limiting | Upstash Redis (`@upstash/ratelimit`)                           |
+| Validation    | Zod (schema validation)                                        |
+| Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF)                              |
+| Linting       | ESLint 9 + eslint-config-next + Prettier + husky + lint-staged |
+| Testing       | Vitest + Testing Library + Playwright E2E                      |
+| Analytics     | Vercel Analytics + Speed Insights (no cookies)                 |
+| Deployment    | Vercel via GitHub Actions CI/CD                                |
+| Dev Tooling   | Claude Code CLI + Cursor                                       |
 
 ## Getting Started
 
@@ -217,8 +217,8 @@ Pipeline steps skip automatically when their outputs are newer than their inputs
 ### Testing
 
 ```bash
-npm test              # Run all unit/component tests (341 tests)
-npm run test:e2e      # Playwright E2E smoke tests (11 tests)
+npm test              # Run all unit/component tests
+npm run test:e2e      # Playwright E2E smoke tests
 npm run test:unit     # Unit tests only (pure logic, no generated files needed)
 npm run test:pipeline # Pipeline integration tests (validates generated outputs)
 ```
@@ -259,7 +259,7 @@ Hot-reload is enabled — edit any `.tsx`, `.css`, or `.ts` file and the browser
 | ---------------------- | -------------------------------------- | ------------------------------------ |
 | Change CSS/layout      | Edit `app/globals.css` or `.tsx` files | Hot-reloads on `localhost:3000`      |
 | Preview resume changes | `npm run generate && npm run approve`  | Then refresh browser                 |
-| Run tests              | `npm test`                             | 341 tests + 11 E2E, ~500ms           |
+| Run tests              | `npm test`                             | ~500ms                               |
 | Check before push      | `npm run check`                        | Full CI-equivalent + data validation |
 
 ### Repeating on a Fresh Machine
@@ -310,7 +310,7 @@ Push to main → CI (ci.yml): lint, format, test, build, validate
 
 Custom-domain DNS operations are documented in [docs/domain-dns-runbook.md](docs/domain-dns-runbook.md).
 
-The project uses `framework: null` in `vercel.json` because `output: 'export'` produces a plain static site that Vercel's Next.js adapter cannot serve directly. Every push to `main` triggers a build — for a static site that builds in <5 seconds, this is simpler and more reliable than conditional skip logic.
+The project uses `"framework": "nextjs"` in `vercel.json` for proper App Router support (server-rendered pages + API routes). Every push to `main` triggers a CI + deploy workflow.
 
 ## Project Structure
 

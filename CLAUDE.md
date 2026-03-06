@@ -114,8 +114,8 @@ See [README.md](README.md#5-run-the-pipeline) for the full command reference. Qu
 - `npm run build` — website only (reads committed data, no API key)
 - `npm run pipeline:full` — pipeline + build (convenience)
 - `npm run brand` — generate brand assets (OG image, favicons) if missing
-- `npm test` — run all 360 unit/component tests
-- `npm run test:e2e` — Playwright E2E tests (11 smoke tests)
+- `npm test` — run all unit/component tests
+- `npm run test:e2e` — Playwright E2E smoke tests
 - `npm run check` — full pre-push release checklist (data + docs + lint + format + test + build + validate)
 - `npm run check:quick` — instant data file validation only
 - `npm run check:fix` — quick check + auto-fix stale public/ copies

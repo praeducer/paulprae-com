@@ -12,8 +12,10 @@ import { test, expect } from "@playwright/test";
 test.describe("page rendering", () => {
   test("homepage renders chat interface with welcome message", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("text=Paul Prae")).toBeVisible({ timeout: 10_000 });
-    await expect(page.locator("text=Principal AI Engineer")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Paul Prae", level: 1 })).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.locator("text=Principal AI Engineer").first()).toBeVisible();
   });
 
   test("homepage shows quick action chips", async ({ page }) => {
@@ -107,7 +109,9 @@ test.describe("chat interaction", () => {
     });
 
     await page.goto("/");
-    await expect(page.locator("text=Paul Prae")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Paul Prae", level: 1 })).toBeVisible({
+      timeout: 10_000,
+    });
 
     // Type a message in the composer
     const composer = page.locator('textarea, input[type="text"], [role="textbox"]').first();
