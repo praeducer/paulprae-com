@@ -26,6 +26,7 @@ import { PATHS, CLAUDE } from "../lib/config.js";
 import type { CareerData, GenerationResult } from "../lib/types.js";
 import { isDirectRun, hasForceFlag } from "../lib/script-utils.js";
 import { loadPrompt } from "../lib/prompts/loader.js";
+import { stripEmpty } from "../lib/data-utils.js";
 import {
   generateWithPrompt,
   classifyError,
@@ -67,33 +68,6 @@ const PROMPT_VERSION = `${promptMetadata.id}@${promptMetadata.version}`;
 /** Fields to omit from career data — rarely useful for resume generation. */
 const OMIT_FIELDS = new Set(["licenseNumber", "activities", "cause", "number"]);
 
-/**
- * Recursively strip empty strings, null values, empty arrays, and
- * fields in the OMIT_FIELDS set from an object tree.
- */
-function stripEmpty(obj: unknown): unknown {
-  if (Array.isArray(obj)) {
-    const filtered = obj.map(stripEmpty).filter((item) => item !== undefined);
-    return filtered.length > 0 ? filtered : undefined;
-  }
-
-  if (obj !== null && typeof obj === "object") {
-    const result: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
-      if (OMIT_FIELDS.has(key)) continue;
-      const cleaned = stripEmpty(value);
-      if (cleaned !== undefined) {
-        result[key] = cleaned;
-      }
-    }
-    return Object.keys(result).length > 0 ? result : undefined;
-  }
-
-  // Scalar values: strip empty strings and nulls
-  if (obj === null || obj === "") return undefined;
-  return obj;
-}
-
 // ─── Company Data Loader ────────────────────────────────────────────────────
 // Loads verified company metrics from data/sources/knowledge/career/companies.json
 
@@ -116,8 +90,8 @@ function buildUserMessage(careerData: CareerData): string {
   const companyData = loadCompanyData();
 
   // Strip empty fields and use compact JSON to save tokens
-  const compactCore = JSON.stringify(stripEmpty(coreData));
-  const compactCompanies = JSON.stringify(stripEmpty(companyData));
+  const compactCore = JSON.stringify(stripEmpty(coreData, OMIT_FIELDS));
+  const compactCompanies = JSON.stringify(stripEmpty(companyData, OMIT_FIELDS));
 
   const sections: string[] = [
     "Generate a professional resume from the career data below. Apply all formatting, grounding, and quality rules from your instructions.",
@@ -145,7 +119,7 @@ function buildUserMessage(careerData: CareerData): string {
   }
 
   if (knowledge.length > 0) {
-    const compactKnowledge = JSON.stringify(stripEmpty(knowledge));
+    const compactKnowledge = JSON.stringify(stripEmpty(knowledge, OMIT_FIELDS));
     sections.push(
       `<document index="${companyData.length > 0 ? "3" : "2"}">`,
       "<source>knowledge-base — Supplementary context: achievements with quantified metrics, domain expertise, STAR-method narratives. Entries with 'SCOPE BOUNDARY' markers contain mandatory constraints about what work was/was NOT done in specific roles. Entries with 'confidence: verified' are authoritative. Entries with 'relatedPositions' map to specific roles.</source>",
@@ -695,6 +669,7 @@ export const _testExports = {
   formatMarkdown,
   shouldSkipGenerate,
   stripEmpty,
+  OMIT_FIELDS,
   loadCompanyData,
   generate,
 };

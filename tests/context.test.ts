@@ -8,7 +8,8 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { loadCareerContext, buildSystemPrompt, stripEmpty } from "../lib/agent/context";
+import { loadCareerContext, buildSystemPrompt } from "../lib/agent/context";
+import { stripEmpty } from "../lib/data-utils";
 
 // ─── loadCareerContext ──────────────────────────────────────────────────────
 

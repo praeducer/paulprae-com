@@ -9,8 +9,9 @@
 
 import fs from "fs";
 import path from "path";
-import matter from "gray-matter";
 import { PATHS } from "../config";
+import { stripEmpty } from "../data-utils";
+import { loadPrompt } from "../prompts/loader";
 import type { CareerData } from "../types";
 
 // ─── Knowledge Base Paths ────────────────────────────────────────────────────
@@ -42,24 +43,6 @@ function loadCareerDataForAgent(): CareerData | null {
   } catch {
     return null;
   }
-}
-
-/** Strips empty/null/undefined values from objects for cleaner prompt context. */
-export function stripEmpty(obj: unknown): unknown {
-  if (obj === null || obj === undefined || obj === "") return undefined;
-  if (Array.isArray(obj)) {
-    const filtered = obj.map(stripEmpty).filter((v) => v !== undefined);
-    return filtered.length > 0 ? filtered : undefined;
-  }
-  if (typeof obj === "object") {
-    const cleaned: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
-      const v = stripEmpty(value);
-      if (v !== undefined) cleaned[key] = v;
-    }
-    return Object.keys(cleaned).length > 0 ? cleaned : undefined;
-  }
-  return obj;
 }
 
 // ─── Context Building ───────────────────────────────────────────────────────
@@ -95,15 +78,16 @@ export function loadCareerContext(): CareerContext | null {
 
 type PromptMode = "chat" | "tools" | "resume-generator";
 
-const PROMPT_FILES: Record<PromptMode, string> = {
-  chat: path.join(process.cwd(), "lib", "prompts", "career-chat.system.md"),
-  tools: path.join(process.cwd(), "lib", "prompts", "job-tools.system.md"),
-  "resume-generator": path.join(process.cwd(), "lib", "prompts", "resume-generator.system.md"),
+const PROMPT_IDS: Record<PromptMode, string> = {
+  chat: "career-chat",
+  tools: "job-tools",
+  "resume-generator": "resume-generator",
 };
 
 /**
  * Builds the complete system prompt for a given mode by loading the
- * prompt template and injecting career data + knowledge base content.
+ * prompt template (via the shared prompt loader) and injecting career
+ * data + knowledge base content.
  *
  * The assembled prompt is designed for Anthropic prompt caching:
  * the career data block is large and stable, making it ideal for caching.
@@ -112,24 +96,13 @@ export function buildSystemPrompt(mode: PromptMode): string | null {
   const context = loadCareerContext();
   if (!context) return null;
 
-  const promptPath = PROMPT_FILES[mode];
+  const promptId = PROMPT_IDS[mode];
   let template: string;
   try {
-    const raw = fs.readFileSync(promptPath, "utf-8");
-    // Strip YAML frontmatter
-    const { content } = matter(raw);
-    template = content;
+    const loaded = loadPrompt(promptId);
+    template = loaded.systemPrompt;
   } catch {
     return null;
-  }
-
-  // Load few-shot examples if available
-  const fewShotPath = promptPath.replace(".system.md", ".few-shot.md");
-  try {
-    const fewShot = fs.readFileSync(fewShotPath, "utf-8").trim();
-    if (fewShot) template += "\n\n" + fewShot;
-  } catch {
-    // No few-shot file — that's fine
   }
 
   // Inject context into template placeholders
