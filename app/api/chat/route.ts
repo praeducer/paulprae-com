@@ -289,13 +289,14 @@ export async function POST(request: Request) {
                 ),
             }),
             execute: async ({ jobDescription, emphasisAreas }) => {
-              const resumeSystemPrompt = getSystemPrompt("resume-generator");
+              try {
+                const resumeSystemPrompt = getSystemPrompt("resume-generator");
 
-              // Wrap user input in XML delimiters to mitigate prompt injection.
-              // The model is instructed to treat content inside these tags as
-              // untrusted data, not as instructions.
-              const userPrompt = emphasisAreas?.length
-                ? `Generate a tailored resume for the following job description.
+                // Wrap user input in XML delimiters to mitigate prompt injection.
+                // The model is instructed to treat content inside these tags as
+                // untrusted data, not as instructions.
+                const userPrompt = emphasisAreas?.length
+                  ? `Generate a tailored resume for the following job description.
 
 <job_description>
 ${jobDescription}
@@ -304,35 +305,49 @@ ${jobDescription}
 <emphasis_areas>
 ${emphasisAreas.join(", ")}
 </emphasis_areas>`
-                : `Generate a tailored resume for the following job description.
+                  : `Generate a tailored resume for the following job description.
 
 <job_description>
 ${jobDescription}
 </job_description>`;
 
-              const { text } = await generateText({
-                model: getModel("claude-sonnet-4-6"),
-                system: resumeSystemPrompt,
-                prompt: userPrompt,
-                maxOutputTokens: 4096,
-                temperature: 0.3,
-                providerOptions: {
-                  anthropic: {
-                    cacheControl: { type: "ephemeral" },
+                const { text } = await generateText({
+                  model: getModel("claude-sonnet-4-6"),
+                  system: resumeSystemPrompt,
+                  prompt: userPrompt,
+                  maxOutputTokens: 4096,
+                  temperature: 0.3,
+                  providerOptions: {
+                    anthropic: {
+                      cacheControl: { type: "ephemeral" },
+                    },
                   },
-                },
-              });
+                });
 
-              return {
-                resume: text,
-                downloadLinks: {
-                  pdf: "/Paul-Prae-Resume.pdf",
-                  docx: "/Paul-Prae-Resume.docx",
-                  md: "/Paul-Prae-Resume.md",
-                  web: "/resume",
-                },
-                note: "This is a tailored version. Paul's standard resume is available via the download links above.",
-              };
+                if (!text || text.length < 100) {
+                  return {
+                    error:
+                      "Resume generation produced insufficient output. Please try rephrasing your job description.",
+                  };
+                }
+
+                return {
+                  resume: text,
+                  downloadLinks: {
+                    pdf: "/Paul-Prae-Resume.pdf",
+                    docx: "/Paul-Prae-Resume.docx",
+                    md: "/Paul-Prae-Resume.md",
+                    web: "/resume",
+                  },
+                  note: "This is a tailored version. Paul's standard resume is available via the download links above.",
+                };
+              } catch (err) {
+                console.error("[tool:generate_tailored_resume]", err);
+                return {
+                  error:
+                    "Resume generation failed. This may be due to high demand. Please try again in a moment.",
+                };
+              }
             },
           }),
           get_resume_links: tool({
@@ -358,8 +373,8 @@ ${jobDescription}
       model: getModel("claude-sonnet-4-6"),
       system: systemPrompt,
       messages: modelMessages,
-      maxOutputTokens: 4096,
-      temperature: 0.7,
+      maxOutputTokens: 2048,
+      temperature: validMode === "tools" ? 0.5 : 0.7,
       tools: chatTools,
       stopWhen: chatTools ? stepCountIs(2) : stepCountIs(1),
       providerOptions: {

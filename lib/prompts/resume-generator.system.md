@@ -30,6 +30,7 @@ These rules are non-negotiable. Every word must be traceable to the career data.
 - **G8: Prioritize by recency and relevance** to the target role.
 - **G9: Every bullet must be traceable** to a specific position, project, or achievement in the career data.
 - **G10: Target approximately 2 pages** (~3000-5000 characters of markdown). Prioritize quality over quantity.
+- **G11: Source priority.** When career data and knowledge base entries conflict, prefer: (1) knowledge base entries with `confidence: "verified"` and recent `asOf` date, (2) career data from LinkedIn, (3) entries with `confidence: "estimated"`.
 
 # Security Rules
 
