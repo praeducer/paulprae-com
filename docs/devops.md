@@ -33,12 +33,13 @@ Configure these in GitHub repo Settings → Secrets and variables → Actions:
 
 After every deployment, the smoke test (`npm run smoke`) verifies:
 
-1. Homepage returns 200 with expected content ("Paul Prae", "Professional Summary")
-2. Resume MD download hash matches the local committed file
-3. PDF download returns 200, correct content-type, size > 10 KB
-4. DOCX download returns 200, correct content-type, size > 5 KB
-5. HTTP → HTTPS redirect works
-6. Security headers present (HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
+1. Homepage returns 200 with expected content ("Paul Prae", "AI Career Assistant")
+2. Resume page returns 200 with expected content ("Paul Prae", "Professional Summary")
+3. Resume MD download hash matches the local committed file
+4. PDF download returns 200, correct content-type, size > 10 KB
+5. DOCX download returns 200, correct content-type, size > 5 KB
+6. HTTP → HTTPS redirect works
+7. Security headers present (HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
 
 Run locally:
 
@@ -124,7 +125,7 @@ The workflow also runs on a monthly schedule (1st of each month at 9 AM UTC) to 
 - **Build command:** `npm run build`
 - **Output directory:** `.next/` (managed by Vercel)
 - **Compute:** Fluid Compute (Pro plan) — streaming AI responses via `/api/chat`
-- **Auto-deploy:** Vercel's Git integration deploys on push to `main`. Preview deploys on PR branches.
+- **Deploy:** GitHub Actions Deploy workflow handles deployments (Vercel Git integration is not used).
 
 ## Monitoring
 

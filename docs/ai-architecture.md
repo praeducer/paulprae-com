@@ -19,12 +19,12 @@ paulprae.com is a chat-first career platform with an AI assistant that answers r
 
 **Rationale:**
 
-- The career dataset is small: ~2KB career-data.json + ~20KB knowledge base = ~8K tokens after `stripEmpty()` optimization.
-- Anthropic prompt caching makes full injection cost-effective: first request caches the ~90K-token system prompt for 5 minutes at 1.25x write cost; subsequent turns reuse it at 0.1x (90% reduction). A typical 5-turn conversation costs ~$0.15 vs. ~$1.70 without caching.
+- The career dataset fits in a single system prompt: career-data.json (~259KB) + 5 knowledge base files (~11KB), compressed via `stripEmpty()` to remove empty fields. This is well within Claude's 200K-token context window.
+- Anthropic prompt caching makes full injection cost-effective: the first request caches the system prompt for 5 minutes at 1.25x write cost; subsequent turns reuse it at 0.1x (90% reduction).
 - Vector retrieval adds infrastructure (embedding model, vector DB, index maintenance) without proportional benefit at this scale. The retrieval step itself would cost more in latency (~200ms) than the tokens saved.
 - The full context gives Claude complete visibility into all career data, preventing missed connections that selective retrieval might cause.
 
-**Phase 3 path:** When the knowledge base grows beyond ~50K tokens (e.g., Neo4j knowledge graph with hundreds of project entries), the system will migrate to embedding-based retrieval. The prompt template's `{{CAREER_DATA}}` placeholder is already abstracted — switching from full injection to filtered results requires changing only the context builder.
+**Phase 3 path:** When the knowledge base grows significantly (e.g., Neo4j knowledge graph with hundreds of project entries), the system will migrate to embedding-based retrieval. The prompt template's `{{CAREER_DATA}}` placeholder is already abstracted — switching from full injection to filtered results requires changing only the context builder.
 
 ## Decision 2: Model Selection (Sonnet for Chat, Opus for Pipeline)
 
@@ -58,9 +58,9 @@ paulprae.com is a chat-first career platform with an AI assistant that answers r
 
 **Rationale:**
 
-- System prompts contain ~90K tokens of career data that is stable within a conversation session.
+- System prompts contain the full career dataset, which is stable within a conversation session.
 - Ephemeral (5-min TTL) matches the expected recruiter interaction pattern: browse site, ask 3-7 questions over 2-5 minutes, leave.
-- First request: ~$0.11 (cache write at 1.25x). Subsequent turns: ~$0.01 each (cache read at 0.1x). A 5-turn conversation saves ~$0.40 vs. no caching.
+- First request pays 1.25x input cost (cache write). Subsequent turns pay only 0.1x (cache read) — ~90% cost reduction per follow-up turn.
 - No persistent cache needed — career data changes only when the pipeline runs (weekly at most), and the 5-min window covers a single session.
 
 ## Decision 5: Single Agent with Tools (Not Multi-Agent)
@@ -76,7 +76,7 @@ paulprae.com is a chat-first career platform with an AI assistant that answers r
 
 ## Decision 6: Grounding via Entity-Scope Binding
 
-**Decision:** Enforce grounding through explicit rules (G1-G11) that require every fact to be attributed to exactly one company and one role, with few-shot examples showing correct vs. incorrect attribution.
+**Decision:** Enforce grounding through explicit rules (G1-G10) that require every fact to be attributed to exactly one company and one role, with few-shot examples showing correct vs. incorrect attribution.
 
 **Rationale:**
 
@@ -145,32 +145,10 @@ No custom telemetry code is needed. The existing platform integrations provide c
 
 ---
 
-## Token Budget Breakdown
+## Cost Model
 
-**Typical chat conversation (5 turns):**
+Exact token counts vary with career data size. Costs are based on [Anthropic pricing](https://docs.anthropic.com/en/docs/about-claude/models) for Sonnet 4.6 ($3/$15 per MTok) and Opus 4.6 ($15/$75 per MTok):
 
-| Component                                       | Tokens     | Cost       |
-| ----------------------------------------------- | ---------- | ---------- |
-| System prompt (first turn, cache write)         | ~8,000     | $0.03      |
-| System prompt (turns 2-5, cache read)           | ~8,000 x 4 | $0.003 x 4 |
-| User messages (5 turns, ~100 tokens each)       | 500        | $0.002     |
-| Assistant responses (5 turns, ~300 tokens each) | 1,500      | $0.023     |
-| **Total**                                       |            | **~$0.07** |
-
-**Resume generation via tool call (additional):**
-
-| Component                                    | Tokens | Cost       |
-| -------------------------------------------- | ------ | ---------- |
-| Resume-generator system prompt (cache write) | ~8,000 | $0.03      |
-| Job description input                        | ~500   | $0.002     |
-| Resume output (~2 pages)                     | ~2,000 | $0.03      |
-| **Total**                                    |        | **~$0.06** |
-
-**Pipeline resume generation (Opus, offline):**
-
-| Component                              | Tokens  | Cost       |
-| -------------------------------------- | ------- | ---------- |
-| System prompt + few-shot + career data | ~12,000 | $0.18      |
-| Thinking tokens (adaptive, max effort) | ~30,000 | $0.45      |
-| Resume output                          | ~2,000  | $0.15      |
-| **Total**                              |         | **~$0.78** |
+- **Chat conversation (5 turns):** First turn pays cache write cost; subsequent turns benefit from ~90% cache read discount. A typical 5-turn session costs well under $1.
+- **Resume generation via tool call:** Sonnet generates a tailored resume from a JD. Output capped at 4,096 tokens.
+- **Pipeline resume generation (Opus):** Offline, uses adaptive thinking at max effort. Cost per generation is ~$1-2 depending on thinking token usage.

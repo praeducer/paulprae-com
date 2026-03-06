@@ -21,10 +21,9 @@ Deliver a fast, shareable professional site at `https://paulprae.com` that prese
 
 ### 2.1 Runtime model
 
-- **Frontend:** Next.js App Router (server-rendered with static pre-rendering for `/resume`)
-- **Backend:** `/api/chat` streaming endpoint via AI SDK 6 + Claude
+- **Frontend:** Next.js App Router with static export (`output: 'export'`)
 - **Build-time AI:** Claude API invoked locally by pipeline scripts
-- **Hosting:** Vercel with Fluid Compute (Pro plan) — `.next/` output
+- **Hosting:** Vercel CDN — static `out/` directory
 
 ### 2.2 Core stack (implemented)
 
@@ -107,20 +106,14 @@ Browser
         │                        Mode param switches system prompt (chat vs tools)
         ├── Career data + knowledge base in system prompt with prompt caching
         │   (90K tokens cached, 10x cheaper after first turn)
-        └── Tool-calling (chat mode only, maxSteps: 3):
+        └── Tool-calling (chat mode only, stopWhen: stepCountIs(2)):
               ├── generate_tailored_resume: JD → Sonnet → tailored resume markdown
               └── get_resume_links: returns PDF/DOCX/MD/web download URLs
 ```
 
 ### 3.5 Prompt caching strategy
 
-Career data (~90K tokens after `stripEmpty()` compression) is placed in the system prompt with Anthropic's ephemeral cache control (5-min TTL):
-
-| Conversation turn  | Cost (Sonnet 4.6) | Mechanism                 |
-| ------------------ | ----------------- | ------------------------- |
-| First message      | ~$0.34            | Cache write (1.25x input) |
-| Each subsequent    | ~$0.03            | Cache read (0.1x input)   |
-| 10-message session | ~$0.60            | Amortized across turns    |
+Career data (career-data.json + 5 knowledge base files, compressed via `stripEmpty()`) is placed in the system prompt with Anthropic's ephemeral cache control (5-min TTL). After the first request, subsequent turns reuse the cached prompt at ~90% cost reduction.
 
 ### 3.6 Model routing
 
@@ -134,9 +127,7 @@ Career data (~90K tokens after `stripEmpty()` compression) is placed in the syst
 ### 3.7 Key Anthropic API features used
 
 - **Prompt caching** (GA) — `cache_control: { type: "ephemeral" }` on system prompt blocks
-- **Structured outputs** (GA) — guaranteed JSON schema conformance for resume data
-- **Search results / citations** (GA) — natural citations when answering from career data
-- **Compaction API** (beta, Opus 4.6) — server-side context summarization for long conversations
+- **Tool use** (GA) — `tool()` definitions with Zod schemas for resume generation and link retrieval
 
 ### 3.8 Vercel AI SDK 6 patterns
 
@@ -155,7 +146,7 @@ const result = streamText({
   model: anthropic("claude-sonnet-4-6"),
   system: systemPrompt,
   messages: modelMessages,
-  maxOutputTokens: 4096, // Note: renamed from maxTokens in AI SDK 6
+  maxOutputTokens: 2048, // Chat responses; 4096 for tool-called resume generation
 });
 
 return result.toUIMessageStreamResponse(); // Note: renamed from toDataStreamResponse in AI SDK 6

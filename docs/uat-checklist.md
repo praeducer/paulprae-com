@@ -13,7 +13,7 @@ Run this checklist after every major deployment. Automated tests (unit, E2E, CI 
 ### Visual & Layout
 
 - [ ] Page loads without flash of unstyled content
-- [ ] Header shows name, subtitle (desktop only), "View Resume" link, PDF download icon
+- [ ] Header shows name (links to home), subtitle (desktop only), "Resume" link, PDF download
 - [ ] Welcome hero shows name, headline, description, and quick action chips
 - [ ] Chat composer is visible at bottom with placeholder text
 - [ ] Dark mode: toggle system theme, verify no color clashes or unreadable text
