@@ -4,7 +4,16 @@ Run this checklist after every major deployment. Automated tests (unit, E2E, CI 
 
 **When to run:** After merging to `main` and confirming production deploy is live.
 **Where:** https://paulprae.com (production) and mobile device/emulator.
-**Time:** ~15 minutes.
+**Time:** ~20 minutes.
+
+**Pre-flight (automated):** Before starting manual testing, run these commands. All should pass:
+
+```bash
+npm run check:quick   # data files, resume quality, public download sync
+npx vitest run        # unit + component tests (400+ tests)
+npx tsc --noEmit      # TypeScript compilation
+npx eslint .          # linting
+```
 
 ---
 
@@ -13,10 +22,17 @@ Run this checklist after every major deployment. Automated tests (unit, E2E, CI 
 ### Visual & Layout
 
 - [ ] Page loads without flash of unstyled content
-- [ ] Header shows name (links to home), subtitle (desktop only), "Resume" link, PDF download
+- [ ] Header shows site name (links to `/`), subtitle (desktop only), "Resume" link, PDF download icon
 - [ ] Welcome hero shows name, headline, description, and quick action chips
 - [ ] Chat composer is visible at bottom with placeholder text
 - [ ] Dark mode: toggle system theme, verify no color clashes or unreadable text
+- [ ] Skip-to-content link appears on Tab press (no visible flash on page load)
+
+### Accessibility
+
+- [ ] Page has exactly one `<h1>` (screen-reader-only: "Chat with Paul Prae's AI Career Assistant")
+- [ ] Tab order: skip link → header links → quick action chips → composer
+- [ ] Quick action chips have minimum 44px touch targets on mobile
 
 ### Chat Interaction (requires live API)
 
@@ -26,6 +42,7 @@ Run this checklist after every major deployment. Automated tests (unit, E2E, CI 
 - [ ] Response is concise (top 3-5 items, not an exhaustive list)
 - [ ] Copy and regenerate buttons appear below assistant messages
 - [ ] Character counter appears when typing a long message (~3000+ chars)
+- [ ] Scroll-to-bottom arrow appears when scrolled up, hides when at bottom
 
 ### Tool-Calling
 
@@ -48,7 +65,7 @@ The goal: earn trust through **absolute honesty and accuracy** and leave a **mem
 > Give me a quick overview of Paul.
 
 - [ ] Response is 150-300 words (concise, not a wall of text)
-- [ ] Mentions current role (Arine), key past employers (AWS, Microsoft, Booz Allen, Slalom)
+- [ ] Mentions current role (Arine), key past employers (AWS, Microsoft, Booz Allen Hamilton, Slalom)
 - [ ] Includes healthcare domain expertise
 - [ ] No emojis in headings or body text
 - [ ] Ends with follow-up suggestions (plain dashes, no emojis)
@@ -125,14 +142,16 @@ Send these in sequence:
 ## 3. Resume Page (`/resume`)
 
 - [ ] Full resume renders with all sections (Summary, Experience, Education, Skills, etc.)
-- [ ] Section navigation works (if present)
+- [ ] Section navigation sidebar is visible (desktop) and highlights active section on scroll
+- [ ] Clicking a section nav link scrolls to that section smoothly
 - [ ] Download links work: PDF opens/downloads, DOCX opens/downloads
-- [ ] "Back to Chat" or header link returns to `/`
-- [ ] Content matches the latest approved resume
+- [ ] Header link ("paulprae.com" or site name) returns to `/`
+- [ ] Content matches the latest approved resume (`data/generated/Paul-Prae-Resume.md`)
 
 ## 4. Tools Page (`/tools`)
 
 - [ ] Page renders with job search tool chips
+- [ ] Page has sr-only `<h1>` ("Job Search Tools")
 - [ ] Select a tool (e.g., "Cover Letter"), enter a job description, send
 - [ ] Response generates exactly ONE piece of content (not multiple variants)
 - [ ] Response is professional quality and appropriately formatted
@@ -143,25 +162,38 @@ Send these in sequence:
 Test on a real phone or browser DevTools (375px width):
 
 - [ ] Chat homepage: composer doesn't overflow, messages are readable
+- [ ] Quick action chips have adequate tap targets (no accidental mis-taps)
 - [ ] Resume page: content reflows properly, no horizontal scroll
 - [ ] Tools page: chips wrap correctly
 - [ ] Header: subtitle hides on mobile, navigation still accessible
 
-## 6. Security & Error Handling
+## 6. SEO & Metadata
+
+- [ ] View Source on `/`: `<title>` contains "Paul Prae"
+- [ ] View Source on `/`: Open Graph tags present (`og:title`, `og:description`, `og:image`)
+- [ ] View Source on `/`: `<script type="application/ld+json">` contains Person and WebSite schemas
+- [ ] View Source on `/resume`: `<title>` contains "Resume"
+- [ ] `/robots.txt` is accessible and contains `Allow: /` and `Sitemap:` directive
+- [ ] `/sitemap.xml` is accessible and lists `/` and `/resume` (not `/tools`)
+
+## 7. Security & Error Handling
 
 - [ ] Rapid-fire messages (send 20+ quickly) — should see rate limit message (429)
 - [ ] Very long message (paste 5000+ chars) — should be rejected or truncated
 - [ ] API errors display a user-friendly message, not a stack trace
+- [ ] View response headers (DevTools → Network): CSP, HSTS, X-Frame-Options, X-Content-Type-Options present
+- [ ] `/nonexistent-page` returns a branded 404 page (not a raw error)
 
-## 7. Performance & Infrastructure
+## 8. Performance & Infrastructure
 
 - [ ] First page load under 3 seconds on broadband
 - [ ] Chat first response (TTFT) under 5 seconds
+- [ ] Lighthouse score: Performance ≥ 90, Accessibility ≥ 90, SEO ≥ 90
 - [ ] Check Vercel Dashboard > Functions — `/api/chat` executions appear
 - [ ] Check Vercel Dashboard > AI Gateway — API calls are logged with cost/token data
 - [ ] Check Anthropic Console > Usage — requests appear, within spend limits
 
-## 8. Cross-Browser (spot check)
+## 9. Cross-Browser (spot check)
 
 - [ ] Chrome: all features work
 - [ ] Safari/Firefox: basic chat flow works, no layout breaks
@@ -174,14 +206,14 @@ Test on a real phone or browser DevTools (375px width):
 | ------------------- | ----- | ----- |
 | Chat Homepage       |       |       |
 | AI Response Quality |       |       |
-| Tool-Calling        |       |       |
 | Resume Page         |       |       |
 | Tools Page          |       |       |
 | Mobile              |       |       |
+| SEO & Metadata      |       |       |
 | Security            |       |       |
 | Performance         |       |       |
 | Cross-Browser       |       |       |
 
-**Tested by:** **\*\***\_\_\_**\*\***
-**Date:** **\*\***\_\_\_**\*\***
-**Deployment SHA:** **\*\***\_\_\_**\*\***
+**Tested by:** \_\_\_\_\_\_\_\_\_\_
+**Date:** \_\_\_\_\_\_\_\_\_\_
+**Deployment SHA:** \_\_\_\_\_\_\_\_\_\_
