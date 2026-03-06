@@ -290,6 +290,7 @@ export default function ResumePage() {
         tabIndex={-1}
         className="max-w-3xl mx-auto px-6 py-8 print:py-4 print:px-0 print:max-w-none focus:outline-none"
       >
+        <h1 className="sr-only">{profile.name} — Resume</h1>
         <article className="resume-prose prose prose-slate max-w-none">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
             {bodyMarkdown}

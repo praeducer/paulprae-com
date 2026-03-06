@@ -131,7 +131,7 @@ function ChatComposer() {
       <div className="flex items-end gap-2">
         <ComposerPrimitive.Input
           placeholder="Ask about Paul's experience, or paste a job description..."
-          className="min-h-[40px] max-h-[40px] sm:max-h-[200px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:max-h-[200px] dark:text-slate-100 dark:placeholder:text-slate-500"
+          className="min-h-[40px] max-h-[120px] sm:max-h-[200px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder:text-slate-500"
           aria-label="Chat message"
           maxLength={MAX_MESSAGE_CHARS}
           autoFocus
@@ -215,7 +215,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                 {SITE_SUBTITLE}
               </p>
               <nav
-                className="ml-auto flex shrink-0 items-center gap-2"
+                className="ml-auto flex items-center gap-1 sm:gap-2"
                 aria-label="Site navigation"
               >
                 {mode === "tools" && (
@@ -248,7 +248,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                     <path d="M10 3a.75.75 0 0 1 .75.75v7.69l2.72-2.72a.75.75 0 1 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06 0l-4-4a.75.75 0 1 1 1.06-1.06l2.72 2.72V3.75A.75.75 0 0 1 10 3Z" />
                     <path d="M3.75 14a.75.75 0 0 1 .75.75v1.5h11v-1.5a.75.75 0 0 1 1.5 0v1.5A1.5 1.5 0 0 1 15.5 17.25h-11A1.5 1.5 0 0 1 3 15.75v-1.5a.75.75 0 0 1 .75-.75Z" />
                   </svg>
-                  PDF
+                  <span className="hidden sm:inline">PDF</span>
                 </a>
               </nav>
             </div>
@@ -307,12 +307,14 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                 </ThreadPrimitive.Empty>
 
                 {/* Messages */}
-                <ThreadPrimitive.Messages
-                  components={{
-                    UserMessage,
-                    AssistantMessage,
-                  }}
-                />
+                <div aria-live="polite" aria-atomic="false">
+                  <ThreadPrimitive.Messages
+                    components={{
+                      UserMessage,
+                      AssistantMessage,
+                    }}
+                  />
+                </div>
               </div>
 
               {/* Scroll anchor + Composer */}

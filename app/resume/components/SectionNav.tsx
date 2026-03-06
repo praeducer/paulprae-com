@@ -91,6 +91,7 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
           <a
             key={s.id}
             href={`#${s.id}`}
+            aria-current={activeId === s.id ? "true" : undefined}
             className={`inline-flex min-h-[44px] shrink-0 items-center rounded-md px-2.5 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none ${
               activeId === s.id
                 ? "bg-slate-200 font-medium text-slate-900 dark:bg-slate-700 dark:text-slate-100"
