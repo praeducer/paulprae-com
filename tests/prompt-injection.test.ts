@@ -152,6 +152,16 @@ describe("few-shot examples reinforce grounding", () => {
     expect(fewShot).toContain("Slalom");
   });
 
+  it("career-chat few-shot dates match career data", () => {
+    const fewShot = readPrompt("career-chat.few-shot.md");
+    // Verify Arine date starts with 2025 (not outdated 2023)
+    expect(fewShot).toMatch(/Arine \(2025/);
+    // Verify Slalom date range (2015-2018, not 2019-2022)
+    expect(fewShot).toMatch(/Slalom.*\(2015/);
+    // Verify TReNDS date range (2022-2023, not 2017-2019)
+    expect(fewShot).toMatch(/TReNDS.*\(2022/);
+  });
+
   it("resume-writer has few-shot examples file", () => {
     const fewShotPath = path.join(PROMPTS_DIR, "resume-writer.few-shot.md");
     expect(fs.existsSync(fewShotPath)).toBe(true);

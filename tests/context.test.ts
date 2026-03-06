@@ -48,6 +48,17 @@ describe("buildSystemPrompt", () => {
     expect(prompt).not.toBeNull();
     expect(prompt!.toLowerCase()).toMatch(/tailor/);
   });
+
+  it("replaces outdated '15 years' in career data with canonical figure", () => {
+    const prompt = buildSystemPrompt("chat");
+    expect(prompt).not.toBeNull();
+    // The career data JSON section (after {{CAREER_DATA}} injection) should
+    // have "13+" not "15 years". G2 still mentions "15 years" as a warning —
+    // that's intentional. Extract the data block after the last "Career Data" heading.
+    const dataSection = prompt!.split("# Career Data").pop()!;
+    expect(dataSection).not.toMatch(/With 15 years/i);
+    expect(dataSection).toContain("13+ years");
+  });
 });
 
 // ─── stripEmpty ─────────────────────────────────────────────────────────────

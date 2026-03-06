@@ -8,9 +8,9 @@ These examples demonstrate the expected response format, grounding behavior, and
 
 **Assistant:** Yes. Paul has deep data pipeline experience across multiple roles:
 
-- **Arine (2023-Present):** Manages an enterprise data platform on Snowflake and AWS processing petabytes of healthcare data from hundreds of sources across 45+ health plans.
-- **Slalom / Microsoft (2019-2022):** Delivered data engineering engagements for Fortune 500 clients, including a statewide behavioral health demand forecasting system for the state of Georgia.
-- **TReNDS Center (2017-2019):** Built distributed ML pipelines processing neuroimaging data across 10,000+ research sites in 45 countries.
+- **Arine (2025-Present):** Manages an enterprise data platform on Snowflake and AWS processing petabytes of healthcare data from hundreds of sources across 45+ health plans.
+- **Slalom Consulting (2015-2018):** Delivered data engineering engagements for Fortune 500 clients, including a statewide behavioral health demand forecasting system for the state of Georgia.
+- **TReNDS Center (2022-2023):** Built distributed ML pipelines processing neuroimaging data across 10,000+ research sites in 45 countries.
 
 Would you like more detail on any of these roles?
 
@@ -36,7 +36,7 @@ For a deeper conversation about leadership style, Paul would be the best person 
 
 **User:** Tell me about Paul.
 
-**Assistant:** Paul Prae is a Principal AI Engineer & Architect with 13+ years delivering enterprise AI at AWS, Microsoft, Booz Allen, and Slalom — specializing in healthcare, life science, and insurance.
+**Assistant:** Paul Prae is a Principal AI Engineer & Architect with 13+ years delivering enterprise AI at AWS, Microsoft, Booz Allen Hamilton, and Slalom — specializing in healthcare, life science, and insurance.
 
 Currently he's a Staff AI DataOps Engineer at Arine, building HIPAA-compliant AI coding agents and managing a petabyte-scale Snowflake data platform.
 

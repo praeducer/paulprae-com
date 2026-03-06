@@ -10,10 +10,11 @@
 import fs from "fs";
 import path from "path";
 import { PATHS } from "../config";
+import { loadCareerData } from "../career-data";
 import { stripEmpty } from "../data-utils";
+import type { CareerData } from "../types";
 import { loadPrompt } from "../prompts/loader";
 import { YEARS_EXPERIENCE } from "../constants";
-import type { CareerData } from "../types";
 
 // ─── Knowledge Base Paths ────────────────────────────────────────────────────
 
@@ -27,25 +28,6 @@ const KNOWLEDGE_FILES = {
   communicationStyles: path.join(KNOWLEDGE_DIR, "brand", "communication-styles.json"),
 } as const;
 
-// ─── Loaders ────────────────────────────────────────────────────────────────
-
-function loadJsonFile(filePath: string): unknown {
-  try {
-    return JSON.parse(fs.readFileSync(filePath, "utf-8"));
-  } catch {
-    return null;
-  }
-}
-
-function loadCareerDataForAgent(): CareerData | null {
-  try {
-    const raw = fs.readFileSync(PATHS.careerDataOutput, "utf-8");
-    return JSON.parse(raw) as CareerData;
-  } catch {
-    return null;
-  }
-}
-
 // ─── Context Building ───────────────────────────────────────────────────────
 
 export interface CareerContext {
@@ -57,21 +39,29 @@ export interface CareerContext {
   communicationStyles: unknown;
 }
 
+function loadJsonSafe(filePath: string): unknown {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Loads all data needed for the agent's system prompt context.
  * Returns null if career data is missing (pipeline hasn't run).
  */
 export function loadCareerContext(): CareerContext | null {
-  const careerData = loadCareerDataForAgent();
+  const careerData = loadCareerData();
   if (!careerData) return null;
 
   return {
     careerData,
-    platformConstraints: loadJsonFile(KNOWLEDGE_FILES.platformConstraints),
-    messageTemplates: loadJsonFile(KNOWLEDGE_FILES.messageTemplates),
-    writingFormulas: loadJsonFile(KNOWLEDGE_FILES.writingFormulas),
-    audienceFrameworks: loadJsonFile(KNOWLEDGE_FILES.audienceFrameworks),
-    communicationStyles: loadJsonFile(KNOWLEDGE_FILES.communicationStyles),
+    platformConstraints: loadJsonSafe(KNOWLEDGE_FILES.platformConstraints),
+    messageTemplates: loadJsonSafe(KNOWLEDGE_FILES.messageTemplates),
+    writingFormulas: loadJsonSafe(KNOWLEDGE_FILES.writingFormulas),
+    audienceFrameworks: loadJsonSafe(KNOWLEDGE_FILES.audienceFrameworks),
+    communicationStyles: loadJsonSafe(KNOWLEDGE_FILES.communicationStyles),
   };
 }
 

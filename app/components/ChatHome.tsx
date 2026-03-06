@@ -270,9 +270,15 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                     <div className="mb-4 sm:mb-6 text-center">
                       {mode === "chat" ? (
                         <>
-                          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
-                            {SITE_NAME}
+                          <h1 className="sr-only">
+                            Chat with Paul Prae&apos;s AI Career Assistant
                           </h1>
+                          <p
+                            className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100"
+                            aria-hidden="true"
+                          >
+                            {SITE_NAME}
+                          </p>
                           <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
                             {SITE_SUBTITLE}
                           </p>
@@ -286,9 +292,13 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                         </>
                       ) : (
                         <>
-                          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                          <h1 className="sr-only">Job Search Tools</h1>
+                          <p
+                            className="text-2xl font-bold text-slate-900 dark:text-slate-100"
+                            aria-hidden="true"
+                          >
                             Job Search Tools
-                          </h1>
+                          </p>
                           <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
                             AI-powered content generation
                           </p>

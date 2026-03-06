@@ -67,8 +67,8 @@ describe("ChatHome", () => {
   });
 
   it("tools mode renders Job Search Tools heading", () => {
-    const { getByText } = render(<ChatHome mode="tools" />);
-    expect(getByText("Job Search Tools")).toBeTruthy();
+    const { getByRole } = render(<ChatHome mode="tools" />);
+    expect(getByRole("heading", { name: "Job Search Tools" })).toBeTruthy();
   });
 
   it("renders composer placeholder", () => {
