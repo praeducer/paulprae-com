@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/og-image.png",
+        url: `${SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
         alt: ogTitle,
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: ogTitle,
     description: SITE_OG_DESCRIPTION,
-    images: ["/og-image.png"],
+    images: [`${SITE_URL}/og-image.png`],
   },
   alternates: {
     canonical: SITE_URL,

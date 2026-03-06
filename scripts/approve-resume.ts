@@ -15,6 +15,7 @@ import readline from "readline";
 import { PATHS } from "../lib/config";
 import { parseResume } from "../lib/resume-parser";
 import { isDirectRun, hasForceFlag } from "../lib/script-utils";
+import { scoreResume, formatScoreReport } from "../lib/resume-quality";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -63,17 +64,46 @@ async function approve(): Promise<boolean> {
   console.log(`   Characters: ${info.chars.toLocaleString()}`);
   console.log(`   Sections (${info.sections.length}): ${info.sections.join(", ")}`);
 
-  // Show diff summary if approved version exists
+  // Quality gate: compare staging vs approved to detect regressions
+  const stagingContent = fs.readFileSync(PATHS.resumeStaging, "utf-8");
+  const stagingScore = scoreResume(stagingContent);
+
   if (fs.existsSync(PATHS.resumeOutput)) {
     const approvedContent = fs.readFileSync(PATHS.resumeOutput, "utf-8");
     const charDiff = info.chars - approvedContent.length;
     const sign = charDiff >= 0 ? "+" : "";
     console.log(`   vs. approved: ${sign}${charDiff} chars`);
+
+    const approvedScore = scoreResume(approvedContent);
+    console.log();
+    console.log(formatScoreReport("Staging", stagingScore));
+    console.log(formatScoreReport("Approved", approvedScore));
+
+    const delta = stagingScore.total - approvedScore.total;
+    const deltaPercent =
+      approvedScore.total > 0 ? Math.round((delta / approvedScore.total) * 100) : 0;
+
+    if (delta < 0) {
+      console.log(
+        `\n   ⚠ QUALITY REGRESSION: score dropped by ${Math.abs(delta)} points (${deltaPercent}%)`,
+      );
+      if (!hasForceFlag()) {
+        console.log("   ❌ Refusing to promote a lower-quality resume.");
+        console.log("   Run 'npm run compare' to review, or use --force to override.\n");
+        return false;
+      }
+      console.log("   ⚠ --force flag detected — bypassing quality gate.\n");
+    } else {
+      console.log(
+        `\n   ✅ Quality check passed: ${sign}${delta} points (${sign}${deltaPercent}%)\n`,
+      );
+    }
   } else {
     console.log("   No previous approved version (first approval).");
+    console.log();
+    console.log(formatScoreReport("Staging", stagingScore));
+    console.log();
   }
-
-  console.log();
 
   // Confirm unless --force
   if (!hasForceFlag()) {

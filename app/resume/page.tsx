@@ -227,7 +227,7 @@ export default function ResumePage() {
               <a
                 href={profile.linkedin}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="me noopener noreferrer"
                 aria-label="View Paul Prae on LinkedIn"
                 className="inline-flex min-h-[44px] items-center rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
               >
@@ -238,7 +238,7 @@ export default function ResumePage() {
               <a
                 href={profile.github}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="me noopener noreferrer"
                 aria-label="View Paul Prae on GitHub"
                 className="inline-flex min-h-[44px] items-center rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
               >

@@ -12,6 +12,7 @@ import path from "path";
 import { PATHS } from "../config";
 import { stripEmpty } from "../data-utils";
 import { loadPrompt } from "../prompts/loader";
+import { YEARS_EXPERIENCE } from "../constants";
 import type { CareerData } from "../types";
 
 // ─── Knowledge Base Paths ────────────────────────────────────────────────────
@@ -105,8 +106,16 @@ export function buildSystemPrompt(mode: PromptMode): string | null {
     return null;
   }
 
-  // Inject context into template placeholders
-  const careerDataJson = JSON.stringify(stripEmpty(context.careerData), null, 2);
+  // Inject context into template placeholders.
+  // Sanitize career data: replace outdated "15 years" claims from LinkedIn
+  // with the canonical years-of-experience figure. The LinkedIn summary
+  // contains "15 years" which the model reads as ground truth, overriding
+  // the grounding rule G2. Fixing at the data layer is more reliable than
+  // instruction-level overrides.
+  const careerDataJson = JSON.stringify(stripEmpty(context.careerData), null, 2).replace(
+    /\b15\s+years?\b/gi,
+    `${YEARS_EXPERIENCE} years`,
+  );
   const audienceJson = JSON.stringify(context.audienceFrameworks, null, 2);
 
   let prompt = template

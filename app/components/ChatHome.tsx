@@ -13,7 +13,7 @@ import {
 import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
 import QuickActions from "./QuickActions";
-import { MAX_MESSAGE_CHARS, SITE_NAME, SITE_SUBTITLE, YEARS_EXPERIENCE } from "../../lib/constants";
+import { MAX_MESSAGE_CHARS, SITE_NAME, SITE_SUBTITLE, HERO_DESCRIPTION } from "../../lib/constants";
 
 // ─── Markdown Text Wrapper ──────────────────────────────────────────────────
 
@@ -277,9 +277,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                             {SITE_SUBTITLE}
                           </p>
                           <p className="mt-3 max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-                            {YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and
-                            Fortune 500 across healthcare, life science, and insurance. Currently
-                            building AI agents and data platforms at Arine.
+                            {HERO_DESCRIPTION}
                           </p>
                           <p className="mt-2 max-w-lg text-xs text-slate-400 dark:text-slate-500">
                             Ask about Paul&apos;s experience, download his resume, or request a
@@ -349,7 +347,15 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
 
         <footer className="shrink-0 py-1.5 text-center">
           <p className="text-xs text-slate-400 dark:text-slate-500">
-            paulprae.com &mdash; Built with Next.js, Claude AI, and Tailwind CSS
+            paulprae.com &mdash; Built with Next.js, Claude AI, and Tailwind CSS &mdash;{" "}
+            <a
+              href="https://github.com/praeducer/paulprae-com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-slate-600 dark:hover:text-slate-300"
+            >
+              view source
+            </a>
           </p>
         </footer>
       </div>

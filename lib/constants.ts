@@ -22,6 +22,9 @@ export const SITE_DESCRIPTION = `Chat with an AI assistant about ${SITE_NAME}'s 
 /** OG / Twitter meta description — punchier, lead with tagline. */
 export const SITE_OG_DESCRIPTION = `${SITE_TAGLINE}. ${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.`;
 
+/** Hero description shown on the chat homepage. */
+export const HERO_DESCRIPTION = `${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance. Currently building AI agents and data platforms at Arine.`;
+
 // ─── Input Limits ───────────────────────────────────────────────────────────
 
 /** Per-message character limit — enforced by both the UI and the API. */

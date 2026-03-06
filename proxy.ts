@@ -12,8 +12,10 @@ const ALLOWED_ORIGINS = new Set([
 function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return true; // Same-origin requests (no Origin header)
   if (ALLOWED_ORIGINS.has(origin)) return true;
-  // Allow Vercel preview deployments (strict: must match project slug prefix)
-  if (/^https:\/\/paulprae(-com)?(-[a-z0-9]+)*-praeducers-projects\.vercel\.app$/.test(origin))
+  // Allow Vercel preview deployments (strict: project slug + deployment hash only)
+  if (
+    /^https:\/\/paulprae-com(?:-[a-z0-9]{1,20}){0,5}-praeducers-projects\.vercel\.app$/.test(origin)
+  )
     return true;
   // Allow localhost in development
   if (
