@@ -48,7 +48,7 @@ Deliver a fast, shareable professional site at `https://paulprae.com` that prese
 
 ## 3. Phase 2 Architecture (In Progress)
 
-> **Implementation status:** Sprint 2 complete on `feat/phase2-implementation` branch. Sprint 1 delivered chat homepage, resume page, tools page, and streaming API. Sprint 2 added tool-calling for tailored resume generation, security hardening, and rate limiting. See `docs/phase2-redesign-plan.md` for the redesign plan.
+> **Implementation status:** Complete. Sprint 1 delivered chat homepage, resume page, tools page, and streaming API. Sprint 2 added tool-calling for tailored resume generation, security hardening, and rate limiting.
 
 Phase 2 transforms the static site into an interactive career platform with a chat-first homepage and job search tools. The architecture adds server-side capabilities while preserving the existing resume pipeline.
 
@@ -338,9 +338,7 @@ Interactive career platform with chat-first homepage:
 - Vercel AI SDK 6 with streaming (`toUIMessageStreamResponse`)
 - Vercel Fluid Compute for serverless AI functions (maxDuration: 120s)
 
-**Sprint 1+2 complete** on `feat/phase2-implementation` branch.
-Implementation plans archived in `.claude/plans/archive/`.
-Authoritative redesign plan: `docs/phase2-redesign-plan.md`.
+**Sprint 1+2 complete.**
 
 ### Phase 3 (Future)
 
@@ -372,8 +370,6 @@ Authoritative redesign plan: `docs/phase2-redesign-plan.md`.
 
 - `README.md` (setup, pipeline, deployment)
 - `CLAUDE.md` (project memory and guardrails)
-- `.claude/plans/remaining-work.md` (pre-merge checklist)
-- `.claude/plans/backlog.md` (future enhancements)
 - `docs/domain-dns-runbook.md` (domain DNS operations)
 - `docs/linux-dev-environment-setup.md` (Linux/WSL setup)
 - `docs/windows-dev-environment-setup.md` (Windows setup)

@@ -4,7 +4,7 @@
 
 **paulprae.com** is an AI-powered career platform that positions Paul Prae as a Principal AI Engineer & Architect. The site features an AI chat assistant for recruiter Q&A, tailored resume generation, and job search tools — all grounded in structured career data.
 
-**Current Phase:** Phase 2 — AI Chat Platform (Sprint 2 on `feat/phase2-implementation`)
+**Current Phase:** Phase 2 — AI Chat Platform (complete, pending merge to main)
 **Repository:** github.com/praeducer/paulprae-com
 **Live URL:** https://paulprae.com (also: paulprae-com-one.vercel.app)
 
@@ -123,7 +123,7 @@ See [README.md](README.md#5-run-the-pipeline) for the full command reference. Qu
 
 ## Phase 2 — AI Chat Platform (Active)
 
-Phase 2 is the current platform on `feat/phase2-implementation`. Chat-first homepage with AI career assistant, tailored resume generation via tool-calling, and job search content tools.
+Phase 2 is the current platform. Chat-first homepage with AI career assistant, tailored resume generation via tool-calling, and job search content tools.
 
 **Key features:**
 
@@ -137,7 +137,7 @@ Phase 2 is the current platform on `feat/phase2-implementation`. Chat-first home
 - `ANTHROPIC_API_KEY` — Claude API access for chat + tool-calling
 - `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` — Rate limiting (optional in dev)
 
-**Human setup required before deploy:** See `.claude/plans/human-steps-phase2.md`
+**Post-deploy testing:** See [`docs/uat-checklist.md`](docs/uat-checklist.md)
 
 ## Phase 3 Preview (Do Not Implement Yet)
 

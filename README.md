@@ -305,7 +305,7 @@ Push to main → CI (ci.yml): lint, format, test, build, validate
 1. Run the pipeline locally: `npm run pipeline`
 2. Commit generated files: `git add data/generated/ public/Paul-Prae-Resume.* && git commit`
 3. Push to `main` (CI runs lint, format, test, build automatically)
-4. If CI passes, Deploy workflow: preview → smoke test (6 checks) → promote → production smoke
+4. If CI passes, Deploy workflow: preview → smoke test → promote → production smoke
 5. Production updates within ~2 minutes at [paulprae.com](https://paulprae.com)
 
 Custom-domain DNS operations are documented in [docs/domain-dns-runbook.md](docs/domain-dns-runbook.md).

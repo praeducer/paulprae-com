@@ -83,7 +83,7 @@ paulprae.com is a chat-first career platform with an AI assistant that answers r
 - The most common and damaging error in AI-generated resumes is metric conflation: merging achievements from one company with scale metrics from another. Entity-scope binding (Rule G1) prevents this by requiring single-entity attribution.
 - SCOPE BOUNDARY markers in the knowledge base provide hard constraints on what work was/was not performed in specific roles.
 - Few-shot examples (in `resume-writer.few-shot.md` and `career-chat.few-shot.md`) demonstrate the expected grounding behavior more effectively than rules alone.
-- Post-generation validation in the pipeline (~30 automated checks) catches any remaining violations.
+- Post-generation validation in the pipeline (automated checks in `validateResumeOutput()`) catches any remaining violations.
 
 ---
 
@@ -132,16 +132,16 @@ No custom telemetry code is needed. The existing platform integrations provide c
 
 ## Cost Controls
 
-| Control                | Implementation                                                       | Location                             |
-| ---------------------- | -------------------------------------------------------------------- | ------------------------------------ |
-| Prompt caching         | Ephemeral 5-min TTL; 90% cost reduction on follow-up turns           | `route.ts` line 366                  |
-| Output token cap       | `maxOutputTokens: 2048` for chat, `4096` for resume generation       | `route.ts` lines 361, 317            |
-| Temperature tuning     | 0.7 (chat), 0.5 (tools), 0.3 (resume gen) — lower = fewer retries    | `route.ts` line 362                  |
-| Rate limiting          | 20 requests/minute per IP via Upstash Redis                          | `route.ts` lines 97-99               |
-| Input size limits      | 4K chars/message, 50 messages max, 100KB body max                    | `route.ts` lines 37-41               |
-| Model tiering          | Sonnet ($3/$15/MTok) for chat; Opus ($15/$75/MTok) only for pipeline | `route.ts` line 358, `lib/config.ts` |
-| Anthropic spend limits | Configurable monthly cap at console.anthropic.com                    | Anthropic Console > Settings         |
-| Vercel spend limits    | Configurable at Vercel Dashboard > Settings > Billing                | Vercel Dashboard                     |
+| Control                | Implementation                                              | Location                    |
+| ---------------------- | ----------------------------------------------------------- | --------------------------- |
+| Prompt caching         | Ephemeral 5-min TTL; ~90% cost reduction on follow-up turns | `route.ts` (streamText)     |
+| Output token cap       | Separate limits for chat vs. resume generation              | `route.ts` (streamText)     |
+| Temperature tuning     | Lower temperature for tools/resume (fewer retries)          | `route.ts` (streamText)     |
+| Rate limiting          | Sliding window per IP via Upstash Redis                     | `route.ts` (rate limiter)   |
+| Input size limits      | Per-message char limit, message count cap, body size cap    | `route.ts` (constants)      |
+| Model tiering          | Sonnet for chat; Opus only for pipeline                     | `route.ts`, `lib/config.ts` |
+| Anthropic spend limits | Configurable monthly cap at console.anthropic.com           | Anthropic Console           |
+| Vercel spend limits    | Configurable at Vercel Dashboard > Settings > Billing       | Vercel Dashboard            |
 
 ---
 
