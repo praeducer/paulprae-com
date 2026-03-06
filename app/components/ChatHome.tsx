@@ -266,17 +266,17 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
               <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pt-5">
                 {/* Welcome / Empty State */}
                 <ThreadPrimitive.Empty>
-                  <div className="flex flex-1 flex-col items-center justify-center py-8 sm:py-12">
-                    <div className="mb-6 text-center">
+                  <div className="flex flex-1 flex-col items-center justify-center py-4 sm:py-12">
+                    <div className="mb-4 sm:mb-6 text-center">
                       {mode === "chat" ? (
                         <>
-                          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100">
                             {SITE_NAME}
                           </h1>
                           <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
                             {SITE_SUBTITLE}
                           </p>
-                          <p className="mt-3 max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                          <p className="mt-2 sm:mt-3 hidden sm:block max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                             {HERO_DESCRIPTION}
                           </p>
                           <p className="mt-2 max-w-lg text-xs text-slate-400 dark:text-slate-500">

@@ -53,18 +53,21 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: SITE_URL,
+    languages: {
+      "en-US": SITE_URL,
+    },
   },
   manifest: "/manifest.json",
 };
 
-function PersonJsonLd() {
+function StructuredDataJsonLd() {
   if (!careerData) return null;
 
   const profile = careerData.profile;
   const recentPosition = careerData.positions[0];
   const education = careerData.education[0];
 
-  const jsonLd = {
+  const person = {
     "@context": "https://schema.org",
     "@type": "Person",
     "@id": `${SITE_URL}/#person`,
@@ -96,11 +99,27 @@ function PersonJsonLd() {
     }),
   };
 
+  const website = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+    author: { "@id": `${SITE_URL}/#person` },
+  };
+
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }}
+      />
+    </>
   );
 }
 
@@ -112,7 +131,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
       </head>
       <body className="bg-white text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
-        <PersonJsonLd />
+        <StructuredDataJsonLd />
         {children}
         <Analytics />
         <SpeedInsights />

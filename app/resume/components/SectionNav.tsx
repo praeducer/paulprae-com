@@ -9,7 +9,7 @@ interface Section {
 
 /**
  * Compact horizontal section navigation bar.
- * Highlights the currently visible section based on scroll position.
+ * Highlights the currently visible section using IntersectionObserver.
  * Dynamically positions itself below the sticky header using ResizeObserver.
  * Hidden on print via the no-print class.
  */
@@ -28,9 +28,6 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
     const sync = (entries?: ResizeObserverEntry[]) => {
       const root = document.documentElement.style;
       root.setProperty("--nav-height", `${nav.offsetHeight}px`);
-      // Only reposition the nav when the header height changed.
-      // The nav is observed solely to keep --nav-height accurate;
-      // setting nav.style.top only depends on the header.
       if (!entries || entries.some((e) => e.target === header)) {
         root.setProperty("--header-height", `${header.offsetHeight}px`);
         nav.style.top = `${header.offsetHeight}px`;
@@ -44,38 +41,70 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
     return () => ro.disconnect();
   }, []);
 
-  // Track which section is active based on scroll position.
-  // Reads --header-height and --nav-height from CSS so JS and CSS stay in sync.
-  // (--sticky-offset is a calc() expression that parseFloat cannot resolve.)
+  // Track which section is active using IntersectionObserver.
+  // Each section heading is observed; the last one to cross the
+  // sticky offset threshold becomes "active". More reliable than
+  // scroll-based calculation because it handles dynamic content
+  // and avoids measuring getComputedStyle on every scroll frame.
   useEffect(() => {
-    const onScroll = () => {
-      if (window.scrollY < 100) {
-        setActiveId("");
-        return;
-      }
+    if (sections.length === 0) return;
 
-      const style = getComputedStyle(document.documentElement);
-      const headerH = parseFloat(style.getPropertyValue("--header-height") || "0");
-      const navH = parseFloat(style.getPropertyValue("--nav-height") || "0");
-      const threshold = headerH + navH + 16;
+    // Build a map of section positions for fallback ordering
+    const sectionOrder = new Map(sections.map((s, i) => [s.id, i]));
 
-      let current = "";
-      for (const section of sections) {
-        const el = document.getElementById(section.id);
-        if (el && el.getBoundingClientRect().top <= threshold) {
-          current = section.id;
+    // Track which sections are currently intersecting
+    const visibleSections = new Set<string>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = entry.target.id;
+          if (entry.isIntersecting) {
+            visibleSections.add(id);
+          } else {
+            visibleSections.delete(id);
+          }
         }
-      }
-      setActiveId(current);
-    };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    // Defer the initial check so layout measurement is complete.
-    const raf = requestAnimationFrame(onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      cancelAnimationFrame(raf);
-    };
+        // Pick the last (lowest on page) visible section heading
+        let bestId = "";
+        let bestOrder = -1;
+        for (const id of visibleSections) {
+          const order = sectionOrder.get(id) ?? -1;
+          if (order > bestOrder) {
+            bestOrder = order;
+            bestId = id;
+          }
+        }
+
+        // If no headings are in view, find the last one scrolled past
+        if (!bestId) {
+          for (const section of sections) {
+            const el = document.getElementById(section.id);
+            if (el && el.getBoundingClientRect().top < window.innerHeight * 0.3) {
+              bestId = section.id;
+            }
+          }
+        }
+
+        setActiveId(bestId);
+      },
+      {
+        // Negative top margin accounts for sticky header + nav.
+        // Uses a generous margin so headings are detected before
+        // they reach the very top of the viewport.
+        rootMargin: "-80px 0px -60% 0px",
+        threshold: 0,
+      },
+    );
+
+    // Observe all section heading elements
+    for (const section of sections) {
+      const el = document.getElementById(section.id);
+      if (el) observer.observe(el);
+    }
+
+    return () => observer.disconnect();
   }, [sections]);
 
   if (sections.length === 0) return null;

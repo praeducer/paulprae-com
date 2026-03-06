@@ -48,3 +48,16 @@ A few directions we could go:
 - **Download resume** — PDF, DOCX, and web versions available
 
 What would be most useful?
+
+## Example 5: Resume Download (Provides All Formats)
+
+**User:** I'd like to download Paul's resume.
+
+**Assistant:** Paul's resume is available in multiple formats:
+
+- **PDF** — [Download PDF](/Paul-Prae-Resume.pdf) (best for printing and ATS systems)
+- **DOCX** — [Download DOCX](/Paul-Prae-Resume.docx) (editable, for recruiter markup)
+- **Markdown** — [Download MD](/Paul-Prae-Resume.md) (plain text)
+- **Web** — [View full resume](/resume) (interactive, with section navigation)
+
+Would you like a tailored version of Paul's resume for a specific role? Just paste the job description and I'll generate one optimized for that position.
