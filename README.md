@@ -1,374 +1,200 @@
-# paulprae.com — AI-Powered Career Platform
+# paulprae.com
 
 [![CI](https://github.com/praeducer/paulprae-com/actions/workflows/ci.yml/badge.svg)](https://github.com/praeducer/paulprae-com/actions/workflows/ci.yml)
 [![Deploy](https://github.com/praeducer/paulprae-com/actions/workflows/deploy.yml/badge.svg)](https://github.com/praeducer/paulprae-com/actions/workflows/deploy.yml)
 
-A professional career platform with an AI chat assistant that helps recruiters explore Paul Prae's experience, download resumes, and request tailored resumes for specific roles. Built with Next.js 16, Vercel AI SDK 6, and Claude.
+An AI career platform at [paulprae.com](https://paulprae.com). Recruiters chat with a Claude-powered career assistant, explore a structured resume, and request tailored resumes for specific roles — all grounded in real career data.
 
-## Overview
+This project is both a product and a portfolio piece. The codebase demonstrates production AI engineering: streaming LLM integration, tool-calling, prompt engineering with grounding rules, security hardening, and a CI/CD pipeline that deploys with zero manual steps.
 
-This project evolves across three phases:
+## What It Does
 
-1. **Phase 1:** AI-generated resume pipeline — LinkedIn data + knowledge base fed to Claude, rendered as styled HTML
-2. **Phase 2 (Current):** AI chat platform — interactive recruiter Q&A, tailored resume generation via tool-calling, job search content tools
-3. **Phase 3:** Knowledge-graph-augmented AI — Neo4j career graph, AI agents, n8n automation pipelines
-
-## Routes
-
-| Route       | Description                                                                     |
-| ----------- | ------------------------------------------------------------------------------- |
-| `/`         | AI chat interface — recruiter Q&A, resume downloads, tailored resume generation |
-| `/resume`   | Static resume page with section navigation                                      |
-| `/tools`    | Job search content tools (cover letters, LinkedIn messages, etc.) — noindex     |
-| `/api/chat` | Streaming chat API with tool-calling (Sonnet 4.6)                               |
-
-## Resume Pipeline
-
-The pipeline generates career data and resume outputs:
-
-```
-LinkedIn CSV Export → Ingestion Script → Claude API → Markdown Resume → PDF/DOCX Export
-```
-
-1. **Ingest** LinkedIn data exports and knowledge base JSONs into a unified career data file
-2. **Generate** a professional Markdown resume by calling Claude Opus 4.6 with structured career data + brand guidelines
-3. **Export** the Markdown resume to PDF (via Pandoc + Typst) and DOCX (via Pandoc)
-4. **Build** the Next.js site (reads committed resume data at build time)
-5. **Deploy** to Vercel on merge to `main`
+| Route                                    | Purpose                                                                                               |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| [`/`](https://paulprae.com)              | AI chat — recruiter Q&A, resume downloads, tailored resume generation                                 |
+| [`/resume`](https://paulprae.com/resume) | Full resume with section navigation and PDF/DOCX/MD downloads                                         |
+| `/api/chat`                              | Streaming chat API with [tool-calling](https://docs.anthropic.com/en/docs/build-with-claude/tool-use) |
 
 ## Architecture
 
-The project has two independent workflows connected by committed data files:
+Two independent workflows connected by committed data files:
 
 ```
-┌─────────────────────────────┬──────────────────────────────┐
-│   Resume Pipeline           │   Website + Chat             │
-│   (local-only)              │   (server-rendered)          │
-├─────────────────────────────┼──────────────────────────────┤
-│ npm run pipeline            │ npm run dev / npm run build  │
-│ Requires: API key,          │ Requires: Node.js +          │
-│   pandoc, typst             │   ANTHROPIC_API_KEY (chat)   │
-│ Outputs: career-data.json,  │ Reads: committed data files  │
-│   resume .md, PDF, DOCX     │ Streams: /api/chat responses │
-│ Frequency: When career      │ Frequency: Any code change   │
-│   data changes              │                              │
-└──────────────┬──────────────┴──────────────────────────────┘
-               │ committed to git
-               ▼
-       data/generated/career-data.json
-       data/generated/Paul-Prae-Resume.md
+Resume Pipeline (local)              Website + Chat (Vercel)
+─────────────────────────            ──────────────────────────
+LinkedIn CSV + knowledge JSONs       Next.js App Router
+    ↓ npm run ingest                     ↓ npm run build
+career-data.json ──────────────────→ /resume (static pre-render)
+    ↓ npm run generate                   ↓
+Paul-Prae-Resume.md                  /api/chat (streaming)
+    ↓ npm run export                     │ system prompt = career data
+PDF + DOCX                               │ + grounding rules
+                                         ↓
+                                     Claude Sonnet → SSE stream → UI
 ```
 
-The pipeline and website are independent. You can develop the website without the pipeline. The chat API requires `ANTHROPIC_API_KEY` at runtime.
+The pipeline and website are independent. Website development requires only Node.js. The chat API requires `ANTHROPIC_API_KEY` at runtime.
+
+### AI Chat System
+
+The chat API ([`app/api/chat/route.ts`](app/api/chat/route.ts)) streams responses via [Vercel AI SDK 6](https://ai-sdk.dev/docs/introduction) with two tools:
+
+- **`generate_tailored_resume`** — accepts a job description, calls Claude to produce a role-specific resume
+- **`get_resume_links`** — returns download URLs for PDF, DOCX, Markdown, and web formats
+
+Career data (~90K tokens) is loaded into the system prompt with [Anthropic prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) (5-min TTL). After the first request, subsequent turns reuse the cached prompt at ~90% cost reduction.
+
+System prompts include grounding rules (G1-G10) that constrain the model to only cite verified career data, and security rules (S1-S5) that defend against prompt injection. Prompts live in [`lib/prompts/`](lib/prompts/) as Markdown files with YAML frontmatter.
+
+### Resume Pipeline
+
+The pipeline generates career artifacts from structured data:
+
+1. **Ingest** — parse LinkedIn CSV exports + knowledge base JSONs into [`career-data.json`](data/generated/career-data.json)
+2. **Generate** — call Claude Opus 4.6 with career data + brand guidelines → Markdown resume
+3. **Compare** — optional interactive section-by-section review (`--judge` for LLM scoring)
+4. **Approve** — promote staging resume to approved (the version the website reads)
+5. **Export** — Pandoc + Typst convert → PDF and DOCX
+
+Generation writes to a staging file; the website reads the approved file. This prevents regeneration from overwriting reviewed content. All pipeline steps skip automatically when outputs are newer than inputs.
 
 ## Tech Stack
 
-| Layer         | Technology                                                     |
-| ------------- | -------------------------------------------------------------- |
-| Framework     | Next.js 16 (App Router, TypeScript, Turbopack)                 |
-| AI Chat       | Vercel AI SDK 6 (`ai` + `@ai-sdk/anthropic`) + Claude Sonnet   |
-| Chat UI       | `@assistant-ui/react` + `@assistant-ui/react-ai-sdk`           |
-| Styling       | Tailwind CSS 4.x                                               |
-| Markdown      | react-markdown + remark-gfm                                    |
-| AI Generation | Anthropic Claude API (Opus 4.6) for resume pipeline            |
-| Rate Limiting | Upstash Redis (`@upstash/ratelimit`)                           |
-| Validation    | Zod (schema validation)                                        |
-| Resume Export | Pandoc (MD→DOCX) + Typst (MD→PDF)                              |
-| Linting       | ESLint 9 + eslint-config-next + Prettier + husky + lint-staged |
-| Testing       | Vitest + Testing Library + Playwright E2E                      |
-| Analytics     | Vercel Analytics + Speed Insights (no cookies)                 |
-| Deployment    | Vercel via GitHub Actions CI/CD                                |
-| Dev Tooling   | Claude Code CLI + Cursor                                       |
+| Layer         | Technology                                                                                                              | Version |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------- | ------- |
+| Framework     | [Next.js](https://nextjs.org/) (App Router, TypeScript)                                                                 | 16.x    |
+| AI Chat       | [Vercel AI SDK](https://ai-sdk.dev/) (`ai` + `@ai-sdk/anthropic`) + Claude Sonnet 4.6                                   | 6.x     |
+| Chat UI       | [`@assistant-ui/react`](https://github.com/assistant-ui/assistant-ui) (Radix-style primitives)                          | 0.12.x  |
+| Styling       | [Tailwind CSS](https://tailwindcss.com/)                                                                                | 4.x     |
+| AI Generation | [Anthropic Claude API](https://docs.anthropic.com/) (Opus 4.6) for resume pipeline                                      | —       |
+| Rate Limiting | [Upstash Redis](https://upstash.com/) (`@upstash/ratelimit`) with in-memory fallback                                    | —       |
+| Validation    | [Zod](https://zod.dev/)                                                                                                 | 4.x     |
+| Resume Export | [Pandoc](https://pandoc.org/) (MD→DOCX) + [Typst](https://typst.app/) (MD→PDF)                                          | —       |
+| Testing       | [Vitest](https://vitest.dev/) + [Testing Library](https://testing-library.com/) + [Playwright](https://playwright.dev/) | —       |
+| Linting       | ESLint 9 + Prettier + husky + lint-staged                                                                               | —       |
+| Deployment    | [Vercel](https://vercel.com/) via [GitHub Actions](https://github.com/praeducer/paulprae-com/actions) CI/CD             | —       |
 
 ## Getting Started
 
-### Quick Start (Website Development Only)
-
-No API key, no system dependencies — just Node.js:
+### Website Development (no API key needed)
 
 ```bash
 git clone https://github.com/praeducer/paulprae-com.git
 cd paulprae-com
 npm install
-npm run dev        # → localhost:3000 (hot-reload with Turbopack)
+npm run dev     # localhost:3000 with Turbopack hot-reload
 ```
 
-The website reads committed data files and works out of the box. If you only need to make UI/style changes, this is all you need.
+The website reads committed data files and works immediately. For UI/style changes, this is all you need.
 
-### Full Pipeline Setup (Resume Generation)
+### Full Pipeline Setup
 
-To regenerate resume content from LinkedIn data, you also need:
-
-- Anthropic API key ([console.anthropic.com](https://console.anthropic.com/))
-- Pandoc ([pandoc.org](https://pandoc.org/installing.html)) — for resume export
-- Typst ([typst.app](https://github.com/typst/typst)) — for PDF export
-
-### 1. Clone and Install
-
-```bash
-git clone https://github.com/praeducer/paulprae-com.git
-cd paulprae-com
-
-# Install all dependencies (Node.js, npm packages, pandoc, typst)
-# Linux/WSL/macOS:
-bash scripts/setup/install-pipeline-deps.sh
-# Windows: powershell -NoProfile -File scripts\setup\install-dev-tools.ps1
-
-npm install
-```
-
-**Optional — MCP (Claude Code & Cursor):** To install shared MCP config (Vercel, GitHub, Filesystem, Fetch), run `bash scripts/setup/install-mcp.sh` (Linux/WSL/macOS) or `powershell -NoProfile -File scripts\setup\install-mcp.ps1` (Windows). See [docs/mcp-setup.md](docs/mcp-setup.md).
-
-### 2. Configure API Key
+To regenerate resume content from LinkedIn data:
 
 ```bash
 cp .env.local.example .env.local
-# Edit .env.local and add your ANTHROPIC_API_KEY (get one at console.anthropic.com/settings/keys)
+# Add your ANTHROPIC_API_KEY (https://console.anthropic.com/settings/keys)
+
+# Place LinkedIn CSVs in data/sources/linkedin/
+# Export from: https://www.linkedin.com/mypreferences/d/download-my-data
+# Select "Download larger data archive" for full position descriptions
+
+# Install export dependencies (for PDF/DOCX)
+# Ubuntu/WSL: sudo apt-get install -y pandoc && cargo install typst-cli
+# macOS: brew install pandoc typst
+
+npm run pipeline     # ingest → generate → export
 ```
 
-> **Billing:** The pipeline uses Claude Opus 4.6. A single resume generation costs ~$0.50-$2.00 in API credits. Ensure your account has credits at [console.anthropic.com/settings/billing](https://console.anthropic.com/settings/billing).
-
-### 3. Add LinkedIn Data
-
-1. Go to [linkedin.com/mypreferences/d/download-my-data](https://www.linkedin.com/mypreferences/d/download-my-data)
-2. Select **"Download larger data archive"** (the smaller export doesn't include full position descriptions)
-3. Wait for LinkedIn's email (10 minutes to 24 hours), then download and unzip
-4. Copy CSVs into `data/sources/linkedin/`
-
-The pipeline recognizes these files (case-insensitive):
-
-| File                           | Required?    | What it contains            |
-| ------------------------------ | ------------ | --------------------------- |
-| `Positions.csv`                | **Required** | Work experience             |
-| `Education.csv`                | Recommended  | Degrees, schools            |
-| `Skills.csv`                   | Recommended  | LinkedIn skill endorsements |
-| `Profile.csv`                  | Recommended  | Name, headline, summary     |
-| `Email Addresses.csv`          | Recommended  | Contact email               |
-| `Certifications.csv`           | Optional     | Professional certifications |
-| `Projects.csv`                 | Optional     | Project portfolio           |
-| `Publications.csv`             | Optional     | Published works             |
-| `Languages.csv`                | Optional     | Language proficiencies      |
-| `Recommendations_Received.csv` | Optional     | Peer recommendations        |
-| `Honors.csv`                   | Optional     | Awards, honors              |
-| `Volunteering.csv`             | Optional     | Volunteer experience        |
-| `Courses.csv`                  | Optional     | Course completions          |
-
-At minimum, you need `Positions.csv` or `Education.csv` for the pipeline to succeed. LinkedIn CSVs are gitignored and stay local to your machine.
-
-### 4. Install Export Dependencies (Optional — for PDF/DOCX)
-
-If you want PDF and DOCX exports (not just the web resume):
-
-**Ubuntu/WSL:**
+### Commands
 
 ```bash
-sudo apt-get install -y pandoc
-cargo install typst-cli  # or download from https://github.com/typst/typst/releases
+# Development
+npm run dev                # Dev server (Turbopack)
+npm run build              # Production build
+npm test                   # 400+ unit/component tests (~500ms)
+npm run test:e2e           # Playwright E2E smoke tests
+npm run check              # Full pre-push checklist (lint + format + test + build + validate)
+
+# Pipeline
+npm run pipeline           # Full: ingest → generate → export
+npm run pipeline:content   # AI steps only: ingest → generate
+npm run ingest             # Parse LinkedIn CSVs + knowledge JSONs → career-data.json
+npm run generate           # Claude API → Paul-Prae-Resume.md
+npm run export             # Pandoc + Typst → PDF + DOCX
 ```
 
-**macOS:**
+## Security
 
-```bash
-brew install pandoc typst
-```
+The chat API includes multiple defense layers documented in [`SECURITY.md`](SECURITY.md):
 
-**Windows (PowerShell):**
-
-```powershell
-winget install --id JohnMacFarlane.Pandoc --exact
-winget install --id Typst.Typst --exact
-```
-
-Verify: `pandoc --version && typst --version`
-
-> The `npm run export` step will **fail** if pandoc/typst are missing. If you only need the web resume, skip the export step and run `npm run ingest && npm run generate && npm run build` instead.
-
-### 5. Run the Pipeline
-
-```bash
-# Full pipeline: ingest → generate → export (no website build)
-npm run pipeline
-
-# Or run steps individually:
-npm run ingest      # Parse LinkedIn CSVs + knowledge JSONs → career-data.json
-npm run generate    # Call Claude API → data/generated/Paul-Prae-Resume.md
-npm run export      # Convert to PDF + DOCX (requires pandoc + typst)
-npm run export:pdf  # PDF only
-npm run export:docx # DOCX only
-npm run build       # Next.js static export → out/ (website only, no API key needed)
-
-# Composable sub-pipelines:
-npm run pipeline:content  # ingest → generate (AI steps only)
-npm run pipeline:render   # export (from existing markdown)
-npm run pipeline:full     # pipeline + build (convenience for full rebuild)
-npm run pipeline:deploy   # full pipeline + build + stage files for git
-
-# Force variants (skip freshness checks):
-npm run ingest:force      # Re-ingest even if inputs unchanged
-npm run generate:force    # Regenerate even if resume is fresh
-
-# Brand assets (OG image, favicon, apple-touch-icon):
-npm run brand             # Generate if missing (skips existing)
-npm run brand:force       # Regenerate all brand assets
-```
-
-Pipeline steps skip automatically when their outputs are newer than their inputs. The ingest step uses SHA-256 content hashing; generate and export use file modification times. Use `--force` to override (e.g., `npm run generate:force`).
-
-### Testing
-
-```bash
-npm test              # Run all unit/component tests
-npm run test:e2e      # Playwright E2E smoke tests
-npm run test:unit     # Unit tests only (pure logic, no generated files needed)
-npm run test:pipeline # Pipeline integration tests (validates generated outputs)
-```
-
-### Linting & Formatting
-
-```bash
-npm run lint          # ESLint check (cached)
-npm run lint:fix      # ESLint auto-fix
-npm run format        # Prettier format all files
-npm run format:check  # Prettier check (CI-friendly)
-```
-
-A **pre-commit hook** runs automatically on every `git commit` (installed via `npm install`). It runs Prettier on staged files via lint-staged, so formatting issues are fixed before they reach CI. No extra setup needed — husky wires it in via the `prepare` npm lifecycle hook.
-
-The hook works across all Git environments: WSL/Linux/macOS terminals use `npx` directly, while Windows Git clients (GitHub Desktop, VS Code) automatically delegate to WSL when `npx` isn't available in the Windows shell.
-
-### Pre-Push Checklist
-
-```bash
-npm run check         # Full checklist: data files → lint → format → test → build → validate
-npm run check:quick   # Data file validation only (instant, no lint/test/build)
-```
-
-`npm run check` runs the same checks as CI plus validates that resume data files exist, public download copies are in sync, and the build output contains expected content. Run it before pushing to catch issues locally.
-
-### Local Development
-
-```bash
-npm run dev         # Start dev server with Turbopack (localhost:3000)
-```
-
-Hot-reload is enabled — edit any `.tsx`, `.css`, or `.ts` file and the browser updates instantly. No API key or pipeline setup needed for website development.
-
-**Common tasks:**
-
-| Task                   | Command                                | Notes                                |
-| ---------------------- | -------------------------------------- | ------------------------------------ |
-| Change CSS/layout      | Edit `app/globals.css` or `.tsx` files | Hot-reloads on `localhost:3000`      |
-| Preview resume changes | `npm run generate && npm run approve`  | Then refresh browser                 |
-| Run tests              | `npm test`                             | ~500ms                               |
-| Check before push      | `npm run check`                        | Full CI-equivalent + data validation |
-
-### Repeating on a Fresh Machine
-
-1. Clone the repo
-2. `npm install`
-3. Copy `.env.local` from your password manager (or create a new key)
-4. Place LinkedIn CSVs in `data/sources/linkedin/` (re-export if needed)
-5. Install pandoc + typst (see step 4)
-6. `npm run pipeline`
-
-The knowledge base (`data/sources/knowledge/`) is committed to git and transfers automatically with the repo.
-
-### Troubleshooting
-
-| Problem                       | Solution                                                                                        |
-| ----------------------------- | ----------------------------------------------------------------------------------------------- |
-| `tsx not found`               | Run `npm install` first, or use `npx tsx`                                                       |
-| `ANTHROPIC_API_KEY not found` | Create `.env.local` per step 2                                                                  |
-| `No CSV files found`          | Place LinkedIn CSVs in `data/sources/linkedin/` per step 3                                      |
-| `API Error: 401`              | Check your API key in `.env.local`                                                              |
-| `API Error: 429`              | Rate limited — wait 60 seconds and retry                                                        |
-| `pandoc not found`            | Install per step 4, or skip export step                                                         |
-| UNC path / CMD.EXE errors     | Run via WSL: `wsl bash -lc "source ~/.nvm/nvm.sh && cd ~/dev/paulprae-com && npm run pipeline"` |
+- **Origin validation** — [`proxy.ts`](proxy.ts) blocks cross-origin requests from unauthorized domains
+- **Rate limiting** — 20 req/min per IP via Upstash Redis (in-memory fallback when Redis unavailable)
+- **Input validation** — request body size (100KB), message count (50), per-message length (4K chars)
+- **Prompt injection defense** — security rules S1-S5 in all system prompts, XML delimiters around user input in tool calls
+- **Security headers** — CSP, HSTS, X-Frame-Options (DENY), Permissions-Policy via [`vercel.json`](vercel.json)
 
 ## Deployment
 
-The site deploys through GitHub Actions (Vercel Git integration is disabled):
-
-| Environment       | Branch | URL                                  | Trigger                          |
-| ----------------- | ------ | ------------------------------------ | -------------------------------- |
-| Local dev         | any    | `localhost:3000`                     | `npm run dev`                    |
-| Preview / Staging | `main` | `*.vercel.app`                       | CI passes → Deploy workflow      |
-| Production        | `main` | [paulprae.com](https://paulprae.com) | Smoke test passes → auto-promote |
-
-AI generation happens **locally** — Vercel only runs `next build` against committed files (no API keys needed on the Vercel build server).
+Deploys through GitHub Actions — [Vercel Git integration is not used](https://vercel.com/docs/deployments/git):
 
 ```
-Push to main → CI (ci.yml): lint, format, test, build, validate
-            → Deploy (deploy.yml): preview → smoke test → promote to production → smoke test
+Push to main → CI: lint, format, test, build, validate
+             → Deploy: preview → smoke test → promote to production
 ```
 
-1. Run the pipeline locally: `npm run pipeline`
-2. Commit generated files: `git add data/generated/ public/Paul-Prae-Resume.* && git commit`
-3. Push to `main` (CI runs lint, format, test, build automatically)
-4. If CI passes, Deploy workflow: preview → smoke test → promote → production smoke
-5. Production updates within ~2 minutes at [paulprae.com](https://paulprae.com)
+| Environment | URL                                  | Trigger                          |
+| ----------- | ------------------------------------ | -------------------------------- |
+| Local       | `localhost:3000`                     | `npm run dev`                    |
+| Preview     | `*.vercel.app`                       | CI passes → deploy workflow      |
+| Production  | [paulprae.com](https://paulprae.com) | Smoke test passes → auto-promote |
 
-Custom-domain DNS operations are documented in [docs/domain-dns-runbook.md](docs/domain-dns-runbook.md).
-
-The project uses `"framework": "nextjs"` in `vercel.json` for proper App Router support (server-rendered pages + API routes). Every push to `main` triggers a CI + deploy workflow.
+AI generation runs locally. Vercel only runs `next build` against committed files — no API key needed in the build step.
 
 ## Project Structure
 
 ```
-paulprae-com/
-├── app/                    # Next.js App Router pages and layouts
-├── data/
-│   ├── sources/
-│   │   ├── linkedin/       # LinkedIn CSV exports (gitignored — may contain unparsed columns)
-│   │   └── knowledge/      # Knowledge base JSONs (committed — recruiter-facing content)
-│   └── generated/          # Pipeline output: career-data.json + Paul-Prae-Resume.md (committed), PDF + DOCX (gitignored)
-├── tests/                  # Unit tests (Vitest) + pipeline integration tests
-├── docs/                   # Technical documentation, design docs, and browser automation prompts
-├── scripts/                # Build pipeline + export + brand asset scripts + resume-pdf.typ stylesheet
-├── lib/                    # Shared utilities (config, types, markdown helpers)
-├── public/                 # Static assets (OG image, favicons, robots.txt, sitemap.xml)
-├── .env.local.example      # Environment variable template
-├── CLAUDE.md               # Claude Code project memory
-└── next.config.ts          # Next.js configuration
+app/                        Next.js App Router pages and layouts
+  api/chat/route.ts         Streaming chat API with tool-calling
+  components/               ChatHome (shared by / and /tools), QuickActions
+  resume/                   Resume page with section nav, downloads
+  tools/                    Job search content tools (noindex)
+lib/
+  agent/context.ts          Career context builder for system prompts
+  prompts/                  System prompts (Markdown + YAML frontmatter + few-shot examples)
+  data-utils.ts             Shared utilities (stripEmpty for token optimization)
+  constants.ts              Shared constants (client + server)
+data/
+  sources/linkedin/         LinkedIn CSV exports (gitignored)
+  sources/knowledge/        Knowledge base JSONs (committed)
+  generated/                Pipeline outputs (career-data.json, resume .md committed; PDF/DOCX gitignored)
+scripts/                    Pipeline scripts + Typst stylesheet
+tests/                      Unit, integration, component tests (Vitest + Testing Library)
+e2e/                        Playwright E2E smoke tests
+proxy.ts                    Next.js 16 proxy (CORS + origin validation)
+docs/                       Technical documentation
 ```
-
-## Roadmap
-
-### Phase 2: AI Chat Platform (Complete)
-
-- AI chat homepage where recruiters can ask questions about Paul's career
-- Tool-calling for tailored resume generation from job descriptions
-- Job search content tools (cover letters, LinkedIn messages, etc.)
-- Streaming API with Claude Sonnet via Vercel AI SDK 6
-- Rate limiting, CORS, prompt injection defenses, security headers
-
-### Phase 3: Knowledge-Graph-Augmented AI (Preview — Not Started)
-
-- Neo4j knowledge graph capturing career relationships (skills → projects → roles → outcomes)
-- AI agent with tool-calling (graph queries, vector search, web research)
-- n8n automation workflows for data ingestion and content enrichment
-- Interactive career timeline and skill visualizations
 
 ## Documentation
 
-| Doc                                                                              | Purpose                                                                             |
-| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| [`docs/README.md`](docs/README.md)                                               | Documentation map and ownership by concern                                          |
-| [`docs/technical-design-document.md`](docs/technical-design-document.md)         | Current architecture and phased technical roadmap                                   |
-| [`docs/domain-dns-runbook.md`](docs/domain-dns-runbook.md)                       | Custom-domain DNS operations, validation, troubleshooting, rollback                 |
-| [`docs/linux-dev-environment-setup.md`](docs/linux-dev-environment-setup.md)     | Linux/WSL setup: nvm, Claude Code CLI, Cursor, pipeline deps                        |
-| [`docs/windows-dev-environment-setup.md`](docs/windows-dev-environment-setup.md) | Windows host setup: Dev Drive, tooling, and validation                              |
-| [`docs/devops.md`](docs/devops.md)                                               | Deployment, smoke tests, rollback, CI/CD configuration                              |
-| [`docs/mcp-setup.md`](docs/mcp-setup.md)                                         | MCP config for Claude Code and Cursor (Vercel, GitHub, Filesystem, Fetch)           |
-| [`scripts/setup/`](scripts/setup/)                                               | Automated setup scripts (Windows + Linux/WSL) for dev environment and pipeline deps |
+| Document                                                                 | Purpose                                               |
+| ------------------------------------------------------------------------ | ----------------------------------------------------- |
+| [`docs/technical-design-document.md`](docs/technical-design-document.md) | System architecture, constraints, and phase roadmap   |
+| [`docs/ai-architecture.md`](docs/ai-architecture.md)                     | AI architecture decisions and well-architected review |
+| [`docs/devops.md`](docs/devops.md)                                       | Deployment, smoke tests, rollback, CI/CD              |
+| [`docs/uat-checklist.md`](docs/uat-checklist.md)                         | Manual QA checklist for post-deploy verification      |
+| [`docs/domain-dns-runbook.md`](docs/domain-dns-runbook.md)               | DNS operations, validation, troubleshooting           |
+| [`SECURITY.md`](SECURITY.md)                                             | Security policy, threat model, cost controls          |
+| [`CHANGELOG.md`](CHANGELOG.md)                                           | Release history                                       |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md)                                     | Development workflow and code standards               |
 
-## Resume Versioning
+## Roadmap
 
-Each pipeline run archives the resume to `data/generated/versions/` and logs it in [`data/generated/VERSIONS.md`](data/generated/VERSIONS.md). Use git tags (`resume/YYYY-MM-DD`) for milestone versions.
+### Phase 3: Knowledge-Graph-Augmented AI (planned)
 
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow, branching strategy, commit conventions, and code quality standards.
+- Neo4j knowledge graph (Person → Role → Company → Project → Skill → Outcome)
+- AI agents with tool-calling via Claude Agent SDK
+- n8n automation workflows for data ingestion and enrichment
 
 ## License
 

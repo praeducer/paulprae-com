@@ -186,7 +186,7 @@ export default function ResumePage() {
       {/* Skip navigation — off-screen until keyboard focus */}
       <a
         href="#resume-content"
-        className="absolute -top-full left-2 z-50 rounded bg-white px-4 py-2 text-sm text-slate-900 ring-2 ring-blue-500 focus:top-2 focus:outline-none dark:bg-slate-900 dark:text-slate-100"
+        className="absolute -top-full left-2 z-50 rounded bg-white px-4 py-2 text-sm text-slate-900 ring-2 ring-blue-500 focus-visible:top-2 focus-visible:outline-none dark:bg-slate-900 dark:text-slate-100"
       >
         Skip to resume content
       </a>

@@ -107,7 +107,7 @@ The build pipeline transforms raw career data into a deployed site:
 
 ## Common Commands
 
-See [README.md](README.md#5-run-the-pipeline) for the full command reference. Quick shortcuts:
+See [README.md](README.md#commands) for the full command reference. Quick shortcuts:
 
 - `npm run dev` — local development server with hot reload
 - `npm run pipeline` — full pipeline: ingest → generate → export (no build)
