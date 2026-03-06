@@ -15,7 +15,7 @@ import SectionNav from "./components/SectionNav";
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "Paul Prae — Resume | AI Engineer & Architect",
+  title: "Paul Prae — Resume | Principal AI Engineer & Solutions Architect",
   description:
     "Building AI agents that ship AI products. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
   alternates: {
@@ -202,7 +202,7 @@ export default function ResumePage() {
               {profile.name}
             </Link>
             <p className="hidden sm:block text-sm text-slate-500 dark:text-slate-400 truncate">
-              {profile.headline.split("|")[0].trim()}
+              Principal AI Engineer &amp; Solutions Architect
             </p>
             <Link
               href="/"
