@@ -318,7 +318,7 @@ ${jobDescription}
                   model: getModel("claude-sonnet-4-6"),
                   system: resumeSystemPrompt,
                   prompt: userPrompt,
-                  maxOutputTokens: 4096,
+                  maxOutputTokens: 8192,
                   temperature: 0.3,
                   providerOptions: {
                     anthropic: {
