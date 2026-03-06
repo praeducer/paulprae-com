@@ -246,7 +246,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
         {/* Chat Thread */}
         <ThreadPrimitive.Root className="flex min-h-0 flex-1 flex-col">
           <ThreadPrimitive.Viewport className="flex flex-1 flex-col overflow-y-auto">
-            <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6">
+            <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pt-5">
               {/* Welcome / Empty State */}
               <ThreadPrimitive.Empty>
                 <div className="flex flex-1 flex-col items-center justify-center py-12">
