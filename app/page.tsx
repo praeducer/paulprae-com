@@ -1,24 +1,23 @@
 import type { Metadata } from "next";
 import ChatHome from "./components/ChatHome";
+import { SITE_NAME, SITE_SUBTITLE, SITE_URL, SITE_DESCRIPTION } from "../lib/constants";
 
 export const metadata: Metadata = {
-  title: "Paul Prae — AI Career Assistant | paulprae.com",
-  description:
-    "Chat with an AI assistant about Paul Prae's career, skills, and experience. Download resumes, ask about expertise, or use job search tools.",
+  title: `${SITE_NAME} — AI Career Assistant | paulprae.com`,
+  description: SITE_DESCRIPTION,
   openGraph: {
-    title: "Paul Prae — AI Career Assistant | paulprae.com",
-    description:
-      "Chat with an AI assistant about Paul Prae's career, skills, and experience. Download resumes, ask about expertise, or use job search tools.",
+    title: `${SITE_NAME} — AI Career Assistant | paulprae.com`,
+    description: SITE_DESCRIPTION,
     type: "website",
-    url: "https://paulprae.com",
-    siteName: "Paul Prae",
+    url: SITE_URL,
+    siteName: SITE_NAME,
     locale: "en_US",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Paul Prae — AI Career Assistant",
+        alt: `${SITE_NAME} — ${SITE_SUBTITLE}`,
       },
     ],
   },

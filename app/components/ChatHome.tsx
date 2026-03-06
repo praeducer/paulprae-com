@@ -134,7 +134,6 @@ function ChatComposer() {
           className="min-h-[40px] max-h-[40px] sm:max-h-[200px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:max-h-[200px] dark:text-slate-100 dark:placeholder:text-slate-500"
           aria-label="Chat message"
           maxLength={MAX_MESSAGE_CHARS}
-          rows={1}
           autoFocus
         />
         <ComposerPrimitive.Send asChild>
