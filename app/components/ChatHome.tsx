@@ -14,8 +14,7 @@ import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-s
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
 import type { TextMessagePart } from "@assistant-ui/react";
 import QuickActions from "./QuickActions";
-
-const MAX_MESSAGE_CHARS = 4_000;
+import { MAX_MESSAGE_CHARS } from "../../lib/constants";
 
 // ─── Markdown Text Wrapper ──────────────────────────────────────────────────
 
@@ -24,6 +23,11 @@ const MAX_MESSAGE_CHARS = 4_000;
 function MarkdownText(_props: TextMessagePart & { status: Record<string, unknown> }) {
   return <MarkdownTextPrimitive />;
 }
+
+// ─── Shared Styles ──────────────────────────────────────────────────────────
+
+const actionButtonClass =
+  "rounded-md p-1.5 min-h-[32px] min-w-[32px] flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none dark:hover:bg-slate-800 dark:hover:text-slate-300";
 
 // ─── Custom Thread Components ───────────────────────────────────────────────
 
@@ -57,7 +61,7 @@ function AssistantMessage() {
             <button
               type="button"
               title="Copy to clipboard"
-              className="rounded-md p-1.5 min-h-[32px] min-w-[32px] flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none dark:hover:bg-slate-800 dark:hover:text-slate-300"
+              className={actionButtonClass}
               aria-label="Copy message"
             >
               <svg
@@ -75,7 +79,7 @@ function AssistantMessage() {
             <button
               type="button"
               title="Regenerate response"
-              className="rounded-md p-1.5 min-h-[32px] min-w-[32px] flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none dark:hover:bg-slate-800 dark:hover:text-slate-300"
+              className={actionButtonClass}
               aria-label="Regenerate response"
             >
               <svg

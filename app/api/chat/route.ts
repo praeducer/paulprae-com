@@ -11,6 +11,7 @@ import {
 } from "ai";
 import { z } from "zod";
 import { buildSystemPrompt } from "../../../lib/agent/context";
+import { MAX_MESSAGE_CHARS } from "../../../lib/constants";
 
 // Vercel Fluid Compute: explicit timeout for streaming chat responses.
 // Pro plan default is 300s with Fluid Compute, but we set 120s as a
@@ -35,7 +36,6 @@ function getModel(modelId: string): LanguageModel {
 
 const MAX_MESSAGES = 50;
 const MAX_BODY_BYTES = 100_000; // 100 KB
-const MAX_MESSAGE_CHARS = 4_000; // Per-message content limit (~1K tokens)
 const MAX_JOB_DESC_CHARS = 10_000; // Tool input: job description
 const MAX_EMPHASIS_ITEMS = 10; // Tool input: emphasis areas count
 const MAX_EMPHASIS_CHARS = 200; // Tool input: per emphasis area
