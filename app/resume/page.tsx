@@ -201,7 +201,7 @@ export default function ResumePage() {
             </p>
             <Link
               href="/"
-              className="ml-auto shrink-0 inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-blue-400 dark:hover:bg-blue-950"
+              className="ml-auto shrink-0 inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

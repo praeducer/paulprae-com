@@ -188,53 +188,53 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <div className="flex h-dvh flex-col">
-        {/* Header */}
+        {/* Header — matches resume page header (Row 1) */}
         <header className="shrink-0 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95">
-          <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-3">
-            <div>
-              <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">Paul Prae</h1>
-              <p className="hidden text-xs text-slate-500 sm:block dark:text-slate-400">
+          <div className="mx-auto max-w-3xl px-6 py-3">
+            <div className="flex items-baseline gap-3">
+              <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Paul Prae</h1>
+              <p className="hidden text-sm text-slate-500 sm:block dark:text-slate-400 truncate">
                 Principal AI Engineer &amp; Solutions Architect
               </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link
-                href="/resume"
-                className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-              >
-                View Resume
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="h-3.5 w-3.5"
-                  aria-hidden="true"
+              <div className="ml-auto flex shrink-0 items-center gap-2">
+                <Link
+                  href="/resume"
+                  className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M5 10a.75.75 0 0 1 .75-.75h6.638L10.23 7.29a.75.75 0 1 1 1.04-1.08l3.5 3.25a.75.75 0 0 1 0 1.08l-3.5 3.25a.75.75 0 1 1-1.04-1.08l2.158-1.96H5.75A.75.75 0 0 1 5 10Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </Link>
-              <a
-                href="/Paul-Prae-Resume.pdf"
-                download
-                className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-                aria-label="Download resume as PDF"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="h-3.5 w-3.5"
-                  aria-hidden="true"
+                  View Resume
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="h-3.5 w-3.5"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5 10a.75.75 0 0 1 .75-.75h6.638L10.23 7.29a.75.75 0 1 1 1.04-1.08l3.5 3.25a.75.75 0 0 1 0 1.08l-3.5 3.25a.75.75 0 1 1-1.04-1.08l2.158-1.96H5.75A.75.75 0 0 1 5 10Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </Link>
+                <a
+                  href="/Paul-Prae-Resume.pdf"
+                  download
+                  className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                  aria-label="Download resume as PDF"
                 >
-                  <path d="M10 3a.75.75 0 0 1 .75.75v7.69l2.72-2.72a.75.75 0 1 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06 0l-4-4a.75.75 0 1 1 1.06-1.06l2.72 2.72V3.75A.75.75 0 0 1 10 3Z" />
-                  <path d="M3.75 14a.75.75 0 0 1 .75.75v1.5h11v-1.5a.75.75 0 0 1 1.5 0v1.5A1.5 1.5 0 0 1 15.5 17.25h-11A1.5 1.5 0 0 1 3 15.75v-1.5a.75.75 0 0 1 .75-.75Z" />
-                </svg>
-                PDF
-              </a>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="h-3.5 w-3.5"
+                    aria-hidden="true"
+                  >
+                    <path d="M10 3a.75.75 0 0 1 .75.75v7.69l2.72-2.72a.75.75 0 1 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06 0l-4-4a.75.75 0 1 1 1.06-1.06l2.72 2.72V3.75A.75.75 0 0 1 10 3Z" />
+                    <path d="M3.75 14a.75.75 0 0 1 .75.75v1.5h11v-1.5a.75.75 0 0 1 1.5 0v1.5A1.5 1.5 0 0 1 15.5 17.25h-11A1.5 1.5 0 0 1 3 15.75v-1.5a.75.75 0 0 1 .75-.75Z" />
+                  </svg>
+                  PDF
+                </a>
+              </div>
             </div>
           </div>
         </header>
@@ -267,10 +267,13 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                       </>
                     ) : (
                       <>
-                        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                           Job Search Tools
                         </h2>
-                        <p className="mt-2 max-w-md text-sm text-slate-500 dark:text-slate-400">
+                        <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+                          AI-powered content generation
+                        </p>
+                        <p className="mt-3 max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                           Generate tailored outreach, interview prep, and application content. All
                           grounded in Paul&apos;s real career data and optimized for each platform.
                         </p>
@@ -314,6 +317,9 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                   </button>
                 </ThreadPrimitive.ScrollToBottom>
                 <ChatComposer />
+                <p className="mt-1.5 text-center text-[10px] text-slate-400 dark:text-slate-500">
+                  paulprae.com &mdash; Built with Next.js, Claude AI, and Tailwind CSS
+                </p>
               </div>
             </ThreadPrimitive.ViewportFooter>
           </ThreadPrimitive.Viewport>
