@@ -37,11 +37,64 @@ function getModel(modelId: string): LanguageModel {
 
 // ─── Request Limits ─────────────────────────────────────────────────────────
 
-const MAX_MESSAGES = 50;
-const MAX_BODY_BYTES = 100_000; // 100 KB
-const MAX_JOB_DESC_CHARS = 10_000; // Tool input: job description
-const MAX_EMPHASIS_ITEMS = 10; // Tool input: emphasis areas count
-const MAX_EMPHASIS_CHARS = 200; // Tool input: per emphasis area
+export const CHAT_REQUEST_LIMITS = {
+  maxMessages: 50,
+  maxBodyBytes: 100_000, // 100 KB
+  maxJobDescriptionChars: 10_000, // Tool input: job description
+  maxEmphasisItems: 10, // Tool input: emphasis areas count
+  maxEmphasisChars: 200, // Tool input: per emphasis area
+} as const;
+
+const MAX_MESSAGES = CHAT_REQUEST_LIMITS.maxMessages;
+const MAX_BODY_BYTES = CHAT_REQUEST_LIMITS.maxBodyBytes;
+const MAX_JOB_DESC_CHARS = CHAT_REQUEST_LIMITS.maxJobDescriptionChars;
+const MAX_EMPHASIS_ITEMS = CHAT_REQUEST_LIMITS.maxEmphasisItems;
+const MAX_EMPHASIS_CHARS = CHAT_REQUEST_LIMITS.maxEmphasisChars;
+
+export const generateTailoredResumeInputSchema = z.object({
+  jobDescription: z
+    .string()
+    .max(MAX_JOB_DESC_CHARS, `Job description must be under ${MAX_JOB_DESC_CHARS} characters`)
+    .describe("The job description or role requirements to tailor the resume for"),
+  emphasisAreas: z
+    .array(
+      z
+        .string()
+        .max(
+          MAX_EMPHASIS_CHARS,
+          `Each emphasis area must be under ${MAX_EMPHASIS_CHARS} characters`,
+        ),
+    )
+    .max(MAX_EMPHASIS_ITEMS, `Maximum ${MAX_EMPHASIS_ITEMS} emphasis areas`)
+    .optional()
+    .describe("Specific areas to emphasize (e.g., 'AI/ML', 'healthcare', 'leadership')"),
+});
+
+export const getResumeLinksInputSchema = z.object({});
+
+/**
+ * Wrap untrusted job input in XML tags so prompts treat it as data.
+ */
+export function buildTailoredResumePrompt(
+  jobDescription: string,
+  emphasisAreas?: string[],
+): string {
+  return emphasisAreas?.length
+    ? `Generate a tailored resume for the following job description.
+
+<job_description>
+${jobDescription}
+</job_description>
+
+<emphasis_areas>
+${emphasisAreas.join(", ")}
+</emphasis_areas>`
+    : `Generate a tailored resume for the following job description.
+
+<job_description>
+${jobDescription}
+</job_description>`;
+}
 
 // ─── Rate Limiting (Upstash + in-memory fallback) ───────────────────────────
 
@@ -271,51 +324,11 @@ export async function POST(request: Request) {
           generate_tailored_resume: tool({
             description:
               "Generate a tailored version of Paul Prae's resume optimized for a specific job description. Use when a recruiter provides a JD or asks for a customized resume.",
-            inputSchema: z.object({
-              jobDescription: z
-                .string()
-                .max(
-                  MAX_JOB_DESC_CHARS,
-                  `Job description must be under ${MAX_JOB_DESC_CHARS} characters`,
-                )
-                .describe("The job description or role requirements to tailor the resume for"),
-              emphasisAreas: z
-                .array(
-                  z
-                    .string()
-                    .max(
-                      MAX_EMPHASIS_CHARS,
-                      `Each emphasis area must be under ${MAX_EMPHASIS_CHARS} characters`,
-                    ),
-                )
-                .max(MAX_EMPHASIS_ITEMS, `Maximum ${MAX_EMPHASIS_ITEMS} emphasis areas`)
-                .optional()
-                .describe(
-                  "Specific areas to emphasize (e.g., 'AI/ML', 'healthcare', 'leadership')",
-                ),
-            }),
+            inputSchema: generateTailoredResumeInputSchema,
             execute: async ({ jobDescription, emphasisAreas }) => {
               try {
                 const resumeSystemPrompt = getSystemPrompt("resume-generator");
-
-                // Wrap user input in XML delimiters to mitigate prompt injection.
-                // The model is instructed to treat content inside these tags as
-                // untrusted data, not as instructions.
-                const userPrompt = emphasisAreas?.length
-                  ? `Generate a tailored resume for the following job description.
-
-<job_description>
-${jobDescription}
-</job_description>
-
-<emphasis_areas>
-${emphasisAreas.join(", ")}
-</emphasis_areas>`
-                  : `Generate a tailored resume for the following job description.
-
-<job_description>
-${jobDescription}
-</job_description>`;
+                const userPrompt = buildTailoredResumePrompt(jobDescription, emphasisAreas);
 
                 const { text } = await generateText({
                   model: getModel("claude-sonnet-4-6"),
@@ -359,7 +372,7 @@ ${jobDescription}
           get_resume_links: tool({
             description:
               "Get download links for Paul Prae's resume in various formats. Use when someone asks to download or view the resume.",
-            inputSchema: z.object({}),
+            inputSchema: getResumeLinksInputSchema,
             execute: async () => ({
               pdf: "/Paul-Prae-Resume.pdf",
               docx: "/Paul-Prae-Resume.docx",

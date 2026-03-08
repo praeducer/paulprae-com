@@ -5,16 +5,16 @@
 ```
 Push to main → CI workflow (lint, test, build) → Deploy workflow → Vercel --prod → Smoke test
                                                                                       ↓
-                                                                            Fail → Auto-rollback + Issue
+                                                                            Fail → Create issue + manual rollback
 ```
 
 Two GitHub Actions workflows manage the pipeline:
 
-| Workflow                      | Trigger                   | Purpose                                       |
-| ----------------------------- | ------------------------- | --------------------------------------------- |
-| **CI** (`ci.yml`)             | Push/PR to main           | Lint, format, test, build, quality gates      |
-| **Deploy** (`deploy.yml`)     | After CI passes on main   | Build, deploy to Vercel, smoke test, rollback |
-| **Pipeline** (`pipeline.yml`) | Manual / Monthly schedule | Full resume generation pipeline + PR creation |
+| Workflow                      | Trigger                   | Purpose                                            |
+| ----------------------------- | ------------------------- | -------------------------------------------------- |
+| **CI** (`ci.yml`)             | Push/PR to main           | Lint, format, test, build, quality gates           |
+| **Deploy** (`deploy.yml`)     | After CI passes on main   | Build, deploy to Vercel, smoke test, failure issue |
+| **Pipeline** (`pipeline.yml`) | Manual / Monthly schedule | Full resume generation pipeline + PR creation      |
 
 The Deploy workflow uses `workflow_run` to trigger only after CI succeeds on `main`. This prevents deploying broken builds.
 
@@ -50,13 +50,15 @@ SMOKE_TEST_URL=https://preview.vercel.app npm run smoke  # Test against preview
 
 ## Rollback Procedures
 
-### Automatic Rollback (Deploy Workflow)
+### Failure Handling (Deploy Workflow)
 
-If the smoke test fails after deployment, the workflow automatically:
+If preview or production smoke tests fail, the workflow:
 
-1. Retrieves the previous production deployment from Vercel
-2. Promotes it back to production
-3. Creates a GitHub issue labeled `deploy-failure`
+1. Stops promotion (or marks the run failed if production smoke fails)
+2. Creates a GitHub issue with deployment context and run URL
+3. Leaves rollback as a manual operator action
+
+This keeps rollback explicit and auditable.
 
 ### Manual Rollback via Vercel CLI
 

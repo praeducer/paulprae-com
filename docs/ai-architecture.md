@@ -89,7 +89,7 @@ paulprae.com is a chat-first career platform with an AI assistant that answers r
 
 ## Observability Stack
 
-No custom telemetry code is needed. The existing platform integrations provide comprehensive observability:
+Platform integrations provide most observability. Additionally, this repo includes pipeline telemetry logging for generation runs.
 
 ### Vercel AI Gateway (Not Currently Active)
 
@@ -127,6 +127,12 @@ No custom telemetry code is needed. The existing platform integrations provide c
 **Where:** [console.upstash.com](https://console.upstash.com) > Database > Analytics tab.
 **How:** Rate limiter uses `@upstash/ratelimit` with `analytics: true` for per-key tracking.
 
+### Local Pipeline Telemetry
+
+**What:** JSONL log of generation metadata (model, token usage, duration, estimated cost).
+**Where:** `data/generated/.telemetry.jsonl`
+**How:** Written by `lib/ai/telemetry.ts` during pipeline generation scripts.
+
 ---
 
 ## Cost Controls
@@ -149,5 +155,5 @@ No custom telemetry code is needed. The existing platform integrations provide c
 Exact token counts vary with career data size. Costs are based on [Anthropic pricing](https://docs.anthropic.com/en/docs/about-claude/models) for Sonnet 4.6 ($3/$15 per MTok) and Opus 4.6 ($15/$75 per MTok):
 
 - **Chat conversation (5 turns):** First turn pays cache write cost; subsequent turns benefit from ~90% cache read discount. A typical 5-turn session costs well under $1.
-- **Resume generation via tool call:** Sonnet generates a tailored resume from a JD. Output capped at 4,096 tokens.
+- **Resume generation via tool call:** Sonnet generates a tailored resume from a JD. Output capped at 8,192 tokens.
 - **Pipeline resume generation (Opus):** Offline, uses adaptive thinking at max effort. Cost per generation is ~$1-2 depending on thinking token usage.

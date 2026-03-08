@@ -51,7 +51,7 @@ System prompts include grounding rules (G1-G10) that constrain the model to only
 The pipeline generates career artifacts from structured data:
 
 1. **Ingest** — parse LinkedIn CSV exports + knowledge base JSONs into [`career-data.json`](data/generated/career-data.json)
-2. **Generate** — call Claude Opus 4.6 with career data + brand guidelines → Markdown resume
+2. **Generate** — call Claude Opus 4.6 with career data + brand guidelines → staging markdown resume
 3. **Compare** — optional interactive section-by-section review (`--judge` for LLM scoring)
 4. **Approve** — promote staging resume to approved (the version the website reads)
 5. **Export** — Pandoc + Typst convert → PDF and DOCX
@@ -120,9 +120,15 @@ npm run check              # Full pre-push checklist (lint + format + test + bui
 npm run pipeline           # Full: ingest → generate → export
 npm run pipeline:content   # AI steps only: ingest → generate
 npm run ingest             # Parse LinkedIn CSVs + knowledge JSONs → career-data.json
-npm run generate           # Claude API → Paul-Prae-Resume.md
+npm run generate           # Claude API → Paul-Prae-Resume.staging.md
 npm run export             # Pandoc + Typst → PDF + DOCX
 ```
+
+Playwright notes:
+
+- Default `npm run test:e2e` runs fast mocked smoke tests on Chromium only.
+- Use `PW_FULL_MATRIX=1 npm run test:e2e` for Firefox/WebKit/mobile matrix.
+- Use `E2E_LIVE_CHAT=1 npx playwright test e2e/live-chat.spec.ts` for optional real API validation.
 
 ## Security
 

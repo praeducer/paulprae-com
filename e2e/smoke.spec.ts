@@ -15,7 +15,7 @@ test.describe("page rendering", () => {
     await expect(page.getByRole("heading", { name: "Paul Prae", level: 1 })).toBeVisible({
       timeout: 10_000,
     });
-    await expect(page.locator("text=Principal AI Engineer").first()).toBeVisible();
+    await expect(page.getByRole("textbox", { name: "Chat message" })).toBeVisible();
   });
 
   test("homepage shows quick action chips", async ({ page }) => {
@@ -44,7 +44,12 @@ test.describe("page rendering", () => {
 
   test("tools page renders with tool chips", async ({ page }) => {
     await page.goto("/tools");
-    await expect(page.locator("text=Job Search Tools")).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator("p").filter({ hasText: "Job Search Tools" }).first()).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.getByRole("button", { name: "Cover Letter" })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test("tools page has noindex meta tag", async ({ page }) => {

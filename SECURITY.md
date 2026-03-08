@@ -53,7 +53,7 @@ This policy covers:
 
 - Rate limiting prevents API abuse (20 req/min/IP)
 - `maxDuration = 120` caps Vercel Fluid Compute usage per request
-- `maxOutputTokens` limits response generation cost (2048 for chat/tools, 4096 for resume generation)
+- `maxOutputTokens` limits response generation cost (2048 for chat/tools, 8192 for resume generation)
 - Anthropic prompt caching reduces cost ~90% for repeat system prompts
 - Anthropic spending limits provide a hard cost ceiling
 - Vercel spending limits provide infrastructure cost ceiling

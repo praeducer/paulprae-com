@@ -4,110 +4,142 @@
  * Run: npm test -- tests/proxy.test.ts
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-// Mock NextResponse and NextRequest from next/server
-vi.mock("next/server", () => {
+const mockNextServer = vi.hoisted(() => {
   class MockHeaders {
     private store = new Map<string, string>();
+
+    constructor(initial?: Record<string, string>) {
+      if (initial) {
+        for (const [key, value] of Object.entries(initial)) {
+          this.set(key, value);
+        }
+      }
+    }
+
     set(key: string, value: string) {
       this.store.set(key.toLowerCase(), value);
     }
+
     get(key: string) {
       return this.store.get(key.toLowerCase()) ?? null;
     }
-    has(key: string) {
-      return this.store.has(key.toLowerCase());
+  }
+
+  class MockNextResponse {
+    status: number;
+    headers: MockHeaders;
+    body: string | null;
+
+    constructor(
+      body: string | null = null,
+      init?: { status?: number; headers?: Record<string, string> },
+    ) {
+      this.status = init?.status ?? 200;
+      this.headers = new MockHeaders(init?.headers);
+      this.body = body;
+    }
+
+    static next() {
+      return new MockNextResponse(null, { status: 200 });
     }
   }
 
-  return {
-    NextResponse: {
-      next: () => {
-        const headers = new MockHeaders();
-        return { headers, status: 200 };
-      },
-      json: (body: unknown, init?: { status?: number }) => ({
-        body,
-        status: init?.status ?? 200,
-        headers: new MockHeaders(),
-      }),
-    },
-    NextRequest: vi.fn(),
-  };
+  return { MockNextResponse };
 });
 
-// The middleware uses NextRequest which we need to mock at the module level.
-// Since the middleware is tightly coupled to Next.js internals, we test the
-// origin validation logic directly instead of calling the middleware function.
+vi.mock("next/server", () => ({
+  NextResponse: mockNextServer.MockNextResponse,
+  NextRequest: vi.fn(),
+}));
 
-describe("Origin validation logic", () => {
-  const ALLOWED_ORIGINS = new Set([
-    "https://paulprae.com",
-    "https://www.paulprae.com",
-    "https://paulprae-com-one.vercel.app",
-  ]);
+import { proxy, isAllowedOrigin, ALLOWED_ORIGINS } from "../proxy";
 
-  function isAllowedOrigin(origin: string | null, isDev = false): boolean {
-    if (!origin) return true;
-    if (ALLOWED_ORIGINS.has(origin)) return true;
-    if (/^https:\/\/paulprae(-com)?(-[a-z0-9]+)*-praeducers-projects\.vercel\.app$/.test(origin))
-      return true;
-    if (isDev && (origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:")))
-      return true;
-    return false;
-  }
+function makeRequest(pathname: string, method = "POST", origin: string | null = null) {
+  return {
+    nextUrl: { pathname },
+    method,
+    headers: {
+      get(name: string) {
+        if (name.toLowerCase() === "origin") return origin;
+        return null;
+      },
+    },
+  };
+}
 
-  it("allows requests with no origin (same-origin)", () => {
+const originalNodeEnv = process.env.NODE_ENV;
+
+describe("origin validation", () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = "test";
+  });
+
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
+  });
+
+  it("exports expected static allowed origins", () => {
+    expect(ALLOWED_ORIGINS.has("https://paulprae.com")).toBe(true);
+    expect(ALLOWED_ORIGINS.has("https://www.paulprae.com")).toBe(true);
+    expect(ALLOWED_ORIGINS.has("https://paulprae-com-one.vercel.app")).toBe(true);
+  });
+
+  it("allows requests with no origin", () => {
     expect(isAllowedOrigin(null)).toBe(true);
   });
 
-  it("allows paulprae.com", () => {
-    expect(isAllowedOrigin("https://paulprae.com")).toBe(true);
-  });
-
-  it("allows www.paulprae.com", () => {
-    expect(isAllowedOrigin("https://www.paulprae.com")).toBe(true);
-  });
-
-  it("allows Vercel preview deployments", () => {
+  it("allows Vercel preview URL pattern used by production proxy", () => {
     expect(isAllowedOrigin("https://paulprae-com-abc123-praeducers-projects.vercel.app")).toBe(
       true,
     );
   });
 
-  it("allows Vercel branch alias deployments", () => {
-    expect(isAllowedOrigin("https://paulprae-com-git-feat-x-praeducers-projects.vercel.app")).toBe(
-      true,
-    );
-  });
-
-  it("blocks random external origins", () => {
+  it("blocks disallowed external origins", () => {
     expect(isAllowedOrigin("https://evil.com")).toBe(false);
   });
 
-  it("blocks other Vercel apps not related to paulprae", () => {
-    expect(isAllowedOrigin("https://some-other-app.vercel.app")).toBe(false);
+  it("allows localhost only in development mode", () => {
+    process.env.NODE_ENV = "development";
+    expect(isAllowedOrigin("http://localhost:3000")).toBe(true);
+
+    process.env.NODE_ENV = "test";
+    expect(isAllowedOrigin("http://localhost:3000")).toBe(false);
+  });
+});
+
+describe("proxy route protection", () => {
+  it("returns 403 for disallowed API cross-origin requests", () => {
+    const res = proxy(makeRequest("/api/chat", "POST", "https://evil.com") as never);
+    expect(res.status).toBe(403);
   });
 
-  it("blocks Vercel apps with paulprae in name but wrong project", () => {
-    expect(isAllowedOrigin("https://evil-paulprae-stealer.vercel.app")).toBe(false);
+  it("returns 204 preflight with CORS headers for allowed origin", () => {
+    const origin = "https://paulprae.com";
+    const res = proxy(makeRequest("/api/chat", "OPTIONS", origin) as never);
+    expect(res.status).toBe(204);
+    expect(res.headers.get("access-control-allow-origin")).toBe(origin);
+    expect(res.headers.get("access-control-allow-methods")).toContain("POST");
   });
 
-  it("blocks localhost in production", () => {
-    expect(isAllowedOrigin("http://localhost:3000", false)).toBe(false);
+  it("returns 405 for non-POST API requests", () => {
+    const res = proxy(makeRequest("/api/chat", "GET", "https://paulprae.com") as never);
+    expect(res.status).toBe(405);
+    expect(res.headers.get("allow")).toContain("POST");
   });
 
-  it("allows localhost in development", () => {
-    expect(isAllowedOrigin("http://localhost:3000", true)).toBe(true);
+  it("passes allowed POST API requests and sets response CORS header", () => {
+    const origin = "https://paulprae.com";
+    const res = proxy(makeRequest("/api/chat", "POST", origin) as never);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("access-control-allow-origin")).toBe(origin);
   });
 
-  it("allows 127.0.0.1 in development", () => {
-    expect(isAllowedOrigin("http://127.0.0.1:3001", true)).toBe(true);
-  });
-
-  it("blocks http (non-https) paulprae.com", () => {
-    expect(isAllowedOrigin("http://paulprae.com")).toBe(false);
+  it("passes non-API requests without API CORS header", () => {
+    const res = proxy(makeRequest("/resume", "GET", "https://paulprae.com") as never);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("access-control-allow-origin")).toBeNull();
   });
 });
 

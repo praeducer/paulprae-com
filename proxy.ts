@@ -2,14 +2,14 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // ─── Allowed Origins ─────────────────────────────────────────────────────────
 
-const ALLOWED_ORIGINS = new Set([
+export const ALLOWED_ORIGINS = new Set([
   "https://paulprae.com",
   "https://www.paulprae.com",
   "https://paulprae-com-one.vercel.app",
 ]);
 
 /** In development, allow localhost origins. */
-function isAllowedOrigin(origin: string | null): boolean {
+export function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return true; // Same-origin requests (no Origin header)
   if (ALLOWED_ORIGINS.has(origin)) return true;
   // Allow Vercel preview deployments (team-scoped: any paulprae deployment

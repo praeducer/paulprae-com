@@ -71,7 +71,7 @@ Phase 2 transforms the static site into an interactive career platform with a ch
 | AI Gateway      | `@ai-sdk/gateway` (Sprint 2+)           | Unified routing, observability                    |
 | Rate limiting   | `@upstash/ratelimit` + `@upstash/redis` | Distributed rate limiting                         |
 | Chat model      | Claude Sonnet 4.6                       | Fast Q&A ($3/$15 per MTok)                        |
-| Resume model    | Claude Opus 4.6                         | Quality generation ($5/$25)                       |
+| Resume model    | Claude Opus 4.6                         | Higher-quality offline resume generation          |
 | Compute         | Vercel Fluid Compute (Pro)              | Up to 800s function duration                      |
 
 ### 3.3 Why NOT Modal
@@ -146,7 +146,7 @@ const result = streamText({
   model: anthropic("claude-sonnet-4-6"),
   system: systemPrompt,
   messages: modelMessages,
-  maxOutputTokens: 2048, // Chat responses; 4096 for tool-called resume generation
+  maxOutputTokens: 2048, // Chat responses; 8192 for tool-called resume generation
 });
 
 return result.toUIMessageStreamResponse(); // Note: renamed from toDataStreamResponse in AI SDK 6
@@ -312,6 +312,7 @@ Supporting commands:
 - `npm run lint`
 - `npm run format:check`
 - `npm test`
+- `npm run test:e2e` (Playwright mocked smoke tests; optional full matrix/live modes via env flags)
 - `npm run test:pipeline` (validates generated outputs when available)
 
 ### 7.2 Manual checks
