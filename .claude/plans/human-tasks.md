@@ -6,77 +6,41 @@ Tasks requiring manual action: Vercel dashboard, GitHub UI, DNS provider, browse
 
 ---
 
-## Pre-Merge Checklist
+## Completed: Phase 2 Launch
 
-Complete these before merging PR #21 (`feat/phase2-implementation`) to `main`.
-
-### API & Runtime
-
-- [x] Fund Anthropic API credits -- confirmed funded
-- [x] Test chat streaming -- verified locally with AI SDK 6 UIMessage format, response streams correctly with grounded career data
-- [x] Verify Vercel env vars are correct for all 3 environments (Production, Preview, Development):
-  - `ANTHROPIC_API_KEY` -- required, confirmed funded
-  - `KV_REST_API_URL` + `KV_REST_API_TOKEN` -- confirmed set in all 3 environments (Upstash Redis for rate limiting)
-  - Supabase/Postgres vars present but unused until Phase 3 (harmless)
-
-### Git & GitHub
-
-- [x] Tag current `main` as `v1.0.0` (Phase 1 milestone) -- tagged at `e0fd07f`
-- [x] Review PR #21 description -- updated with comprehensive Phase 2 summary
-- [ ] **YOU: Merge PR #21 to `main`** at https://github.com/praeducer/paulprae-com/pull/21
+- [x] Fund Anthropic API credits
+- [x] Test chat streaming locally
+- [x] Verify Vercel env vars (all 3 environments)
+- [x] Tag `v1.0.0` at `e0fd07f`
+- [x] Merge PR #21 — Phase 2 AI chat platform
+- [x] Production deployment verified
+- [x] Automated smoke tests passed (8/8)
+- [x] Full production QA — 418 unit tests, chat API, security headers, SEO
+- [x] Fix skip-nav flash on mobile — PR #26 (sr-only + focus-visible:not-sr-only)
+- [x] Fix skip-nav touch-device flash — PR #27 (@media hover:hover gate in globals.css)
+- [x] CORS hardening — PR #27 (explicit ACAO in vercel.json overrides Vercel CDN wildcard)
 
 ---
 
-## Post-Merge Steps (In Order)
+## Current: Post-Deploy Verification
 
-After merging PR #21 to `main`, Vercel will auto-deploy to production. Follow these steps in order:
+### YOU — Mobile browser test (PR #27)
 
-### Step 1: YOU -- Verify production deploy started
+- [ ] Visit `https://paulprae.com/` → tap "Resume" link → confirm skip-nav does NOT flash
+- [ ] Visit `https://paulprae.com/resume` directly on mobile → confirm no skip-nav flash
+- [ ] On desktop, Tab through resume page → confirm skip-nav appears on first Tab press
 
-- [ ] Check Vercel Dashboard -- confirm a new production deployment is building from the merge commit
-- [ ] Wait for deployment to reach "Ready" status (typically 1-2 minutes)
+### YOU — CORS verification
 
-### Step 2: CLAUDE CODE -- Run automated smoke tests against production
+- [ ] Run: `curl -sI https://paulprae.com | grep -i access-control` → should show `https://paulprae.com` (not `*`)
+- [ ] If still showing `*`, Vercel CDN cache may need time to propagate the new header
 
-Tell Claude Code: `Run npm run smoke against production and report results.`
-
-This runs the automated smoke test suite against `https://paulprae.com`:
-
-- Homepage returns 200 with expected content
-- Resume page renders with correct sections
-- Chat API validates input (returns 400 on empty body)
-- PDF/DOCX/MD downloads return correct content-types and sizes
-- Resume MD hash matches local copy
-- HTTPS redirect works
-- Security headers present (HSTS, XFO, CSP, etc.)
-
-### Step 3: YOU -- Quick browser smoke test
-
-- [ ] Visit `https://paulprae.com/` -- confirm Phase 2 chat UI (composer, quick action chips)
-- [ ] Send a chat message -- confirm streaming response with real content
-- [ ] Visit `https://paulprae.com/resume` -- confirm resume page renders
-- [ ] Download PDF -- confirm real file
-- [ ] Visit `https://paulprae.com/nonexistent` -- confirm branded 404 page
-
-### Step 4: CLAUDE CODE -- Run production QA iteration
-
-Tell Claude Code: `Run the /qa-comprehensive command against production (https://paulprae.com). Mode: production. Fix any issues found.`
-
-This runs the full stakeholder-centered QA plan covering:
-
-- Recruiter journey, hiring manager probes, engineering peer questions
-- Tailored resume generation, tools page
-- Security headers, CORS, rate limiting
-- SEO metadata, structured data
-- Mobile responsiveness, accessibility
-
-### Step 5: YOU -- Monitor dashboards (first 48 hours)
+### YOU — Monitor dashboards (first 48 hours)
 
 - [ ] Monitor Anthropic API costs: console.anthropic.com > Usage
-- [ ] Check Vercel Dashboard > Functions -- verify `/api/chat` executions with successful status
-- [ ] Check Vercel Dashboard > Analytics -- verify real user visits
-- [ ] Monitor Upstash Redis dashboard (console.upstash.com) -- verify rate limiting counters
-- [ ] Watch for Vercel deployment errors or function timeout alerts
+- [ ] Check Vercel Dashboard > Functions — verify `/api/chat` executions with successful status
+- [ ] Check Vercel Dashboard > Analytics — verify real user visits
+- [ ] Monitor Upstash Redis dashboard (console.upstash.com) — verify rate limiting counters
 
 ---
 
