@@ -190,11 +190,8 @@ export default function ResumePage() {
 
   return (
     <>
-      {/* Skip navigation — hidden until keyboard Tab (not programmatic focus from client navigation) */}
-      <a
-        href="#resume-content"
-        className="sr-only z-50 rounded bg-white px-4 py-2 text-sm text-slate-900 ring-2 ring-blue-500 focus-visible:not-sr-only focus-visible:fixed focus-visible:left-2 focus-visible:top-2 focus-visible:outline-none dark:bg-slate-900 dark:text-slate-100"
-      >
+      {/* Skip navigation — keyboard-only, hidden on touch devices (see globals.css .skip-nav) */}
+      <a href="#resume-content" className="skip-nav">
         Skip to resume content
       </a>
 

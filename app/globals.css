@@ -112,6 +112,29 @@ html {
   display: none;
 }
 
+/* ─── Skip Navigation ────────────────────────────────────────────────────── */
+/* Keyboard-only skip link. Hidden by default via sr-only clipping.
+   Only revealed on :focus-visible AND on hover-capable devices — touch-only
+   devices (hover: none) never show it, preventing the flash caused by some
+   mobile browsers triggering :focus-visible on programmatic focus during
+   Next.js client navigation. */
+
+.skip-nav {
+  @apply sr-only;
+}
+
+@media (hover: hover) {
+  .skip-nav:focus-visible {
+    @apply not-sr-only fixed left-2 top-2 z-50 rounded bg-white px-4 py-2 text-sm text-slate-900 ring-2 ring-blue-500 outline-none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .skip-nav:focus-visible {
+      @apply bg-slate-900 text-slate-100;
+    }
+  }
+}
+
 /* ─── Reduced Motion ──────────────────────────────────────────────────────── */
 /* Respect user preferences for reduced motion (WCAG 2.2) */
 
