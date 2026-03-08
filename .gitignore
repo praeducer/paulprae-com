@@ -72,8 +72,7 @@ NUL
 !.cursor/mcp.json
 *.code-workspace
 
-# Claude Code transient/local files
-.claude/prompts/
+# Claude Code local-only files
 .claude/settings.local.json
 
 # Debug logs
