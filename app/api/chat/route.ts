@@ -4,6 +4,7 @@ import {
   streamText,
   generateText,
   convertToModelMessages,
+  pruneMessages,
   tool,
   stepCountIs,
   type UIMessage,
@@ -39,7 +40,7 @@ function getModel(modelId: string): LanguageModel {
 
 export const CHAT_REQUEST_LIMITS = {
   maxMessages: 50,
-  maxBodyBytes: 100_000, // 100 KB
+  maxBodyBytes: 256_000, // 256 KB — tool results (tailored resumes) inflate conversation JSON
   maxJobDescriptionChars: 10_000, // Tool input: job description
   maxEmphasisItems: 10, // Tool input: emphasis areas count
   maxEmphasisChars: 200, // Tool input: per emphasis area
@@ -314,8 +315,16 @@ export async function POST(request: Request) {
     });
   }
 
-  // Convert UIMessages to ModelMessages for the language model
-  const modelMessages = await convertToModelMessages(messages);
+  // Convert UIMessages to ModelMessages for the language model, then prune
+  // old tool calls/results to keep context within the model's token budget.
+  // Tool results (e.g., full tailored resumes ~5K tokens each) accumulate fast.
+  // Keep only the last message's tool interactions; strip reasoning from older turns.
+  const rawModelMessages = await convertToModelMessages(messages);
+  const modelMessages = pruneMessages({
+    messages: rawModelMessages,
+    toolCalls: "before-last-message",
+    reasoning: "before-last-message",
+  });
 
   // Define tools for chat mode only
   const chatTools =

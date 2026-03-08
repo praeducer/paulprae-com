@@ -3,6 +3,7 @@
 interface QuickActionsProps {
   mode: "chat" | "tools";
   onAction: (prompt: string) => void;
+  onPrefill?: (text: string) => void;
 }
 
 const CHAT_ACTIONS = [
@@ -20,8 +21,8 @@ const CHAT_ACTIONS = [
   },
   {
     label: "Tailored resume",
-    prompt:
-      "I'd like a tailored version of Paul's resume for the following role:\n\n[Paste the job description here]",
+    prompt: "I'd like a tailored version of Paul's resume for the following role:\n\n",
+    prefill: true, // Pre-fill composer so user can paste JD before sending
   },
   {
     label: "Download resume",
@@ -73,9 +74,10 @@ const TOOLS_ACTIONS_ROW2 = [
 ];
 
 /**
- * Quick action chips that pre-fill the chat with mode-specific prompts.
+ * Quick action chips. Most send a message immediately; chips with `prefill`
+ * populate the composer so the user can add context (e.g., paste a JD) first.
  */
-export default function QuickActions({ mode, onAction }: QuickActionsProps) {
+export default function QuickActions({ mode, onAction, onPrefill }: QuickActionsProps) {
   const actions = mode === "chat" ? CHAT_ACTIONS : [...TOOLS_ACTIONS_ROW1, ...TOOLS_ACTIONS_ROW2];
 
   return (
@@ -84,7 +86,13 @@ export default function QuickActions({ mode, onAction }: QuickActionsProps) {
         <button
           key={action.label}
           type="button"
-          onClick={() => onAction(action.prompt)}
+          onClick={() => {
+            if ("prefill" in action && action.prefill && onPrefill) {
+              onPrefill(action.prompt);
+            } else {
+              onAction(action.prompt);
+            }
+          }}
           className="min-h-[44px] sm:min-h-0 rounded-full border border-slate-200 bg-white px-3 py-2.5 text-xs sm:py-1.5 text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200"
         >
           {action.label}

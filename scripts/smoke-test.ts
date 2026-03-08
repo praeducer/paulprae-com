@@ -271,8 +271,11 @@ async function checkHttpsRedirect(): Promise<SmokeResult> {
 async function checkSecurityHeaders(): Promise<SmokeResult> {
   try {
     const res = await fetchWithTimeout(BASE_URL);
+    // HSTS is set by vercel.json but not injected on localhost or some preview URLs.
+    // Only require it when testing against a real HTTPS deployment.
+    const isLocal = BASE_URL.includes("localhost") || BASE_URL.includes("127.0.0.1");
     const required: { header: string; pattern?: RegExp }[] = [
-      { header: "strict-transport-security", pattern: /max-age=\d+/ },
+      ...(!isLocal ? [{ header: "strict-transport-security", pattern: /max-age=\d+/ }] : []),
       { header: "x-frame-options" },
       { header: "x-content-type-options" },
       { header: "referrer-policy" },

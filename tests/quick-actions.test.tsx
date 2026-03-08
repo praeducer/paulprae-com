@@ -34,9 +34,14 @@ describe("QuickActions", () => {
     );
   });
 
-  it("includes tailored resume chip in chat mode", () => {
+  it("tailored resume chip calls onPrefill instead of onAction", () => {
     const onAction = vi.fn();
-    const { getByText } = render(<QuickActions mode="chat" onAction={onAction} />);
-    expect(getByText("Tailored resume")).toBeTruthy();
+    const onPrefill = vi.fn();
+    const { getByText } = render(
+      <QuickActions mode="chat" onAction={onAction} onPrefill={onPrefill} />,
+    );
+    fireEvent.click(getByText("Tailored resume"));
+    expect(onAction).not.toHaveBeenCalled();
+    expect(onPrefill).toHaveBeenCalledWith(expect.stringContaining("tailored"));
   });
 });

@@ -13,14 +13,15 @@ import {
 } from "@assistant-ui/react";
 import { useAISDKRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
+import remarkGfm from "remark-gfm";
 import QuickActions from "./QuickActions";
 import { MAX_MESSAGE_CHARS, SITE_NAME, SITE_SUBTITLE, HERO_DESCRIPTION } from "../../lib/constants";
 
 // ─── Markdown Text Wrapper ──────────────────────────────────────────────────
 
-/** Wraps MarkdownTextPrimitive to match the TextMessagePartComponent interface */
+/** Wraps MarkdownTextPrimitive with GFM support (tables, strikethrough, etc.) */
 function MarkdownText() {
-  return <MarkdownTextPrimitive />;
+  return <MarkdownTextPrimitive remarkPlugins={[remarkGfm]} />;
 }
 
 // ─── Shared Styles ──────────────────────────────────────────────────────────
@@ -48,7 +49,7 @@ function AssistantMessage() {
   return (
     <MessagePrimitive.Root className="flex justify-start group mb-5">
       <div className="max-w-[80%] space-y-2">
-        <div className="rounded-2xl bg-slate-100 px-5 py-4 text-sm leading-relaxed text-slate-900 prose prose-sm prose-slate max-w-none prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-li:my-0.5 dark:bg-slate-800/80 dark:text-slate-100 dark:prose-invert">
+        <div className="rounded-2xl bg-slate-100 px-5 py-4 text-sm leading-relaxed text-slate-900 prose prose-sm prose-slate max-w-none prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-li:my-0.5 prose-table:border-collapse prose-th:border prose-th:border-slate-300 prose-th:px-3 prose-th:py-1.5 prose-th:text-left prose-td:border prose-td:border-slate-300 prose-td:px-3 prose-td:py-1.5 dark:bg-slate-800/80 dark:text-slate-100 dark:prose-invert dark:prose-th:border-slate-600 dark:prose-td:border-slate-600 overflow-x-auto">
           <MessagePrimitive.Content
             components={{
               Text: MarkdownText,
@@ -199,6 +200,20 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
     [runtime],
   );
 
+  // Pre-fill the composer textarea with text (e.g., for tailored resume chip)
+  // Uses native DOM event dispatch to sync with assistant-ui's controlled input.
+  const handlePrefill = useCallback((text: string) => {
+    const textarea = document.querySelector<HTMLTextAreaElement>('[aria-label="Chat message"]');
+    if (!textarea) return;
+    const nativeSetter = Object.getOwnPropertyDescriptor(
+      HTMLTextAreaElement.prototype,
+      "value",
+    )?.set;
+    nativeSetter?.call(textarea, text);
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    textarea.focus();
+  }, []);
+
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <div className="flex h-dvh flex-col">
@@ -227,6 +242,26 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                 className="ml-auto flex items-center gap-1 sm:gap-2"
                 aria-label="Site navigation"
               >
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.location.href = mode === "tools" ? "/tools" : "/";
+                  }}
+                  className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                  title="Start a new conversation"
+                  aria-label="New conversation"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="h-3.5 w-3.5"
+                    aria-hidden="true"
+                  >
+                    <path d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm0 10.5a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1-.75-.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Z" />
+                  </svg>
+                  <span className="hidden sm:inline">New chat</span>
+                </button>
                 {mode === "tools" && (
                   <Link
                     href="/"
@@ -246,6 +281,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                   download
                   className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                   aria-label="Download resume as PDF"
+                  title="Download resume as PDF"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -275,7 +311,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
               <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pt-5">
                 {/* Welcome / Empty State */}
                 <ThreadPrimitive.Empty>
-                  <div className="flex flex-1 flex-col items-center justify-center py-4 sm:py-12">
+                  <div className="flex flex-1 flex-col items-center justify-start pt-[10vh] sm:pt-[15vh] py-4 sm:py-12">
                     <div className="mb-4 sm:mb-6 text-center">
                       {mode === "chat" ? (
                         <>
@@ -319,7 +355,11 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                         </>
                       )}
                     </div>
-                    <QuickActions mode={mode} onAction={handleQuickAction} />
+                    <QuickActions
+                      mode={mode}
+                      onAction={handleQuickAction}
+                      onPrefill={handlePrefill}
+                    />
                   </div>
                 </ThreadPrimitive.Empty>
 
