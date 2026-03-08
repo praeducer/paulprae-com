@@ -16,7 +16,7 @@ Deployment workflow details (build/push behavior) are documented in `README.md`.
 
 | Role         | Service                 | Notes                                |
 | ------------ | ----------------------- | ------------------------------------ |
-| Site hosting | Vercel                  | Static build output served from CDN  |
+| Site hosting | Vercel                  | Server-rendered Next.js + CDN        |
 | DNS          | DreamHost               | Authoritative DNS for `paulprae.com` |
 | Email        | Office 365 / Outlook    | Mail flow for `@paulprae.com`        |
 | Blog         | Ghost (`prae.ghost.io`) | `blog.paulprae.com` endpoint         |

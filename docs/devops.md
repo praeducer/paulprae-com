@@ -5,16 +5,16 @@
 ```
 Push to main → CI workflow (lint, test, build) → Deploy workflow → Vercel --prod → Smoke test
                                                                                       ↓
-                                                                            Fail → Auto-rollback + Issue
+                                                                            Fail → Create issue + manual rollback
 ```
 
 Two GitHub Actions workflows manage the pipeline:
 
-| Workflow                      | Trigger                   | Purpose                                       |
-| ----------------------------- | ------------------------- | --------------------------------------------- |
-| **CI** (`ci.yml`)             | Push/PR to main           | Lint, format, test, build, quality gates      |
-| **Deploy** (`deploy.yml`)     | After CI passes on main   | Build, deploy to Vercel, smoke test, rollback |
-| **Pipeline** (`pipeline.yml`) | Manual / Monthly schedule | Full resume generation pipeline + PR creation |
+| Workflow                      | Trigger                   | Purpose                                            |
+| ----------------------------- | ------------------------- | -------------------------------------------------- |
+| **CI** (`ci.yml`)             | Push/PR to main           | Lint, format, test, build, quality gates           |
+| **Deploy** (`deploy.yml`)     | After CI passes on main   | Build, deploy to Vercel, smoke test, failure issue |
+| **Pipeline** (`pipeline.yml`) | Manual / Monthly schedule | Full resume generation pipeline + PR creation      |
 
 The Deploy workflow uses `workflow_run` to trigger only after CI succeeds on `main`. This prevents deploying broken builds.
 
@@ -33,12 +33,13 @@ Configure these in GitHub repo Settings → Secrets and variables → Actions:
 
 After every deployment, the smoke test (`npm run smoke`) verifies:
 
-1. Homepage returns 200 with expected content ("Paul Prae", "Professional Summary")
-2. Resume MD download hash matches the local committed file
-3. PDF download returns 200, correct content-type, size > 10 KB
-4. DOCX download returns 200, correct content-type, size > 5 KB
-5. HTTP → HTTPS redirect works
-6. Security headers present (HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
+1. Homepage returns 200 with expected content ("Paul Prae", "AI Career Assistant")
+2. Resume page returns 200 with expected content ("Paul Prae", "Professional Summary")
+3. Resume MD download hash matches the local committed file
+4. PDF download returns 200, correct content-type, size > 10 KB
+5. DOCX download returns 200, correct content-type, size > 5 KB
+6. HTTP → HTTPS redirect works
+7. Security headers present (HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
 
 Run locally:
 
@@ -49,13 +50,15 @@ SMOKE_TEST_URL=https://preview.vercel.app npm run smoke  # Test against preview
 
 ## Rollback Procedures
 
-### Automatic Rollback (Deploy Workflow)
+### Failure Handling (Deploy Workflow)
 
-If the smoke test fails after deployment, the workflow automatically:
+If preview or production smoke tests fail, the workflow:
 
-1. Retrieves the previous production deployment from Vercel
-2. Promotes it back to production
-3. Creates a GitHub issue labeled `deploy-failure`
+1. Stops promotion (or marks the run failed if production smoke fails)
+2. Creates a GitHub issue with deployment context and run URL
+3. Leaves rollback as a manual operator action
+
+This keeps rollback explicit and auditable.
 
 ### Manual Rollback via Vercel CLI
 
@@ -120,10 +123,11 @@ The workflow also runs on a monthly schedule (1st of each month at 9 AM UTC) to 
 
 ## Vercel Configuration
 
-- **Framework:** `null` (static site served from `out/`)
+- **Framework:** Auto-detected Next.js (server-rendered with API routes)
 - **Build command:** `npm run build`
-- **Output directory:** `out`
-- **Auto-deploy:** Vercel's Git integration may still fire, but the GitHub Actions deploy is the source of truth. To prevent double-builds, set Vercel Project Settings → Git → Ignored Build Step to `exit 0`.
+- **Output directory:** `.next/` (managed by Vercel)
+- **Compute:** Fluid Compute (Pro plan) — streaming AI responses via `/api/chat`
+- **Deploy:** GitHub Actions Deploy workflow handles deployments (Vercel Git integration is not used).
 
 ## Monitoring
 

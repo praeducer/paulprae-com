@@ -1,0 +1,102 @@
+/**
+ * chat-home.test.tsx — Tests for the ChatHome component.
+ *
+ * Mocks assistant-ui primitives to test rendering without a runtime.
+ *
+ * Run: npm test -- tests/chat-home.test.tsx
+ *
+ * @vitest-environment jsdom
+ */
+
+import { describe, it, expect, vi } from "vitest";
+import type { ReactNode } from "react";
+
+// Mock assistant-ui modules before importing the component
+vi.mock("@assistant-ui/react", () => {
+  const Passthrough = ({ children }: { children?: ReactNode }) => <>{children}</>;
+  return {
+    AssistantRuntimeProvider: Passthrough,
+    ThreadPrimitive: {
+      Root: Passthrough,
+      Viewport: Passthrough,
+      Empty: Passthrough,
+      Messages: () => null,
+      ViewportFooter: Passthrough,
+      ScrollToBottom: Passthrough,
+    },
+    MessagePrimitive: {
+      Root: Passthrough,
+      Content: () => null,
+    },
+    ComposerPrimitive: {
+      Root: ({ children }: { children?: ReactNode }) => <form>{children}</form>,
+      Input: (props: { placeholder?: string }) => (
+        <input placeholder={props.placeholder} aria-label="chat input" />
+      ),
+      Send: Passthrough,
+    },
+    ActionBarPrimitive: {
+      Root: Passthrough,
+      Copy: Passthrough,
+      Reload: Passthrough,
+    },
+    useComposer: (selector?: (state: { text: string }) => unknown) =>
+      selector ? selector({ text: "" }) : { text: "" },
+  };
+});
+
+vi.mock("@ai-sdk/react", () => ({
+  useChat: () => ({
+    messages: [],
+    setMessages: vi.fn(),
+    sendMessage: vi.fn(),
+    regenerate: vi.fn(),
+    clearError: vi.fn(),
+    stop: vi.fn(),
+    error: undefined,
+    status: "ready",
+    id: "test",
+  }),
+}));
+
+vi.mock("@assistant-ui/react-ai-sdk", () => ({
+  useAISDKRuntime: () => ({
+    thread: { append: vi.fn() },
+  }),
+  AssistantChatTransport: class {
+    setRuntime() {}
+  },
+}));
+
+vi.mock("@assistant-ui/react-markdown", () => ({
+  MarkdownTextPrimitive: () => null,
+}));
+
+import { render } from "@testing-library/react";
+import ChatHome from "../app/components/ChatHome";
+
+describe("ChatHome", () => {
+  it("chat mode renders Paul Prae heading and title", () => {
+    const { getAllByText } = render(<ChatHome mode="chat" />);
+    expect(getAllByText("Paul Prae").length).toBeGreaterThanOrEqual(1);
+    expect(getAllByText(/Principal AI Engineer/).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("tools mode renders Job Search Tools heading", () => {
+    const { getByRole } = render(<ChatHome mode="tools" />);
+    expect(getByRole("heading", { name: "Job Search Tools" })).toBeTruthy();
+  });
+
+  it("renders composer placeholder", () => {
+    const { container } = render(<ChatHome mode="chat" />);
+    const input = container.querySelector('input[placeholder*="experience"]');
+    expect(input).toBeTruthy();
+  });
+
+  it("renders Resume link", () => {
+    const { getByText } = render(<ChatHome mode="chat" />);
+    const link = getByText("Resume");
+    expect(link).toBeTruthy();
+    expect(link.closest("a")?.getAttribute("href")).toBe("/resume");
+  });
+});

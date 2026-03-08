@@ -33,6 +33,7 @@ const {
   scoreResume,
   formatScoreReport,
   stripEmpty,
+  OMIT_FIELDS,
 } = _testExports;
 
 // ─── System Prompt Quality ──────────────────────────────────────────────────
@@ -483,7 +484,7 @@ describe("stripEmpty", () => {
 
   it("strips OMIT_FIELDS (licenseNumber, activities, cause, number)", () => {
     const obj = { name: "Test", licenseNumber: "ABC", activities: "stuff", cause: "education" };
-    expect(stripEmpty(obj)).toEqual({ name: "Test" });
+    expect(stripEmpty(obj, OMIT_FIELDS)).toEqual({ name: "Test" });
   });
 
   it("recursively strips nested empty fields", () => {

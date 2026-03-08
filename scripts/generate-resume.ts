@@ -26,6 +26,7 @@ import { PATHS, CLAUDE } from "../lib/config.js";
 import type { CareerData, GenerationResult } from "../lib/types.js";
 import { isDirectRun, hasForceFlag } from "../lib/script-utils.js";
 import { loadPrompt } from "../lib/prompts/loader.js";
+import { stripEmpty } from "../lib/data-utils.js";
 import {
   generateWithPrompt,
   classifyError,
@@ -34,6 +35,7 @@ import {
   formatTelemetrySummary,
 } from "../lib/ai/index.js";
 import type { GenerationTelemetry } from "../lib/ai/index.js";
+import { scoreResume, formatScoreReport, MAJOR_COMPANIES } from "../lib/resume-quality.js";
 
 // Load environment variables from .env.local
 config({ path: PATHS.envFile });
@@ -67,33 +69,6 @@ const PROMPT_VERSION = `${promptMetadata.id}@${promptMetadata.version}`;
 /** Fields to omit from career data — rarely useful for resume generation. */
 const OMIT_FIELDS = new Set(["licenseNumber", "activities", "cause", "number"]);
 
-/**
- * Recursively strip empty strings, null values, empty arrays, and
- * fields in the OMIT_FIELDS set from an object tree.
- */
-function stripEmpty(obj: unknown): unknown {
-  if (Array.isArray(obj)) {
-    const filtered = obj.map(stripEmpty).filter((item) => item !== undefined);
-    return filtered.length > 0 ? filtered : undefined;
-  }
-
-  if (obj !== null && typeof obj === "object") {
-    const result: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
-      if (OMIT_FIELDS.has(key)) continue;
-      const cleaned = stripEmpty(value);
-      if (cleaned !== undefined) {
-        result[key] = cleaned;
-      }
-    }
-    return Object.keys(result).length > 0 ? result : undefined;
-  }
-
-  // Scalar values: strip empty strings and nulls
-  if (obj === null || obj === "") return undefined;
-  return obj;
-}
-
 // ─── Company Data Loader ────────────────────────────────────────────────────
 // Loads verified company metrics from data/sources/knowledge/career/companies.json
 
@@ -116,8 +91,8 @@ function buildUserMessage(careerData: CareerData): string {
   const companyData = loadCompanyData();
 
   // Strip empty fields and use compact JSON to save tokens
-  const compactCore = JSON.stringify(stripEmpty(coreData));
-  const compactCompanies = JSON.stringify(stripEmpty(companyData));
+  const compactCore = JSON.stringify(stripEmpty(coreData, OMIT_FIELDS));
+  const compactCompanies = JSON.stringify(stripEmpty(companyData, OMIT_FIELDS));
 
   const sections: string[] = [
     "Generate a professional resume from the career data below. Apply all formatting, grounding, and quality rules from your instructions.",
@@ -145,7 +120,7 @@ function buildUserMessage(careerData: CareerData): string {
   }
 
   if (knowledge.length > 0) {
-    const compactKnowledge = JSON.stringify(stripEmpty(knowledge));
+    const compactKnowledge = JSON.stringify(stripEmpty(knowledge, OMIT_FIELDS));
     sections.push(
       `<document index="${companyData.length > 0 ? "3" : "2"}">`,
       "<source>knowledge-base — Supplementary context: achievements with quantified metrics, domain expertise, STAR-method narratives. Entries with 'SCOPE BOUNDARY' markers contain mandatory constraints about what work was/was NOT done in specific roles. Entries with 'confidence: verified' are authoritative. Entries with 'relatedPositions' map to specific roles.</source>",
@@ -410,93 +385,7 @@ function validateResumeOutput(markdown: string, careerData: CareerData): string[
 }
 
 // ─── Quality Scoring ─────────────────────────────────────────────────────────
-// Numeric quality score for regression detection. Higher is better.
-
-interface ResumeQualityScore {
-  /** Total score (sum of all components) */
-  total: number;
-  /** Number of ## sections found */
-  sectionCount: number;
-  /** Number of positions in Experience section */
-  positionCount: number;
-  /** Total bullet count across all positions */
-  totalBullets: number;
-  /** Number of bullets containing quantified metrics */
-  quantifiedBullets: number;
-  /** Resume character count */
-  charCount: number;
-  /** Number of major companies (Fortune 500 / recognized brands) found */
-  majorCompanyCoverage: number;
-}
-
-const MAJOR_COMPANIES = [
-  "Arine",
-  "Booz Allen Hamilton",
-  "Amazon Web Services",
-  "Slalom",
-  "Red Ventures",
-  "Microsoft",
-  "Hyperbloom",
-  "Modular Earth",
-  "Mento",
-  "TReNDS",
-  "NeuroLex",
-  "Decooda",
-];
-
-function scoreResume(markdown: string): ResumeQualityScore {
-  const sectionCount = (markdown.match(/^## /gm) || []).length;
-
-  const experienceSection =
-    markdown.split("## Professional Experience")[1]?.split(/^## /m)[0] || "";
-  const positionBlocks = experienceSection.split(/^### /m).filter((b) => b.trim());
-  const positionCount = positionBlocks.length;
-
-  let totalBullets = 0;
-  let quantifiedBullets = 0;
-  const quantPattern = /\d+[%+]|\$[\d,.]+|\d+M\+|\d+K\+|\d+,\d{3}|\d+\+\s|team of \d/;
-
-  for (const block of positionBlocks) {
-    const bullets = block.match(/^- .+/gm) || [];
-    totalBullets += bullets.length;
-    quantifiedBullets += bullets.filter((b) => quantPattern.test(b)).length;
-  }
-
-  const charCount = markdown.length;
-
-  let majorCompanyCoverage = 0;
-  for (const company of MAJOR_COMPANIES) {
-    if (markdown.includes(company)) majorCompanyCoverage++;
-  }
-
-  // Scoring weights — each component contributes to the total
-  const total =
-    sectionCount * 5 + // ~6 sections × 5 = 30 points
-    positionCount * 8 + // ~10 positions × 8 = 80 points
-    totalBullets * 3 + // ~30 bullets × 3 = 90 points
-    quantifiedBullets * 5 + // ~15 quant bullets × 5 = 75 points
-    majorCompanyCoverage * 10 + // ~10 companies × 10 = 100 points
-    Math.min(charCount / 100, 80); // max 80 points for length
-
-  return {
-    total: Math.round(total),
-    sectionCount,
-    positionCount,
-    totalBullets,
-    quantifiedBullets,
-    charCount,
-    majorCompanyCoverage,
-  };
-}
-
-function formatScoreReport(label: string, score: ResumeQualityScore): string {
-  return [
-    `   ${label} Quality Score: ${score.total}`,
-    `     Sections: ${score.sectionCount} | Positions: ${score.positionCount} | Bullets: ${score.totalBullets}`,
-    `     Quantified bullets: ${score.quantifiedBullets}/${score.totalBullets} (${score.totalBullets > 0 ? Math.round((score.quantifiedBullets / score.totalBullets) * 100) : 0}%)`,
-    `     Major companies: ${score.majorCompanyCoverage}/${MAJOR_COMPANIES.length} | Length: ${score.charCount.toLocaleString()} chars`,
-  ].join("\n");
-}
+// Imported from lib/resume-quality.ts (shared with approve-resume.ts)
 
 // ─── Main Generation Pipeline ────────────────────────────────────────────────
 
@@ -695,6 +584,7 @@ export const _testExports = {
   formatMarkdown,
   shouldSkipGenerate,
   stripEmpty,
+  OMIT_FIELDS,
   loadCompanyData,
   generate,
 };

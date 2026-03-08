@@ -8,13 +8,13 @@ See [README.md — Getting Started](README.md#getting-started) for setup instruc
 
 ## Environments
 
-| Environment       | Branch      | URL                                  | Deploys on      |
-| ----------------- | ----------- | ------------------------------------ | --------------- |
-| Local dev         | any         | `localhost:3000`                     | `npm run dev`   |
-| Preview / Staging | PR branches | `<branch>-paulprae-com.vercel.app`   | Push to PR      |
-| Production        | `main`      | [paulprae.com](https://paulprae.com) | Merge to `main` |
+| Environment       | Branch           | URL                                  | Deploys on                                      |
+| ----------------- | ---------------- | ------------------------------------ | ----------------------------------------------- |
+| Local dev         | any              | `localhost:3000`                     | `npm run dev`                                   |
+| Preview / Staging | manual on branch | `<deployment>.vercel.app`            | manual `vercel deploy` (or workflow extension)  |
+| Production        | `main`           | [paulprae.com](https://paulprae.com) | merge/push to `main` after CI + Deploy workflow |
 
-Vercel automatically creates a **preview deploy** for every PR. Use the preview URL to verify changes before merging.
+Production deployment is managed by GitHub Actions (`ci.yml` then `deploy.yml`). PR preview deployment is not automatic in the current workflow set.
 
 ## Branching Strategy (GitHub Flow)
 
@@ -93,7 +93,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/) style:
 
 [optional body explaining why, not what]
 
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>   # if AI-assisted
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>   # if AI-assisted
 ```
 
 **Types:** `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `style`, `design`
@@ -109,10 +109,10 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>   # if AI-assisted
 The AI generation pipeline runs **locally**, not on Vercel. Before committing generated content:
 
 ```bash
-npm run pipeline          # Full: ingest → generate → export → build
+npm run pipeline          # Full: ingest → generate → export
 # or
 npm run pipeline:content  # Just: ingest → generate
-npm run pipeline:render   # Just: export → build
+npm run pipeline:render   # Just: export
 ```
 
 Generated files that should be committed: `data/generated/career-data.json`, `data/generated/<Name>-Resume.md` (filename derived from profile name), `public/<Name>-Resume.*`
@@ -138,9 +138,16 @@ Or run individual checks:
 ```bash
 npm run lint          # ESLint
 npm run format:check  # Prettier
-npm test              # Vitest (315+ tests)
-npm run build         # Next.js static export
+npm test              # Vitest
+npm run test:e2e      # Playwright E2E smoke tests
+npm run build         # Next.js build
 ```
+
+E2E options:
+
+- Default: Chromium + mocked smoke tests.
+- Full matrix: `PW_FULL_MATRIX=1 npm run test:e2e`.
+- Optional live API check: `E2E_LIVE_CHAT=1 npx playwright test e2e/live-chat.spec.ts`.
 
 CI runs lint, format, test, build, and build output validation on every PR. All must pass to merge.
 

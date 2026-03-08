@@ -3,14 +3,25 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { loadCareerData } from "../lib/career-data";
+import {
+  SITE_NAME,
+  SITE_SUBTITLE,
+  SITE_URL,
+  SITE_DESCRIPTION,
+  SITE_OG_DESCRIPTION,
+} from "../lib/constants";
 
 const careerData = loadCareerData();
 
+const ogTitle = `${SITE_NAME} — ${SITE_SUBTITLE}`;
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://paulprae.com"),
-  title: "Paul Prae — Principal AI Engineer & Solutions Architect",
-  description:
-    "Building AI agents that ship AI products. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} — AI Career Assistant | paulprae.com`,
+    template: "%s | paulprae.com",
+  },
+  description: SITE_DESCRIPTION,
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "32x32" },
@@ -19,55 +30,53 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "Paul Prae — Principal AI Engineer & Solutions Architect",
-    description:
-      "Building AI agents that ship AI products. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
+    title: ogTitle,
+    description: SITE_OG_DESCRIPTION,
     type: "website",
-    url: "https://paulprae.com",
-    siteName: "Paul Prae",
+    url: SITE_URL,
+    siteName: SITE_NAME,
     locale: "en_US",
     images: [
       {
-        url: "/og-image.png",
+        url: `${SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "Paul Prae — Principal AI Engineer & Solutions Architect",
+        alt: ogTitle,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Paul Prae — Principal AI Engineer & Solutions Architect",
-    description:
-      "Building AI agents that ship AI products. 15+ years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.",
-    images: ["/og-image.png"],
+    title: ogTitle,
+    description: SITE_OG_DESCRIPTION,
+    images: [`${SITE_URL}/og-image.png`],
   },
   alternates: {
-    canonical: "https://paulprae.com",
+    canonical: SITE_URL,
+    languages: {
+      "en-US": SITE_URL,
+    },
   },
   manifest: "/manifest.json",
-  other: {
-    "theme-color": "#ffffff",
-  },
 };
 
-function PersonJsonLd() {
+function StructuredDataJsonLd() {
   if (!careerData) return null;
 
   const profile = careerData.profile;
   const recentPosition = careerData.positions[0];
   const education = careerData.education[0];
 
-  const jsonLd = {
+  const person = {
     "@context": "https://schema.org",
     "@type": "Person",
-    "@id": "https://paulprae.com/#person",
+    "@id": `${SITE_URL}/#person`,
     name: profile.name,
-    url: profile.website || "https://paulprae.com",
-    image: "https://paulprae.com/og-image.png",
+    url: profile.website || SITE_URL,
+    image: `${SITE_URL}/og-image.png`,
     email: profile.email,
-    jobTitle: "Principal AI Engineer & Solutions Architect",
-    description: metadata.description,
+    jobTitle: SITE_SUBTITLE,
+    description: SITE_DESCRIPTION,
     sameAs: [profile.linkedin, "https://github.com/praeducer"].filter(Boolean),
     knowsAbout: careerData.skills.slice(0, 20),
     ...(recentPosition && {
@@ -90,19 +99,39 @@ function PersonJsonLd() {
     }),
   };
 
+  const website = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+    author: { "@id": `${SITE_URL}/#person` },
+  };
+
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }}
+      />
+    </>
   );
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+      </head>
       <body className="bg-white text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
-        <PersonJsonLd />
+        <StructuredDataJsonLd />
         {children}
         <Analytics />
         <SpeedInsights />

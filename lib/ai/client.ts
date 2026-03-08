@@ -202,7 +202,7 @@ export async function generateWithPrompt(
       }
     }
 
-    // Extract cache stats
+    // Extract cache stats (fields exist on Anthropic responses but aren't in SDK types yet)
     const usage = response.usage as unknown as Record<string, unknown>;
     const cacheRead =
       typeof usage.cache_read_input_tokens === "number" ? usage.cache_read_input_tokens : 0;

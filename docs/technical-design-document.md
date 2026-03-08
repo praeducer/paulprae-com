@@ -21,10 +21,9 @@ Deliver a fast, shareable professional site at `https://paulprae.com` that prese
 
 ### 2.1 Runtime model
 
-- **Frontend:** Next.js App Router static site (`output: 'export'`)
-- **Backend at request time:** none (no API routes, no SSR)
-- **Build-time AI:** Claude API invoked locally by scripts
-- **Hosting:** Vercel static hosting from `out/`
+- **Frontend:** Next.js App Router with static export (`output: 'export'`)
+- **Build-time AI:** Claude API invoked locally by pipeline scripts
+- **Hosting:** Vercel CDN — static `out/` directory
 
 ### 2.2 Core stack (implemented)
 
@@ -37,18 +36,18 @@ Deliver a fast, shareable professional site at `https://paulprae.com` that prese
 | Validation         | Zod                                   |
 | Testing            | Vitest                                |
 | Export             | Pandoc (DOCX) + Typst (PDF)           |
-| Deployment         | Vercel (static)                       |
+| Deployment         | Vercel (server-rendered + API routes) |
 
 ### 2.3 Constraints and guardrails
 
-- Site must remain static-export compatible in Phase 1.
+- Site must remain static-export compatible in Phase 1 only.
 - No server runtime secrets are needed in Vercel for generation.
 - Generated resume markdown is an artifact; source-of-truth logic is in generation scripts.
 - Recruiter-facing data is versioned in git; raw LinkedIn exports remain local/gitignored.
 
-## 3. Phase 2 Architecture (In Progress)
+## 3. Phase 2 Architecture (Complete)
 
-> **Implementation status:** Sprint 1 complete on `feat/phase2-implementation` branch. See `docs/phase2-redesign-plan.md` for the authoritative redesign plan with user stories, QA strategy, and sprint breakdown.
+> **Implementation status:** Complete. Sprint 1 delivered chat homepage, resume page, tools page, and streaming API. Sprint 2 added tool-calling for tailored resume generation, security hardening, and rate limiting.
 
 Phase 2 transforms the static site into an interactive career platform with a chat-first homepage and job search tools. The architecture adds server-side capabilities while preserving the existing resume pipeline.
 
@@ -72,7 +71,7 @@ Phase 2 transforms the static site into an interactive career platform with a ch
 | AI Gateway      | `@ai-sdk/gateway` (Sprint 2+)           | Unified routing, observability                    |
 | Rate limiting   | `@upstash/ratelimit` + `@upstash/redis` | Distributed rate limiting                         |
 | Chat model      | Claude Sonnet 4.6                       | Fast Q&A ($3/$15 per MTok)                        |
-| Resume model    | Claude Opus 4.6                         | Quality generation ($5/$25)                       |
+| Resume model    | Claude Opus 4.6                         | Higher-quality offline resume generation          |
 | Compute         | Vercel Fluid Compute (Pro)              | Up to 800s function duration                      |
 
 ### 3.3 Why NOT Modal
@@ -101,44 +100,34 @@ Browser
   │
   ├── GET /resume  ───────────→ Static pre-render (Vercel CDN, instant)
   │
-  ├── POST /api/chat  ────────→ Fluid Compute function (maxDuration: 60)
-  │     │                        Model: claude-sonnet-4-6
-  │     │                        Pattern: streamText → toUIMessageStreamResponse → SSE
-  │     │                        Mode param switches system prompt (chat vs tools)
-  │     └── Career data + knowledge base in system prompt with prompt caching
-  │         (90K tokens cached, 10x cheaper after first turn)
-  │
-  └── POST /api/resume  ──────→ Fluid Compute function (maxDuration: 300) [Sprint 2+]
-        │                        Model: claude-opus-4-6
-        │                        Pattern: generateText with adaptive thinking
-        └── Tailored resume generation from job descriptions
+  └── POST /api/chat  ────────→ Fluid Compute function (maxDuration: 120)
+        │                        Model: claude-sonnet-4-6
+        │                        Pattern: streamText → toUIMessageStreamResponse → SSE
+        │                        Mode param switches system prompt (chat vs tools)
+        ├── Career data + knowledge base in system prompt with prompt caching
+        │   (90K tokens cached, 10x cheaper after first turn)
+        └── Tool-calling (chat mode only, stopWhen: stepCountIs(2)):
+              ├── generate_tailored_resume: JD → Sonnet → tailored resume markdown
+              └── get_resume_links: returns PDF/DOCX/MD/web download URLs
 ```
 
 ### 3.5 Prompt caching strategy
 
-Career data (~90K tokens after `stripEmpty()` compression) is placed in the system prompt with Anthropic's ephemeral cache control (5-min TTL):
-
-| Conversation turn  | Cost (Sonnet 4.6) | Mechanism                 |
-| ------------------ | ----------------- | ------------------------- |
-| First message      | ~$0.34            | Cache write (1.25x input) |
-| Each subsequent    | ~$0.03            | Cache read (0.1x input)   |
-| 10-message session | ~$0.60            | Amortized across turns    |
+Career data (career-data.json + 5 knowledge base files, compressed via `stripEmpty()`) is placed in the system prompt with Anthropic's ephemeral cache control (5-min TTL). After the first request, subsequent turns reuse the cached prompt at ~90% cost reduction.
 
 ### 3.6 Model routing
 
-| Use case                      | Model               | Why                                                           |
-| ----------------------------- | ------------------- | ------------------------------------------------------------- |
-| Chat Q&A                      | `claude-sonnet-4-6` | Fast, cheap, sufficient quality for career Q&A                |
-| Resume generation             | `claude-opus-4-6`   | Highest quality with adaptive thinking for complex formatting |
-| Future: intent classification | `claude-haiku-4-5`  | Sub-second, $1/$5 per MTok                                    |
+| Use case                      | Model               | Why                                                                |
+| ----------------------------- | ------------------- | ------------------------------------------------------------------ |
+| Chat Q&A                      | `claude-sonnet-4-6` | Fast, cheap, sufficient quality for career Q&A                     |
+| Tailored resume (tool call)   | `claude-sonnet-4-6` | Same model as chat; fast turnaround for recruiter-facing tool call |
+| Pipeline resume generation    | `claude-opus-4-6`   | Highest quality for the canonical resume artifact                  |
+| Future: intent classification | `claude-haiku-4-5`  | Sub-second, $1/$5 per MTok                                         |
 
 ### 3.7 Key Anthropic API features used
 
 - **Prompt caching** (GA) — `cache_control: { type: "ephemeral" }` on system prompt blocks
-- **Adaptive thinking** (Opus 4.6) — `thinking: { type: "adaptive" }` for resume generation
-- **Structured outputs** (GA) — guaranteed JSON schema conformance for resume data
-- **Search results / citations** (GA) — natural citations when answering from career data
-- **Compaction API** (beta, Opus 4.6) — server-side context summarization for long conversations
+- **Tool use** (GA) — `tool()` definitions with Zod schemas for resume generation and link retrieval
 
 ### 3.8 Vercel AI SDK 6 patterns
 
@@ -157,7 +146,7 @@ const result = streamText({
   model: anthropic("claude-sonnet-4-6"),
   system: systemPrompt,
   messages: modelMessages,
-  maxOutputTokens: 4096, // Note: renamed from maxTokens in AI SDK 6
+  maxOutputTokens: 2048, // Chat responses; 8192 for tool-called resume generation
 });
 
 return result.toUIMessageStreamResponse(); // Note: renamed from toDataStreamResponse in AI SDK 6
@@ -194,17 +183,25 @@ const runtime = useChatRuntime({ transport });
 ```
 lib/
 ├── agent/
-│   └── context.ts              # buildCareerContext(), buildSystemPrompt(), stripEmpty()
+│   └── context.ts              # buildCareerContext(), buildSystemPrompt()
 ├── prompts/
-│   ├── career-chat.system.md   # Recruiter Q&A prompt (grounding rules G1-G8)
+│   ├── loader.ts               # loadPrompt() — YAML frontmatter parser for prompt files
+│   ├── career-chat.system.md   # Recruiter Q&A prompt (grounding rules G1-G10)
+│   ├── career-chat.few-shot.md # Few-shot examples for chat tone/style
 │   ├── job-tools.system.md     # Content generation prompt (STAR, AIDA, PAS, BAB)
-│   └── resume-writer.system.md # Existing pipeline prompt (unchanged)
+│   ├── resume-generator.system.md # Tool-called resume generation prompt
+│   ├── resume-writer.system.md # Pipeline resume generation prompt
+│   ├── resume-writer.few-shot.md  # Few-shot examples for pipeline resume
+│   └── resume-writer.config.json  # Pipeline prompt configuration
+├── data-utils.ts               # stripEmpty() — shared by pipeline and chat
+├── constants.ts                # MAX_MESSAGE_CHARS — shared by client and server
 ├── career-data.ts              # loadCareerData() — existing, unchanged
 ├── config.ts                   # PATHS, RESUME_FILE_BASE — existing, unchanged
 └── types.ts                    # CareerData types — existing, unchanged
 
 app/
 ├── page.tsx                    # Chat homepage (imports ChatHome)
+├── tools/page.tsx              # Job search tools page (noindex)
 ├── resume/
 │   ├── page.tsx                # Resume page (extracted from Phase 1 homepage)
 │   └── components/
@@ -212,10 +209,11 @@ app/
 │       └── BackToTop.tsx       # Back-to-top button
 ├── components/
 │   ├── ChatHome.tsx            # Main chat client component ("use client")
-│   ├── ModeToggle.tsx          # Ask About Paul / Job Tools toggle
 │   └── QuickActions.tsx        # Mode-specific action chips
 ├── api/chat/route.ts           # POST handler: mode switching, rate limiting, streaming
 └── layout.tsx                  # Updated metadata for multi-page site
+
+proxy.ts                        # Next.js 16 proxy (CORS + origin validation)
 ```
 
 Existing `lib/` files (types, config, career-data) are unchanged — the agent context loader imports from them directly.
@@ -268,7 +266,7 @@ Pipeline order:
 1. `npm run ingest` -> parse CSV/knowledge inputs into `career-data.json`
 2. `npm run generate` -> generate Markdown resume from structured data
 3. `npm run export` -> produce PDF/DOCX artifacts from Markdown
-4. `npm run build` -> Next.js build (Phase 1: static export to `out/`; Phase 2: server build to `.next/`)
+4. `npm run build` -> Next.js server build to `.next/`
 5. push to `main` -> Vercel builds and deploys
 
 Supporting commands:
@@ -314,6 +312,7 @@ Supporting commands:
 - `npm run lint`
 - `npm run format:check`
 - `npm test`
+- `npm run test:e2e` (Playwright mocked smoke tests; optional full matrix/live modes via env flags)
 - `npm run test:pipeline` (validates generated outputs when available)
 
 ### 7.2 Manual checks
@@ -328,20 +327,19 @@ Supporting commands:
 
 AI-generated static resume: LinkedIn data + knowledge base → Claude → Markdown → Next.js static site → Vercel CDN.
 
-### Phase 2 (In Progress — see §3)
+### Phase 2 (Complete — see §3)
 
 Interactive career platform with chat-first homepage:
 
-- Chat homepage (`/`) with two modes: "Ask About Paul" (recruiter Q&A) and "Job Search Tools" (content generation)
+- Chat homepage (`/`) — recruiter Q&A with AI career assistant
 - Resume page (`/resume`) — extracted from Phase 1 homepage
+- Tools page (`/tools`) — job search content tools (noindex)
 - AI chat via `@assistant-ui/react` primitives with AI SDK 6 transport
-- Tailored resume generation from job descriptions (Opus 4.6) — Sprint 2+
+- Tool-calling: `generate_tailored_resume` and `get_resume_links` (chat mode only)
 - Vercel AI SDK 6 with streaming (`toUIMessageStreamResponse`)
-- Vercel Fluid Compute for serverless AI functions
+- Vercel Fluid Compute for serverless AI functions (maxDuration: 120s)
 
-**Sprint 1 complete** on `feat/phase2-implementation` branch (builds, 315 tests pass).
-Implementation tracked in `.claude/plans/phase2a-backend-agent-api.md`, `phase2b-frontend-chat.md`, `phase2c-devops-docs.md`.
-Authoritative redesign plan: `docs/phase2-redesign-plan.md`.
+**Sprint 1+2 complete.**
 
 ### Phase 3 (Future)
 
@@ -373,9 +371,6 @@ Authoritative redesign plan: `docs/phase2-redesign-plan.md`.
 
 - `README.md` (setup, pipeline, deployment)
 - `CLAUDE.md` (project memory and guardrails)
-- `.claude/plans/phase2a-backend-agent-api.md` (backend implementation plan)
-- `.claude/plans/phase2b-frontend-chat.md` (frontend implementation plan)
-- `.claude/plans/phase2c-devops-docs.md` (devops implementation plan)
 - `docs/domain-dns-runbook.md` (domain DNS operations)
 - `docs/linux-dev-environment-setup.md` (Linux/WSL setup)
 - `docs/windows-dev-environment-setup.md` (Windows setup)

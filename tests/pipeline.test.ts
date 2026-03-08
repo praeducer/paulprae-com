@@ -359,28 +359,6 @@ describe("resume-pdf.typ", () => {
   });
 });
 
-// ─── Next.js Build Output ───────────────────────────────────────────────────
-
-describe("Next.js static build", () => {
-  const outDir = path.join(process.cwd(), "out");
-  const exists = fs.existsSync(outDir);
-
-  it.skipIf(!exists)("out/ directory exists", () => {
-    expect(fs.existsSync(outDir)).toBe(true);
-  });
-
-  it.skipIf(!exists)("contains index.html", () => {
-    expect(fs.existsSync(path.join(outDir, "index.html"))).toBe(true);
-  });
-
-  it.skipIf(!exists)("index.html contains resume content", () => {
-    const html = fs.readFileSync(path.join(outDir, "index.html"), "utf-8");
-    // Should contain the rendered resume
-    expect(html.length).toBeGreaterThan(1000);
-    expect(html).toContain("Paul Prae");
-  });
-});
-
 // ─── Version Manifest ──────────────────────────────────────────────────────
 
 describe("VERSIONS.md", () => {

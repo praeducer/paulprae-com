@@ -278,6 +278,21 @@ The career data includes a **Supplementary Knowledge Base** with curated context
 7. **Check confidence levels:** When knowledge entries have `confidence: "verified"`, use those facts with full precision. When `confidence: "estimated"`, use qualifying language like "approximately" or ranges.
    </knowledge_base_strategy>
 
+<acceptance_criteria>
+Your output will be automatically validated against these checks. Optimize for all of them:
+
+1. All required sections present: Professional Summary, Professional Experience, Education, Technical Skills
+2. At least 75% of bullets start with an approved action verb from the brand_voice list
+3. Every position with 2+ bullets has at least 1 quantified metric
+4. No first-person pronouns ("I", "my", "me")
+5. No passive phrasing ("was responsible for", "assisted with", "helped with")
+6. No resume cliches ("track record", "proven ability", "results-driven", "passionate about")
+7. No invented compound phrases ("progressive leadership", "holistic framework", "synergistic delivery")
+8. Resume length between 3000-12000 characters (~2 pages)
+9. Recent employers (current + last 2 years) explicitly appear with 3+ bullets each
+10. Tier 1 positions (current + last 2 years) have at least 3 bullets
+    </acceptance_criteria>
+
 <output_instructions>
 
 - Output ONLY the Markdown resume content

@@ -7,8 +7,8 @@
  *   3. ESLint passes
  *   4. Prettier formatting passes
  *   5. All tests pass
- *   6. Next.js static build succeeds
- *   7. Build output (out/index.html) exists and contains expected content
+ *   6. Next.js build succeeds
+ *   7. Build output (.next/BUILD_ID) exists
  *
  * Usage:
  *   npm run check            # Full checklist (lint → format → test → build → validate)
@@ -229,48 +229,24 @@ function checkBuild(): CheckResult {
   return {
     name: "Build",
     passed: ok,
-    detail: ok ? "static export succeeded" : output.split("\n").slice(-3).join(" | "),
+    detail: ok ? "build succeeded" : output.split("\n").slice(-3).join(" | "),
     durationMs: Date.now() - start,
   };
 }
 
 function checkBuildOutput(): CheckResult {
   const start = Date.now();
-  const indexPath = path.join(ROOT, "out", "index.html");
+  const buildIdPath = path.join(ROOT, ".next", "BUILD_ID");
   const issues: string[] = [];
 
-  if (!fileExists(indexPath)) {
-    issues.push("out/index.html not found (run build first)");
-  } else {
-    const html = fs.readFileSync(indexPath, "utf-8");
-    const size = fileSize(indexPath);
-
-    if (size < 10_000) {
-      issues.push(`index.html suspiciously small (${humanSize(size)})`);
-    }
-
-    // Check for expected content markers
-    const markers: { label: string; pattern: RegExp }[] = [
-      { label: "page title", pattern: /Paul Prae/i },
-      { label: "Professional Summary", pattern: /Professional Summary/i },
-      { label: "download link", pattern: /\.pdf/i },
-      { label: "meta description", pattern: /<meta[^>]*description/i },
-    ];
-
-    for (const marker of markers) {
-      if (!marker.pattern.test(html)) {
-        issues.push(`missing: ${marker.label}`);
-      }
-    }
+  if (!fileExists(buildIdPath)) {
+    issues.push(".next/BUILD_ID not found (run build first)");
   }
 
   return {
     name: "Build output",
     passed: issues.length === 0,
-    detail:
-      issues.length === 0
-        ? `out/index.html valid (${humanSize(fileSize(indexPath))})`
-        : issues.join("; "),
+    detail: issues.length === 0 ? ".next/BUILD_ID present" : issues.join("; "),
     durationMs: Date.now() - start,
   };
 }
