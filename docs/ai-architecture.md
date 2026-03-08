@@ -9,7 +9,7 @@ This document explains the key architectural decisions for the AI system powerin
 paulprae.com is a chat-first career platform with an AI assistant that answers recruiter questions, generates tailored resumes via tool-calling, and produces job search content — all grounded in structured career data.
 
 **Runtime stack:** Next.js 16 + Vercel AI SDK 6 + Claude Sonnet 4.6 (chat) + Claude Opus 4.6 (pipeline)
-**Infrastructure:** Vercel (hosting + AI Gateway), Upstash Redis (rate limiting), Anthropic API
+**Infrastructure:** Vercel (hosting), Upstash Redis (rate limiting via Vercel KV integration), Anthropic API (direct SDK)
 
 ---
 
@@ -91,12 +91,11 @@ paulprae.com is a chat-first career platform with an AI assistant that answers r
 
 No custom telemetry code is needed. The existing platform integrations provide comprehensive observability:
 
-### Vercel AI Gateway
+### Vercel AI Gateway (Not Currently Active)
 
 **What:** Automatic tracking of every AI generation routed through the gateway.
-**Metrics:** Token usage (input, output, cache read, cache creation), cost per generation, latency, model, finish reason, generation ID.
-**Where:** Vercel Dashboard > Project > AI Gateway tab.
-**How:** Production requests route through `@ai-sdk/gateway` (configured in `route.ts`). The gateway intercepts all Anthropic API calls and records metadata with zero application code.
+**Status:** Not in use. The chat API uses the direct Anthropic SDK (`@ai-sdk/anthropic`) for reliability. Gateway support exists in `route.ts` but only activates when `AI_GATEWAY_API_KEY` is explicitly set. `VERCEL_OIDC_TOKEN` (auto-injected by Vercel) is intentionally ignored — using it without gateway configuration causes silent stream failures.
+**Future:** Can be enabled by setting `AI_GATEWAY_API_KEY` in Vercel env vars once the Vercel AI Gateway is configured for this project.
 
 ### Vercel Runtime Logs
 
@@ -120,7 +119,7 @@ No custom telemetry code is needed. The existing platform integrations provide c
 
 **What:** API usage, billing, rate limit status, spend caps.
 **Where:** [console.anthropic.com](https://console.anthropic.com) > Usage tab.
-**How:** All API calls (both gateway-routed and direct) are tracked by Anthropic's platform. Set spend limits under Settings > Limits to prevent cost overruns.
+**How:** All direct Anthropic API calls are tracked by the platform. Set spend limits under Settings > Limits to prevent cost overruns.
 
 ### Upstash Console
 

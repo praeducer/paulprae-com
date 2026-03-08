@@ -2,6 +2,7 @@
 
 import { useMemo, useCallback } from "react";
 import Link from "next/link";
+import { useChat } from "@ai-sdk/react";
 import {
   AssistantRuntimeProvider,
   ThreadPrimitive,
@@ -10,7 +11,7 @@ import {
   ActionBarPrimitive,
   useComposer,
 } from "@assistant-ui/react";
-import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
+import { useAISDKRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
 import QuickActions from "./QuickActions";
 import { MAX_MESSAGE_CHARS, SITE_NAME, SITE_SUBTITLE, HERO_DESCRIPTION } from "../../lib/constants";
@@ -177,7 +178,15 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
     [mode],
   );
 
-  const runtime = useChatRuntime({ transport });
+  // Use useChat directly instead of useChatRuntime to avoid
+  // unstable_useRemoteThreadListRuntime which recreates the Chat instance
+  // when its internal thread ID changes, causing "Cannot read properties of
+  // undefined (reading 'state')" on multi-turn conversations.
+  const chat = useChat({ transport });
+  const runtime = useAISDKRuntime(chat);
+
+  // Keep transport's runtime reference current (needed for model context in requests)
+  transport.setRuntime(runtime);
 
   // Quick action handler — appends a message to the thread
   const handleQuickAction = useCallback(

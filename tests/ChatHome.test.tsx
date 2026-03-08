@@ -45,11 +45,27 @@ vi.mock("@assistant-ui/react", () => {
   };
 });
 
+vi.mock("@ai-sdk/react", () => ({
+  useChat: () => ({
+    messages: [],
+    setMessages: vi.fn(),
+    sendMessage: vi.fn(),
+    regenerate: vi.fn(),
+    clearError: vi.fn(),
+    stop: vi.fn(),
+    error: undefined,
+    status: "ready",
+    id: "test",
+  }),
+}));
+
 vi.mock("@assistant-ui/react-ai-sdk", () => ({
-  useChatRuntime: () => ({
+  useAISDKRuntime: () => ({
     thread: { append: vi.fn() },
   }),
-  AssistantChatTransport: vi.fn(),
+  AssistantChatTransport: class {
+    setRuntime() {}
+  },
 }));
 
 vi.mock("@assistant-ui/react-markdown", () => ({

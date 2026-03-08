@@ -20,10 +20,10 @@ Complete these before merging PR #21 (`feat/phase2-implementation`) to `main`.
 
 - [ ] Fund Anthropic API credits (see Critical Blocker above)
 - [ ] Test chat on the latest preview deployment -- send a message and confirm a real streaming response (not an empty bubble)
-- [ ] Verify Vercel env vars are correct for all 3 environments (Production, Preview, Development):
+- [x] Verify Vercel env vars are correct for all 3 environments (Production, Preview, Development):
   - `ANTHROPIC_API_KEY` -- required, must have funded balance
-  - `KV_REST_API_URL` + `KV_REST_API_TOKEN` -- Upstash Redis for rate limiting (optional but recommended)
-  - Remove any stale Phase 3 vars if not needed yet (Supabase, Postgres)
+  - `KV_REST_API_URL` + `KV_REST_API_TOKEN` -- confirmed set in all 3 environments (Upstash Redis for rate limiting)
+  - Supabase/Postgres vars present but unused until Phase 3 (harmless)
 
 ### Git & GitHub
 
@@ -56,7 +56,7 @@ Complete these after merging to `main` and confirming the Vercel production depl
 - [ ] Monitor Anthropic API costs: console.anthropic.com > Usage
 - [ ] Check Vercel Dashboard > Functions -- verify `/api/chat` executions appear with successful status
 - [ ] Check Vercel Dashboard > Analytics -- verify real user visits are being tracked
-- [ ] Monitor Upstash Redis dashboard (if configured) -- verify rate limiting counters are active
+- [ ] Monitor Upstash Redis dashboard (console.upstash.com) -- verify rate limiting counters active under `paulprae:chat` prefix
 - [ ] Watch for any Vercel deployment errors or function timeout alerts
 
 ---

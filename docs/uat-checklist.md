@@ -190,8 +190,8 @@ Test on a real phone or browser DevTools (375px width):
 - [ ] Chat first response (TTFT) under 5 seconds
 - [ ] Lighthouse score: Performance ≥ 90, Accessibility ≥ 90, SEO ≥ 90
 - [ ] Check Vercel Dashboard > Functions — `/api/chat` executions appear
-- [ ] Check Vercel Dashboard > AI Gateway — API calls are logged with cost/token data
 - [ ] Check Anthropic Console > Usage — requests appear, within spend limits
+- [ ] Check Upstash Console — rate limiting counters active under `paulprae:chat` prefix
 
 ## 9. Cross-Browser (spot check)
 
