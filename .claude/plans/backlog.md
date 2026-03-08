@@ -2,7 +2,7 @@
 
 Actionable coding and documentation tasks for Claude Code. No human-only tasks here (those are in `human-tasks.md`).
 
-> Last reconciled: 2026-03-06 against `feat/phase2-implementation` branch.
+> Last reconciled: 2026-03-08 against `feat/phase2-implementation` branch (pre-merge to main).
 
 ---
 
