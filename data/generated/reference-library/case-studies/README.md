@@ -1,6 +1,6 @@
 # Case Studies
 
-Keep approved case-study files here.
+Keep approved case-study files here for AI-assisted retrieval and response generation.
 
 Suggested practice:
 

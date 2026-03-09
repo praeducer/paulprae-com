@@ -200,20 +200,19 @@ This plan is written for both:
 
 ---
 
-## Workstream E — Approved Content Library (Lean, Immediate)
+## Workstream E — AI Reference Library (Lean, Immediate)
 
-The goal is immediate curation, not framework design. Keep this folder simple and flat so it stays maintainable for a one-person part-time workflow.
+The goal is immediate curation, not framework design. Keep this library simple and flat so it stays maintainable for a one-person part-time workflow while still supporting multiple stakeholders and LLM platforms.
 
 ### Current directory structure
 
 ```text
-data/generated/approved-content/
+data/generated/reference-library/
 ├── README.md
 ├── INDEX.md
-└── artifacts/
-    ├── resumes/
-    ├── case-studies/
-    └── recruiter-qa/
+├── resumes/
+├── case-studies/
+└── stakeholder-qa/
 ```
 
 ### Operational rules
@@ -221,8 +220,9 @@ data/generated/approved-content/
 - [ ] Keep only approved source artifacts you want to curate and ingest.
 - [ ] Keep filenames readable; avoid deep nested date folders.
 - [ ] Update `INDEX.md` whenever files are added/replaced.
-- [ ] Save recruiter clarifications as standalone markdown files in `artifacts/recruiter-qa/`.
+- [ ] Save stakeholder clarifications as standalone markdown files in `stakeholder-qa/`.
 - [ ] Ignore Windows `:Zone.Identifier` files.
+- [ ] Keep documents platform-agnostic for ingestion by Claude, Bedrock, and Gemini/Vertex.
 
 ### Deferred by design
 
@@ -266,11 +266,11 @@ data/generated/approved-content/
 
 ---
 
-## Seed Entry for Future Ingestion (Approved Recruiter Clarification)
+## Seed Entry for Future Ingestion (Approved Stakeholder Clarification)
 
 Source artifact:
 
-- `data/generated/approved-content/artifacts/recruiter-qa/faq-employment-timeline-ey-2026-03.md`
+- `data/generated/reference-library/stakeholder-qa/faq-employment-timeline-ey-2026-03.md`
 
 Recommended destination tables:
 
