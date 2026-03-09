@@ -1,16 +1,34 @@
-# Approved Generative Content Library
+# Approved Content (Lean)
 
-This directory stores approved artifacts, example sets, and evaluation assets used to improve future AI generation quality.
+This directory is intentionally simple for a one-person, part-time workflow.
 
-## Structure
+Use it to store approved files you want to curate and ingest next.
 
-- `artifacts/` approved deliverables grouped by type and date
-- `datasets/` golden-set and evaluation datasets for regression checks
-- `few-shot/` reusable examples for prompting
-- `metadata/` manifests and provenance records
+## Current structure
 
-## Usage rules
+```text
+data/generated/approved-content/
+├── README.md
+├── INDEX.md
+└── artifacts/
+    ├── resumes/
+    ├── case-studies/
+    └── recruiter-qa/
+```
 
-- Only approved, recruiter-safe, public-safe content belongs here.
-- Include provenance metadata for each artifact.
-- Prefer immutable dated folders for released artifacts.
+## Rules
+
+- Keep the tree flat. Avoid deep nesting unless there is a clear operational need.
+- Only store approved, recruiter-safe, public-safe content.
+- Keep original filenames unless normalization is useful for search.
+- Add new entries to `INDEX.md` when files are added or replaced.
+
+## Naming guidance
+
+- Resumes: `Paul-Prae-Resume-YYYYMMDD.<ext>`
+- Recruiter clarifications: `faq-<topic>-<yyyy-mm>.md`
+- Case studies: keep human-readable source filenames
+
+## Deferred on purpose
+
+The previous `datasets/`, `few-shot/`, and `metadata/` scaffolding was removed to reduce maintenance overhead. Add those back later only when automated eval workflows are actually active.

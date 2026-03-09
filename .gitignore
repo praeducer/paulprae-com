@@ -25,6 +25,7 @@ build/
 data/sources/linkedin/*.csv
 data/sources/linkedin/*.zip
 data/sources/linkedin/*.zip:Zone.Identifier
+*:Zone.Identifier
 
 # Pipeline: binary build artifacts (regenerable via npm run export)
 # Covers recruiter-friendly naming (Paul-Prae-Resume.pdf) and fallback (Resume.pdf)
