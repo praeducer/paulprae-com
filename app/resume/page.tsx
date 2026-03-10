@@ -9,6 +9,7 @@ import { stripHtmlComments, stripHeaderBlock } from "../../lib/markdown";
 import { PATHS, RESUME_FILE_BASE } from "../../lib/config";
 import { loadCareerData } from "../../lib/career-data";
 import { slugify } from "../../lib/ui-utils";
+import { DownloadIcon, CalendarIcon } from "../components/Icons";
 import {
   SITE_NAME,
   SITE_SUBTITLE,
@@ -63,22 +64,6 @@ function getFileSize(filePath: string): string | null {
   } catch {
     return null;
   }
-}
-
-/** Inline SVG download arrow icon (no dependency needed). */
-function DownloadIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      className="h-3.5 w-3.5"
-      aria-hidden="true"
-    >
-      <path d="M10 3a.75.75 0 0 1 .75.75v7.69l2.72-2.72a.75.75 0 1 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06 0l-4-4a.75.75 0 1 1 1.06-1.06l2.72 2.72V3.75A.75.75 0 0 1 10 3Z" />
-      <path d="M3.75 14a.75.75 0 0 1 .75.75v1.5h11v-1.5a.75.75 0 0 1 1.5 0v1.5A1.5 1.5 0 0 1 15.5 17.25h-11A1.5 1.5 0 0 1 3 15.75v-1.5a.75.75 0 0 1 .75-.75Z" />
-    </svg>
-  );
 }
 
 /** Extract H2 sections from markdown for the section navigation bar. */
@@ -168,6 +153,9 @@ export default function ResumePage() {
 
   // ─── Markdown component overrides ──────────────────────────────────────────
 
+  const contactLinkClass =
+    "inline-flex min-h-[44px] items-center gap-1 rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100";
+
   const markdownComponents: Components = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     h2: ({ children, node, ...props }) => {
@@ -227,7 +215,7 @@ export default function ResumePage() {
               <a
                 href={`mailto:${profile.email}`}
                 aria-label="Send email to Paul Prae"
-                className="inline-flex min-h-[44px] items-center rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+                className={contactLinkClass}
               >
                 Email
               </a>
@@ -238,8 +226,9 @@ export default function ResumePage() {
               rel="noopener noreferrer"
               aria-label="Schedule an interview with Paul (opens in new tab)"
               title="Schedule an interview with Paul (opens in new tab)"
-              className="inline-flex min-h-[44px] items-center rounded-md px-2.5 text-xs font-medium text-blue-700 transition-colors hover:text-blue-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-blue-300 dark:hover:text-blue-200"
+              className="inline-flex min-h-[44px] items-center gap-1 rounded-md bg-blue-50 px-3 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 hover:text-blue-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 dark:hover:text-blue-200"
             >
+              <CalendarIcon className="h-3.5 w-3.5" />
               Schedule interview
             </a>
             {profile.linkedin && (
@@ -248,7 +237,7 @@ export default function ResumePage() {
                 target="_blank"
                 rel="me noopener noreferrer"
                 aria-label="View Paul Prae on LinkedIn"
-                className="inline-flex min-h-[44px] items-center rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+                className={contactLinkClass}
               >
                 LinkedIn
               </a>
@@ -259,7 +248,7 @@ export default function ResumePage() {
                 target="_blank"
                 rel="me noopener noreferrer"
                 aria-label="View Paul Prae on GitHub"
-                className="inline-flex min-h-[44px] items-center rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+                className={contactLinkClass}
               >
                 GitHub
               </a>
@@ -275,27 +264,27 @@ export default function ResumePage() {
               href={pdfPath}
               download
               aria-label="Download resume as PDF"
-              className="inline-flex min-h-[44px] items-center gap-1 rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+              className={contactLinkClass}
             >
-              <DownloadIcon />
+              <DownloadIcon className="h-3.5 w-3.5" />
               PDF{pdfSize && <span className="opacity-60">({pdfSize})</span>}
             </a>
             <a
               href={docxPath}
               download
               aria-label="Download resume as DOCX"
-              className="inline-flex min-h-[44px] items-center gap-1 rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+              className={contactLinkClass}
             >
-              <DownloadIcon />
+              <DownloadIcon className="h-3.5 w-3.5" />
               DOCX{docxSize && <span className="opacity-60">({docxSize})</span>}
             </a>
             <a
               href={mdPath}
               download
               aria-label="Download resume as Markdown"
-              className="inline-flex min-h-[44px] items-center gap-1 rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+              className={contactLinkClass}
             >
-              <DownloadIcon />
+              <DownloadIcon className="h-3.5 w-3.5" />
               MD{mdSize && <span className="opacity-60">({mdSize})</span>}
             </a>
           </div>
