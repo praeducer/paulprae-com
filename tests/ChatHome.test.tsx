@@ -74,6 +74,7 @@ vi.mock("@assistant-ui/react-markdown", () => ({
 
 import { render } from "@testing-library/react";
 import ChatHome from "../app/components/ChatHome";
+import { BOOK_INTERVIEW_URL } from "../lib/constants";
 
 describe("ChatHome", () => {
   it("chat mode renders Paul Prae heading and title", () => {
@@ -98,5 +99,13 @@ describe("ChatHome", () => {
     const link = getByText("Resume");
     expect(link).toBeTruthy();
     expect(link.closest("a")?.getAttribute("href")).toBe("/resume");
+  });
+
+  it("renders Schedule interview link", () => {
+    const { getByRole } = render(<ChatHome mode="chat" />);
+    const link = getByRole("link", { name: /schedule an interview with paul/i });
+    expect(link).toBeTruthy();
+    expect(link.getAttribute("href")).toBe(BOOK_INTERVIEW_URL);
+    expect(link.getAttribute("target")).toBe("_blank");
   });
 });

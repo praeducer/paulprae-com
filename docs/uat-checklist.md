@@ -22,7 +22,7 @@ npx eslint .          # linting
 ### Visual & Layout
 
 - [ ] Page loads without flash of unstyled content
-- [ ] Header shows site name (links to `/`), subtitle (desktop only), "Resume" link, PDF download icon
+- [ ] Header shows site name (links to `/`), subtitle (desktop only), "Resume" link, PDF download icon, and "Schedule interview" CTA
 - [ ] Welcome hero shows name, headline, description, and quick action chips
 - [ ] Chat composer is visible at bottom with placeholder text
 - [ ] Dark mode: toggle system theme, verify no color clashes or unreadable text
@@ -145,6 +145,7 @@ Send these in sequence:
 - [ ] Section navigation sidebar is visible (desktop) and highlights active section on scroll
 - [ ] Clicking a section nav link scrolls to that section smoothly
 - [ ] Download links work: PDF opens/downloads, DOCX opens/downloads
+- [ ] Header contact row includes both Email and Schedule interview links
 - [ ] Header link ("paulprae.com" or site name) returns to `/`
 - [ ] Content matches the latest approved resume (`data/generated/Paul-Prae-Resume.md`)
 

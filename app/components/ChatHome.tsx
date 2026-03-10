@@ -15,7 +15,13 @@ import { useAISDKRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
 import remarkGfm from "remark-gfm";
 import QuickActions from "./QuickActions";
-import { MAX_MESSAGE_CHARS, SITE_NAME, SITE_SUBTITLE, HERO_DESCRIPTION } from "../../lib/constants";
+import {
+  MAX_MESSAGE_CHARS,
+  SITE_NAME,
+  SITE_SUBTITLE,
+  HERO_DESCRIPTION,
+  BOOK_INTERVIEW_URL,
+} from "../../lib/constants";
 
 // ─── Markdown Text Wrapper ──────────────────────────────────────────────────
 
@@ -291,6 +297,29 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                     <path d="M3.75 14a.75.75 0 0 1 .75.75v1.5h11v-1.5a.75.75 0 0 1 1.5 0v1.5A1.5 1.5 0 0 1 15.5 17.25h-11A1.5 1.5 0 0 1 3 15.75v-1.5a.75.75 0 0 1 .75-.75Z" />
                   </svg>
                   <span className="hidden sm:inline">PDF</span>
+                </a>
+                <a
+                  href={BOOK_INTERVIEW_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 rounded-md bg-blue-700 px-2.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-blue-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:bg-blue-600 dark:hover:bg-blue-500"
+                  aria-label="Schedule an interview with Paul (opens in new tab)"
+                  title="Schedule an interview with Paul (opens in new tab)"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="h-3.5 w-3.5"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.75 3a.75.75 0 0 1 .75.75V4h7V3.75a.75.75 0 0 1 1.5 0V4h.25A2.25 2.25 0 0 1 17.5 6.25v8A2.25 2.25 0 0 1 15.25 16.5h-10A2.25 2.25 0 0 1 3 14.25v-8A2.25 2.25 0 0 1 5.25 4h.25v-.25A.75.75 0 0 1 5.75 3Zm-1.25 5.5v5.75c0 .414.336.75.75.75h10a.75.75 0 0 0 .75-.75V8.5h-12Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span className="hidden sm:inline">Schedule interview</span>
                 </a>
               </nav>
             </div>

@@ -9,7 +9,13 @@ import { stripHtmlComments, stripHeaderBlock } from "../../lib/markdown";
 import { PATHS, RESUME_FILE_BASE } from "../../lib/config";
 import { loadCareerData } from "../../lib/career-data";
 import { slugify } from "../../lib/ui-utils";
-import { SITE_NAME, SITE_SUBTITLE, SITE_URL, SITE_OG_DESCRIPTION } from "../../lib/constants";
+import {
+  SITE_NAME,
+  SITE_SUBTITLE,
+  SITE_URL,
+  SITE_OG_DESCRIPTION,
+  BOOK_INTERVIEW_URL,
+} from "../../lib/constants";
 import BackToTop from "./components/BackToTop";
 import SectionNav from "./components/SectionNav";
 
@@ -226,6 +232,16 @@ export default function ResumePage() {
                 Email
               </a>
             )}
+            <a
+              href={BOOK_INTERVIEW_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Schedule an interview with Paul (opens in new tab)"
+              title="Schedule an interview with Paul (opens in new tab)"
+              className="inline-flex min-h-[44px] items-center rounded-md px-2.5 text-xs font-medium text-blue-700 transition-colors hover:text-blue-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-blue-300 dark:hover:text-blue-200"
+            >
+              Schedule interview
+            </a>
             {profile.linkedin && (
               <a
                 href={profile.linkedin}
