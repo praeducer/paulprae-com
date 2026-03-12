@@ -35,7 +35,7 @@ data/generated/        → Pipeline outputs: career-data.json + Paul-Prae-Resume
 scripts/               → Pipeline scripts (ingest, generate, export, brand) + resume-pdf.typ stylesheet
 lib/                   → Shared utilities: config, types, markdown, career-data, ui-utils, script-utils
 lib/agent/             → Career context builder for chat system prompts
-lib/prompts/           → System prompt templates (career-chat, job-tools, resume-generator)
+lib/prompts/           → System prompt templates (career-chat, job-tools, resume-writer)
 tests/                 → Unit, integration, and component tests (Vitest + Testing Library)
 proxy.ts               → Next.js 16 proxy (CORS + origin validation for API routes)
 public/                → Static assets (OG image, favicons, resume downloads) committed for Vercel

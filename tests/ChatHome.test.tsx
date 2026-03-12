@@ -8,8 +8,17 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeAll } from "vitest";
 import type { ReactNode } from "react";
+
+// ResizeObserver is not available in JSDOM — stub it for SiteNav's header height measurement.
+beforeAll(() => {
+  globalThis.ResizeObserver ??= class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+});
 
 // Mock assistant-ui modules before importing the component
 vi.mock("@assistant-ui/react", () => {

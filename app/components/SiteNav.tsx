@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChatIcon, DownloadIcon, CalendarIcon } from "./Icons";
@@ -27,14 +28,32 @@ export default function SiteNav({ children }: { children?: React.ReactNode }) {
   const pathname = usePathname();
   const isResume = pathname === "/resume";
   const isTools = pathname === "/tools";
+  const headerRef = useRef<HTMLElement>(null);
+
+  // Publish --header-height so downstream sticky elements (e.g. SectionNav)
+  // and scroll-padding-top can account for the sticky header.
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const sync = () => {
+      document.documentElement.style.setProperty("--header-height", `${header.offsetHeight}px`);
+    };
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(header);
+    return () => ro.disconnect();
+  }, []);
 
   return (
-    <header className="no-print shrink-0 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95">
+    <header
+      ref={headerRef}
+      className="no-print sticky top-0 z-40 shrink-0 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95"
+    >
       <div className="mx-auto max-w-3xl px-6 py-3">
         <div className="flex items-baseline gap-3">
           <Link
             href="/"
-            className="text-xl font-bold text-slate-900 hover:text-slate-700 dark:text-slate-100 dark:hover:text-slate-300"
+            className="whitespace-nowrap rounded-sm text-xl font-bold text-slate-900 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none dark:text-slate-100 dark:hover:text-slate-300"
           >
             {SITE_NAME}
           </Link>
@@ -46,7 +65,7 @@ export default function SiteNav({ children }: { children?: React.ReactNode }) {
             aria-label="Site navigation"
           >
             {isResume ? (
-              <Link href="/" className={NAV_LINK_CLASS} title="Chat with Paul's AI assistant">
+              <Link href="/" className={NAV_LINK_CLASS} aria-label="Chat with Paul's AI assistant">
                 <ChatIcon className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Chat with AI</span>
               </Link>

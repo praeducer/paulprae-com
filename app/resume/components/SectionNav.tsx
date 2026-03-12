@@ -10,7 +10,7 @@ interface Section {
 /**
  * Compact horizontal section navigation bar.
  * Highlights the currently visible section using IntersectionObserver.
- * Sticks to the top of the viewport (header scrolls away above it).
+ * Sticks below the sticky header using top: var(--header-height).
  * Hidden on print via the no-print class.
  */
 export default function SectionNav({ sections }: { sections: Section[] }) {
@@ -106,7 +106,8 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
     <nav
       ref={navRef}
       aria-label="Resume sections"
-      className="no-print sticky top-0 z-30 hidden overflow-x-clip border-b border-slate-200/80 bg-white/95 backdrop-blur-sm sm:block dark:border-slate-700/80 dark:bg-slate-950/95"
+      style={{ top: "var(--header-height, 0px)" }}
+      className="no-print sticky z-30 hidden overflow-x-clip border-b border-slate-200/80 bg-white/95 backdrop-blur-sm sm:block dark:border-slate-700/80 dark:bg-slate-950/95"
     >
       <div className="mx-auto flex max-w-3xl items-center gap-1 overflow-x-auto px-6 py-1.5 text-xs scrollbar-none">
         {sections.map((s) => (

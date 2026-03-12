@@ -223,14 +223,14 @@ describe("Prompt injection defenses", () => {
     expect(prompt).toContain("system prompt");
   });
 
-  it("resume-generator system prompt contains security rules", async () => {
+  it("resume-writer system prompt contains security rules", async () => {
     const fs = await import("fs");
     const path = await import("path");
     const prompt = fs.readFileSync(
-      path.join(process.cwd(), "lib", "prompts", "resume-generator.system.md"),
+      path.join(process.cwd(), "lib", "prompts", "resume-writer.system.md"),
       "utf-8",
     );
-    expect(prompt).toContain("# Security Rules");
+    expect(prompt).toContain("security_rules");
     expect(prompt).toContain("untrusted user data");
     expect(prompt).toContain("prompt injection");
   });

@@ -25,6 +25,20 @@ describe("loadCareerContext", () => {
     expect(ctx).not.toBeNull();
     expect(ctx!.audienceFrameworks).toBeTruthy();
   });
+
+  it("loads company data from knowledge base", () => {
+    const ctx = loadCareerContext();
+    expect(ctx).not.toBeNull();
+    expect(ctx!.companies).toBeTruthy();
+    expect(Array.isArray(ctx!.companies)).toBe(true);
+  });
+
+  it("does not load career-objectives.json into context", () => {
+    const ctx = loadCareerContext();
+    expect(ctx).not.toBeNull();
+    // CareerContext should not have a careerObjectives field
+    expect(ctx).not.toHaveProperty("careerObjectives");
+  });
 });
 
 // ─── buildSystemPrompt ──────────────────────────────────────────────────────
@@ -43,10 +57,14 @@ describe("buildSystemPrompt", () => {
     expect(prompt).toContain("Platform Constraints");
   });
 
-  it("resume-generator mode contains tailoring content", () => {
+  it("resume-generator mode loads unified resume-writer prompt", () => {
     const prompt = buildSystemPrompt("resume-generator");
     expect(prompt).not.toBeNull();
     expect(prompt!.toLowerCase()).toMatch(/tailor/);
+    // Unified prompt should contain security rules from the former resume-generator
+    expect(prompt!).toContain("untrusted user data");
+    // Unified prompt should contain quality rules from resume-writer
+    expect(prompt!.toLowerCase()).toContain("acceptance_criteria");
   });
 
   it("injects resume download paths into system prompt", () => {
@@ -69,6 +87,22 @@ describe("buildSystemPrompt", () => {
     expect(prompt).not.toBeNull();
     expect(prompt).not.toContain("{{BOOK_INTERVIEW_URL}}");
     expect(prompt).toContain("outlook.office.com/bookwithme");
+  });
+
+  it("injects company data into chat system prompt", () => {
+    const prompt = buildSystemPrompt("chat");
+    expect(prompt).not.toBeNull();
+    expect(prompt).not.toContain("{{COMPANY_DATA}}");
+    // Should contain actual company data (e.g., Arine metrics)
+    expect(prompt).toContain("Arine");
+    expect(prompt).toContain("45+");
+  });
+
+  it("injects company data into resume-generator system prompt", () => {
+    const prompt = buildSystemPrompt("resume-generator");
+    expect(prompt).not.toBeNull();
+    expect(prompt).not.toContain("{{COMPANY_DATA}}");
+    expect(prompt).toContain("Arine");
   });
 
   it("replaces outdated '15 years' in career data with canonical figure", () => {

@@ -52,9 +52,10 @@ export const NAV_LINK_CLASS =
 export const CTA_BUTTON_CLASS =
   "inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-md bg-blue-700 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none dark:bg-blue-600 dark:hover:bg-blue-500";
 
-/** Contact/download link in secondary nav row — lighter weight. */
+/** Contact/download link in secondary nav row — lighter weight.
+ *  44px mobile tap target tightened to 36px on desktop for visual compactness. */
 export const CONTACT_LINK_CLASS =
-  "inline-flex min-h-[44px] items-center gap-1 rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100";
+  "inline-flex min-h-[44px] sm:min-h-[36px] items-center gap-1 rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100";
 
 // ─── Chat AI Configuration ──────────────────────────────────────────────────
 

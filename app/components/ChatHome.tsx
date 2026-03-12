@@ -27,9 +27,28 @@ import {
 
 // ─── Markdown Text Wrapper ──────────────────────────────────────────────────
 
-/** Wraps MarkdownTextPrimitive with GFM support (tables, strikethrough, etc.) */
+/** Wraps MarkdownTextPrimitive with GFM support and external link handling. */
 function MarkdownText() {
-  return <MarkdownTextPrimitive remarkPlugins={[remarkGfm]} />;
+  return (
+    <MarkdownTextPrimitive
+      remarkPlugins={[remarkGfm]}
+      components={{
+        a: ({ href, children, ...props }) => {
+          const isExternal = href?.startsWith("http");
+          return (
+            <a
+              href={href}
+              {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              className="text-blue-700 underline hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+              {...props}
+            >
+              {children}
+            </a>
+          );
+        },
+      }}
+    />
+  );
 }
 
 // ─── Shared Styles ──────────────────────────────────────────────────────────
@@ -182,8 +201,9 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
     [runtime],
   );
 
-  // Pre-fill the composer textarea with text (e.g., for tailored resume chip)
-  // Uses native DOM event dispatch to sync with assistant-ui's controlled input.
+  // Pre-fill the composer textarea with text (e.g., for tailored resume chip).
+  // Uses native setter + event dispatch to sync with assistant-ui's controlled input.
+  // Dispatches both "input" and "change" events for compat with automated testing tools.
   const handlePrefill = useCallback((text: string) => {
     const textarea = document.querySelector<HTMLTextAreaElement>('[aria-label="Chat message"]');
     if (!textarea) return;
@@ -193,6 +213,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
     )?.set;
     nativeSetter?.call(textarea, text);
     textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    textarea.dispatchEvent(new Event("change", { bubbles: true }));
     textarea.focus();
   }, []);
 
@@ -212,6 +233,11 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
           tabIndex={-1}
           className="flex min-h-0 flex-1 flex-col focus:outline-none"
         >
+          {/* Persistent sr-only h1 — always in DOM for screen readers, even after messages appear */}
+          <h1 className="sr-only">
+            {mode === "chat" ? "Chat with Paul Prae's AI Career Assistant" : "Job Search Tools"}
+          </h1>
+
           <ThreadPrimitive.Root className="flex min-h-0 flex-1 flex-col">
             <ThreadPrimitive.Viewport className="flex flex-1 flex-col overflow-y-auto">
               <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pt-5">
@@ -221,9 +247,6 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                     <div className="mb-4 sm:mb-6 text-center">
                       {mode === "chat" ? (
                         <>
-                          <h1 className="sr-only">
-                            Chat with Paul Prae&apos;s AI Career Assistant
-                          </h1>
                           <p
                             className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100"
                             aria-hidden="true"
@@ -243,7 +266,6 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                         </>
                       ) : (
                         <>
-                          <h1 className="sr-only">Job Search Tools</h1>
                           <p
                             className="text-2xl font-bold text-slate-900 dark:text-slate-100"
                             aria-hidden="true"

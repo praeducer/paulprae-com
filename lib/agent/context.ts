@@ -26,6 +26,7 @@ const KNOWLEDGE_FILES = {
   writingFormulas: path.join(KNOWLEDGE_DIR, "content", "writing-formulas.json"),
   audienceFrameworks: path.join(KNOWLEDGE_DIR, "strategy", "audience-frameworks.json"),
   communicationStyles: path.join(KNOWLEDGE_DIR, "brand", "communication-styles.json"),
+  companies: path.join(KNOWLEDGE_DIR, "career", "companies.json"),
 } as const;
 
 // ─── Context Building ───────────────────────────────────────────────────────
@@ -37,6 +38,7 @@ export interface CareerContext {
   writingFormulas: unknown;
   audienceFrameworks: unknown;
   communicationStyles: unknown;
+  companies: unknown;
 }
 
 function loadJsonSafe(filePath: string): unknown {
@@ -62,6 +64,7 @@ export function loadCareerContext(): CareerContext | null {
     writingFormulas: loadJsonSafe(KNOWLEDGE_FILES.writingFormulas),
     audienceFrameworks: loadJsonSafe(KNOWLEDGE_FILES.audienceFrameworks),
     communicationStyles: loadJsonSafe(KNOWLEDGE_FILES.communicationStyles),
+    companies: loadJsonSafe(KNOWLEDGE_FILES.companies),
   };
 }
 
@@ -72,7 +75,7 @@ type PromptMode = "chat" | "tools" | "resume-generator";
 const PROMPT_IDS: Record<PromptMode, string> = {
   chat: "career-chat",
   tools: "job-tools",
-  "resume-generator": "resume-generator",
+  "resume-generator": "resume-writer",
 };
 
 /**
@@ -107,10 +110,12 @@ export function buildSystemPrompt(mode: PromptMode): string | null {
     `${YEARS_EXPERIENCE} years`,
   );
   const audienceJson = JSON.stringify(context.audienceFrameworks, null, 2);
+  const companyJson = JSON.stringify(context.companies, null, 2);
 
   let prompt = template
     .replace("{{CAREER_DATA}}", careerDataJson)
     .replace("{{AUDIENCE_FRAMEWORKS}}", audienceJson)
+    .replace("{{COMPANY_DATA}}", companyJson)
     .replace("{{BOOK_INTERVIEW_URL}}", BOOK_INTERVIEW_URL)
     .replace(/\{\{RESUME_PDF_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.pdf)
     .replace(/\{\{RESUME_DOCX_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.docx)

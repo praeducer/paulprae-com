@@ -349,6 +349,11 @@ export async function POST(request: Request) {
       : undefined;
 
   try {
+    // Prompt caching: top-level providerOptions.anthropic.cacheControl marks the
+    // system prompt for Anthropic's ephemeral cache. The system prompt (~50KB with
+    // career data) is stable between requests, making it ideal for caching.
+    // The @ai-sdk/anthropic provider applies cache_control to the last system
+    // content block automatically — no multi-part system message needed.
     const result = streamText({
       model: getModel(CHAT_MODEL_ID),
       system: systemPrompt,

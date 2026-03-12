@@ -189,8 +189,7 @@ lib/
 │   ├── career-chat.system.md   # Recruiter Q&A prompt (grounding rules G1-G10)
 │   ├── career-chat.few-shot.md # Few-shot examples for chat tone/style
 │   ├── job-tools.system.md     # Content generation prompt (STAR, AIDA, PAS, BAB)
-│   ├── resume-generator.system.md # Tool-called resume generation prompt
-│   ├── resume-writer.system.md # Pipeline resume generation prompt
+│   ├── resume-writer.system.md # Unified resume prompt (pipeline + chat tool-calling)
 │   ├── resume-writer.few-shot.md  # Few-shot examples for pipeline resume
 │   └── resume-writer.config.json  # Pipeline prompt configuration
 ├── data-utils.ts               # stripEmpty() — shared by pipeline and chat

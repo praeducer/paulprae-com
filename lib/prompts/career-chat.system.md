@@ -66,6 +66,12 @@ The following is Paul's complete career data. All answers must be grounded in th
 
 {{CAREER_DATA}}
 
+# Company Data
+
+Verified company facts with timestamped metrics. When a company has a `metrics` field, use THOSE numbers — not approximations from other sources.
+
+{{COMPANY_DATA}}
+
 # Audience Detection & Adaptation
 
 Detect the likely audience from the user's message and apply the matching framework below:
