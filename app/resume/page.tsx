@@ -189,7 +189,7 @@ export default function ResumePage() {
         Skip to resume content
       </a>
 
-      <header className="no-print sticky top-0 z-40 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95">
+      <header className="no-print border-b border-slate-200/60 bg-white dark:border-slate-700/60 dark:bg-slate-950">
         <div className="max-w-3xl mx-auto px-6 py-3">
           {/* Row 1: Name + short title + Chat link */}
           <div className="flex items-baseline gap-3">
@@ -199,18 +199,18 @@ export default function ResumePage() {
             >
               {profile.name}
             </Link>
-            <p className="hidden min-w-0 sm:block text-sm text-slate-500 dark:text-slate-400 truncate">
+            <p className="hidden min-w-0 sm:block text-sm text-slate-500 dark:text-slate-400 truncate lg:whitespace-normal lg:line-clamp-2">
               {SITE_SUBTITLE}
             </p>
             <Link
               href="/"
-              className="ml-auto shrink-0 inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              className="ml-auto shrink-0 inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
             >
               Chat with AI
             </Link>
           </div>
           {/* Row 2: Contact + Downloads — unified text-style links */}
-          <div className="mt-1 flex flex-wrap items-center gap-x-1 gap-y-1">
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-2">
             {profile.email && (
               <a
                 href={`mailto:${profile.email}`}

@@ -10,33 +10,26 @@ interface Section {
 /**
  * Compact horizontal section navigation bar.
  * Highlights the currently visible section using IntersectionObserver.
- * Dynamically positions itself below the sticky header using ResizeObserver.
+ * Sticks to the top of the viewport (header scrolls away above it).
  * Hidden on print via the no-print class.
  */
 export default function SectionNav({ sections }: { sections: Section[] }) {
   const [activeId, setActiveId] = useState<string>("");
   const navRef = useRef<HTMLElement>(null);
 
-  // Dynamically measure the header and nav heights so CSS custom properties
-  // (--header-height, --nav-height) always reflect the true rendered sizes.
-  // This drives scroll-padding-top and scroll-margin-top via --sticky-offset.
+  // Track the nav height so CSS custom properties (--nav-height) reflect
+  // the true rendered size. This drives scroll-padding-top and
+  // scroll-margin-top via --sticky-offset.
   useEffect(() => {
-    const header = document.querySelector("header");
     const nav = navRef.current;
-    if (!header || !nav) return;
+    if (!nav) return;
 
-    const sync = (entries?: ResizeObserverEntry[]) => {
-      const root = document.documentElement.style;
-      root.setProperty("--nav-height", `${nav.offsetHeight}px`);
-      if (!entries || entries.some((e) => e.target === header)) {
-        root.setProperty("--header-height", `${header.offsetHeight}px`);
-        nav.style.top = `${header.offsetHeight}px`;
-      }
+    const sync = () => {
+      document.documentElement.style.setProperty("--nav-height", `${nav.offsetHeight}px`);
     };
 
     sync();
     const ro = new ResizeObserver(sync);
-    ro.observe(header);
     ro.observe(nav);
     return () => ro.disconnect();
   }, []);
@@ -90,7 +83,7 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
         setActiveId(bestId);
       },
       {
-        // Negative top margin accounts for sticky header + nav.
+        // Negative top margin accounts for sticky nav.
         // Uses a generous margin so headings are detected before
         // they reach the very top of the viewport.
         rootMargin: "-80px 0px -60% 0px",
@@ -131,6 +124,11 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
           </a>
         ))}
       </div>
+      {/* Right-edge fade indicating scrollable overflow */}
+      <div
+        className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-slate-950"
+        aria-hidden="true"
+      />
     </nav>
   );
 }

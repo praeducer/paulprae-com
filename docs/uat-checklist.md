@@ -23,7 +23,10 @@ npx eslint .          # linting
 
 - [ ] Page loads without flash of unstyled content
 - [ ] Header shows site name (links to `/`), subtitle (desktop only), "Resume" link, PDF download icon, and "Book Interview" CTA
-- [ ] Welcome hero shows name, headline, description, and quick action chips
+- [ ] All header nav items have consistent 44px minimum height
+- [ ] Subtitle shows full text at lg+ viewports (wraps to 2 lines if needed) and truncates at smaller widths
+- [ ] Welcome hero shows name, headline, description, and quick action chips (including "Book interview" CTA chip)
+- [ ] Quick action chips show pointer cursor on hover
 - [ ] Chat composer is visible at bottom with placeholder text
 - [ ] Dark mode: toggle system theme, verify no color clashes or unreadable text
 - [ ] Skip-to-content link appears on Tab press (no visible flash on page load)
@@ -142,10 +145,13 @@ Send these in sequence:
 ## 3. Resume Page (`/resume`)
 
 - [ ] Full resume renders with all sections (Summary, Experience, Education, Skills, etc.)
-- [ ] Section navigation sidebar is visible (desktop) and highlights active section on scroll
+- [ ] Header scrolls away on scroll; only section nav stays sticky
+- [ ] Section navigation bar is visible (desktop), highlights active section, and shows right-edge fade when content overflows
+- [ ] All section labels are visible (including "Publications" — not clipped)
 - [ ] Clicking a section nav link scrolls to that section smoothly
 - [ ] Download links work: PDF opens/downloads, DOCX opens/downloads
-- [ ] Header contact row includes both Email and Book Interview links
+- [ ] Header contact row includes both Email and Book Interview links with comfortable spacing (8px gaps)
+- [ ] "Chat with AI" link has subtle border to distinguish it as a feature (not a plain nav link)
 - [ ] Header link ("paulprae.com" or site name) returns to `/`
 - [ ] Content matches the latest approved resume (`data/generated/Paul-Prae-Resume.md`)
 

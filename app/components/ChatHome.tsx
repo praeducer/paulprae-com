@@ -45,7 +45,7 @@ const actionButtonClass =
   "rounded-md p-1.5 min-h-[32px] min-w-[32px] flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none dark:hover:bg-slate-800 dark:hover:text-slate-300";
 
 const navLinkClass =
-  "inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100";
+  "inline-flex min-h-[44px] items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100";
 
 // ─── Custom Thread Components ───────────────────────────────────────────────
 
@@ -224,7 +224,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
               >
                 {SITE_NAME}
               </Link>
-              <p className="hidden min-w-0 text-sm text-slate-500 sm:block dark:text-slate-400 truncate">
+              <p className="hidden min-w-0 text-sm text-slate-500 sm:block dark:text-slate-400 truncate lg:whitespace-normal lg:line-clamp-2">
                 {SITE_SUBTITLE}
               </p>
               <nav
@@ -265,7 +265,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                   href={BOOK_INTERVIEW_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-blue-700 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none dark:bg-blue-600 dark:hover:bg-blue-500"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-md bg-blue-700 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none dark:bg-blue-600 dark:hover:bg-blue-500"
                   aria-label="Book interview with Paul (opens in new tab)"
                   title="Book interview with Paul (opens in new tab)"
                 >

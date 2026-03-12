@@ -76,19 +76,15 @@ afterEach(() => {
     writable: true,
     value: originalIntersectionObserver,
   });
-  document.documentElement.style.removeProperty("--header-height");
   document.documentElement.style.removeProperty("--nav-height");
 });
 
 describe("SectionNav", () => {
   it("renders nav links and sets sticky CSS variables", () => {
     document.body.innerHTML = `
-      <header id="sticky-header"></header>
       <h2 id="summary">Summary</h2>
       <h2 id="experience">Experience</h2>
     `;
-    const header = document.getElementById("sticky-header");
-    Object.defineProperty(header, "offsetHeight", { configurable: true, value: 72 });
 
     render(
       <SectionNav
@@ -104,14 +100,12 @@ describe("SectionNav", () => {
     expect(screen.getByRole("link", { name: "Experience" }).getAttribute("href")).toBe(
       "#experience",
     );
-    expect(document.documentElement.style.getPropertyValue("--header-height")).toBe("72px");
     expect(resizeObservers.length).toBeGreaterThan(0);
     expect(intersectionObservers.length).toBeGreaterThan(0);
   });
 
   it("updates aria-current when observed section becomes active", async () => {
     document.body.innerHTML = `
-      <header id="sticky-header"></header>
       <h2 id="summary">Summary</h2>
       <h2 id="experience">Experience</h2>
     `;

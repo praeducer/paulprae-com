@@ -6,14 +6,14 @@
 
 :root {
   color-scheme: light dark;
-  /* --header-height and --nav-height are set dynamically by SectionNav's
-     ResizeObserver. --sticky-offset drives both scroll-padding-top and
-     the JS active-section threshold.
-     --nav-height defaults to 0 because the nav is hidden on mobile
-     (sm:block hidden) — JS sets the real value after hydration. */
-  --header-height: 100px;
+  /* --nav-height is set dynamically by SectionNav's ResizeObserver.
+     --sticky-offset drives both scroll-padding-top and the JS
+     active-section threshold. Only the section nav is sticky (the
+     resume header scrolls away), so the offset is just the nav height.
+     Defaults to 0 because the nav is hidden on mobile (sm:block hidden)
+     — JS sets the real value after hydration. */
   --nav-height: 0px;
-  --sticky-offset: calc(var(--header-height) + var(--nav-height));
+  --sticky-offset: var(--nav-height);
 }
 
 html {
