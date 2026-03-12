@@ -48,12 +48,6 @@
     ]
   },
   "job_preferences": {
-    "compensation": {
-      "annual_salary": 200000,
-      "bonus": 25000,
-      "total_compensation": 225000,
-      "currency": "USD"
-    },
     "employment_type": "Full-time",
     "location_preferences": "within 25 miles of Buford, GA or Atlanta, GA, United States",
     "work_arrangements": [

@@ -23,7 +23,6 @@ Generate a professional resume in Markdown format from the structured career dat
 
 - **Name:** Paul Prae
 - **Target roles:** Principal AI Engineer, Solutions Architect, Director of AI, Head of AI Engineering
-- **Target compensation:** $225,000+ (salary + bonus)
 - **Target companies:** NVIDIA, Microsoft, AWS, Google, Anthropic, Perplexity, Cursor, Mistral, and well-funded AI startups
 - **Key differentiators:** AI engineering leadership, healthcare domain expertise (Arine, BCBS, Humana ecosystem), Fortune 500 enterprise delivery (AWS, Microsoft, Slalom), full-stack spanning data engineering, ML systems, and cloud infrastructure
   </candidate_profile>
