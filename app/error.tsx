@@ -1,7 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { SITE_NAME, SITE_SUBTITLE } from "../lib/constants";
+import {
+  SITE_NAME,
+  SITE_SUBTITLE,
+  BUTTON_PRIMARY_CLASS,
+  BUTTON_SECONDARY_CLASS,
+} from "../lib/constants";
 
 export default function GlobalError({
   error,
@@ -22,17 +27,10 @@ export default function GlobalError({
         <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">Error ID: {error.digest}</p>
       )}
       <div className="mt-8 flex gap-4">
-        <button
-          type="button"
-          onClick={reset}
-          className="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-600 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none"
-        >
+        <button type="button" onClick={reset} className={BUTTON_PRIMARY_CLASS}>
           Try again
         </button>
-        <Link
-          href="/"
-          className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-        >
+        <Link href="/" className={BUTTON_SECONDARY_CLASS}>
           Go to homepage
         </Link>
       </div>

@@ -91,6 +91,19 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
   useEffect(() => {
     if (sections.length === 0) return;
 
+    // If URL has a hash matching a section (e.g. /resume#education),
+    // override scroll-spy during the browser's scroll-to-hash animation
+    // to prevent briefly highlighting the wrong section. The deferred
+    // scheduleUpdate() below picks up the override via updateActiveSection().
+    const hash = window.location.hash.slice(1);
+    if (hash && sections.some((s) => s.id === hash) && !clickOverrideRef.current) {
+      clickOverrideRef.current = hash;
+      if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = setTimeout(() => {
+        clickOverrideRef.current = null;
+      }, 1000);
+    }
+
     // Throttle scroll handler to ~60fps via rAF.
     // Initial detection also runs through rAF to avoid synchronous
     // setState inside the effect body (react-hooks/set-state-in-effect).

@@ -7,7 +7,7 @@ import remarkGfm from "remark-gfm";
 import { stripHtmlComments, stripHeaderBlock } from "../../lib/markdown";
 import { PATHS } from "../../lib/config";
 import { loadCareerData } from "../../lib/career-data";
-import { slugify } from "../../lib/ui-utils";
+import { slugify, externalLinkProps } from "../../lib/ui-utils";
 import { DownloadIcon } from "../components/Icons";
 import BookInterviewLink from "../components/BookInterviewLink";
 import SiteNav from "../components/SiteNav";
@@ -18,6 +18,7 @@ import {
   SITE_URL,
   SITE_OG_DESCRIPTION,
   GITHUB_URL,
+  FOOTER_LINK_CLASS,
   CONTACT_LINK_CLASS,
   RESUME_DOWNLOAD_PATHS,
   RESUME_PUBLIC_FILE_BASE,
@@ -170,18 +171,11 @@ export default function ResumePage() {
     },
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    a: ({ href, children, node, ...props }) => {
-      const isExternal = href?.startsWith("http");
-      return (
-        <a
-          href={href}
-          {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-          {...props}
-        >
-          {children}
-        </a>
-      );
-    },
+    a: ({ href, children, node, ...props }) => (
+      <a href={href} {...externalLinkProps(href)} {...props}>
+        {children}
+      </a>
+    ),
   };
 
   return (
@@ -287,12 +281,7 @@ export default function ResumePage() {
         <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-slate-600 dark:text-slate-400">
           <p>
             &copy; {new Date().getFullYear()} {profile.name} &mdash; AI-generated resume &mdash;{" "}
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-slate-600 underline hover:text-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:rounded focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-200"
-            >
+            <a href={GITHUB_URL} {...externalLinkProps(GITHUB_URL)} className={FOOTER_LINK_CLASS}>
               view pipeline on GitHub
             </a>
           </p>

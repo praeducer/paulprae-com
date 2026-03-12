@@ -25,7 +25,9 @@ import {
   SITE_DOMAIN,
   HERO_DESCRIPTION,
   GITHUB_URL,
+  FOOTER_LINK_CLASS,
 } from "../../lib/constants";
+import { externalLinkProps } from "../../lib/ui-utils";
 
 // ─── Markdown Text Wrapper ──────────────────────────────────────────────────
 
@@ -35,19 +37,16 @@ function MarkdownText() {
     <MarkdownTextPrimitive
       remarkPlugins={[remarkGfm]}
       components={{
-        a: ({ href, children, ...props }) => {
-          const isExternal = href?.startsWith("http");
-          return (
-            <a
-              href={href}
-              {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-              className="text-blue-700 underline hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
-              {...props}
-            >
-              {children}
-            </a>
-          );
-        },
+        a: ({ href, children, ...props }) => (
+          <a
+            href={href}
+            {...externalLinkProps(href)}
+            className="text-blue-700 underline hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+            {...props}
+          >
+            {children}
+          </a>
+        ),
       }}
     />
   );
@@ -383,12 +382,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
         <footer className="shrink-0 py-1.5 text-center">
           <p className="text-xs text-slate-400 dark:text-slate-500">
             {SITE_DOMAIN} &mdash; Built with Next.js, Claude AI, and Tailwind CSS &mdash;{" "}
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-slate-600 dark:hover:text-slate-300"
-            >
+            <a href={GITHUB_URL} {...externalLinkProps(GITHUB_URL)} className={FOOTER_LINK_CLASS}>
               view source
             </a>
           </p>

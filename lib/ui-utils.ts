@@ -11,3 +11,18 @@ export function slugify(text: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 }
+
+/**
+ * Returns `target="_blank"` and `rel="noopener noreferrer"` for external URLs.
+ * Returns an empty object for internal URLs so the attributes are omitted.
+ *
+ * Usage: `<a href={href} {...externalLinkProps(href)}>` in markdown renderers,
+ * footer links, and anywhere external links need safe defaults.
+ */
+export function externalLinkProps(href?: string): {
+  target?: "_blank";
+  rel?: "noopener noreferrer";
+} {
+  if (!href?.startsWith("http")) return {};
+  return { target: "_blank", rel: "noopener noreferrer" };
+}
