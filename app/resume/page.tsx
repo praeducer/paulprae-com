@@ -224,12 +224,12 @@ export default function ResumePage() {
               href={BOOK_INTERVIEW_URL}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Schedule an interview with Paul (opens in new tab)"
-              title="Schedule an interview with Paul (opens in new tab)"
-              className="inline-flex min-h-[44px] items-center gap-1 rounded-md bg-blue-50 px-3 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 hover:text-blue-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 dark:hover:text-blue-200"
+              aria-label="Book interview with Paul (opens in new tab)"
+              title="Book interview with Paul (opens in new tab)"
+              className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-md bg-blue-50 px-3.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 hover:text-blue-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 dark:hover:text-blue-200"
             >
               <CalendarIcon className="h-3.5 w-3.5" />
-              Schedule interview
+              Book Interview
             </a>
             {profile.linkedin && (
               <a

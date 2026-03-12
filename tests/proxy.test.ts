@@ -72,15 +72,13 @@ function makeRequest(pathname: string, method = "POST", origin: string | null = 
   };
 }
 
-const originalNodeEnv = process.env.NODE_ENV;
-
 describe("origin validation", () => {
   beforeEach(() => {
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
   });
 
   afterEach(() => {
-    process.env.NODE_ENV = originalNodeEnv;
+    vi.unstubAllEnvs();
   });
 
   it("exports expected static allowed origins", () => {
@@ -122,10 +120,10 @@ describe("origin validation", () => {
   });
 
   it("allows localhost only in development mode", () => {
-    process.env.NODE_ENV = "development";
+    vi.stubEnv("NODE_ENV", "development");
     expect(isAllowedOrigin("http://localhost:3000")).toBe(true);
 
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
     expect(isAllowedOrigin("http://localhost:3000")).toBe(false);
   });
 });

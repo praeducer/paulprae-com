@@ -101,9 +101,9 @@ describe("ChatHome", () => {
     expect(link.closest("a")?.getAttribute("href")).toBe("/resume");
   });
 
-  it("renders Schedule interview link", () => {
+  it("renders Book Interview link", () => {
     const { getByRole } = render(<ChatHome mode="chat" />);
-    const link = getByRole("link", { name: /schedule an interview with paul/i });
+    const link = getByRole("link", { name: /book interview with paul/i });
     expect(link).toBeTruthy();
     expect(link.getAttribute("href")).toBe(BOOK_INTERVIEW_URL);
     expect(link.getAttribute("target")).toBe("_blank");
