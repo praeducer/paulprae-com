@@ -11,6 +11,11 @@
 import { describe, it, expect, vi, beforeAll } from "vitest";
 import type { ReactNode } from "react";
 
+// SiteNav calls usePathname() — provide a mock for the test environment.
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/",
+}));
+
 // ResizeObserver is not available in JSDOM — stub it for SiteNav's header height measurement.
 beforeAll(() => {
   globalThis.ResizeObserver ??= class {

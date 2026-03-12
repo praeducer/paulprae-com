@@ -5,7 +5,7 @@ import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { stripHtmlComments, stripHeaderBlock } from "../../lib/markdown";
-import { PATHS, RESUME_FILE_BASE } from "../../lib/config";
+import { PATHS } from "../../lib/config";
 import { loadCareerData } from "../../lib/career-data";
 import { slugify } from "../../lib/ui-utils";
 import { DownloadIcon } from "../components/Icons";
@@ -18,6 +18,8 @@ import {
   SITE_OG_DESCRIPTION,
   GITHUB_URL,
   CONTACT_LINK_CLASS,
+  RESUME_DOWNLOAD_PATHS,
+  RESUME_PUBLIC_FILE_BASE,
 } from "../../lib/constants";
 import BackToTop from "./components/BackToTop";
 import SectionNav from "./components/SectionNav";
@@ -136,15 +138,15 @@ export default function ResumePage() {
   const cleanMarkdown = stripHtmlComments(resumeMarkdown);
 
   const profile = careerData.profile;
-  const pdfPath = `/${RESUME_FILE_BASE}.pdf`;
-  const docxPath = `/${RESUME_FILE_BASE}.docx`;
-  const mdPath = `/${RESUME_FILE_BASE}.md`;
+  const pdfPath = RESUME_DOWNLOAD_PATHS.pdf;
+  const docxPath = RESUME_DOWNLOAD_PATHS.docx;
+  const mdPath = RESUME_DOWNLOAD_PATHS.md;
 
   // Read file sizes at build time for download button labels
   const publicDir = path.join(process.cwd(), "public");
-  const pdfSize = getFileSize(path.join(publicDir, `${RESUME_FILE_BASE}.pdf`));
-  const docxSize = getFileSize(path.join(publicDir, `${RESUME_FILE_BASE}.docx`));
-  const mdSize = getFileSize(path.join(publicDir, `${RESUME_FILE_BASE}.md`));
+  const pdfSize = getFileSize(path.join(publicDir, `${RESUME_PUBLIC_FILE_BASE}.pdf`));
+  const docxSize = getFileSize(path.join(publicDir, `${RESUME_PUBLIC_FILE_BASE}.docx`));
+  const mdSize = getFileSize(path.join(publicDir, `${RESUME_PUBLIC_FILE_BASE}.md`));
 
   // Strip the header block (H1 + contact line + HR) — already shown in the
   // sticky header, so we don't render it again in the body.

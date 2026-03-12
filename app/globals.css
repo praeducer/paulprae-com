@@ -10,9 +10,10 @@
      --nav-height is set by SectionNav's ResizeObserver (resume section nav).
      --sticky-offset drives scroll-padding-top and scroll-margin-top so
      anchor links land below all sticky elements.
-     Both default to 0 — JS sets real values after hydration. */
-  --header-height: 0px;
-  --nav-height: 0px;
+     Conservative fallbacks so deep links (e.g. /resume#experience) land
+     below sticky elements before JS hydrates. Overwritten after hydration. */
+  --header-height: 64px;
+  --nav-height: 48px;
   --sticky-offset: calc(var(--header-height) + var(--nav-height));
 }
 

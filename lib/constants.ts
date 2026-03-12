@@ -35,10 +35,15 @@ export const GITHUB_PROFILE_URL = "https://github.com/praeducer";
 
 // ─── Resume Downloads ───────────────────────────────────────────────────────
 
+/** Public-facing base filename (without extension) for resume downloads.
+ *  Must match the pipeline output in lib/config.ts (derived from career-data.json profile.name).
+ *  If the name changes there, update here too — `npm run check` will catch mismatches. */
+export const RESUME_PUBLIC_FILE_BASE = "Paul-Prae-Resume";
+
 export const RESUME_DOWNLOAD_PATHS = {
-  pdf: "/Paul-Prae-Resume.pdf",
-  docx: "/Paul-Prae-Resume.docx",
-  md: "/Paul-Prae-Resume.md",
+  pdf: `/${RESUME_PUBLIC_FILE_BASE}.pdf`,
+  docx: `/${RESUME_PUBLIC_FILE_BASE}.docx`,
+  md: `/${RESUME_PUBLIC_FILE_BASE}.md`,
   web: "/resume",
 } as const;
 

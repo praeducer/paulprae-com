@@ -142,7 +142,10 @@ async function initRateLimit() {
       const { Redis } = await import("@upstash/redis");
       ratelimit = new Ratelimit({
         redis: Redis.fromEnv(),
-        limiter: Ratelimit.slidingWindow(RATE_LIMIT_CONFIG.maxRequests, "1 m"),
+        limiter: Ratelimit.slidingWindow(
+          RATE_LIMIT_CONFIG.maxRequests,
+          `${RATE_LIMIT_CONFIG.windowMs / 1000} s`,
+        ),
         analytics: true,
         prefix: RATE_LIMIT_CONFIG.prefix,
       });

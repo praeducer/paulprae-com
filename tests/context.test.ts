@@ -10,6 +10,7 @@
 import { describe, it, expect } from "vitest";
 import { loadCareerContext, buildSystemPrompt } from "../lib/agent/context";
 import { stripEmpty } from "../lib/data-utils";
+import { RESUME_DOWNLOAD_PATHS, BOOK_INTERVIEW_URL } from "../lib/constants";
 
 // ─── loadCareerContext ──────────────────────────────────────────────────────
 
@@ -76,17 +77,17 @@ describe("buildSystemPrompt", () => {
     expect(prompt).not.toContain("{{RESUME_MD_PATH}}");
     expect(prompt).not.toContain("{{RESUME_WEB_PATH}}");
     // Actual paths should be present
-    expect(prompt).toContain("/Paul-Prae-Resume.pdf");
-    expect(prompt).toContain("/Paul-Prae-Resume.docx");
-    expect(prompt).toContain("/Paul-Prae-Resume.md");
-    expect(prompt).toContain("/resume");
+    expect(prompt).toContain(RESUME_DOWNLOAD_PATHS.pdf);
+    expect(prompt).toContain(RESUME_DOWNLOAD_PATHS.docx);
+    expect(prompt).toContain(RESUME_DOWNLOAD_PATHS.md);
+    expect(prompt).toContain(RESUME_DOWNLOAD_PATHS.web);
   });
 
   it("injects booking URL into system prompt", () => {
     const prompt = buildSystemPrompt("chat");
     expect(prompt).not.toBeNull();
     expect(prompt).not.toContain("{{BOOK_INTERVIEW_URL}}");
-    expect(prompt).toContain("outlook.office.com/bookwithme");
+    expect(prompt).toContain(BOOK_INTERVIEW_URL);
   });
 
   it("injects company data into chat system prompt", () => {

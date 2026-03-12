@@ -59,7 +59,11 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
     // When scrolled to the very bottom, force-activate the last section.
     // Without this, short final sections (Projects, Publications) can never
     // become active because the page bottoms out before they cross the threshold.
-    const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 2;
+    const scrollHeight = Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight,
+    );
+    const atBottom = window.innerHeight + window.scrollY >= scrollHeight - 2;
     if (atBottom) {
       setActiveId(sections[sections.length - 1].id);
       return;
