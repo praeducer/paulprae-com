@@ -10,6 +10,7 @@ import {
   ActionBarPrimitive,
   useComposer,
   useMessage,
+  useAuiState,
 } from "@assistant-ui/react";
 import { useAISDKRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
@@ -53,28 +54,55 @@ function MarkdownText() {
 }
 
 // ─── Thinking Indicator ────────────────────────────────────────────────────
-// Breathing dot animation shown in the assistant bubble before tokens arrive.
-// Uses useMessage to detect running state with no text content yet.
-// Accessible: role="status" for screen readers, sr-only fallback text,
-// respects prefers-reduced-motion (see globals.css).
+// Breathing dots shown while the assistant is generating a response.
+// Two layers ensure coverage across the full message lifecycle:
+//   1. MessageThinking — inside AssistantMessage, hides once tokens stream in
+//   2. ThreadThinking  — standalone bubble below all messages, covers the gap
+//      before assistant-ui creates the AssistantMessage component
+// Mirrors the Claude.ai pattern. Accessible via role="status".
+// Respects prefers-reduced-motion (see globals.css).
 
-function ThinkingIndicator() {
-  const showThinking = useMessage((m) => {
+const thinkingDotClass = "thinking-dot h-2 w-2 rounded-full bg-slate-400 dark:bg-slate-500";
+
+function ThinkingDots() {
+  return (
+    <div role="status" aria-label="Generating response">
+      <span className="sr-only">Thinking…</span>
+      <div className="flex items-center gap-1.5" aria-hidden="true">
+        <span className={thinkingDotClass} />
+        <span className={thinkingDotClass} />
+        <span className={thinkingDotClass} />
+      </div>
+    </div>
+  );
+}
+
+/** Inside AssistantMessage — shows until text tokens start streaming. */
+function MessageThinking() {
+  const show = useMessage((m) => {
     if (m.role !== "assistant") return false;
     return (
       m.status.type === "running" && !m.content.some((p) => p.type === "text" && p.text.length > 0)
     );
   });
+  return show ? <ThinkingDots /> : null;
+}
 
-  if (!showThinking) return null;
+/** Thread-level — standalone bubble shown when running but no assistant message exists yet. */
+function ThreadThinking() {
+  const isRunning = useAuiState((s) => s.thread.isRunning);
+  // Check if the last message is already an assistant message (MessageThinking handles that case).
+  const lastIsAssistant = useAuiState((s) => {
+    const msgs = s.thread.messages;
+    return msgs.length > 0 && msgs[msgs.length - 1].role === "assistant";
+  });
+
+  if (!isRunning || lastIsAssistant) return null;
 
   return (
-    <div role="status" aria-label="Generating response">
-      <span className="sr-only">Thinking…</span>
-      <div className="flex items-center gap-1.5" aria-hidden="true">
-        <span className="thinking-dot h-2 w-2 rounded-full bg-slate-400 dark:bg-slate-500" />
-        <span className="thinking-dot h-2 w-2 rounded-full bg-slate-400 dark:bg-slate-500" />
-        <span className="thinking-dot h-2 w-2 rounded-full bg-slate-400 dark:bg-slate-500" />
+    <div className="chat-message-in flex justify-start mb-5">
+      <div className="rounded-2xl bg-slate-100 px-5 py-4 dark:bg-slate-800/80">
+        <ThinkingDots />
       </div>
     </div>
   );
@@ -111,7 +139,7 @@ function AssistantMessage() {
               Text: MarkdownText,
             }}
           />
-          <ThinkingIndicator />
+          <MessageThinking />
         </div>
         <ActionBarPrimitive.Root className="flex gap-1 opacity-100 sm:opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
           <ActionBarPrimitive.Copy asChild>
@@ -329,6 +357,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                       AssistantMessage,
                     }}
                   />
+                  <ThreadThinking />
                 </div>
               </div>
 

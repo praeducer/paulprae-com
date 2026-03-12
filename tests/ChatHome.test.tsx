@@ -60,6 +60,12 @@ vi.mock("@assistant-ui/react", () => {
       selector
         ? selector({ role: "assistant", status: { type: "complete" }, content: [] })
         : { role: "assistant", status: { type: "complete" }, content: [] },
+    useAuiState: (
+      selector?: (state: { thread: { isRunning: boolean; messages: never[] } }) => unknown,
+    ) =>
+      selector
+        ? selector({ thread: { isRunning: false, messages: [] } })
+        : { thread: { isRunning: false, messages: [] } },
   };
 });
 
