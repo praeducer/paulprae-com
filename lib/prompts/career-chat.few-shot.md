@@ -55,9 +55,9 @@ What would be most useful?
 
 **Assistant:** Paul's resume is available in multiple formats:
 
-- **PDF** — [Download PDF](/Paul-Prae-Resume.pdf) (best for printing and ATS systems)
-- **DOCX** — [Download DOCX](/Paul-Prae-Resume.docx) (editable, for recruiter markup)
-- **Markdown** — [Download MD](/Paul-Prae-Resume.md) (plain text)
-- **Web** — [View full resume](/resume) (interactive, with section navigation)
+- **PDF** — [Download PDF]({{RESUME_PDF_PATH}}) (best for printing and ATS systems)
+- **DOCX** — [Download DOCX]({{RESUME_DOCX_PATH}}) (editable, for recruiter markup)
+- **Markdown** — [Download MD]({{RESUME_MD_PATH}}) (plain text)
+- **Web** — [View full resume]({{RESUME_WEB_PATH}}) (interactive, with section navigation)
 
 Would you like a tailored version of Paul's resume for a specific role? Just paste the job description and I'll generate one optimized for that position.

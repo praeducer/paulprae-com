@@ -49,6 +49,28 @@ describe("buildSystemPrompt", () => {
     expect(prompt!.toLowerCase()).toMatch(/tailor/);
   });
 
+  it("injects resume download paths into system prompt", () => {
+    const prompt = buildSystemPrompt("chat");
+    expect(prompt).not.toBeNull();
+    // Template variables should be replaced with actual paths, not remain as placeholders
+    expect(prompt).not.toContain("{{RESUME_PDF_PATH}}");
+    expect(prompt).not.toContain("{{RESUME_DOCX_PATH}}");
+    expect(prompt).not.toContain("{{RESUME_MD_PATH}}");
+    expect(prompt).not.toContain("{{RESUME_WEB_PATH}}");
+    // Actual paths should be present
+    expect(prompt).toContain("/Paul-Prae-Resume.pdf");
+    expect(prompt).toContain("/Paul-Prae-Resume.docx");
+    expect(prompt).toContain("/Paul-Prae-Resume.md");
+    expect(prompt).toContain("/resume");
+  });
+
+  it("injects booking URL into system prompt", () => {
+    const prompt = buildSystemPrompt("chat");
+    expect(prompt).not.toBeNull();
+    expect(prompt).not.toContain("{{BOOK_INTERVIEW_URL}}");
+    expect(prompt).toContain("outlook.office.com/bookwithme");
+  });
+
   it("replaces outdated '15 years' in career data with canonical figure", () => {
     const prompt = buildSystemPrompt("chat");
     expect(prompt).not.toBeNull();

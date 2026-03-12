@@ -14,7 +14,7 @@ import { loadCareerData } from "../career-data";
 import { stripEmpty } from "../data-utils";
 import type { CareerData } from "../types";
 import { loadPrompt } from "../prompts/loader";
-import { YEARS_EXPERIENCE, BOOK_INTERVIEW_URL } from "../constants";
+import { YEARS_EXPERIENCE, BOOK_INTERVIEW_URL, RESUME_DOWNLOAD_PATHS } from "../constants";
 
 // ─── Knowledge Base Paths ────────────────────────────────────────────────────
 
@@ -111,7 +111,11 @@ export function buildSystemPrompt(mode: PromptMode): string | null {
   let prompt = template
     .replace("{{CAREER_DATA}}", careerDataJson)
     .replace("{{AUDIENCE_FRAMEWORKS}}", audienceJson)
-    .replace("{{BOOK_INTERVIEW_URL}}", BOOK_INTERVIEW_URL);
+    .replace("{{BOOK_INTERVIEW_URL}}", BOOK_INTERVIEW_URL)
+    .replace(/\{\{RESUME_PDF_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.pdf)
+    .replace(/\{\{RESUME_DOCX_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.docx)
+    .replace(/\{\{RESUME_MD_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.md)
+    .replace(/\{\{RESUME_WEB_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.web);
 
   // Tools mode has additional placeholders
   if (mode === "tools") {
