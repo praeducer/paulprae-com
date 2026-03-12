@@ -9,6 +9,7 @@ import {
   ComposerPrimitive,
   ActionBarPrimitive,
   useComposer,
+  useMessage,
 } from "@assistant-ui/react";
 import { useAISDKRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
@@ -51,6 +52,34 @@ function MarkdownText() {
   );
 }
 
+// ─── Thinking Indicator ────────────────────────────────────────────────────
+// Breathing dot animation shown in the assistant bubble before tokens arrive.
+// Uses useMessage to detect running state with no text content yet.
+// Accessible: role="status" for screen readers, sr-only fallback text,
+// respects prefers-reduced-motion (see globals.css).
+
+function ThinkingIndicator() {
+  const showThinking = useMessage((m) => {
+    if (m.role !== "assistant") return false;
+    return (
+      m.status.type === "running" && !m.content.some((p) => p.type === "text" && p.text.length > 0)
+    );
+  });
+
+  if (!showThinking) return null;
+
+  return (
+    <div role="status" aria-label="Generating response">
+      <span className="sr-only">Thinking…</span>
+      <div className="flex items-center gap-1.5" aria-hidden="true">
+        <span className="thinking-dot h-2 w-2 rounded-full bg-slate-400 dark:bg-slate-500" />
+        <span className="thinking-dot h-2 w-2 rounded-full bg-slate-400 dark:bg-slate-500" />
+        <span className="thinking-dot h-2 w-2 rounded-full bg-slate-400 dark:bg-slate-500" />
+      </div>
+    </div>
+  );
+}
+
 // ─── Shared Styles ──────────────────────────────────────────────────────────
 
 const actionButtonClass =
@@ -60,7 +89,7 @@ const actionButtonClass =
 
 function UserMessage() {
   return (
-    <MessagePrimitive.Root className="flex justify-end mb-5">
+    <MessagePrimitive.Root className="chat-message-in flex justify-end mb-5">
       <div className="max-w-[85%] rounded-2xl bg-blue-700 px-4 py-3 text-sm text-white dark:bg-blue-800">
         <MessagePrimitive.Content
           components={{
@@ -74,7 +103,7 @@ function UserMessage() {
 
 function AssistantMessage() {
   return (
-    <MessagePrimitive.Root className="flex justify-start group mb-5">
+    <MessagePrimitive.Root className="chat-message-in flex justify-start group mb-5">
       <div className="max-w-[80%] space-y-2">
         <div className="rounded-2xl bg-slate-100 px-5 py-4 text-sm leading-relaxed text-slate-900 prose prose-sm prose-slate max-w-none prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-li:my-0.5 prose-table:border-collapse prose-th:border prose-th:border-slate-300 prose-th:px-3 prose-th:py-1.5 prose-th:text-left prose-td:border prose-td:border-slate-300 prose-td:px-3 prose-td:py-1.5 dark:bg-slate-800/80 dark:text-slate-100 dark:prose-invert dark:prose-th:border-slate-600 dark:prose-td:border-slate-600 overflow-x-auto">
           <MessagePrimitive.Content
@@ -82,6 +111,7 @@ function AssistantMessage() {
               Text: MarkdownText,
             }}
           />
+          <ThinkingIndicator />
         </div>
         <ActionBarPrimitive.Root className="flex gap-1 opacity-100 sm:opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
           <ActionBarPrimitive.Copy asChild>

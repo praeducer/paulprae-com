@@ -51,6 +51,10 @@ vi.mock("@assistant-ui/react", () => {
     },
     useComposer: (selector?: (state: { text: string }) => unknown) =>
       selector ? selector({ text: "" }) : { text: "" },
+    useMessage: (selector?: (state: Record<string, unknown>) => unknown) =>
+      selector
+        ? selector({ role: "assistant", status: { type: "complete" }, content: [] })
+        : { role: "assistant", status: { type: "complete" }, content: [] },
   };
 });
 
