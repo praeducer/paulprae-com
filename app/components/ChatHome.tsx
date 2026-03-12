@@ -44,6 +44,9 @@ function MarkdownText() {
 const actionButtonClass =
   "rounded-md p-1.5 min-h-[32px] min-w-[32px] flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none dark:hover:bg-slate-800 dark:hover:text-slate-300";
 
+const navLinkClass =
+  "inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100";
+
 // ─── Custom Thread Components ───────────────────────────────────────────────
 
 function UserMessage() {
@@ -233,7 +236,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                   onClick={() => {
                     window.location.href = mode === "tools" ? "/tools" : "/";
                   }}
-                  className="inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                  className={navLinkClass}
                   title="Start a new conversation"
                   aria-label="New conversation"
                 >
@@ -241,23 +244,17 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                   <span className="hidden sm:inline">New chat</span>
                 </button>
                 {mode === "tools" && (
-                  <Link
-                    href="/"
-                    className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-                  >
+                  <Link href="/" className={navLinkClass}>
                     Chat with AI
                   </Link>
                 )}
-                <Link
-                  href="/resume"
-                  className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-                >
+                <Link href="/resume" className={navLinkClass}>
                   Resume
                 </Link>
                 <a
                   href="/Paul-Prae-Resume.pdf"
                   download
-                  className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                  className={navLinkClass}
                   aria-label="Download resume as PDF"
                   title="Download resume as PDF"
                 >

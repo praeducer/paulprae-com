@@ -199,12 +199,12 @@ export default function ResumePage() {
             >
               {profile.name}
             </Link>
-            <p className="hidden sm:block text-sm text-slate-500 dark:text-slate-400 truncate">
+            <p className="hidden min-w-0 sm:block text-sm text-slate-500 dark:text-slate-400 truncate">
               {SITE_SUBTITLE}
             </p>
             <Link
               href="/"
-              className="ml-auto shrink-0 inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              className="ml-auto shrink-0 inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
             >
               Chat with AI
             </Link>
