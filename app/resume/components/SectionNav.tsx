@@ -22,6 +22,10 @@ interface Section {
 export default function SectionNav({ sections }: { sections: Section[] }) {
   const [activeId, setActiveId] = useState<string>("");
   const navRef = useRef<HTMLElement>(null);
+  // Temporarily override scroll-spy after a nav click so the clicked
+  // section stays highlighted while the browser settles the scroll.
+  const clickOverrideRef = useRef<string | null>(null);
+  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Publish --nav-height so scroll-padding-top accounts for this
   // sticky bar via --sticky-offset.
@@ -58,6 +62,12 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
     const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 2;
     if (atBottom) {
       setActiveId(sections[sections.length - 1].id);
+      return;
+    }
+
+    // If a nav link was just clicked, honour that override until scroll settles.
+    if (clickOverrideRef.current) {
+      setActiveId(clickOverrideRef.current);
       return;
     }
 
@@ -111,6 +121,16 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
             key={s.id}
             href={`#${s.id}`}
             aria-current={activeId === s.id ? "true" : undefined}
+            onClick={() => {
+              // Override scroll-spy for 1s so the clicked section stays
+              // highlighted while the browser finishes scrolling.
+              clickOverrideRef.current = s.id;
+              setActiveId(s.id);
+              if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+              clickTimerRef.current = setTimeout(() => {
+                clickOverrideRef.current = null;
+              }, 1000);
+            }}
             className={`inline-flex min-h-[44px] shrink-0 items-center rounded-md px-2.5 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none ${
               activeId === s.id
                 ? "bg-slate-200 font-medium text-slate-900 dark:bg-slate-700 dark:text-slate-100"
