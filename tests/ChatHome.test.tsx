@@ -125,11 +125,13 @@ describe("ChatHome", () => {
     expect(link.closest("a")?.getAttribute("href")).toBe("/resume");
   });
 
-  it("renders Book Interview link", () => {
-    const { getByRole } = render(<ChatHome mode="chat" />);
-    const link = getByRole("link", { name: /book interview with paul/i });
-    expect(link).toBeTruthy();
-    expect(link.getAttribute("href")).toBe(BOOK_INTERVIEW_URL);
-    expect(link.getAttribute("target")).toBe("_blank");
+  it("renders Book Interview links in header and quick actions", () => {
+    const { getAllByRole } = render(<ChatHome mode="chat" />);
+    const links = getAllByRole("link", { name: /book interview with paul/i });
+    expect(links.length).toBe(2);
+    for (const link of links) {
+      expect(link.getAttribute("href")).toBe(BOOK_INTERVIEW_URL);
+      expect(link.getAttribute("target")).toBe("_blank");
+    }
   });
 });

@@ -106,6 +106,7 @@ export default function QuickActions({ mode, onAction, onPrefill }: QuickActions
               href={action.url}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Book interview with Paul (opens in new tab)"
               className={ctaChipClass}
             >
               <CalendarIcon className="h-3 w-3" />

@@ -56,6 +56,13 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
     // sticky area plus a small buffer (24px breathing room).
     const threshold = offset + 24;
 
+    // Click override takes precedence — prevents desync between click
+    // highlight and scroll-spy during smooth-scroll animation.
+    if (clickOverrideRef.current) {
+      setActiveId(clickOverrideRef.current);
+      return;
+    }
+
     // When scrolled to the very bottom, force-activate the last section.
     // Without this, short final sections (Projects, Publications) can never
     // become active because the page bottoms out before they cross the threshold.
@@ -69,13 +76,8 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
       return;
     }
 
-    // If a nav link was just clicked, honour that override until scroll settles.
-    if (clickOverrideRef.current) {
-      setActiveId(clickOverrideRef.current);
-      return;
-    }
-
-    let bestId = "";
+    // Default to first section when scrolled above all headings.
+    let bestId = sections[0].id;
     for (const section of sections) {
       const el = document.getElementById(section.id);
       if (el && el.getBoundingClientRect().top <= threshold) {

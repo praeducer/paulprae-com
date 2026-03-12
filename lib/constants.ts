@@ -51,7 +51,7 @@ export const RESUME_DOWNLOAD_PATHS = {
 
 /** Standard nav link — used for Resume, PDF download, contextual button. */
 export const NAV_LINK_CLASS =
-  "inline-flex min-h-[44px] items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100";
+  "inline-flex min-h-[44px] cursor-pointer items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100";
 
 /** Primary CTA button — solid blue, used for Book Interview. */
 export const CTA_BUTTON_CLASS =

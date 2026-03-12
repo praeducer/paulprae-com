@@ -17,22 +17,33 @@ import {
  * Shared site navigation header — rendered identically on every page.
  *
  * Uses `usePathname()` to swap the contextual first nav item:
- * - `/resume`  → "Chat with AI" (Link, SPA navigation)
- * - `/`, `/tools` → "New chat" (button, hard reload to reset state)
+ * - `/`         → "New chat" (button, hard reload to reset state)
+ * - all others  → "Chat with AI" (Link, SPA navigation, subtle border)
  *
  * Accepts optional `children` for page-specific secondary rows
  * (e.g. resume page's contact + download row) — server-rendered
  * content can be passed via the Next.js "donut pattern".
  */
-export default function SiteNav({ children }: { children?: React.ReactNode }) {
+export default function SiteNav({
+  children,
+  sticky = true,
+}: {
+  children?: React.ReactNode;
+  sticky?: boolean;
+}) {
   const pathname = usePathname();
-  const isResume = pathname === "/resume";
-  const isTools = pathname === "/tools";
+  const isChat = pathname === "/";
   const headerRef = useRef<HTMLElement>(null);
 
   // Publish --header-height so downstream sticky elements (e.g. SectionNav)
   // and scroll-padding-top can account for the sticky header.
+  // When the header scrolls away (sticky=false), set 0px so SectionNav
+  // sticks to the viewport top.
   useEffect(() => {
+    if (!sticky) {
+      document.documentElement.style.setProperty("--header-height", "0px");
+      return;
+    }
     const header = headerRef.current;
     if (!header) return;
     const sync = () => {
@@ -42,12 +53,12 @@ export default function SiteNav({ children }: { children?: React.ReactNode }) {
     const ro = new ResizeObserver(sync);
     ro.observe(header);
     return () => ro.disconnect();
-  }, []);
+  }, [sticky]);
 
   return (
     <header
       ref={headerRef}
-      className="no-print sticky top-0 z-40 shrink-0 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95"
+      className={`no-print ${sticky ? "sticky top-0" : "relative"} z-40 shrink-0 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95`}
     >
       <div className="mx-auto max-w-3xl px-6 py-3">
         <div className="flex items-baseline gap-3">
@@ -64,16 +75,11 @@ export default function SiteNav({ children }: { children?: React.ReactNode }) {
             className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3"
             aria-label="Site navigation"
           >
-            {isResume ? (
-              <Link href="/" className={NAV_LINK_CLASS} aria-label="Chat with Paul's AI assistant">
-                <ChatIcon className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Chat with AI</span>
-              </Link>
-            ) : (
+            {isChat ? (
               <button
                 type="button"
                 onClick={() => {
-                  window.location.href = isTools ? "/tools" : "/";
+                  window.location.href = "/";
                 }}
                 className={NAV_LINK_CLASS}
                 title="Start a new conversation"
@@ -82,6 +88,15 @@ export default function SiteNav({ children }: { children?: React.ReactNode }) {
                 <ChatIcon className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">New chat</span>
               </button>
+            ) : (
+              <Link
+                href="/"
+                className={`${NAV_LINK_CLASS} border border-slate-200 dark:border-slate-700`}
+                aria-label="Chat with Paul's AI assistant"
+              >
+                <ChatIcon className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Chat with AI</span>
+              </Link>
             )}
             <Link href="/resume" className={NAV_LINK_CLASS}>
               Resume
