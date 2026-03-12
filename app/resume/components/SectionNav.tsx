@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 interface Section {
   id: string;
@@ -9,17 +9,22 @@ interface Section {
 
 /**
  * Compact horizontal section navigation bar.
- * Highlights the currently visible section using IntersectionObserver.
+ * Highlights the currently visible section using a scroll-based algorithm.
  * Sticks below the sticky header using top: var(--header-height).
  * Hidden on print via the no-print class.
+ *
+ * Active section detection: on each scroll frame, reads --sticky-offset
+ * from computed style and picks the LAST heading whose top has scrolled
+ * past that threshold. This matches the standard scroll-spy pattern
+ * (Bootstrap, Tailwind docs, MDN) and avoids the rootMargin sync
+ * issues of IntersectionObserver with dynamic sticky offsets.
  */
 export default function SectionNav({ sections }: { sections: Section[] }) {
   const [activeId, setActiveId] = useState<string>("");
   const navRef = useRef<HTMLElement>(null);
 
-  // Track the nav height so CSS custom properties (--nav-height) reflect
-  // the true rendered size. This drives scroll-padding-top and
-  // scroll-margin-top via --sticky-offset.
+  // Publish --nav-height so scroll-padding-top and scroll-margin-top
+  // account for this sticky bar via --sticky-offset.
   useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
@@ -34,71 +39,53 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
     return () => ro.disconnect();
   }, []);
 
-  // Track which section is active using IntersectionObserver.
-  // Each section heading is observed; the last one to cross the
-  // sticky offset threshold becomes "active". More reliable than
-  // scroll-based calculation because it handles dynamic content
-  // and avoids measuring getComputedStyle on every scroll frame.
+  // Scroll-based active section detection.
+  // Reads --sticky-offset from CSS (set by SiteNav + this component) and
+  // picks the last heading whose top edge has crossed that threshold.
+  const updateActiveSection = useCallback(() => {
+    if (sections.length === 0) return;
+
+    const offset =
+      parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sticky-offset")) ||
+      0;
+    // Threshold: heading is "active" once its top is at or above the
+    // sticky area plus a small buffer (24px breathing room).
+    const threshold = offset + 24;
+
+    let bestId = "";
+    for (const section of sections) {
+      const el = document.getElementById(section.id);
+      if (el && el.getBoundingClientRect().top <= threshold) {
+        bestId = section.id;
+      }
+    }
+
+    setActiveId(bestId);
+  }, [sections]);
+
   useEffect(() => {
     if (sections.length === 0) return;
 
-    // Build a map of section positions for fallback ordering
-    const sectionOrder = new Map(sections.map((s, i) => [s.id, i]));
+    // Throttle scroll handler to ~60fps via rAF.
+    // Initial detection also runs through rAF to avoid synchronous
+    // setState inside the effect body (react-hooks/set-state-in-effect).
+    let ticking = false;
+    const scheduleUpdate = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          updateActiveSection();
+          ticking = false;
+        });
+      }
+    };
 
-    // Track which sections are currently intersecting
-    const visibleSections = new Set<string>();
+    // Initial detection (deferred)
+    scheduleUpdate();
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const id = entry.target.id;
-          if (entry.isIntersecting) {
-            visibleSections.add(id);
-          } else {
-            visibleSections.delete(id);
-          }
-        }
-
-        // Pick the last (lowest on page) visible section heading
-        let bestId = "";
-        let bestOrder = -1;
-        for (const id of visibleSections) {
-          const order = sectionOrder.get(id) ?? -1;
-          if (order > bestOrder) {
-            bestOrder = order;
-            bestId = id;
-          }
-        }
-
-        // If no headings are in view, find the last one scrolled past
-        if (!bestId) {
-          for (const section of sections) {
-            const el = document.getElementById(section.id);
-            if (el && el.getBoundingClientRect().top < window.innerHeight * 0.3) {
-              bestId = section.id;
-            }
-          }
-        }
-
-        setActiveId(bestId);
-      },
-      {
-        // Negative top margin accounts for sticky nav.
-        // Uses a generous margin so headings are detected before
-        // they reach the very top of the viewport.
-        rootMargin: "-80px 0px -60% 0px",
-        threshold: 0,
-      },
-    );
-
-    // Observe all section heading elements
-    for (const section of sections) {
-      const el = document.getElementById(section.id);
-      if (el) observer.observe(el);
-    }
-
-    return () => observer.disconnect();
-  }, [sections]);
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    return () => window.removeEventListener("scroll", scheduleUpdate);
+  }, [sections, updateActiveSection]);
 
   if (sections.length === 0) return null;
 

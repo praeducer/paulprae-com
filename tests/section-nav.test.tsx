@@ -13,21 +13,13 @@ interface ResizeObserverLike {
   disconnect: ReturnType<typeof vi.fn>;
 }
 
-interface IntersectionObserverLike {
-  observe: ReturnType<typeof vi.fn>;
-  disconnect: ReturnType<typeof vi.fn>;
-  trigger: (entries: Array<{ target: Element; isIntersecting: boolean }>) => void;
-}
-
 const resizeObservers: ResizeObserverLike[] = [];
-const intersectionObservers: IntersectionObserverLike[] = [];
 
 const originalResizeObserver = globalThis.ResizeObserver;
-const originalIntersectionObserver = globalThis.IntersectionObserver;
+const originalRAF = globalThis.requestAnimationFrame;
 
 beforeEach(() => {
   resizeObservers.length = 0;
-  intersectionObservers.length = 0;
 
   class MockResizeObserver {
     observe = vi.fn();
@@ -37,32 +29,17 @@ beforeEach(() => {
     }
   }
 
-  class MockIntersectionObserver {
-    observe = vi.fn();
-    disconnect = vi.fn();
-    private callback: IntersectionObserverCallback;
-
-    constructor(callback: IntersectionObserverCallback) {
-      this.callback = callback;
-      intersectionObservers.push(this);
-    }
-
-    trigger(entries: Array<{ target: Element; isIntersecting: boolean }>) {
-      this.callback(entries as unknown as IntersectionObserverEntry[], this as never);
-    }
-  }
-
   Object.defineProperty(globalThis, "ResizeObserver", {
     configurable: true,
     writable: true,
     value: MockResizeObserver,
   });
 
-  Object.defineProperty(globalThis, "IntersectionObserver", {
-    configurable: true,
-    writable: true,
-    value: MockIntersectionObserver,
-  });
+  // Synchronous rAF for predictable test timing
+  globalThis.requestAnimationFrame = (cb: FrameRequestCallback) => {
+    cb(0);
+    return 0;
+  };
 });
 
 afterEach(() => {
@@ -71,12 +48,9 @@ afterEach(() => {
     writable: true,
     value: originalResizeObserver,
   });
-  Object.defineProperty(globalThis, "IntersectionObserver", {
-    configurable: true,
-    writable: true,
-    value: originalIntersectionObserver,
-  });
+  globalThis.requestAnimationFrame = originalRAF;
   document.documentElement.style.removeProperty("--nav-height");
+  document.documentElement.style.removeProperty("--sticky-offset");
 });
 
 describe("SectionNav", () => {
@@ -101,14 +75,43 @@ describe("SectionNav", () => {
       "#experience",
     );
     expect(resizeObservers.length).toBeGreaterThan(0);
-    expect(intersectionObservers.length).toBeGreaterThan(0);
   });
 
-  it("updates aria-current when observed section becomes active", async () => {
+  it("updates aria-current based on scroll position", async () => {
     document.body.innerHTML = `
       <h2 id="summary">Summary</h2>
       <h2 id="experience">Experience</h2>
     `;
+
+    // Mock --sticky-offset and element positions
+    document.documentElement.style.setProperty("--sticky-offset", "100px");
+
+    const summaryEl = document.getElementById("summary")!;
+    const experienceEl = document.getElementById("experience")!;
+
+    // Simulate "experience" heading scrolled past the threshold (top <= 124px)
+    vi.spyOn(summaryEl, "getBoundingClientRect").mockReturnValue({
+      top: -200,
+      bottom: -180,
+      left: 0,
+      right: 800,
+      width: 800,
+      height: 20,
+      x: 0,
+      y: -200,
+      toJSON: () => {},
+    });
+    vi.spyOn(experienceEl, "getBoundingClientRect").mockReturnValue({
+      top: 100,
+      bottom: 120,
+      left: 0,
+      right: 800,
+      width: 800,
+      height: 20,
+      x: 0,
+      y: 100,
+      toJSON: () => {},
+    });
 
     render(
       <SectionNav
@@ -119,10 +122,9 @@ describe("SectionNav", () => {
       />,
     );
 
-    const observer = intersectionObservers[0];
-    const experienceHeading = document.getElementById("experience");
+    // Trigger scroll event to update active section
     act(() => {
-      observer.trigger([{ target: experienceHeading as Element, isIntersecting: true }]);
+      window.dispatchEvent(new Event("scroll"));
     });
 
     await waitFor(() => {

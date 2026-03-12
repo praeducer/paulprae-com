@@ -272,6 +272,11 @@ export default function ResumePage() {
             {bodyMarkdown}
           </ReactMarkdown>
         </article>
+        {/* Bottom spacer ensures the last resume sections (Projects, Publications)
+            can scroll to the top of the viewport when clicked in the section nav.
+            Without this, the page bottoms out and the heading stays mid-viewport.
+            Hidden on print to avoid wasting paper. */}
+        <div className="no-print h-[50vh]" aria-hidden="true" />
       </main>
 
       <footer className="no-print max-w-3xl mx-auto px-6 pb-8 pt-4 border-t border-slate-200 dark:border-slate-800">

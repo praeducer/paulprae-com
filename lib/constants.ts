@@ -9,7 +9,7 @@
 // components, and metadata. Update here to change everywhere.
 
 export const SITE_NAME = "Paul Prae";
-export const SITE_SUBTITLE = "Principal AI Engineer & Solutions Architect";
+export const SITE_SUBTITLE = "Principal AI Engineer & Architect";
 export const SITE_TAGLINE = "Building AI Agents That Ship AI Products";
 export const SITE_URL = "https://paulprae.com";
 export const BOOK_INTERVIEW_URL =
