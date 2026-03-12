@@ -13,7 +13,7 @@ export const SITE_SUBTITLE = "Principal AI Engineer & Solutions Architect";
 export const SITE_TAGLINE = "Building AI Agents That Ship AI Products";
 export const SITE_URL = "https://paulprae.com";
 export const BOOK_INTERVIEW_URL =
-  "https://outlook.office.com/bookwithme/user/a0fca4b720774cf286bc50ab99727c5a@Paulprae.com";
+  "https://outlook.office.com/bookwithme/user/a0fca4b720774cf286bc50ab99727c5a@Paulprae.com?anonymous&ismsaljsauthenabled&ep=plink";
 
 /** Years of professional enterprise experience. Career start: Microsoft, July 2012. */
 export const YEARS_EXPERIENCE = "13+";
