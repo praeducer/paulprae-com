@@ -23,8 +23,8 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
   const [activeId, setActiveId] = useState<string>("");
   const navRef = useRef<HTMLElement>(null);
 
-  // Publish --nav-height so scroll-padding-top and scroll-margin-top
-  // account for this sticky bar via --sticky-offset.
+  // Publish --nav-height so scroll-padding-top accounts for this
+  // sticky bar via --sticky-offset.
   useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
@@ -51,6 +51,15 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
     // Threshold: heading is "active" once its top is at or above the
     // sticky area plus a small buffer (24px breathing room).
     const threshold = offset + 24;
+
+    // When scrolled to the very bottom, force-activate the last section.
+    // Without this, short final sections (Projects, Publications) can never
+    // become active because the page bottoms out before they cross the threshold.
+    const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 2;
+    if (atBottom) {
+      setActiveId(sections[sections.length - 1].id);
+      return;
+    }
 
     let bestId = "";
     for (const section of sections) {

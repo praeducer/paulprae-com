@@ -135,6 +135,37 @@ describe("SectionNav", () => {
     expect(screen.getByRole("link", { name: "Summary" }).getAttribute("aria-current")).toBeNull();
   });
 
+  it("force-activates the last section when scrolled to bottom", async () => {
+    document.body.innerHTML = `
+      <h2 id="summary">Summary</h2>
+      <h2 id="publications">Publications</h2>
+    `;
+
+    // Simulate scrolled to bottom of page
+    Object.defineProperty(window, "innerHeight", { value: 800, configurable: true });
+    Object.defineProperty(window, "scrollY", { value: 1200, configurable: true });
+    Object.defineProperty(document.body, "scrollHeight", { value: 2000, configurable: true });
+
+    render(
+      <SectionNav
+        sections={[
+          { id: "summary", label: "Summary" },
+          { id: "publications", label: "Publications" },
+        ]}
+      />,
+    );
+
+    act(() => {
+      window.dispatchEvent(new Event("scroll"));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("link", { name: "Publications" }).getAttribute("aria-current")).toBe(
+        "true",
+      );
+    });
+  });
+
   it("renders nothing when no sections are provided", () => {
     const { container } = render(<SectionNav sections={[]} />);
     expect(container.innerHTML).toBe("");

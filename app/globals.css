@@ -29,7 +29,6 @@ html {
 
 .resume-prose h2 {
   @apply text-xl font-semibold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mt-8 mb-4;
-  scroll-margin-top: calc(var(--sticky-offset) + 16px);
 }
 
 .resume-prose h3 {
