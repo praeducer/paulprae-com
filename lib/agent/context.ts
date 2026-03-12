@@ -14,7 +14,7 @@ import { loadCareerData } from "../career-data";
 import { stripEmpty } from "../data-utils";
 import type { CareerData } from "../types";
 import { loadPrompt } from "../prompts/loader";
-import { YEARS_EXPERIENCE } from "../constants";
+import { YEARS_EXPERIENCE, BOOK_INTERVIEW_URL } from "../constants";
 
 // ─── Knowledge Base Paths ────────────────────────────────────────────────────
 
@@ -110,7 +110,8 @@ export function buildSystemPrompt(mode: PromptMode): string | null {
 
   let prompt = template
     .replace("{{CAREER_DATA}}", careerDataJson)
-    .replace("{{AUDIENCE_FRAMEWORKS}}", audienceJson);
+    .replace("{{AUDIENCE_FRAMEWORKS}}", audienceJson)
+    .replace("{{BOOK_INTERVIEW_URL}}", BOOK_INTERVIEW_URL);
 
   // Tools mode has additional placeholders
   if (mode === "tools") {
