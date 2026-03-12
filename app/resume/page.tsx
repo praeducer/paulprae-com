@@ -8,7 +8,8 @@ import { stripHtmlComments, stripHeaderBlock } from "../../lib/markdown";
 import { PATHS } from "../../lib/config";
 import { loadCareerData } from "../../lib/career-data";
 import { slugify } from "../../lib/ui-utils";
-import { DownloadIcon, CalendarIcon } from "../components/Icons";
+import { DownloadIcon } from "../components/Icons";
+import BookInterviewLink from "../components/BookInterviewLink";
 import SiteNav from "../components/SiteNav";
 import {
   SITE_NAME,
@@ -17,7 +18,6 @@ import {
   SITE_URL,
   SITE_OG_DESCRIPTION,
   GITHUB_URL,
-  BOOK_INTERVIEW_URL,
   CONTACT_LINK_CLASS,
   RESUME_DOWNLOAD_PATHS,
   RESUME_PUBLIC_FILE_BASE,
@@ -225,16 +225,7 @@ export default function ResumePage() {
               GitHub
             </a>
           )}
-          <a
-            href={BOOK_INTERVIEW_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Book interview with Paul (opens in new tab)"
-            className={CONTACT_LINK_CLASS}
-          >
-            <CalendarIcon className="h-3.5 w-3.5" />
-            Book Interview
-          </a>
+          <BookInterviewLink className={CONTACT_LINK_CLASS} />
           {/* Separator between contact and download groups */}
           <span
             aria-hidden="true"

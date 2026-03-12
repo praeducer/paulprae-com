@@ -3,11 +3,11 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChatIcon, DownloadIcon, CalendarIcon } from "./Icons";
+import { ChatIcon, DownloadIcon } from "./Icons";
+import BookInterviewLink from "./BookInterviewLink";
 import {
   SITE_NAME,
   SITE_SUBTITLE,
-  BOOK_INTERVIEW_URL,
   RESUME_DOWNLOAD_PATHS,
   NAV_LINK_CLASS,
   CTA_BUTTON_CLASS,
@@ -111,17 +111,12 @@ export default function SiteNav({
               <DownloadIcon className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">PDF</span>
             </a>
-            <a
-              href={BOOK_INTERVIEW_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <BookInterviewLink
               className={CTA_BUTTON_CLASS}
-              aria-label="Book interview with Paul (opens in new tab)"
               title="Book interview with Paul (opens in new tab)"
             >
-              <CalendarIcon className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Book Interview</span>
-            </a>
+            </BookInterviewLink>
           </nav>
         </div>
         {children}

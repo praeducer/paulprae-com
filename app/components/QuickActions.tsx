@@ -1,7 +1,6 @@
 "use client";
 
-import { CalendarIcon } from "./Icons";
-import { BOOK_INTERVIEW_URL } from "../../lib/constants";
+import BookInterviewLink from "./BookInterviewLink";
 
 interface QuickActionsProps {
   mode: "chat" | "tools";
@@ -9,7 +8,11 @@ interface QuickActionsProps {
   onPrefill?: (text: string) => void;
 }
 
-type Action = { label: string; prompt: string; prefill?: boolean } | { label: string; url: string };
+interface Action {
+  label: string;
+  prompt: string;
+  prefill?: boolean;
+}
 
 const CHAT_ACTIONS: Action[] = [
   {
@@ -32,10 +35,6 @@ const CHAT_ACTIONS: Action[] = [
   {
     label: "Download resume",
     prompt: "I'd like to download Paul's resume. What formats are available?",
-  },
-  {
-    label: "Book Interview",
-    url: BOOK_INTERVIEW_URL,
   },
 ];
 
@@ -91,46 +90,30 @@ const ctaChipClass =
 /**
  * Quick action chips. Most send a message immediately; chips with `prefill`
  * populate the composer so the user can add context (e.g., paste a JD) first.
- * URL chips navigate to an external page (e.g., booking link).
+ * Chat mode appends a BookInterviewLink CTA chip at the end.
  */
 export default function QuickActions({ mode, onAction, onPrefill }: QuickActionsProps) {
   const actions = mode === "chat" ? CHAT_ACTIONS : [...TOOLS_ACTIONS_ROW1, ...TOOLS_ACTIONS_ROW2];
 
   return (
     <div className="flex flex-wrap gap-1.5">
-      {actions.map((action) => {
-        if ("url" in action) {
-          return (
-            <a
-              key={action.label}
-              href={action.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Book interview with Paul (opens in new tab)"
-              className={ctaChipClass}
-            >
-              <CalendarIcon className="h-3 w-3" />
-              {action.label}
-            </a>
-          );
-        }
-        return (
-          <button
-            key={action.label}
-            type="button"
-            onClick={() => {
-              if ("prefill" in action && action.prefill && onPrefill) {
-                onPrefill(action.prompt);
-              } else {
-                onAction(action.prompt);
-              }
-            }}
-            className={chipClass}
-          >
-            {action.label}
-          </button>
-        );
-      })}
+      {actions.map((action) => (
+        <button
+          key={action.label}
+          type="button"
+          onClick={() => {
+            if (action.prefill && onPrefill) {
+              onPrefill(action.prompt);
+            } else {
+              onAction(action.prompt);
+            }
+          }}
+          className={chipClass}
+        >
+          {action.label}
+        </button>
+      ))}
+      {mode === "chat" && <BookInterviewLink className={ctaChipClass} iconClassName="h-3 w-3" />}
     </div>
   );
 }
