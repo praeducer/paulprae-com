@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import Link from "next/link";
 import type { Metadata } from "next";
 import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
@@ -9,13 +8,16 @@ import { stripHtmlComments, stripHeaderBlock } from "../../lib/markdown";
 import { PATHS, RESUME_FILE_BASE } from "../../lib/config";
 import { loadCareerData } from "../../lib/career-data";
 import { slugify } from "../../lib/ui-utils";
-import { DownloadIcon, CalendarIcon } from "../components/Icons";
+import { DownloadIcon } from "../components/Icons";
+import SiteNav from "../components/SiteNav";
 import {
   SITE_NAME,
   SITE_SUBTITLE,
+  SITE_DOMAIN,
   SITE_URL,
   SITE_OG_DESCRIPTION,
-  BOOK_INTERVIEW_URL,
+  GITHUB_URL,
+  CONTACT_LINK_CLASS,
 } from "../../lib/constants";
 import BackToTop from "./components/BackToTop";
 import SectionNav from "./components/SectionNav";
@@ -95,7 +97,7 @@ export default function ResumePage() {
   } catch {
     return (
       <main className="max-w-3xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-bold mb-4">paulprae.com</h1>
+        <h1 className="text-2xl font-bold mb-4">{SITE_DOMAIN}</h1>
         <p className="text-slate-600 dark:text-slate-400">
           Resume not yet generated. Run{" "}
           <code className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-sm">
@@ -114,7 +116,7 @@ export default function ResumePage() {
   if (!careerData) {
     return (
       <main className="max-w-3xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-bold mb-4">paulprae.com</h1>
+        <h1 className="text-2xl font-bold mb-4">{SITE_DOMAIN}</h1>
         <p className="text-slate-600 dark:text-slate-400">
           Career data not found. Run{" "}
           <code className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-sm">
@@ -153,9 +155,6 @@ export default function ResumePage() {
 
   // ─── Markdown component overrides ──────────────────────────────────────────
 
-  const contactLinkClass =
-    "inline-flex min-h-[44px] items-center gap-1 rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100";
-
   const markdownComponents: Components = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     h2: ({ children, node, ...props }) => {
@@ -189,107 +188,76 @@ export default function ResumePage() {
         Skip to resume content
       </a>
 
-      <header className="no-print border-b border-slate-200/60 bg-white dark:border-slate-700/60 dark:bg-slate-950">
-        <div className="max-w-3xl mx-auto px-6 py-3">
-          {/* Row 1: Name + short title + Chat link */}
-          <div className="flex items-baseline gap-3">
-            <Link
-              href="/"
-              className="text-xl font-bold text-slate-900 hover:text-slate-700 dark:text-slate-100 dark:hover:text-slate-300"
-            >
-              {profile.name}
-            </Link>
-            <p className="hidden min-w-0 sm:block text-sm text-slate-500 dark:text-slate-400 truncate lg:whitespace-normal lg:line-clamp-2">
-              {SITE_SUBTITLE}
-            </p>
-            <Link
-              href="/"
-              className="ml-auto shrink-0 inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-            >
-              Chat with AI
-            </Link>
-          </div>
-          {/* Row 2: Contact + Downloads — unified text-style links */}
-          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-2">
-            {profile.email && (
-              <a
-                href={`mailto:${profile.email}`}
-                aria-label="Send email to Paul Prae"
-                className={contactLinkClass}
-              >
-                Email
-              </a>
-            )}
+      <SiteNav>
+        {/* Row 2: Contact + Downloads (resume page only) */}
+        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-2">
+          {profile.email && (
             <a
-              href={BOOK_INTERVIEW_URL}
+              href={`mailto:${profile.email}`}
+              aria-label="Send email to Paul Prae"
+              className={CONTACT_LINK_CLASS}
+            >
+              Email
+            </a>
+          )}
+          {profile.linkedin && (
+            <a
+              href={profile.linkedin}
               target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Book interview with Paul (opens in new tab)"
-              title="Book interview with Paul (opens in new tab)"
-              className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-md bg-blue-50 px-3.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 hover:text-blue-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 dark:hover:text-blue-200"
+              rel="me noopener noreferrer"
+              aria-label="View Paul Prae on LinkedIn"
+              className={CONTACT_LINK_CLASS}
             >
-              <CalendarIcon className="h-3.5 w-3.5" />
-              Book Interview
+              LinkedIn
             </a>
-            {profile.linkedin && (
-              <a
-                href={profile.linkedin}
-                target="_blank"
-                rel="me noopener noreferrer"
-                aria-label="View Paul Prae on LinkedIn"
-                className={contactLinkClass}
-              >
-                LinkedIn
-              </a>
-            )}
-            {profile.github && (
-              <a
-                href={profile.github}
-                target="_blank"
-                rel="me noopener noreferrer"
-                aria-label="View Paul Prae on GitHub"
-                className={contactLinkClass}
-              >
-                GitHub
-              </a>
-            )}
-            {/* Separator between contact and download groups */}
-            <span
-              aria-hidden="true"
-              className="select-none px-1.5 text-xs text-slate-300 dark:text-slate-600"
-            >
-              ·
-            </span>
+          )}
+          {profile.github && (
             <a
-              href={pdfPath}
-              download
-              aria-label="Download resume as PDF"
-              className={contactLinkClass}
+              href={profile.github}
+              target="_blank"
+              rel="me noopener noreferrer"
+              aria-label="View Paul Prae on GitHub"
+              className={CONTACT_LINK_CLASS}
             >
-              <DownloadIcon className="h-3.5 w-3.5" />
-              PDF{pdfSize && <span className="opacity-60">({pdfSize})</span>}
+              GitHub
             </a>
-            <a
-              href={docxPath}
-              download
-              aria-label="Download resume as DOCX"
-              className={contactLinkClass}
-            >
-              <DownloadIcon className="h-3.5 w-3.5" />
-              DOCX{docxSize && <span className="opacity-60">({docxSize})</span>}
-            </a>
-            <a
-              href={mdPath}
-              download
-              aria-label="Download resume as Markdown"
-              className={contactLinkClass}
-            >
-              <DownloadIcon className="h-3.5 w-3.5" />
-              MD{mdSize && <span className="opacity-60">({mdSize})</span>}
-            </a>
-          </div>
+          )}
+          {/* Separator between contact and download groups */}
+          <span
+            aria-hidden="true"
+            className="select-none px-1.5 text-xs text-slate-300 dark:text-slate-600"
+          >
+            ·
+          </span>
+          <a
+            href={pdfPath}
+            download
+            aria-label="Download resume as PDF"
+            className={CONTACT_LINK_CLASS}
+          >
+            <DownloadIcon className="h-3.5 w-3.5" />
+            PDF{pdfSize && <span className="opacity-60">({pdfSize})</span>}
+          </a>
+          <a
+            href={docxPath}
+            download
+            aria-label="Download resume as DOCX"
+            className={CONTACT_LINK_CLASS}
+          >
+            <DownloadIcon className="h-3.5 w-3.5" />
+            DOCX{docxSize && <span className="opacity-60">({docxSize})</span>}
+          </a>
+          <a
+            href={mdPath}
+            download
+            aria-label="Download resume as Markdown"
+            className={CONTACT_LINK_CLASS}
+          >
+            <DownloadIcon className="h-3.5 w-3.5" />
+            MD{mdSize && <span className="opacity-60">({mdSize})</span>}
+          </a>
         </div>
-      </header>
+      </SiteNav>
 
       <SectionNav sections={sections} />
 
@@ -311,7 +279,7 @@ export default function ResumePage() {
           <p>
             &copy; {new Date().getFullYear()} {profile.name} &mdash; AI-generated resume &mdash;{" "}
             <a
-              href="https://github.com/praeducer/paulprae-com"
+              href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-slate-600 underline hover:text-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:rounded focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-200"

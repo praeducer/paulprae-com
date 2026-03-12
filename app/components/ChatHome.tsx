@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useCallback } from "react";
-import Link from "next/link";
 import { useChat } from "@ai-sdk/react";
 import {
   AssistantRuntimeProvider,
@@ -14,22 +13,16 @@ import {
 import { useAISDKRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
 import remarkGfm from "remark-gfm";
+import SiteNav from "./SiteNav";
 import QuickActions from "./QuickActions";
-import {
-  DownloadIcon,
-  CalendarIcon,
-  CopyIcon,
-  ReloadIcon,
-  SendIcon,
-  ChatIcon,
-  ArrowDownIcon,
-} from "./Icons";
+import { CopyIcon, ReloadIcon, SendIcon, ArrowDownIcon } from "./Icons";
 import {
   MAX_MESSAGE_CHARS,
   SITE_NAME,
   SITE_SUBTITLE,
+  SITE_DOMAIN,
   HERO_DESCRIPTION,
-  BOOK_INTERVIEW_URL,
+  GITHUB_URL,
 } from "../../lib/constants";
 
 // ─── Markdown Text Wrapper ──────────────────────────────────────────────────
@@ -43,9 +36,6 @@ function MarkdownText() {
 
 const actionButtonClass =
   "rounded-md p-1.5 min-h-[32px] min-w-[32px] flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none dark:hover:bg-slate-800 dark:hover:text-slate-300";
-
-const navLinkClass =
-  "inline-flex min-h-[44px] items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100";
 
 // ─── Custom Thread Components ───────────────────────────────────────────────
 
@@ -214,68 +204,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
           Skip to chat content
         </a>
 
-        {/* Header — matches resume page header (Row 1) */}
-        <header className="shrink-0 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95">
-          <div className="mx-auto max-w-3xl px-6 py-3">
-            <div className="flex items-baseline gap-3">
-              <Link
-                href="/"
-                className="text-xl font-bold text-slate-900 hover:text-slate-700 dark:text-slate-100 dark:hover:text-slate-300"
-              >
-                {SITE_NAME}
-              </Link>
-              <p className="hidden min-w-0 text-sm text-slate-500 sm:block dark:text-slate-400 truncate lg:whitespace-normal lg:line-clamp-2">
-                {SITE_SUBTITLE}
-              </p>
-              <nav
-                className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3"
-                aria-label="Site navigation"
-              >
-                <button
-                  type="button"
-                  onClick={() => {
-                    window.location.href = mode === "tools" ? "/tools" : "/";
-                  }}
-                  className={navLinkClass}
-                  title="Start a new conversation"
-                  aria-label="New conversation"
-                >
-                  <ChatIcon className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">New chat</span>
-                </button>
-                {mode === "tools" && (
-                  <Link href="/" className={navLinkClass}>
-                    Chat with AI
-                  </Link>
-                )}
-                <Link href="/resume" className={navLinkClass}>
-                  Resume
-                </Link>
-                <a
-                  href="/Paul-Prae-Resume.pdf"
-                  download
-                  className={navLinkClass}
-                  aria-label="Download resume as PDF"
-                  title="Download resume as PDF"
-                >
-                  <DownloadIcon className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">PDF</span>
-                </a>
-                <a
-                  href={BOOK_INTERVIEW_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-[44px] items-center gap-1.5 whitespace-nowrap rounded-md bg-blue-700 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none dark:bg-blue-600 dark:hover:bg-blue-500"
-                  aria-label="Book interview with Paul (opens in new tab)"
-                  title="Book interview with Paul (opens in new tab)"
-                >
-                  <CalendarIcon className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Book Interview</span>
-                </a>
-              </nav>
-            </div>
-          </div>
-        </header>
+        <SiteNav />
 
         {/* Chat Thread */}
         <main
@@ -372,9 +301,9 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
 
         <footer className="shrink-0 py-1.5 text-center">
           <p className="text-xs text-slate-400 dark:text-slate-500">
-            paulprae.com &mdash; Built with Next.js, Claude AI, and Tailwind CSS &mdash;{" "}
+            {SITE_DOMAIN} &mdash; Built with Next.js, Claude AI, and Tailwind CSS &mdash;{" "}
             <a
-              href="https://github.com/praeducer/paulprae-com"
+              href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="underline hover:text-slate-600 dark:hover:text-slate-300"

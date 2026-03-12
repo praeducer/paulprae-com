@@ -34,7 +34,7 @@ const CHAT_ACTIONS: Action[] = [
     prompt: "I'd like to download Paul's resume. What formats are available?",
   },
   {
-    label: "Book interview",
+    label: "Book Interview",
     url: BOOK_INTERVIEW_URL,
   },
 ];
