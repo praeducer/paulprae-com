@@ -113,26 +113,21 @@ html {
 
 /* ─── Skip Navigation ────────────────────────────────────────────────────── */
 /* Keyboard-only skip link. Hidden by default via sr-only clipping.
-   Only revealed on focus AND on hover-capable devices — touch-only devices
-   (hover: none) never show it, preventing the flash caused by some mobile
-   browsers triggering focus on programmatic focus during Next.js client
-   navigation. Both :focus and :focus-visible are listed for browser compat. */
+   Only revealed on :focus-visible (keyboard Tab) — NOT on programmatic focus.
+   This prevents the popup flash during Next.js client-side navigation, which
+   can trigger :focus on the skip link without user intent. */
 
 .skip-nav {
   @apply sr-only;
 }
 
-@media (hover: hover) {
-  .skip-nav:focus,
-  .skip-nav:focus-visible {
-    @apply not-sr-only fixed left-2 top-2 z-50 rounded bg-white px-4 py-2 text-sm text-slate-900 ring-2 ring-blue-500 outline-none;
-  }
+.skip-nav:focus-visible {
+  @apply not-sr-only fixed left-2 top-2 z-50 rounded bg-white px-4 py-2 text-sm text-slate-900 ring-2 ring-blue-500 outline-none;
+}
 
-  @media (prefers-color-scheme: dark) {
-    .skip-nav:focus,
-    .skip-nav:focus-visible {
-      @apply bg-slate-900 text-slate-100;
-    }
+@media (prefers-color-scheme: dark) {
+  .skip-nav:focus-visible {
+    @apply bg-slate-900 text-slate-100;
   }
 }
 
