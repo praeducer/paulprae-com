@@ -12,6 +12,7 @@ import path from "path";
 import sharp from "sharp";
 import { PATHS } from "../lib/config.js";
 import { isDirectRun, hasForceFlag } from "../lib/script-utils.js";
+import { SITE_NAME, SITE_SUBTITLE, SITE_TAGLINE, SITE_DOMAIN } from "../lib/constants.js";
 
 const PUBLIC_DIR = PATHS.publicDir;
 
@@ -77,20 +78,20 @@ function ogImageSvg(): string {
   <rect x="80" y="305" width="400" height="2" fill="url(#accentLine)" rx="1"/>
 
   <!-- Name -->
-  <text x="80" y="270" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="72" font-weight="700" fill="${COLORS.text}" letter-spacing="-1">Paul Prae</text>
+  <text x="80" y="270" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="72" font-weight="700" fill="${COLORS.text}" letter-spacing="-1">${SITE_NAME}</text>
 
   <!-- Title -->
-  <text x="80" y="355" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="400" fill="${COLORS.textMuted}">Principal AI Engineer &amp; Solutions Architect</text>
+  <text x="80" y="355" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="400" fill="${COLORS.textMuted}">${SITE_SUBTITLE.replace(/&/g, "&amp;")}</text>
 
   <!-- Tagline -->
-  <text x="80" y="400" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="500" fill="${COLORS.border}">Building AI Agents That Ship AI Products</text>
+  <text x="80" y="400" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="500" fill="${COLORS.border}">${SITE_TAGLINE}</text>
 
   <!-- Call-to-action button -->
   <rect x="80" y="440" width="220" height="48" rx="8" fill="${COLORS.text}"/>
   <text x="190" y="471" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700" fill="${COLORS.bg}">View Resume →</text>
 
   <!-- URL -->
-  <text x="80" y="560" font-family="ui-monospace, 'Cascadia Code', 'Fira Code', monospace" font-size="18" fill="${COLORS.border}">paulprae.com</text>
+  <text x="80" y="560" font-family="ui-monospace, 'Cascadia Code', 'Fira Code', monospace" font-size="18" fill="${COLORS.border}">${SITE_DOMAIN}</text>
 </svg>`;
 }
 

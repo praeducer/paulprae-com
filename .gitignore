@@ -74,6 +74,7 @@ NUL
 
 # Claude Code local-only files
 .claude/settings.local.json
+.claude/plans/reference-files/
 
 # Debug logs
 npm-debug.log*

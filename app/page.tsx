@@ -3,12 +3,13 @@ import ChatHome from "./components/ChatHome";
 import {
   SITE_NAME,
   SITE_SUBTITLE,
+  SITE_DOMAIN,
   SITE_URL,
   SITE_DESCRIPTION,
   SITE_OG_DESCRIPTION,
 } from "../lib/constants";
 
-const pageTitle = `${SITE_NAME} — AI Career Assistant | paulprae.com`;
+const pageTitle = `${SITE_NAME} — AI Career Assistant | ${SITE_DOMAIN}`;
 
 export const metadata: Metadata = {
   title: pageTitle,

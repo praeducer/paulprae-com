@@ -12,18 +12,20 @@ import {
 } from "ai";
 import { z } from "zod";
 import { buildSystemPrompt } from "../../../lib/agent/context";
-import { MAX_MESSAGE_CHARS } from "../../../lib/constants";
+import {
+  MAX_MESSAGE_CHARS,
+  CHAT_MODEL_ID,
+  CHAT_CONFIG,
+  RESUME_GENERATION_CONFIG,
+  CHAT_REQUEST_LIMITS,
+  RATE_LIMIT_CONFIG,
+  RESUME_DOWNLOAD_PATHS,
+} from "../../../lib/constants";
 
-// Vercel Fluid Compute: explicit timeout for streaming chat responses.
-// Pro plan default is 300s with Fluid Compute, but we set 120s as a
-// sensible ceiling for Sonnet chat + tool-calling.
+// Next.js requires segment config exports to be static literals.
 export const maxDuration = 120;
 
 // ─── Model Provider ─────────────────────────────────────────────────────────
-// Use Vercel AI Gateway only when explicitly configured via AI_GATEWAY_API_KEY.
-// VERCEL_OIDC_TOKEN is auto-injected by Vercel runtime but does NOT mean the
-// AI Gateway is configured for this project. Using it without setup causes
-// silent stream failures (empty response bubbles).
 
 const useGateway = !!process.env.AI_GATEWAY_API_KEY;
 
@@ -36,37 +38,33 @@ function getModel(modelId: string): LanguageModel {
   return anthropic(modelId) as LanguageModel;
 }
 
-// ─── Request Limits ─────────────────────────────────────────────────────────
+// ─── Request Limits (re-export for tests) ───────────────────────────────────
 
-export const CHAT_REQUEST_LIMITS = {
-  maxMessages: 50,
-  maxBodyBytes: 256_000, // 256 KB — tool results (tailored resumes) inflate conversation JSON
-  maxJobDescriptionChars: 10_000, // Tool input: job description
-  maxEmphasisItems: 10, // Tool input: emphasis areas count
-  maxEmphasisChars: 200, // Tool input: per emphasis area
-} as const;
+export { CHAT_REQUEST_LIMITS } from "../../../lib/constants";
 
-const MAX_MESSAGES = CHAT_REQUEST_LIMITS.maxMessages;
-const MAX_BODY_BYTES = CHAT_REQUEST_LIMITS.maxBodyBytes;
-const MAX_JOB_DESC_CHARS = CHAT_REQUEST_LIMITS.maxJobDescriptionChars;
-const MAX_EMPHASIS_ITEMS = CHAT_REQUEST_LIMITS.maxEmphasisItems;
-const MAX_EMPHASIS_CHARS = CHAT_REQUEST_LIMITS.maxEmphasisChars;
+const { maxMessages: MAX_MESSAGES, maxBodyBytes: MAX_BODY_BYTES } = CHAT_REQUEST_LIMITS;
 
 export const generateTailoredResumeInputSchema = z.object({
   jobDescription: z
     .string()
-    .max(MAX_JOB_DESC_CHARS, `Job description must be under ${MAX_JOB_DESC_CHARS} characters`)
+    .max(
+      CHAT_REQUEST_LIMITS.maxJobDescriptionChars,
+      `Job description must be under ${CHAT_REQUEST_LIMITS.maxJobDescriptionChars} characters`,
+    )
     .describe("The job description or role requirements to tailor the resume for"),
   emphasisAreas: z
     .array(
       z
         .string()
         .max(
-          MAX_EMPHASIS_CHARS,
-          `Each emphasis area must be under ${MAX_EMPHASIS_CHARS} characters`,
+          CHAT_REQUEST_LIMITS.maxEmphasisChars,
+          `Each emphasis area must be under ${CHAT_REQUEST_LIMITS.maxEmphasisChars} characters`,
         ),
     )
-    .max(MAX_EMPHASIS_ITEMS, `Maximum ${MAX_EMPHASIS_ITEMS} emphasis areas`)
+    .max(
+      CHAT_REQUEST_LIMITS.maxEmphasisItems,
+      `Maximum ${CHAT_REQUEST_LIMITS.maxEmphasisItems} emphasis areas`,
+    )
     .optional()
     .describe("Specific areas to emphasize (e.g., 'AI/ML', 'healthcare', 'leadership')"),
 });
@@ -101,21 +99,13 @@ ${jobDescription}
 
 let ratelimit: { limit: (key: string) => Promise<{ success: boolean }> } | null = null;
 
-/**
- * In-memory sliding window rate limiter — used when Upstash Redis is
- * unavailable. Protects against runaway costs even without external infra.
- * Entries auto-expire after the window period.
- */
 const memoryStore = new Map<string, number[]>();
-const MEMORY_WINDOW_MS = 60_000; // 1 minute
-const MEMORY_MAX_REQUESTS = 20;
 
 function memoryRateLimit(key: string): boolean {
   const now = Date.now();
   const timestamps = memoryStore.get(key) ?? [];
-  // Evict entries outside the window
-  const valid = timestamps.filter((t) => now - t < MEMORY_WINDOW_MS);
-  if (valid.length >= MEMORY_MAX_REQUESTS) {
+  const valid = timestamps.filter((t) => now - t < RATE_LIMIT_CONFIG.windowMs);
+  if (valid.length >= RATE_LIMIT_CONFIG.maxRequests) {
     memoryStore.set(key, valid);
     return false;
   }
@@ -129,12 +119,11 @@ if (typeof globalThis !== "undefined") {
   const cleanup = () => {
     const now = Date.now();
     for (const [key, timestamps] of memoryStore) {
-      const valid = timestamps.filter((t) => now - t < MEMORY_WINDOW_MS);
+      const valid = timestamps.filter((t) => now - t < RATE_LIMIT_CONFIG.windowMs);
       if (valid.length === 0) memoryStore.delete(key);
       else memoryStore.set(key, valid);
     }
   };
-  // Use a global flag to avoid duplicate intervals across hot reloads
   const globalRef = globalThis as unknown as { _rateLimitCleanup?: boolean };
   if (!globalRef._rateLimitCleanup) {
     globalRef._rateLimitCleanup = true;
@@ -153,16 +142,14 @@ async function initRateLimit() {
       const { Redis } = await import("@upstash/redis");
       ratelimit = new Ratelimit({
         redis: Redis.fromEnv(),
-        limiter: Ratelimit.slidingWindow(20, "1 m"),
+        limiter: Ratelimit.slidingWindow(RATE_LIMIT_CONFIG.maxRequests, "1 m"),
         analytics: true,
-        prefix: "paulprae:chat",
+        prefix: RATE_LIMIT_CONFIG.prefix,
       });
     } else {
-      // Local dev / missing env vars: use in-memory rate limiter
       ratelimit = { limit: async (key: string) => ({ success: memoryRateLimit(key) }) };
     }
   } catch (err) {
-    // Redis init failed: fall back to in-memory rate limiter (not open access)
     console.warn("[rate-limit] Upstash Redis init failed, using in-memory fallback:", err);
     ratelimit = { limit: async (key: string) => ({ success: memoryRateLimit(key) }) };
   }
@@ -190,7 +177,6 @@ function getSystemPrompt(mode: "chat" | "tools" | "resume-generator"): string {
 
 // ─── Input Validation Helpers ───────────────────────────────────────────────
 
-/** Get character length of a single message's text content. */
 function messageTextLength(msg: UIMessage): number {
   let total = 0;
   if (Array.isArray(msg.parts)) {
@@ -201,7 +187,6 @@ function messageTextLength(msg: UIMessage): number {
   return total;
 }
 
-/** Estimate total user input size in characters across all messages. */
 function estimateInputChars(messages: UIMessage[]): number {
   let total = 0;
   for (const msg of messages) {
@@ -210,7 +195,6 @@ function estimateInputChars(messages: UIMessage[]): number {
   return total;
 }
 
-/** Validate individual message content lengths. Returns error message or null. */
 function validateMessages(messages: UIMessage[]): string | null {
   for (let i = 0; i < messages.length; i++) {
     if (messageTextLength(messages[i]) > MAX_MESSAGE_CHARS) {
@@ -223,15 +207,11 @@ function validateMessages(messages: UIMessage[]): string | null {
 // ─── Route Handler ──────────────────────────────────────────────────────────
 
 export async function POST(request: Request) {
-  // Content-Type validation
   const contentType = request.headers.get("content-type");
   if (!contentType?.includes("application/json")) {
     return new Response("Content-Type must be application/json", { status: 415 });
   }
 
-  // Rate limiting — IP extraction relies on Vercel's reverse proxy setting
-  // x-real-ip / x-forwarded-for headers. These are trustworthy on Vercel
-  // because the edge proxy controls the header chain.
   const rl = await initRateLimit();
   const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   const ip =
@@ -246,13 +226,11 @@ export async function POST(request: Request) {
     });
   }
 
-  // Check Content-Length before reading body
   const contentLength = request.headers.get("content-length");
   if (contentLength && parseInt(contentLength, 10) > MAX_BODY_BYTES) {
     return new Response("Request body too large", { status: 413 });
   }
 
-  // Parse request body — AI SDK 6 client sends UIMessage[] with parts[]
   let body: { messages?: unknown; mode?: unknown };
   try {
     const rawText = await request.text();
@@ -281,14 +259,11 @@ export async function POST(request: Request) {
     return new Response(`Too many messages (max ${MAX_MESSAGES})`, { status: 400 });
   }
 
-  // Validate per-message content length
   const msgError = validateMessages(messages);
   if (msgError) {
     return new Response(msgError, { status: 400 });
   }
 
-  // Total input budget: prevent token amplification attacks
-  // 50 messages × 4000 chars = 200K chars max; reject obviously excessive input
   const totalInputChars = estimateInputChars(messages);
   if (totalInputChars > MAX_MESSAGES * MAX_MESSAGE_CHARS) {
     return new Response("Total message content exceeds maximum allowed size", { status: 413 });
@@ -296,15 +271,11 @@ export async function POST(request: Request) {
 
   const validMode = mode === "tools" ? "tools" : "chat";
 
-  // Validate API credentials before attempting to stream.
-  // streamText() is lazy — errors surface asynchronously in the stream,
-  // causing the UI to show an empty bubble instead of an error message.
   if (!useGateway && !process.env.ANTHROPIC_API_KEY) {
     console.error("[chat] ANTHROPIC_API_KEY is not set");
     return new Response("AI service is not configured. Please try again later.", { status: 503 });
   }
 
-  // Build system prompt with career data context
   let systemPrompt: string;
   try {
     systemPrompt = getSystemPrompt(validMode);
@@ -315,10 +286,6 @@ export async function POST(request: Request) {
     });
   }
 
-  // Convert UIMessages to ModelMessages for the language model, then prune
-  // old tool calls/results to keep context within the model's token budget.
-  // Tool results (e.g., full tailored resumes ~5K tokens each) accumulate fast.
-  // Keep only the last message's tool interactions; strip reasoning from older turns.
   const rawModelMessages = await convertToModelMessages(messages);
   const modelMessages = pruneMessages({
     messages: rawModelMessages,
@@ -326,7 +293,6 @@ export async function POST(request: Request) {
     reasoning: "before-last-message",
   });
 
-  // Define tools for chat mode only
   const chatTools =
     validMode === "chat"
       ? {
@@ -340,11 +306,11 @@ export async function POST(request: Request) {
                 const userPrompt = buildTailoredResumePrompt(jobDescription, emphasisAreas);
 
                 const { text } = await generateText({
-                  model: getModel("claude-sonnet-4-6"),
+                  model: getModel(CHAT_MODEL_ID),
                   system: resumeSystemPrompt,
                   prompt: userPrompt,
-                  maxOutputTokens: 8192,
-                  temperature: 0.3,
+                  maxOutputTokens: RESUME_GENERATION_CONFIG.maxOutputTokens,
+                  temperature: RESUME_GENERATION_CONFIG.temperature,
                   providerOptions: {
                     anthropic: {
                       cacheControl: { type: "ephemeral" },
@@ -361,12 +327,7 @@ export async function POST(request: Request) {
 
                 return {
                   resume: text,
-                  downloadLinks: {
-                    pdf: "/Paul-Prae-Resume.pdf",
-                    docx: "/Paul-Prae-Resume.docx",
-                    md: "/Paul-Prae-Resume.md",
-                    web: "/resume",
-                  },
+                  downloadLinks: RESUME_DOWNLOAD_PATHS,
                   note: "This is a tailored version. Paul's standard resume is available via the download links above.",
                 };
               } catch (err) {
@@ -382,27 +343,19 @@ export async function POST(request: Request) {
             description:
               "Get download links for Paul Prae's resume in various formats. Use when someone asks to download or view the resume.",
             inputSchema: getResumeLinksInputSchema,
-            execute: async () => ({
-              pdf: "/Paul-Prae-Resume.pdf",
-              docx: "/Paul-Prae-Resume.docx",
-              md: "/Paul-Prae-Resume.md",
-              web: "/resume",
-            }),
+            execute: async () => RESUME_DOWNLOAD_PATHS,
           }),
         }
       : undefined;
 
-  // Stream response using AI SDK 6 with Anthropic prompt caching.
-  // The system prompt (~90K tokens of career data) is marked for ephemeral
-  // caching (5-min TTL). After the first request, subsequent turns reuse
-  // the cached prompt at ~90% cost reduction.
   try {
     const result = streamText({
-      model: getModel("claude-sonnet-4-6"),
+      model: getModel(CHAT_MODEL_ID),
       system: systemPrompt,
       messages: modelMessages,
-      maxOutputTokens: 2048,
-      temperature: validMode === "tools" ? 0.5 : 0.7,
+      maxOutputTokens: CHAT_CONFIG.maxOutputTokens,
+      temperature:
+        validMode === "tools" ? CHAT_CONFIG.toolsTemperature : CHAT_CONFIG.chatTemperature,
       tools: chatTools,
       stopWhen: chatTools ? stepCountIs(2) : stepCountIs(1),
       providerOptions: {
