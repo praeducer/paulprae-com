@@ -112,7 +112,7 @@ npm run pipeline     # ingest → generate → export
 # Development
 npm run dev                # Dev server (Turbopack)
 npm run build              # Production build
-npm test                   # 400+ unit/component tests (~500ms)
+npm test                   # 460+ unit/component tests (~1s)
 npm run test:e2e           # Playwright E2E smoke tests
 npm run check              # Full pre-push checklist (lint + format + test + build + validate)
 

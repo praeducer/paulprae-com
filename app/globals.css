@@ -8,8 +8,8 @@
   color-scheme: light dark;
   /* --header-height is set by SiteNav's ResizeObserver (sticky header).
      --nav-height is set by SectionNav's ResizeObserver (resume section nav).
-     --sticky-offset drives scroll-padding-top and scroll-margin-top so
-     anchor links land below all sticky elements.
+     --sticky-offset drives scroll-padding-top so anchor links land below
+     all sticky elements.
      Conservative fallbacks so deep links (e.g. /resume#experience) land
      below sticky elements before JS hydrates. Overwritten after hydration. */
   --header-height: 64px;

@@ -36,7 +36,7 @@ Deliver a fast, shareable professional site at `https://paulprae.com` that prese
 | Validation         | Zod                                   |
 | Testing            | Vitest                                |
 | Export             | Pandoc (DOCX) + Typst (PDF)           |
-| Deployment         | Vercel (server-rendered + API routes) |
+| Deployment         | Vercel CDN (static export)            |
 
 ### 2.3 Constraints and guardrails
 

@@ -225,7 +225,7 @@ export async function POST(request: Request) {
   if (!success) {
     return new Response("Too many requests. Please try again in a minute.", {
       status: 429,
-      headers: { "Retry-After": "60" },
+      headers: { "Retry-After": String(Math.ceil(RATE_LIMIT_CONFIG.windowMs / 1000)) },
     });
   }
 

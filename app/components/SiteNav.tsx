@@ -40,19 +40,25 @@ export default function SiteNav({
   // When the header scrolls away (sticky=false), set 0px so SectionNav
   // sticks to the viewport top.
   useEffect(() => {
+    const rootStyle = document.documentElement.style;
     if (!sticky) {
-      document.documentElement.style.setProperty("--header-height", "0px");
-      return;
+      rootStyle.setProperty("--header-height", "0px");
+      return () => {
+        rootStyle.removeProperty("--header-height");
+      };
     }
     const header = headerRef.current;
     if (!header) return;
     const sync = () => {
-      document.documentElement.style.setProperty("--header-height", `${header.offsetHeight}px`);
+      rootStyle.setProperty("--header-height", `${header.offsetHeight}px`);
     };
     sync();
     const ro = new ResizeObserver(sync);
     ro.observe(header);
-    return () => ro.disconnect();
+    return () => {
+      ro.disconnect();
+      rootStyle.removeProperty("--header-height");
+    };
   }, [sticky]);
 
   return (

@@ -122,7 +122,10 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
     scheduleUpdate();
 
     window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    return () => window.removeEventListener("scroll", scheduleUpdate);
+    return () => {
+      window.removeEventListener("scroll", scheduleUpdate);
+      if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+    };
   }, [sections, updateActiveSection]);
 
   if (sections.length === 0) return null;
