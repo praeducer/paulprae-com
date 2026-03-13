@@ -94,7 +94,7 @@ Platform integrations provide most observability. Additionally, this repo includ
 ### Vercel AI Gateway (Not Currently Active)
 
 **What:** Automatic tracking of every AI generation routed through the gateway.
-**Status:** Not in use. The chat API uses the direct Anthropic SDK (`@ai-sdk/anthropic`) for reliability. Gateway support exists in `route.ts` but only activates when `AI_GATEWAY_API_KEY` is explicitly set. `VERCEL_OIDC_TOKEN` (auto-injected by Vercel) is intentionally ignored — using it without gateway configuration causes silent stream failures.
+**Status:** Not in use. The chat API uses the direct Anthropic SDK (`@ai-sdk/anthropic`) by default. Gateway support exists in `route.ts` but only activates when `AI_GATEWAY_API_KEY` is explicitly set — no configuration currently enables it.
 **Future:** Can be enabled by setting `AI_GATEWAY_API_KEY` in Vercel env vars once the Vercel AI Gateway is configured for this project.
 
 ### Vercel Runtime Logs
@@ -140,7 +140,7 @@ Platform integrations provide most observability. Additionally, this repo includ
 | Control                | Implementation                                              | Location                    |
 | ---------------------- | ----------------------------------------------------------- | --------------------------- |
 | Prompt caching         | Ephemeral 5-min TTL; ~90% cost reduction on follow-up turns | `route.ts` (streamText)     |
-| Output token cap       | Separate limits for chat vs. resume generation              | `route.ts` (streamText)     |
+| Output token cap       | Chat: 2,048 tokens; resume generation: 8,192 tokens         | `lib/constants.ts`          |
 | Temperature tuning     | Lower temperature for tools/resume (fewer retries)          | `route.ts` (streamText)     |
 | Rate limiting          | Sliding window per IP via Upstash Redis                     | `route.ts` (rate limiter)   |
 | Input size limits      | Per-message char limit, message count cap, body size cap    | `route.ts` (constants)      |

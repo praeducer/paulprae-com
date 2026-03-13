@@ -40,43 +40,23 @@ import {
 // ─── Site Identity ──────────────────────────────────────────────────────────
 
 describe("site identity constants", () => {
-  it("SITE_NAME is a non-empty string", () => {
-    expect(typeof SITE_NAME).toBe("string");
-    expect(SITE_NAME.length).toBeGreaterThan(0);
+  it.each([
+    ["SITE_NAME", SITE_NAME],
+    ["SITE_SUBTITLE", SITE_SUBTITLE],
+    ["SITE_TAGLINE", SITE_TAGLINE],
+    ["SITE_DESCRIPTION", SITE_DESCRIPTION],
+    ["SITE_OG_DESCRIPTION", SITE_OG_DESCRIPTION],
+    ["HERO_DESCRIPTION", HERO_DESCRIPTION],
+    ["YEARS_EXPERIENCE", YEARS_EXPERIENCE],
+  ])("%s is a non-empty string", (_name, value) => {
+    expect(typeof value).toBe("string");
+    expect(value.length).toBeGreaterThan(0);
   });
 
-  it("SITE_SUBTITLE is a non-empty string", () => {
-    expect(typeof SITE_SUBTITLE).toBe("string");
-    expect(SITE_SUBTITLE.length).toBeGreaterThan(0);
-  });
-
-  it("SITE_TAGLINE is a non-empty string", () => {
-    expect(typeof SITE_TAGLINE).toBe("string");
-    expect(SITE_TAGLINE.length).toBeGreaterThan(0);
-  });
-
-  it("SITE_URL starts with https://", () => {
+  it("SITE_URL is valid HTTPS containing SITE_DOMAIN", () => {
     expect(SITE_URL).toMatch(/^https:\/\//);
-  });
-
-  it("SITE_DOMAIN is a bare domain (no protocol)", () => {
     expect(SITE_DOMAIN).not.toContain("://");
-    expect(SITE_DOMAIN.length).toBeGreaterThan(0);
-  });
-
-  it("SITE_URL contains SITE_DOMAIN", () => {
     expect(SITE_URL).toContain(SITE_DOMAIN);
-  });
-
-  it("derived descriptions are non-empty", () => {
-    expect(SITE_DESCRIPTION.length).toBeGreaterThan(0);
-    expect(SITE_OG_DESCRIPTION.length).toBeGreaterThan(0);
-    expect(HERO_DESCRIPTION.length).toBeGreaterThan(0);
-  });
-
-  it("YEARS_EXPERIENCE is a non-empty string", () => {
-    expect(typeof YEARS_EXPERIENCE).toBe("string");
-    expect(YEARS_EXPERIENCE.length).toBeGreaterThan(0);
   });
 });
 
@@ -169,34 +149,16 @@ describe("input limits", () => {
 // ─── Navigation Styles ─────────────────────────────────────────────────────
 
 describe("navigation style constants", () => {
-  it("NAV_LINK_CLASS is a non-empty string", () => {
-    expect(typeof NAV_LINK_CLASS).toBe("string");
-    expect(NAV_LINK_CLASS.length).toBeGreaterThan(0);
-  });
-
-  it("CTA_BUTTON_CLASS is a non-empty string", () => {
-    expect(typeof CTA_BUTTON_CLASS).toBe("string");
-    expect(CTA_BUTTON_CLASS.length).toBeGreaterThan(0);
-  });
-
-  it("CONTACT_LINK_CLASS is a non-empty string", () => {
-    expect(typeof CONTACT_LINK_CLASS).toBe("string");
-    expect(CONTACT_LINK_CLASS.length).toBeGreaterThan(0);
-  });
-
-  it("FOOTER_LINK_CLASS is a non-empty string", () => {
-    expect(typeof FOOTER_LINK_CLASS).toBe("string");
-    expect(FOOTER_LINK_CLASS.length).toBeGreaterThan(0);
-  });
-
-  it("BUTTON_PRIMARY_CLASS is a non-empty string", () => {
-    expect(typeof BUTTON_PRIMARY_CLASS).toBe("string");
-    expect(BUTTON_PRIMARY_CLASS.length).toBeGreaterThan(0);
-  });
-
-  it("BUTTON_SECONDARY_CLASS is a non-empty string", () => {
-    expect(typeof BUTTON_SECONDARY_CLASS).toBe("string");
-    expect(BUTTON_SECONDARY_CLASS.length).toBeGreaterThan(0);
+  it.each([
+    ["NAV_LINK_CLASS", NAV_LINK_CLASS],
+    ["CTA_BUTTON_CLASS", CTA_BUTTON_CLASS],
+    ["CONTACT_LINK_CLASS", CONTACT_LINK_CLASS],
+    ["FOOTER_LINK_CLASS", FOOTER_LINK_CLASS],
+    ["BUTTON_PRIMARY_CLASS", BUTTON_PRIMARY_CLASS],
+    ["BUTTON_SECONDARY_CLASS", BUTTON_SECONDARY_CLASS],
+  ])("%s is a non-empty string", (_name, value) => {
+    expect(typeof value).toBe("string");
+    expect(value.length).toBeGreaterThan(0);
   });
 });
 

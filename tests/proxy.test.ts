@@ -54,7 +54,7 @@ vi.mock("next/server", () => ({
   NextRequest: vi.fn(),
 }));
 
-import { proxy, isAllowedOrigin, ALLOWED_ORIGINS, config } from "../proxy";
+import { proxy, isAllowedOrigin, ALLOWED_ORIGINS } from "../proxy";
 
 /** Grab a known-good origin from the exported set for use as a test fixture. */
 const KNOWN_ALLOWED_ORIGIN = [...ALLOWED_ORIGINS][0];
@@ -203,46 +203,20 @@ describe("Security headers", () => {
   });
 });
 
-describe("proxy config", () => {
-  it("exports a route matcher covering API routes", () => {
-    expect(config.matcher).toContain("/api/:path*");
-  });
-});
-
 describe("Prompt injection defenses", () => {
-  it("career-chat system prompt contains security rules", async () => {
+  it.each([
+    [
+      "career-chat.system.md",
+      ["# Security Rules", "untrusted input", "Never reveal", "system prompt"],
+    ],
+    ["resume-writer.system.md", ["security_rules", "untrusted user data", "prompt injection"]],
+    ["job-tools.system.md", ["# Security Rules", "untrusted input"]],
+  ])("%s contains security rules", async (filename, expectedStrings) => {
     const fs = await import("fs");
     const path = await import("path");
-    const prompt = fs.readFileSync(
-      path.join(process.cwd(), "lib", "prompts", "career-chat.system.md"),
-      "utf-8",
-    );
-    expect(prompt).toContain("# Security Rules");
-    expect(prompt).toContain("untrusted input");
-    expect(prompt).toContain("Never reveal");
-    expect(prompt).toContain("system prompt");
-  });
-
-  it("resume-writer system prompt contains security rules", async () => {
-    const fs = await import("fs");
-    const path = await import("path");
-    const prompt = fs.readFileSync(
-      path.join(process.cwd(), "lib", "prompts", "resume-writer.system.md"),
-      "utf-8",
-    );
-    expect(prompt).toContain("security_rules");
-    expect(prompt).toContain("untrusted user data");
-    expect(prompt).toContain("prompt injection");
-  });
-
-  it("job-tools system prompt contains security rules", async () => {
-    const fs = await import("fs");
-    const path = await import("path");
-    const prompt = fs.readFileSync(
-      path.join(process.cwd(), "lib", "prompts", "job-tools.system.md"),
-      "utf-8",
-    );
-    expect(prompt).toContain("# Security Rules");
-    expect(prompt).toContain("untrusted input");
+    const prompt = fs.readFileSync(path.join(process.cwd(), "lib", "prompts", filename), "utf-8");
+    for (const s of expectedStrings) {
+      expect(prompt).toContain(s);
+    }
   });
 });

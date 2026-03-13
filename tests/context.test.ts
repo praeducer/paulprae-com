@@ -15,29 +15,16 @@ import { RESUME_DOWNLOAD_PATHS, BOOK_INTERVIEW_URL } from "../lib/constants";
 // ─── loadCareerContext ──────────────────────────────────────────────────────
 
 describe("loadCareerContext", () => {
-  it("returns non-null with profile name Paul Prae", () => {
+  it("loads career data with profile, knowledge base, and company data", () => {
     const ctx = loadCareerContext();
     expect(ctx).not.toBeNull();
     expect(ctx!.careerData.profile.name).toBe("Paul Prae");
-  });
-
-  it("includes knowledge base files", () => {
-    const ctx = loadCareerContext();
-    expect(ctx).not.toBeNull();
     expect(ctx!.audienceFrameworks).toBeTruthy();
-  });
-
-  it("loads company data from knowledge base", () => {
-    const ctx = loadCareerContext();
-    expect(ctx).not.toBeNull();
-    expect(ctx!.companies).toBeTruthy();
     expect(Array.isArray(ctx!.companies)).toBe(true);
   });
 
-  it("does not load career-objectives.json into context", () => {
+  it("excludes career-objectives.json from context", () => {
     const ctx = loadCareerContext();
-    expect(ctx).not.toBeNull();
-    // CareerContext should not have a careerObjectives field
     expect(ctx).not.toHaveProperty("careerObjectives");
   });
 });

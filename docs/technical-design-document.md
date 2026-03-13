@@ -17,7 +17,7 @@ Deliver a fast, shareable professional site at `https://paulprae.com` that prese
 - Leverage the existing tech stack (Next.js, Vercel, TypeScript) before introducing new platforms.
 - Preserve clear migration paths for Phase 3 (knowledge graph, autonomous agents).
 
-## 2. Phase 1 Architecture (Implemented)
+## 2. Phase 1 Architecture (Implemented, Superseded by Phase 2)
 
 ### 2.1 Runtime model
 
@@ -40,14 +40,14 @@ Deliver a fast, shareable professional site at `https://paulprae.com` that prese
 
 ### 2.3 Constraints and guardrails
 
-- Site must remain static-export compatible in Phase 1 only.
+- Site was required to remain static-export compatible during Phase 1 only.
 - No server runtime secrets are needed in Vercel for generation.
 - Generated resume markdown is an artifact; source-of-truth logic is in generation scripts.
 - Recruiter-facing data is versioned in git; raw LinkedIn exports remain local/gitignored.
 
 ## 3. Phase 2 Architecture (Complete)
 
-> **Implementation status:** Complete. Sprint 1 delivered chat homepage, resume page, tools page, and streaming API. Sprint 2 added tool-calling for tailored resume generation, security hardening, and rate limiting.
+> **Implementation status:** Complete and live. Delivers chat homepage, resume page, tools page, streaming API with tool-calling for tailored resume generation, security hardening, and rate limiting.
 
 Phase 2 transforms the static site into an interactive career platform with a chat-first homepage and job search tools. The architecture adds server-side capabilities while preserving the existing resume pipeline.
 
@@ -80,7 +80,7 @@ The original Phase 2 plan called for hosting the agent on Modal. This was droppe
 
 - **Language mismatch:** Modal functions must be Python; this is a TypeScript codebase
 - **Unnecessary complexity:** We proxy to Anthropic's API, not running custom inference — Modal's GPU infrastructure adds zero value
-- **Cost:** Modal Team plan is $250/mo; Vercel Pro is $20/mo
+- **Cost:** Modal Team plan is $250/mo; Vercel Pro is $20/mo base + compute usage
 - **Network hop:** Vercel → Modal → Anthropic adds latency vs. Vercel → Anthropic directly
 - **Operational overhead:** Separate deployment, billing, monitoring for no architectural benefit
 
@@ -193,7 +193,7 @@ lib/
 │   ├── resume-writer.few-shot.md  # Few-shot examples for pipeline resume
 │   └── resume-writer.config.json  # Pipeline prompt configuration
 ├── data-utils.ts               # stripEmpty() — shared by pipeline and chat
-├── constants.ts                # MAX_MESSAGE_CHARS — shared by client and server
+├── constants.ts                # Shared constants (URLs, config, UI classes) — client and server
 ├── career-data.ts              # loadCareerData() — existing, unchanged
 ├── config.ts                   # PATHS, RESUME_FILE_BASE — existing, unchanged
 └── types.ts                    # CareerData types — existing, unchanged
@@ -207,8 +207,11 @@ app/
 │       ├── SectionNav.tsx      # Section navigation bar
 │       └── BackToTop.tsx       # Back-to-top button
 ├── components/
+│   ├── SiteNav.tsx             # Shared navigation header with Book Interview CTA
+│   ├── BookInterviewLink.tsx   # Shared booking link component (SSOT)
 │   ├── ChatHome.tsx            # Main chat client component ("use client")
-│   └── QuickActions.tsx        # Mode-specific action chips
+│   ├── QuickActions.tsx        # Mode-specific action chips
+│   └── Icons.tsx               # Shared SVG icon components
 ├── api/chat/route.ts           # POST handler: mode switching, rate limiting, streaming
 └── layout.tsx                  # Updated metadata for multi-page site
 
@@ -338,7 +341,7 @@ Interactive career platform with chat-first homepage:
 - Vercel AI SDK 6 with streaming (`toUIMessageStreamResponse`)
 - Vercel Fluid Compute for serverless AI functions (maxDuration: 120s)
 
-**Sprint 1+2 complete.**
+**Complete and live at paulprae.com.**
 
 ### Phase 3 (Future)
 

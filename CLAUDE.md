@@ -4,7 +4,7 @@
 
 **paulprae.com** is an AI-powered career platform that positions Paul Prae as a Principal AI Engineer & Architect. The site features an AI chat assistant for recruiter Q&A, tailored resume generation, and job search tools — all grounded in structured career data.
 
-**Current Phase:** Phase 2 — AI Chat Platform (complete, pending merge to main)
+**Current Phase:** Phase 2 — AI Chat Platform (complete and live)
 **Repository:** github.com/praeducer/paulprae-com
 **Live URL:** https://paulprae.com (also: paulprae-com-one.vercel.app)
 
@@ -26,14 +26,14 @@ See [README.md](README.md#tech-stack) for the full tech stack. Key versions: Nex
 ```
 app/                   → Next.js App Router pages and layouts
 app/api/chat/          → Streaming chat API route (AI SDK 6 + Claude)
-app/components/        → Chat UI components (ChatHome, QuickActions)
+app/components/        → Shared UI components (ChatHome, SiteNav, BookInterviewLink, QuickActions, Icons)
 app/resume/            → Resume page with section nav
 app/tools/             → Job search tools page (noindex)
 data/sources/linkedin/ → LinkedIn CSV exports (gitignored — raw exports may contain unparsed columns)
 data/sources/knowledge/→ Knowledge base JSONs (committed — recruiter-facing content for RAG)
 data/generated/        → Pipeline outputs: career-data.json + Paul-Prae-Resume.md (committed), PDF + DOCX (gitignored)
 scripts/               → Pipeline scripts (ingest, generate, export, brand) + resume-pdf.typ stylesheet
-lib/                   → Shared utilities: config, types, markdown, career-data, ui-utils, script-utils
+lib/                   → Shared utilities: constants, config, types, markdown, career-data, ui-utils, script-utils
 lib/agent/             → Career context builder for chat system prompts
 lib/prompts/           → System prompt templates (career-chat, job-tools, resume-writer)
 tests/                 → Unit, integration, and component tests (Vitest + Testing Library)
@@ -121,7 +121,7 @@ See [README.md](README.md#commands) for the full command reference. Quick shortc
 - `npm run check:fix` — quick check + auto-fix stale public/ copies
 - `npm run validate:docs` — validate internal markdown links and required docs
 
-## Phase 2 — AI Chat Platform (Active)
+## Phase 2 — AI Chat Platform (Live)
 
 Phase 2 is the current platform. Chat-first homepage with AI career assistant, tailored resume generation via tool-calling, and job search content tools.
 
