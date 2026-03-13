@@ -41,7 +41,7 @@ The `/api/chat` route is a same-origin API endpoint. Claude API calls happen **s
 - **CORS**: `proxy.ts` validates `Origin` header against an allowlist of production, preview, and localhost origins
 - **Method restriction**: Only `POST` allowed on `/api/*` routes
 - **Rate limiting**: Upstash Redis sliding window (20 req/min) with in-memory fallback
-- **Input validation**: Body size (100KB), message count (50), per-message length (4,000 chars), total input budget
+- **Input validation**: Body size (256KB), message count (50), per-message length (4,000 chars), total input budget
 - **Prompt injection**: User input wrapped in XML delimiters; system prompt contains security rules S1-S5
 
 ## Chat Security Rules

@@ -158,6 +158,17 @@ describe("proxy route protection", () => {
     expect(res.status).toBe(200);
     expect(res.headers.get("access-control-allow-origin")).toBeNull();
   });
+
+  it("returns 403 for OPTIONS preflight from unauthorized origin", () => {
+    const res = proxy(makeRequest("/api/chat", "OPTIONS", "https://evil.com") as never);
+    expect(res.status).toBe(403);
+  });
+
+  it("returns 204 for same-origin OPTIONS (no origin header)", () => {
+    const res = proxy(makeRequest("/api/chat", "OPTIONS", null) as never);
+    expect(res.status).toBe(204);
+    expect(res.headers.get("access-control-allow-origin")).toBe("");
+  });
 });
 
 describe("Security headers", () => {

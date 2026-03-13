@@ -136,7 +136,7 @@ The chat API includes multiple defense layers documented in [`docs/security.md`]
 
 - **Origin validation** — [`proxy.ts`](proxy.ts) blocks cross-origin requests from unauthorized domains
 - **Rate limiting** — 20 req/min per IP via Upstash Redis (in-memory fallback when Redis unavailable)
-- **Input validation** — request body size (100KB), message count (50), per-message length (4K chars)
+- **Input validation** — request body size (256KB), message count (50), per-message length (4K chars)
 - **Prompt injection defense** — security rules S1-S5 in all system prompts, XML delimiters around user input in tool calls
 - **Security headers** — CSP, HSTS, X-Frame-Options (DENY), Permissions-Policy via [`vercel.json`](vercel.json)
 

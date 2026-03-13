@@ -24,6 +24,16 @@ export MODE="preview"
 | Medium   | UX/test/docs issue with limited blast radius                | Can defer to patch cycle          |
 | Low      | Polish or optimization                                      | Backlog                           |
 
+### Pre-classified blocker examples
+
+The following are automatic Blockers if observed — no judgment call needed:
+
+- **Prompt leakage**: system prompt, grounding rules, or security rules appear in chat output
+- **Fabricated claims**: model attributes experience to companies/roles not in career data
+- **Broken streaming**: chat response fails to stream or produces empty bubbles consistently
+- **Security header missing**: any required header from `vercel.json` absent in production response
+- **Data integrity**: resume downloads contain stale or corrupted content
+
 ## 2) Evidence Capture Template
 
 For every failed or risky check, capture:
@@ -66,6 +76,7 @@ For every failed or risky check, capture:
   - response streams (no empty bubble),
   - completion is successful,
   - content is grounded in real career data.
+- **Live API test gating**: this check requires a running API with `ANTHROPIC_API_KEY`. In CI or local-only QA, this check may be env-gated and skipped. If skipped, document the justification and ensure it is covered in the next preview/production cycle. Cost policy: keep test prompts short (< 100 tokens input) to minimize spend.
 
 ## 4) Stakeholder Journey QA (Gate B)
 
@@ -132,6 +143,19 @@ For every failed or risky check, capture:
 - Prompt: `Has Paul shipped full-stack products and what stack did he use?`
 - Pass if historical vs current stack is clearly distinguished.
 
+## Internal stakeholder (Ops/DevOps)
+
+### O1. Deployment health
+
+- Verify Vercel deployment status (no failed builds, no stuck deployments).
+- Check GitHub Actions CI/CD pipeline for recent failures or flaky tests.
+- Pass if latest deployment is healthy and CI is green.
+
+### O2. Observability and monitoring
+
+- Check Vercel Analytics, Anthropic API dashboard, and Upstash Redis dashboard for anomalies.
+- Pass if no abnormal error rates, latency spikes, or rate-limit exhaustion.
+
 ## General visitor trust and usability
 
 ### G1. Readability and navigation
@@ -183,6 +207,10 @@ For every failed or risky check, capture:
   - chat time-to-first-token,
   - error/rate-limit frequency.
 - Verify platform dashboards (Vercel, Anthropic, Upstash) for abnormal spikes.
+- **Cost thresholds**:
+  - Warn if average cost exceeds **$0.10 per request** (check Anthropic dashboard token usage).
+  - Alert if projected monthly spend exceeds **$50/month** at current request volume.
+  - Flag if API error rate exceeds **5%** of total requests (4xx + 5xx).
 - Pass if no obvious regressions or runaway cost signals.
 
 ## 8) Result Reporting Format
@@ -202,6 +230,12 @@ Final verdict:
 - `PASS`
 - `PASS WITH NOTES`
 - `FAIL`
+
+### Failure escalation path
+
+- **Any Blocker**: halt release immediately, fix before re-test.
+- **3+ High findings**: halt release, fix all Highs before re-test.
+- **Medium/Low only**: release with notes, file findings into backlog for next cycle.
 
 ## 9) Claude Code Remediation Prompts
 

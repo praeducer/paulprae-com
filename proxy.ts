@@ -45,7 +45,9 @@ export function proxy(request: NextRequest) {
       return new NextResponse(null, {
         status: 204,
         headers: {
-          "Access-Control-Allow-Origin": origin && isAllowedOrigin(origin) ? origin : "",
+          // The 403 guard above already rejected unauthorized origins,
+          // so any request reaching here is either same-origin or allowed.
+          "Access-Control-Allow-Origin": origin ?? "",
           "Access-Control-Allow-Methods": "POST, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type",
           "Access-Control-Max-Age": "86400",
