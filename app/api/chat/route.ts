@@ -329,9 +329,10 @@ export async function POST(request: Request) {
                 }
 
                 return {
-                  resume: text,
-                  downloadLinks: RESUME_DOWNLOAD_PATHS,
-                  note: "This is a tailored version. Paul's standard resume is available via the download links above.",
+                  tailoredResume: text,
+                  standardResumeLinks: RESUME_DOWNLOAD_PATHS,
+                  instructions:
+                    "Present the FULL tailored resume content below, formatted as markdown. Then tell the user they can: (1) use the copy button on the message to copy the full resume, (2) download Paul's standard resume via the links in the nav bar for comparison. Do NOT just summarize the changes — show the complete tailored resume.",
                 };
               } catch (err) {
                 console.error("[tool:generate_tailored_resume]", err);

@@ -9,7 +9,6 @@ import { PATHS } from "../../lib/config";
 import { loadCareerData } from "../../lib/career-data";
 import { slugify, externalLinkProps } from "../../lib/ui-utils";
 import { DownloadIcon } from "../components/Icons";
-import BookInterviewLink from "../components/BookInterviewLink";
 import SiteNav from "../components/SiteNav";
 import {
   SITE_NAME,
@@ -219,7 +218,6 @@ export default function ResumePage() {
               GitHub
             </a>
           )}
-          <BookInterviewLink className={CONTACT_LINK_CLASS} />
           {/* Separator between contact and download groups */}
           <span
             aria-hidden="true"
@@ -273,8 +271,9 @@ export default function ResumePage() {
         {/* Bottom spacer ensures the last resume sections (Projects, Publications)
             can scroll to the top of the viewport when clicked in the section nav.
             Without this, the page bottoms out and the heading stays mid-viewport.
+            75vh ensures even the shortest final section can reach the sticky offset.
             Hidden on print to avoid wasting paper. */}
-        <div className="no-print h-[50vh]" aria-hidden="true" />
+        <div className="no-print h-[75vh]" aria-hidden="true" />
       </main>
 
       <footer className="no-print max-w-3xl mx-auto px-6 pb-8 pt-4 border-t border-slate-200 dark:border-slate-800">

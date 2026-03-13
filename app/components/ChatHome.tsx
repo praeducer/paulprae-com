@@ -25,7 +25,11 @@ import {
   SITE_DOMAIN,
   HERO_DESCRIPTION,
   GITHUB_URL,
+  GITHUB_PROFILE_URL,
+  CONTACT_EMAIL,
+  LINKEDIN_URL,
   FOOTER_LINK_CLASS,
+  CONTACT_LINK_CLASS,
 } from "../../lib/constants";
 import { externalLinkProps } from "../../lib/ui-utils";
 
@@ -320,6 +324,33 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                             Ask about Paul&apos;s experience, download his resume, or request a
                             tailored resume for your open role.
                           </p>
+                          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-1 gap-y-1">
+                            <a
+                              href={`mailto:${CONTACT_EMAIL}`}
+                              aria-label="Send email to Paul Prae"
+                              className={CONTACT_LINK_CLASS}
+                            >
+                              Email
+                            </a>
+                            <a
+                              href={LINKEDIN_URL}
+                              target="_blank"
+                              rel="me noopener noreferrer"
+                              aria-label="View Paul Prae on LinkedIn"
+                              className={CONTACT_LINK_CLASS}
+                            >
+                              LinkedIn
+                            </a>
+                            <a
+                              href={GITHUB_PROFILE_URL}
+                              target="_blank"
+                              rel="me noopener noreferrer"
+                              aria-label="View Paul Prae on GitHub"
+                              className={CONTACT_LINK_CLASS}
+                            >
+                              GitHub
+                            </a>
+                          </div>
                         </>
                       ) : (
                         <>

@@ -32,6 +32,8 @@ export const HERO_DESCRIPTION = `${YEARS_EXPERIENCE} years delivering enterprise
 export const SITE_DOMAIN = "paulprae.com";
 export const GITHUB_URL = "https://github.com/praeducer/paulprae-com";
 export const GITHUB_PROFILE_URL = "https://github.com/praeducer";
+export const CONTACT_EMAIL = "hireme@paulprae.com";
+export const LINKEDIN_URL = "https://www.linkedin.com/in/paulprae";
 
 // ─── Resume Downloads ───────────────────────────────────────────────────────
 
