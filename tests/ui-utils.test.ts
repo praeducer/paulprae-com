@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { slugify } from "../lib/ui-utils";
+import { slugify, externalLinkProps } from "../lib/ui-utils";
 
 describe("slugify", () => {
   it("converts basic text to lowercase slug", () => {
@@ -32,5 +32,33 @@ describe("slugify", () => {
 
   it("handles all-special-characters input", () => {
     expect(slugify("@#$%")).toBe("");
+  });
+});
+
+describe("externalLinkProps", () => {
+  it("returns target and rel for http URLs", () => {
+    expect(externalLinkProps("https://example.com")).toEqual({
+      target: "_blank",
+      rel: "noopener noreferrer",
+    });
+  });
+
+  it("returns target and rel for http (non-TLS) URLs", () => {
+    expect(externalLinkProps("http://example.com")).toEqual({
+      target: "_blank",
+      rel: "noopener noreferrer",
+    });
+  });
+
+  it("returns empty object for internal paths", () => {
+    expect(externalLinkProps("/resume")).toEqual({});
+  });
+
+  it("returns empty object for undefined", () => {
+    expect(externalLinkProps(undefined)).toEqual({});
+  });
+
+  it("returns empty object for anchor links", () => {
+    expect(externalLinkProps("#section")).toEqual({});
   });
 });

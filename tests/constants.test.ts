@@ -32,6 +32,9 @@ import {
   NAV_LINK_CLASS,
   CTA_BUTTON_CLASS,
   CONTACT_LINK_CLASS,
+  FOOTER_LINK_CLASS,
+  BUTTON_PRIMARY_CLASS,
+  BUTTON_SECONDARY_CLASS,
 } from "../lib/constants";
 
 // ─── Site Identity ──────────────────────────────────────────────────────────
@@ -179,6 +182,21 @@ describe("navigation style constants", () => {
   it("CONTACT_LINK_CLASS is a non-empty string", () => {
     expect(typeof CONTACT_LINK_CLASS).toBe("string");
     expect(CONTACT_LINK_CLASS.length).toBeGreaterThan(0);
+  });
+
+  it("FOOTER_LINK_CLASS is a non-empty string", () => {
+    expect(typeof FOOTER_LINK_CLASS).toBe("string");
+    expect(FOOTER_LINK_CLASS.length).toBeGreaterThan(0);
+  });
+
+  it("BUTTON_PRIMARY_CLASS is a non-empty string", () => {
+    expect(typeof BUTTON_PRIMARY_CLASS).toBe("string");
+    expect(BUTTON_PRIMARY_CLASS.length).toBeGreaterThan(0);
+  });
+
+  it("BUTTON_SECONDARY_CLASS is a non-empty string", () => {
+    expect(typeof BUTTON_SECONDARY_CLASS).toBe("string");
+    expect(BUTTON_SECONDARY_CLASS.length).toBeGreaterThan(0);
   });
 });
 
