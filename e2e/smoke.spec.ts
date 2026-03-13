@@ -38,7 +38,8 @@ test.describe("page rendering", () => {
 
   test("resume page has download links", async ({ page }) => {
     await page.goto("/resume");
-    const pdfLink = page.locator('a[href*="Resume.pdf"]');
+    // Use the contact row PDF link (has file size label) to avoid matching SiteNav's PDF link too
+    const pdfLink = page.locator('a[href*="Resume.pdf"]').filter({ hasText: /KB/ });
     await expect(pdfLink).toBeVisible({ timeout: 10_000 });
   });
 
