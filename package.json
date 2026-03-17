@@ -16,6 +16,7 @@
     "export": "tsx scripts/export-resume.ts",
     "export:pdf": "tsx scripts/export-resume.ts --format pdf",
     "export:docx": "tsx scripts/export-resume.ts --format docx",
+    "export:docs": "tsx scripts/export-docs.ts",
     "ingest:force": "tsx scripts/ingest-linkedin.ts --force",
     "generate:force": "tsx scripts/generate-resume.ts --force",
     "compare": "tsx scripts/compare-resumes.ts",

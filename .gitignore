@@ -95,6 +95,9 @@ coverage/
 playwright-report/
 test-results/
 
+# Documentation exports (regenerable via npm run export:docs)
+docs/exports/
+
 # Misc
 *.pem
 .vercel
