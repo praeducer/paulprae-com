@@ -2,13 +2,13 @@
 
 Actionable coding and documentation tasks for Claude Code. No human-only tasks here (those are in `human-tasks.md`).
 
-> Last reconciled: 2026-03-08 against `feat/phase2-implementation` branch (pre-merge to main).
+> Last reconciled: 2026-03-18 against `feat/interview-booking-cta` (PR #28, pending merge).
 
 ---
 
 ## Post-Merge Automation
 
-- [ ] Bump `package.json` version to `2.0.0` after merging Phase 2 to main
+- [ ] Bump `package.json` version to `2.0.0` after merging PR #28 to main (currently `0.1.0`)
 - [ ] Add CI route validation — `test -d .next/server/app/resume` to verify specific routes exist in build output
 
 ## Pipeline Enhancements

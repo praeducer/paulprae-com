@@ -2,7 +2,7 @@
 
 Tasks requiring manual action: Vercel dashboard, GitHub UI, DNS provider, browser testing, Anthropic console, or personal decisions. Cannot be automated by Claude Code.
 
-> Last updated: 2026-03-08
+> Last updated: 2026-03-18
 
 ---
 
@@ -22,20 +22,43 @@ Tasks requiring manual action: Vercel dashboard, GitHub UI, DNS provider, browse
 
 ---
 
-## Current: Post-Deploy Verification
+## Current: Merge PR #28 (Book Interview CTA)
 
-### YOU — Mobile browser test (PR #27)
+PR #28 is `feat/interview-booking-cta` — adds the Book Interview scheduling CTA across all pages, UX polish, and branch consolidation (phase3 reference library + data model plan).
+
+### YOU — Pre-merge QA (do before merging PR #28)
+
+- [ ] Run `docs/uat-checklist.md` on the Vercel preview deployment for PR #28
+- [ ] Confirm Book Interview CTA appears in header (all pages), chat hero chip, and resume contact row
+- [ ] Confirm all 12 UAT sections pass
+
+### YOU — Merge PR #28
+
+- [ ] Merge PR #28 on GitHub when UAT passes
+
+---
+
+## Post-Merge Verification (PRs #27–28)
+
+These tasks were pending after PRs #26 and #27 and still apply after PR #28 deploys to production.
+
+### YOU — Mobile browser test
 
 - [ ] Visit `https://paulprae.com/` → tap "Resume" link → confirm skip-nav does NOT flash
 - [ ] Visit `https://paulprae.com/resume` directly on mobile → confirm no skip-nav flash
 - [ ] On desktop, Tab through resume page → confirm skip-nav appears on first Tab press
+
+### YOU — Book Interview CTA (mobile, production)
+
+- [ ] On mobile: header shows icon-only "Book Interview" button on all three pages
+- [ ] On mobile: tapping the button opens Microsoft Bookings in a new tab
 
 ### YOU — CORS verification
 
 - [ ] Run: `curl -sI https://paulprae.com | grep -i access-control` → should show `https://paulprae.com` (not `*`)
 - [ ] If still showing `*`, Vercel CDN cache may need time to propagate the new header
 
-### YOU — Monitor dashboards (first 48 hours)
+### YOU — Monitor dashboards (first 48 hours post-merge)
 
 - [ ] Monitor Anthropic API costs: console.anthropic.com > Usage
 - [ ] Check Vercel Dashboard > Functions — verify `/api/chat` executions with successful status
