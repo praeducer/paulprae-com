@@ -102,3 +102,4 @@ docs/exports/
 *.pem
 .vercel
 data/generated/.telemetry.jsonl
+*:Zone.Identifier
