@@ -21,13 +21,13 @@
  *   1  One or more checks failed
  */
 
+import { execFileSync } from "child_process";
+import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import crypto from "crypto";
-import { execFileSync } from "child_process";
 import { PATHS, RESUME_FILE_BASE } from "../lib/config";
-import { isDirectRun } from "../lib/script-utils";
 import { stripHtmlComments } from "../lib/markdown";
+import { isDirectRun } from "../lib/script-utils";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -374,6 +374,42 @@ function checkResumeQuality(): CheckResult {
   };
 }
 
+function checkWSLPaths(): CheckResult {
+  const start = Date.now();
+  let detail = "WSL not detected";
+  let passed = true;
+
+  try {
+    const { ok, output } = runCommand("uname", ["-r"]);
+    if (ok && output.includes("WSL")) {
+      detail = "WSL detected";
+      // Check for slow /mnt/c paths in common locations
+      const slowPaths = ["/mnt/c/dev", "/mnt/c/Users"];
+      const issues: string[] = [];
+      for (const p of slowPaths) {
+        if (fs.existsSync(p)) {
+          issues.push(`${p} exists (use WSL paths instead)`);
+        }
+      }
+      if (issues.length > 0) {
+        detail += ` - ${issues.join(", ")}`;
+        passed = false;
+      } else {
+        detail += " - paths optimized";
+      }
+    }
+  } catch {
+    // uname not available, assume not WSL
+  }
+
+  return {
+    name: "WSL paths",
+    passed,
+    detail,
+    durationMs: Date.now() - start,
+  };
+}
+
 function checkDocs(): CheckResult {
   const start = Date.now();
   const { ok, output } = runCommand("npx", ["tsx", "scripts/validate-docs.ts"]);
@@ -386,8 +422,6 @@ function checkDocs(): CheckResult {
     durationMs: Date.now() - start,
   };
 }
-
-// ─── Main ────────────────────────────────────────────────────────────────────
 
 function main(): void {
   console.log();
@@ -403,6 +437,7 @@ function main(): void {
   results.push(checkDataFiles());
   results.push(checkResumeQuality());
   results.push(checkPublicDownloads());
+  results.push(checkWSLPaths());
 
   if (!quickMode) {
     // Phase 2: Code quality (skip in quick mode)
@@ -489,6 +524,7 @@ export const _testExports = {
   checkDataFiles,
   checkResumeQuality,
   checkPublicDownloads,
+  checkWSLPaths,
   checkBuildOutput,
   fileExists,
   fileSize,

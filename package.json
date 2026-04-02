@@ -45,6 +45,7 @@
     "check": "tsx scripts/release-check.ts",
     "check:quick": "tsx scripts/release-check.ts --quick",
     "check:fix": "tsx scripts/release-check.ts --quick --fix",
+    "env:check": "tsx scripts/env-check.ts",
     "prepare": "husky || true"
   },
   "dependencies": {
