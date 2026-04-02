@@ -2,7 +2,7 @@
 
 Actionable coding and documentation tasks for Claude Code. No human-only tasks here (those are in `human-tasks.md`).
 
-> Last reconciled: 2026-03-18 against `feat/interview-booking-cta` (PR #28, pending merge).
+> Last reconciled: 2026-04-02 against `feat/interview-booking-cta` (PR #28, ready to merge — UAT is the only remaining gate).
 
 ---
 

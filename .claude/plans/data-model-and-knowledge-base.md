@@ -2,27 +2,32 @@
 
 ## Overview
 
-This plan tracks all work related to curating, enriching, and structuring the career data and knowledge base that powers the resume generator — and will feed Phase 2 RAG-based chat.
+This plan tracks all work related to curating, enriching, and structuring the career data and knowledge base that powers the resume generator and Phase 3 knowledge graph.
 
 Three areas:
 
 1. **Quantified metrics** — Adding real numbers to career positions (only Paul knows these)
 2. **Knowledge base curation** — Improving content quality, adding missing entries, fixing stale data
-3. **Data model improvements** — Structural changes to support better grounding, temporal metadata, and Phase 2 RAG
+3. **Data model improvements** — Structural changes to support better grounding, temporal metadata, and Phase 3 RAG
 
 ---
 
 ## Status
 
-| Area                            | Status      | Priority |
-| ------------------------------- | ----------- | -------- |
-| Quantified metrics — TReNDS     | Not started | High     |
-| Quantified metrics — NeuroLex   | Not started | High     |
-| Quantified metrics — Hyperbloom | Not started | Medium   |
-| Quantified metrics — AWS        | Optional    | Low      |
-| Arine metrics (company facts)   | Done (v2.0) | —        |
-| KnowledgeEntry temporal fields  | Done (v2.0) | —        |
-| companies.json verified metrics | Done (v2.0) | —        |
+| Area                              | Status      | Priority |
+| --------------------------------- | ----------- | -------- |
+| Update current employer in data   | Not started | High     |
+| Quantified metrics — TReNDS       | Not started | High     |
+| Quantified metrics — NeuroLex     | Not started | High     |
+| NeuroLex public source research   | Not started | High     |
+| Role-type metadata (FT/PT/owner)  | Not started | Medium   |
+| Project-to-entity metadata links  | Not started | Medium   |
+| Quantified metrics — Hyperbloom   | Not started | Medium   |
+| Repo audit & cleanup (file bloat) | Not started | Medium   |
+| Quantified metrics — AWS          | Optional    | Low      |
+| Arine metrics (company facts)     | Done (v2.0) | —        |
+| KnowledgeEntry temporal fields    | Done (v2.0) | —        |
+| companies.json verified metrics   | Done (v2.0) | —        |
 
 ---
 
@@ -92,15 +97,25 @@ Nice-to-have additions:
 - [ ] Slalom: add behavioral health forecasting project details to `position-metrics.json`
 - [ ] AWS: add speaking/publishing details if available
 
-### Phase 2 prep (for RAG chat)
+### Phase 3 prep (for knowledge graph and RAG)
 
-When Phase 2 (AI chat interface) is implemented, the knowledge base will be ingested into a vector store (Supabase + pgvector) for semantic retrieval. These improvements make chat answers more accurate:
+These improvements prepare the knowledge base for Phase 3 vector ingestion into Supabase + pgvector:
 
 - [ ] Add entries for notable projects (COINSTAC, behavioral health forecasting tools)
 - [ ] Add entries for certifications with descriptions of what was learned/applied
-- [ ] Add entries for technologies with usage context (e.g., "Used Snowflake at Arine for X")
+- [ ] Add entries for technologies with usage context (e.g., "Used Snowflake at [employer] for X")
 - [ ] Ensure all entries have `asOf` and `source` fields where verifiable
 - [ ] Add skill entries with concrete example applications
+
+### NeuroLex public source research
+
+Collect and link these public sources for NeuroLex company context and the Sonde Health acquisition:
+
+- https://www.sondehealth.com/news-blog/sonde-health-acquires-neurolex-labs-creating-the-global-leader-in-voice-science
+- https://www.mobihealthnews.com/news/sonde-health-acquires-neurolex-laboratories-cement-its-vocal-biomarker-health-platform
+- https://www.businesswire.com/news/home/20200825005177/en/Sonde-Health-Acquires-NeuroLex-Labs-Creating-the-Global-Leader-in-Voice-Science
+
+Add verified facts from these sources to `companies.json` (NeuroLex entry) and `position-metrics.json` (NeuroLex role entry).
 
 ---
 
@@ -134,6 +149,12 @@ When Phase 2 (AI chat interface) is implemented, the knowledge base will be inge
 ---
 
 ### Workstream A — Canonical Data Model Design (Start Here)
+
+#### A0) Enrichment metadata (new ideas)
+
+- [ ] Add `employment_type` to role entities: `full_time`, `part_time`, `business_owner`, `contract`, `volunteer`
+- [ ] Add explicit `business_entity` link on projects and contracts, mapping each engagement to its parent organization (e.g., Hyperbloom consulting → specific client entity)
+- [ ] This enables accurate rendering of overlapping roles and prevents conflation in the resume generator
 
 #### A1) Canonical entity inventory
 

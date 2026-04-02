@@ -2,8 +2,8 @@
 
 Run this checklist after every major deployment. Automated tests (unit, E2E, CI smoke tests) cover regressions — this checklist covers what only a human can verify: visual quality, AI response quality, and end-to-end user flows with real API calls.
 
-**When to run:** After merging to `main` and confirming production deploy is live.
-**Where:** https://paulprae.com (production) and mobile device/emulator.
+**When to run:** Before merging a PR (use the Vercel preview URL) and after deploying to production (`https://paulprae.com`).
+**Where:** Preview URL (pre-merge) or https://paulprae.com (post-deploy), plus a mobile device/emulator.
 **Time:** ~20 minutes.
 
 **Pre-flight (automated):** Before starting manual testing, run these commands. All should pass:

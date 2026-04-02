@@ -2,23 +2,7 @@
 
 Tasks requiring manual action: Vercel dashboard, GitHub UI, DNS provider, browser testing, Anthropic console, or personal decisions. Cannot be automated by Claude Code.
 
-> Last updated: 2026-03-18
-
----
-
-## Completed: Phase 2 Launch
-
-- [x] Fund Anthropic API credits
-- [x] Test chat streaming locally
-- [x] Verify Vercel env vars (all 3 environments)
-- [x] Tag `v1.0.0` at `e0fd07f`
-- [x] Merge PR #21 — Phase 2 AI chat platform
-- [x] Production deployment verified
-- [x] Automated smoke tests passed (8/8)
-- [x] Full production QA — 418 unit tests, chat API, security headers, SEO
-- [x] Fix skip-nav flash on mobile — PR #26 (sr-only + focus-visible:not-sr-only)
-- [x] Fix skip-nav touch-device flash — PR #27 (@media hover:hover gate in globals.css)
-- [x] CORS hardening — PR #27 (explicit ACAO in vercel.json overrides Vercel CDN wildcard)
+> Last updated: 2026-04-02
 
 ---
 
