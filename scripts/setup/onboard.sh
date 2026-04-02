@@ -22,7 +22,8 @@ npm run prepare
 
 echo
 echo "📊 Running data pipeline..."
-npm run pipeline
+echo "   (Skipping pipeline - run 'npm run pipeline' manually if needed)"
+# npm run pipeline
 
 echo
 echo "🧪 Running tests..."
