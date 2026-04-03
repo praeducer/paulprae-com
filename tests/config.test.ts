@@ -13,7 +13,7 @@
 
 import { describe, it, expect } from "vitest";
 import path from "path";
-import { PATHS, LINKEDIN_CSV_FILES, RESUME_FILE_BASE, _testExports } from "../lib/config.js";
+import { PATHS, LINKEDIN_CSV_FILES, RESUME_FILE_BASE } from "../lib/config.js";
 
 // RESUME_FILE_BASE constant checks removed — TypeScript + config guarantee correctness.
 // Slugify edge-case tests below cover the actual logic.

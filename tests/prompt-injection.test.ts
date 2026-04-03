@@ -25,7 +25,7 @@ describe("security rules in all system prompts", () => {
   // All prompts must have untrusted input handling and prompt reveal prevention
   const allPromptFiles = [
     "career-chat.system.md",
-    "resume-generator.system.md",
+    "resume-writer.system.md",
     "job-tools.system.md",
   ];
 
@@ -67,8 +67,8 @@ describe("security rules in all system prompts", () => {
 
 // ─── Resume Generator XML Isolation ─────────────────────────────────────────
 
-describe("resume-generator XML injection defense", () => {
-  const prompt = readPrompt("resume-generator.system.md");
+describe("resume-writer XML injection defense", () => {
+  const prompt = readPrompt("resume-writer.system.md");
 
   it("references <job_description> XML tags for untrusted input", () => {
     expect(prompt).toContain("<job_description>");
@@ -118,7 +118,7 @@ describe("schema validation rejects malicious inputs", () => {
 
 describe("grounding rules in prompts", () => {
   const chatPrompt = readPrompt("career-chat.system.md");
-  const resumeGenPrompt = readPrompt("resume-generator.system.md");
+  const resumeWriterPrompt = readPrompt("resume-writer.system.md");
 
   it("career-chat forbids fabricating metrics", () => {
     expect(chatPrompt).toMatch(/[Nn]ever fabricate/);
@@ -128,12 +128,12 @@ describe("grounding rules in prompts", () => {
     expect(chatPrompt).toMatch(/cite specific positions/i);
   });
 
-  it("resume-generator requires every bullet to be traceable", () => {
-    expect(resumeGenPrompt).toMatch(/traceable/i);
+  it("resume-writer requires every bullet to be traceable", () => {
+    expect(resumeWriterPrompt).toMatch(/traceable/i);
   });
 
-  it("resume-generator has source priority rule for conflicts", () => {
-    expect(resumeGenPrompt).toMatch(/[Ss]ource priority/);
+  it("resume-writer has source grounding rule for confidence levels", () => {
+    expect(resumeWriterPrompt).toMatch(/[Ss]ource [Gg]rounding/);
   });
 });
 

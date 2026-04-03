@@ -6,9 +6,11 @@ import { loadCareerData } from "../lib/career-data";
 import {
   SITE_NAME,
   SITE_SUBTITLE,
+  SITE_DOMAIN,
   SITE_URL,
   SITE_DESCRIPTION,
   SITE_OG_DESCRIPTION,
+  GITHUB_PROFILE_URL,
 } from "../lib/constants";
 
 const careerData = loadCareerData();
@@ -18,8 +20,8 @@ const ogTitle = `${SITE_NAME} — ${SITE_SUBTITLE}`;
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — AI Career Assistant | paulprae.com`,
-    template: "%s | paulprae.com",
+    default: `${SITE_NAME} — AI Career Assistant | ${SITE_DOMAIN}`,
+    template: `%s | ${SITE_DOMAIN}`,
   },
   description: SITE_DESCRIPTION,
   icons: {
@@ -77,7 +79,7 @@ function StructuredDataJsonLd() {
     email: profile.email,
     jobTitle: SITE_SUBTITLE,
     description: SITE_DESCRIPTION,
-    sameAs: [profile.linkedin, "https://github.com/praeducer"].filter(Boolean),
+    sameAs: [profile.linkedin, GITHUB_PROFILE_URL].filter(Boolean),
     knowsAbout: careerData.skills.slice(0, 20),
     ...(recentPosition && {
       worksFor: {

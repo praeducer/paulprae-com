@@ -78,5 +78,21 @@ if ((Get-Command npm -ErrorAction SilentlyContinue) -and -not ([Security.Princip
     Write-Warning "Node.js not in PATH. Restart terminal and re-run to install npm packages."
 }
 
+# VS Code extensions
+if (Get-Command code -ErrorAction SilentlyContinue) {
+    $extensions = @("GitHub.copilot-chat")
+    foreach ($ext in $extensions) {
+        $installed = code --list-extensions | Select-String $ext
+        if (-not $installed) {
+            Write-Host "[INSTALL] VS Code extension: $ext..." -ForegroundColor Green
+            code --install-extension $ext --force
+        } else {
+            Write-Host "[SKIP] VS Code extension $ext already installed" -ForegroundColor Yellow
+        }
+    }
+} else {
+    Write-Warning "VS Code not in PATH. Install extensions manually."
+}
+
 Write-Host "`n=== Done ===" -ForegroundColor Cyan
 Write-Host "Next: See docs/windows-dev-environment-setup.md for git config and Dev Drive setup.`n"

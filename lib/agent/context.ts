@@ -14,7 +14,7 @@ import { loadCareerData } from "../career-data";
 import { stripEmpty } from "../data-utils";
 import type { CareerData } from "../types";
 import { loadPrompt } from "../prompts/loader";
-import { YEARS_EXPERIENCE } from "../constants";
+import { YEARS_EXPERIENCE, BOOK_INTERVIEW_URL, RESUME_DOWNLOAD_PATHS } from "../constants";
 
 // ─── Knowledge Base Paths ────────────────────────────────────────────────────
 
@@ -26,6 +26,7 @@ const KNOWLEDGE_FILES = {
   writingFormulas: path.join(KNOWLEDGE_DIR, "content", "writing-formulas.json"),
   audienceFrameworks: path.join(KNOWLEDGE_DIR, "strategy", "audience-frameworks.json"),
   communicationStyles: path.join(KNOWLEDGE_DIR, "brand", "communication-styles.json"),
+  companies: path.join(KNOWLEDGE_DIR, "career", "companies.json"),
 } as const;
 
 // ─── Context Building ───────────────────────────────────────────────────────
@@ -37,6 +38,7 @@ export interface CareerContext {
   writingFormulas: unknown;
   audienceFrameworks: unknown;
   communicationStyles: unknown;
+  companies: unknown;
 }
 
 function loadJsonSafe(filePath: string): unknown {
@@ -62,6 +64,7 @@ export function loadCareerContext(): CareerContext | null {
     writingFormulas: loadJsonSafe(KNOWLEDGE_FILES.writingFormulas),
     audienceFrameworks: loadJsonSafe(KNOWLEDGE_FILES.audienceFrameworks),
     communicationStyles: loadJsonSafe(KNOWLEDGE_FILES.communicationStyles),
+    companies: loadJsonSafe(KNOWLEDGE_FILES.companies),
   };
 }
 
@@ -72,7 +75,7 @@ type PromptMode = "chat" | "tools" | "resume-generator";
 const PROMPT_IDS: Record<PromptMode, string> = {
   chat: "career-chat",
   tools: "job-tools",
-  "resume-generator": "resume-generator",
+  "resume-generator": "resume-writer",
 };
 
 /**
@@ -102,23 +105,30 @@ export function buildSystemPrompt(mode: PromptMode): string | null {
   // contains "15 years" which the model reads as ground truth, overriding
   // the grounding rule G2. Fixing at the data layer is more reliable than
   // instruction-level overrides.
-  const careerDataJson = JSON.stringify(stripEmpty(context.careerData), null, 2).replace(
+  const careerDataJson = JSON.stringify(stripEmpty(context.careerData)).replace(
     /\b15\s+years?\b/gi,
     `${YEARS_EXPERIENCE} years`,
   );
-  const audienceJson = JSON.stringify(context.audienceFrameworks, null, 2);
+  const audienceJson = JSON.stringify(context.audienceFrameworks);
+  const companyJson = JSON.stringify(context.companies);
 
   let prompt = template
     .replace("{{CAREER_DATA}}", careerDataJson)
-    .replace("{{AUDIENCE_FRAMEWORKS}}", audienceJson);
+    .replace("{{AUDIENCE_FRAMEWORKS}}", audienceJson)
+    .replace("{{COMPANY_DATA}}", companyJson)
+    .replace("{{BOOK_INTERVIEW_URL}}", BOOK_INTERVIEW_URL)
+    .replace(/\{\{RESUME_PDF_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.pdf)
+    .replace(/\{\{RESUME_DOCX_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.docx)
+    .replace(/\{\{RESUME_MD_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.md)
+    .replace(/\{\{RESUME_WEB_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.web);
 
   // Tools mode has additional placeholders
   if (mode === "tools") {
     prompt = prompt
-      .replace("{{PLATFORM_CONSTRAINTS}}", JSON.stringify(context.platformConstraints, null, 2))
-      .replace("{{WRITING_FORMULAS}}", JSON.stringify(context.writingFormulas, null, 2))
-      .replace("{{MESSAGE_TEMPLATES}}", JSON.stringify(context.messageTemplates, null, 2))
-      .replace("{{COMMUNICATION_STYLES}}", JSON.stringify(context.communicationStyles, null, 2));
+      .replace("{{PLATFORM_CONSTRAINTS}}", JSON.stringify(context.platformConstraints))
+      .replace("{{WRITING_FORMULAS}}", JSON.stringify(context.writingFormulas))
+      .replace("{{MESSAGE_TEMPLATES}}", JSON.stringify(context.messageTemplates))
+      .replace("{{COMMUNICATION_STYLES}}", JSON.stringify(context.communicationStyles));
   }
 
   return prompt;

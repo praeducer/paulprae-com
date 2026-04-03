@@ -80,6 +80,22 @@ Write-Host "[OK] $DevDrive trusted" -ForegroundColor Green
 fsutil devdrv setFiltersAllowed /volume $DevDrive "PrjFlt, MsSecFlt, WdFilter, bindFlt, wcifs, FileInfo" 2>&1 | Out-Null
 Write-Host "[OK] Common dev filters allowed" -ForegroundColor Green
 
+# Performance diagnostics
+Write-Host "`n--- Performance check ---" -ForegroundColor Cyan
+$driveInfo = Get-Volume -DriveLetter $DevDrive.Trim(':')
+if ($driveInfo.FileSystem -eq "ReFS") {
+    Write-Host "[OK] ReFS filesystem detected (optimal for Dev Drive)" -ForegroundColor Green
+} else {
+    Write-Warning "Filesystem is $($driveInfo.FileSystem). ReFS recommended for Dev Drive."
+}
+
+# Check for antivirus interference
+$avProcesses = Get-Process | Where-Object { $_.ProcessName -match "(defender|antivirus|avast|avg|bitdefender)" } | Select-Object -First 5
+if ($avProcesses) {
+    Write-Warning "Antivirus processes detected. Ensure Dev Drive is excluded from real-time scanning."
+    $avProcesses | ForEach-Object { Write-Host "  - $($_.ProcessName)" }
+}
+
 Write-Host "`n=== Done ===" -ForegroundColor Cyan
 Write-Host "Next steps:"
 Write-Host "  1. Restart terminal for env var changes"

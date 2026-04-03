@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { SITE_NAME, SITE_SUBTITLE } from "../lib/constants";
+import {
+  SITE_NAME,
+  SITE_SUBTITLE,
+  BUTTON_PRIMARY_CLASS,
+  BUTTON_SECONDARY_CLASS,
+} from "../lib/constants";
 
 export default function NotFound() {
   return (
@@ -11,16 +16,10 @@ export default function NotFound() {
         career assistant or view his resume.
       </p>
       <div className="mt-8 flex gap-4">
-        <Link
-          href="/"
-          className="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-600 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none"
-        >
+        <Link href="/" className={BUTTON_PRIMARY_CLASS}>
           Chat with AI
         </Link>
-        <Link
-          href="/resume"
-          className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-        >
+        <Link href="/resume" className={BUTTON_SECONDARY_CLASS}>
           View Resume
         </Link>
       </div>

@@ -45,7 +45,9 @@ export function proxy(request: NextRequest) {
       return new NextResponse(null, {
         status: 204,
         headers: {
-          "Access-Control-Allow-Origin": origin && isAllowedOrigin(origin) ? origin : "",
+          // The 403 guard above already rejected unauthorized origins,
+          // so any request reaching here is either same-origin or allowed.
+          "Access-Control-Allow-Origin": origin ?? "",
           "Access-Control-Allow-Methods": "POST, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type",
           "Access-Control-Max-Age": "86400",
@@ -53,8 +55,10 @@ export function proxy(request: NextRequest) {
       });
     }
 
-    // Only allow POST to API routes
-    if (request.method !== "POST") {
+    // Only allow POST to API routes.
+    // Exception: /api/cron uses GET (Vercel scheduler sends GET + Authorization header).
+    const isCron = pathname === "/api/cron";
+    if (!isCron && request.method !== "POST") {
       return new NextResponse("Method Not Allowed", {
         status: 405,
         headers: { Allow: "POST, OPTIONS" },

@@ -39,6 +39,9 @@ data/generated/resume.docx
 # Pipeline: staging resume (transient, not yet approved for deploy)
 data/generated/*.staging.md
 
+# Pipeline: tailored resumes (generated on-demand, contain company-specific content)
+data/generated/tailored/
+
 # Pipeline: skip-logic hash (machine-local, regenerated each run)
 data/generated/.ingest-hash
 
@@ -74,6 +77,7 @@ NUL
 
 # Claude Code local-only files
 .claude/settings.local.json
+.claude/plans/reference-files/
 
 # Debug logs
 npm-debug.log*
@@ -91,7 +95,11 @@ coverage/
 playwright-report/
 test-results/
 
+# Documentation exports (regenerable via npm run export:docs)
+docs/exports/
+
 # Misc
 *.pem
 .vercel
 data/generated/.telemetry.jsonl
+*:Zone.Identifier

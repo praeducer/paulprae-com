@@ -31,7 +31,7 @@ Configure these in GitHub repo Settings → Secrets and variables → Actions:
 
 ## Smoke Tests
 
-After every deployment, the smoke test (`npm run smoke`) verifies:
+After every deployment, the smoke test (`scripts/smoke-test.ts`, run via `npm run smoke`) verifies:
 
 1. Homepage returns 200 with expected content ("Paul Prae", "AI Career Assistant")
 2. Resume page returns 200 with expected content ("Paul Prae", "Professional Summary")

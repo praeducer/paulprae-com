@@ -399,18 +399,25 @@ function copyToPublic(format: ExportFormat): void {
   if ((format === "all" || format === "docx") && fs.existsSync(PATHS.docxOutput)) {
     copies.push({ src: PATHS.docxOutput, dest: PATHS.publicDocx });
   }
-  // Always copy markdown for direct download
-  if (fs.existsSync(PATHS.resumeOutput)) {
-    copies.push({ src: PATHS.resumeOutput, dest: PATHS.publicMd });
-  }
 
-  if (copies.length === 0) return;
+  if (copies.length === 0 && !fs.existsSync(PATHS.resumeOutput)) return;
 
   console.log("\n   📋 Copying to public/ for web download:");
+
+  // Binary files: byte-exact copy
   for (const { src, dest } of copies) {
     fs.copyFileSync(src, dest);
     const kb = (fs.statSync(dest).size / 1024).toFixed(1);
     console.log(`      ${path.basename(dest)} (${kb} KB)`);
+  }
+
+  // Markdown: strip HTML comments (pipeline metadata) before copying —
+  // downloaded markdown should be clean, user-facing content only.
+  if (fs.existsSync(PATHS.resumeOutput)) {
+    const cleanMd = stripHtmlComments(fs.readFileSync(PATHS.resumeOutput, "utf-8"));
+    fs.writeFileSync(PATHS.publicMd, cleanMd, "utf-8");
+    const kb = (Buffer.byteLength(cleanMd, "utf-8") / 1024).toFixed(1);
+    console.log(`      ${path.basename(PATHS.publicMd)} (${kb} KB) [comments stripped]`);
   }
 }
 

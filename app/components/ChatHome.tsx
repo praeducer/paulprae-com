@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useCallback } from "react";
-import Link from "next/link";
 import { useChat } from "@ai-sdk/react";
 import {
   AssistantRuntimeProvider,
@@ -10,18 +9,106 @@ import {
   ComposerPrimitive,
   ActionBarPrimitive,
   useComposer,
+  useMessage,
+  useAuiState,
 } from "@assistant-ui/react";
 import { useAISDKRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
 import remarkGfm from "remark-gfm";
+import SiteNav from "./SiteNav";
 import QuickActions from "./QuickActions";
-import { MAX_MESSAGE_CHARS, SITE_NAME, SITE_SUBTITLE, HERO_DESCRIPTION } from "../../lib/constants";
+import { CopyIcon, ReloadIcon, SendIcon, ArrowDownIcon } from "./Icons";
+import {
+  MAX_MESSAGE_CHARS,
+  SITE_NAME,
+  SITE_SUBTITLE,
+  SITE_DOMAIN,
+  HERO_DESCRIPTION,
+  GITHUB_URL,
+  GITHUB_PROFILE_URL,
+  CONTACT_EMAIL,
+  LINKEDIN_URL,
+  FOOTER_LINK_CLASS,
+  CONTACT_LINK_CLASS,
+} from "../../lib/constants";
+import { externalLinkProps } from "../../lib/ui-utils";
 
 // ─── Markdown Text Wrapper ──────────────────────────────────────────────────
 
-/** Wraps MarkdownTextPrimitive with GFM support (tables, strikethrough, etc.) */
+/** Wraps MarkdownTextPrimitive with GFM support and external link handling. */
 function MarkdownText() {
-  return <MarkdownTextPrimitive remarkPlugins={[remarkGfm]} />;
+  return (
+    <MarkdownTextPrimitive
+      remarkPlugins={[remarkGfm]}
+      components={{
+        a: ({ href, children, ...props }) => (
+          <a
+            href={href}
+            {...externalLinkProps(href)}
+            className="text-blue-700 underline hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+            {...props}
+          >
+            {children}
+          </a>
+        ),
+      }}
+    />
+  );
+}
+
+// ─── Thinking Indicator ────────────────────────────────────────────────────
+// Breathing dots shown while the assistant is generating a response.
+// Two layers ensure coverage across the full message lifecycle:
+//   1. MessageThinking — inside AssistantMessage, hides once tokens stream in
+//   2. ThreadThinking  — standalone bubble below all messages, covers the gap
+//      before assistant-ui creates the AssistantMessage component
+// Mirrors the Claude.ai pattern. Accessible via role="status".
+// Respects prefers-reduced-motion (see globals.css).
+
+const thinkingDotClass = "thinking-dot h-2 w-2 rounded-full bg-slate-400 dark:bg-slate-500";
+
+function ThinkingDots() {
+  return (
+    <div role="status" aria-label="Generating response">
+      <span className="sr-only">Thinking…</span>
+      <div className="flex items-center gap-1.5" aria-hidden="true">
+        <span className={thinkingDotClass} />
+        <span className={thinkingDotClass} />
+        <span className={thinkingDotClass} />
+      </div>
+    </div>
+  );
+}
+
+/** Inside AssistantMessage — shows until text tokens start streaming. */
+function MessageThinking() {
+  const show = useMessage((m) => {
+    if (m.role !== "assistant") return false;
+    return (
+      m.status.type === "running" && !m.content.some((p) => p.type === "text" && p.text.length > 0)
+    );
+  });
+  return show ? <ThinkingDots /> : null;
+}
+
+/** Thread-level — standalone bubble shown when running but no assistant message exists yet. */
+function ThreadThinking() {
+  const isRunning = useAuiState((s) => s.thread.isRunning);
+  // Check if the last message is already an assistant message (MessageThinking handles that case).
+  const lastIsAssistant = useAuiState((s) => {
+    const msgs = s.thread.messages;
+    return msgs.length > 0 && msgs[msgs.length - 1].role === "assistant";
+  });
+
+  if (!isRunning || lastIsAssistant) return null;
+
+  return (
+    <div className="chat-message-in flex justify-start mb-5">
+      <div className="rounded-2xl bg-slate-100 px-5 py-4 dark:bg-slate-800/80">
+        <ThinkingDots />
+      </div>
+    </div>
+  );
 }
 
 // ─── Shared Styles ──────────────────────────────────────────────────────────
@@ -33,7 +120,7 @@ const actionButtonClass =
 
 function UserMessage() {
   return (
-    <MessagePrimitive.Root className="flex justify-end mb-5">
+    <MessagePrimitive.Root className="chat-message-in flex justify-end mb-5">
       <div className="max-w-[85%] rounded-2xl bg-blue-700 px-4 py-3 text-sm text-white dark:bg-blue-800">
         <MessagePrimitive.Content
           components={{
@@ -47,7 +134,7 @@ function UserMessage() {
 
 function AssistantMessage() {
   return (
-    <MessagePrimitive.Root className="flex justify-start group mb-5">
+    <MessagePrimitive.Root className="chat-message-in flex justify-start group mb-5">
       <div className="max-w-[80%] space-y-2">
         <div className="rounded-2xl bg-slate-100 px-5 py-4 text-sm leading-relaxed text-slate-900 prose prose-sm prose-slate max-w-none prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-li:my-0.5 prose-table:border-collapse prose-th:border prose-th:border-slate-300 prose-th:px-3 prose-th:py-1.5 prose-th:text-left prose-td:border prose-td:border-slate-300 prose-td:px-3 prose-td:py-1.5 dark:bg-slate-800/80 dark:text-slate-100 dark:prose-invert dark:prose-th:border-slate-600 dark:prose-td:border-slate-600 overflow-x-auto">
           <MessagePrimitive.Content
@@ -55,6 +142,7 @@ function AssistantMessage() {
               Text: MarkdownText,
             }}
           />
+          <MessageThinking />
         </div>
         <ActionBarPrimitive.Root className="flex gap-1 opacity-100 sm:opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
           <ActionBarPrimitive.Copy asChild>
@@ -64,15 +152,7 @@ function AssistantMessage() {
               className={actionButtonClass}
               aria-label="Copy message"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="h-4 w-4"
-              >
-                <path d="M7 3.5A1.5 1.5 0 0 1 8.5 2h3.879a1.5 1.5 0 0 1 1.06.44l3.122 3.12a1.5 1.5 0 0 1 .439 1.061V11.5A1.5 1.5 0 0 1 15.5 13H14v-2h1.5V7H13a1 1 0 0 1-1-1V3.5H8.5V5H7V3.5Z" />
-                <path d="M4.5 6A1.5 1.5 0 0 0 3 7.5v9A1.5 1.5 0 0 0 4.5 18h7a1.5 1.5 0 0 0 1.5-1.5V7.5A1.5 1.5 0 0 0 11.5 6h-7Z" />
-              </svg>
+              <CopyIcon className="h-4 w-4" />
             </button>
           </ActionBarPrimitive.Copy>
           <ActionBarPrimitive.Reload asChild>
@@ -82,18 +162,7 @@ function AssistantMessage() {
               className={actionButtonClass}
               aria-label="Regenerate response"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="h-4 w-4"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H4.598a.75.75 0 0 0-.75.75v3.634a.75.75 0 0 0 1.5 0v-2.033l.312.311a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm-10.625-2.85a5.5 5.5 0 0 1 9.201-2.466l.312.312H11.767a.75.75 0 0 0 0 1.5h3.634a.75.75 0 0 0 .75-.75V3.536a.75.75 0 0 0-1.5 0v2.033l-.312-.312A7 7 0 0 0 2.627 8.396a.75.75 0 0 0 1.449.389l.61.789Z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <ReloadIcon className="h-4 w-4" />
             </button>
           </ActionBarPrimitive.Reload>
         </ActionBarPrimitive.Root>
@@ -144,14 +213,7 @@ function ChatComposer() {
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-700 text-white transition-colors hover:bg-blue-600 disabled:opacity-40 disabled:hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:outline-none"
             aria-label="Send message"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-4 w-4"
-            >
-              <path d="M3.105 2.288a.75.75 0 0 0-.826.95l1.414 4.926A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086l-1.414 4.926a.75.75 0 0 0 .826.95 28.897 28.897 0 0 0 15.293-7.155.75.75 0 0 0 0-1.114A28.897 28.897 0 0 0 3.105 2.288Z" />
-            </svg>
+            <SendIcon className="h-4 w-4" />
           </button>
         </ComposerPrimitive.Send>
       </div>
@@ -200,19 +262,17 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
     [runtime],
   );
 
-  // Pre-fill the composer textarea with text (e.g., for tailored resume chip)
-  // Uses native DOM event dispatch to sync with assistant-ui's controlled input.
-  const handlePrefill = useCallback((text: string) => {
-    const textarea = document.querySelector<HTMLTextAreaElement>('[aria-label="Chat message"]');
-    if (!textarea) return;
-    const nativeSetter = Object.getOwnPropertyDescriptor(
-      HTMLTextAreaElement.prototype,
-      "value",
-    )?.set;
-    nativeSetter?.call(textarea, text);
-    textarea.dispatchEvent(new Event("input", { bubbles: true }));
-    textarea.focus();
-  }, []);
+  // Pre-fill the composer with text (e.g., for tailored resume chip).
+  // Uses the assistant-ui runtime API directly to set the composer text,
+  // which reliably syncs internal state without DOM hacking.
+  const handlePrefill = useCallback(
+    (text: string) => {
+      runtime.thread.composer.setText(text);
+      const textarea = document.querySelector<HTMLTextAreaElement>('[aria-label="Chat message"]');
+      textarea?.focus();
+    },
+    [runtime],
+  );
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
@@ -222,80 +282,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
           Skip to chat content
         </a>
 
-        {/* Header — matches resume page header (Row 1) */}
-        <header className="shrink-0 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95">
-          <div className="mx-auto max-w-3xl px-6 py-3">
-            <div className="flex items-baseline gap-3">
-              <Link
-                href="/"
-                className="text-xl font-bold text-slate-900 hover:text-slate-700 dark:text-slate-100 dark:hover:text-slate-300"
-              >
-                {SITE_NAME}
-              </Link>
-              <p className="hidden text-sm text-slate-500 sm:block dark:text-slate-400 truncate">
-                {SITE_SUBTITLE}
-              </p>
-              <nav
-                className="ml-auto flex items-center gap-1 sm:gap-2"
-                aria-label="Site navigation"
-              >
-                <button
-                  type="button"
-                  onClick={() => {
-                    window.location.href = mode === "tools" ? "/tools" : "/";
-                  }}
-                  className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-                  title="Start a new conversation"
-                  aria-label="New conversation"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="h-3.5 w-3.5"
-                    aria-hidden="true"
-                  >
-                    <path d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm0 10.5a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1-.75-.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Z" />
-                  </svg>
-                  <span className="hidden sm:inline">New chat</span>
-                </button>
-                {mode === "tools" && (
-                  <Link
-                    href="/"
-                    className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-                  >
-                    Chat with AI
-                  </Link>
-                )}
-                <Link
-                  href="/resume"
-                  className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-                >
-                  Resume
-                </Link>
-                <a
-                  href="/Paul-Prae-Resume.pdf"
-                  download
-                  className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-                  aria-label="Download resume as PDF"
-                  title="Download resume as PDF"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="h-3.5 w-3.5"
-                    aria-hidden="true"
-                  >
-                    <path d="M10 3a.75.75 0 0 1 .75.75v7.69l2.72-2.72a.75.75 0 1 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06 0l-4-4a.75.75 0 1 1 1.06-1.06l2.72 2.72V3.75A.75.75 0 0 1 10 3Z" />
-                    <path d="M3.75 14a.75.75 0 0 1 .75.75v1.5h11v-1.5a.75.75 0 0 1 1.5 0v1.5A1.5 1.5 0 0 1 15.5 17.25h-11A1.5 1.5 0 0 1 3 15.75v-1.5a.75.75 0 0 1 .75-.75Z" />
-                  </svg>
-                  <span className="hidden sm:inline">PDF</span>
-                </a>
-              </nav>
-            </div>
-          </div>
-        </header>
+        <SiteNav />
 
         {/* Chat Thread */}
         <main
@@ -303,6 +290,11 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
           tabIndex={-1}
           className="flex min-h-0 flex-1 flex-col focus:outline-none"
         >
+          {/* Persistent sr-only h1 — always in DOM for screen readers, even after messages appear */}
+          <h1 className="sr-only">
+            {mode === "chat" ? "Chat with Paul Prae's AI Career Assistant" : "Job Search Tools"}
+          </h1>
+
           <ThreadPrimitive.Root className="flex min-h-0 flex-1 flex-col">
             <ThreadPrimitive.Viewport className="flex flex-1 flex-col overflow-y-auto">
               <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 pt-5">
@@ -312,9 +304,6 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                     <div className="mb-4 sm:mb-6 text-center">
                       {mode === "chat" ? (
                         <>
-                          <h1 className="sr-only">
-                            Chat with Paul Prae&apos;s AI Career Assistant
-                          </h1>
                           <p
                             className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100"
                             aria-hidden="true"
@@ -331,10 +320,36 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                             Ask about Paul&apos;s experience, download his resume, or request a
                             tailored resume for your open role.
                           </p>
+                          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-1 gap-y-1">
+                            <a
+                              href={`mailto:${CONTACT_EMAIL}`}
+                              aria-label="Send email to Paul Prae"
+                              className={CONTACT_LINK_CLASS}
+                            >
+                              Email
+                            </a>
+                            <a
+                              href={LINKEDIN_URL}
+                              target="_blank"
+                              rel="me noopener noreferrer"
+                              aria-label="View Paul Prae on LinkedIn"
+                              className={CONTACT_LINK_CLASS}
+                            >
+                              LinkedIn
+                            </a>
+                            <a
+                              href={GITHUB_PROFILE_URL}
+                              target="_blank"
+                              rel="me noopener noreferrer"
+                              aria-label="View Paul Prae on GitHub"
+                              className={CONTACT_LINK_CLASS}
+                            >
+                              GitHub
+                            </a>
+                          </div>
                         </>
                       ) : (
                         <>
-                          <h1 className="sr-only">Job Search Tools</h1>
                           <p
                             className="text-2xl font-bold text-slate-900 dark:text-slate-100"
                             aria-hidden="true"
@@ -368,6 +383,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                       AssistantMessage,
                     }}
                   />
+                  <ThreadThinking />
                 </div>
               </div>
 
@@ -380,18 +396,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                       className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:hidden dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
                       aria-label="Scroll to bottom"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        className="h-4 w-4"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 3a.75.75 0 0 1 .75.75v10.638l3.96-4.158a.75.75 0 1 1 1.08 1.04l-5.25 5.5a.75.75 0 0 1-1.08 0l-5.25-5.5a.75.75 0 1 1 1.08-1.04l3.96 4.158V3.75A.75.75 0 0 1 10 3Z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                      <ArrowDownIcon className="h-4 w-4" />
                     </button>
                   </ThreadPrimitive.ScrollToBottom>
                   <ChatComposer />
@@ -403,13 +408,8 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
 
         <footer className="shrink-0 py-1.5 text-center">
           <p className="text-xs text-slate-400 dark:text-slate-500">
-            paulprae.com &mdash; Built with Next.js, Claude AI, and Tailwind CSS &mdash;{" "}
-            <a
-              href="https://github.com/praeducer/paulprae-com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-slate-600 dark:hover:text-slate-300"
-            >
+            {SITE_DOMAIN} &mdash; Built with Next.js, Claude AI, and Tailwind CSS &mdash;{" "}
+            <a href={GITHUB_URL} {...externalLinkProps(GITHUB_URL)} className={FOOTER_LINK_CLASS}>
               view source
             </a>
           </p>

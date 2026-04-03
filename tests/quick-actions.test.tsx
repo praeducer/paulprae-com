@@ -11,11 +11,15 @@ import { render, fireEvent } from "@testing-library/react";
 import QuickActions from "../app/components/QuickActions";
 
 describe("QuickActions", () => {
-  it("renders 5 chat mode chips", () => {
+  it("renders 5 chat mode button chips and 1 CTA link", () => {
     const onAction = vi.fn();
     const { container } = render(<QuickActions mode="chat" onAction={onAction} />);
     const buttons = container.querySelectorAll("button");
+    const links = container.querySelectorAll("a");
     expect(buttons.length).toBe(5);
+    expect(links.length).toBe(1);
+    expect(links[0].getAttribute("href")).toContain("outlook.office.com");
+    expect(links[0].getAttribute("target")).toBe("_blank");
   });
 
   it("renders 8 tools mode chips", () => {

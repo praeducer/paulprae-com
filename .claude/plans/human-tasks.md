@@ -2,40 +2,47 @@
 
 Tasks requiring manual action: Vercel dashboard, GitHub UI, DNS provider, browser testing, Anthropic console, or personal decisions. Cannot be automated by Claude Code.
 
-> Last updated: 2026-03-08
+> Last updated: 2026-04-02
 
 ---
 
-## Completed: Phase 2 Launch
+## Current: Merge PR #28 (Book Interview CTA)
 
-- [x] Fund Anthropic API credits
-- [x] Test chat streaming locally
-- [x] Verify Vercel env vars (all 3 environments)
-- [x] Tag `v1.0.0` at `e0fd07f`
-- [x] Merge PR #21 — Phase 2 AI chat platform
-- [x] Production deployment verified
-- [x] Automated smoke tests passed (8/8)
-- [x] Full production QA — 418 unit tests, chat API, security headers, SEO
-- [x] Fix skip-nav flash on mobile — PR #26 (sr-only + focus-visible:not-sr-only)
-- [x] Fix skip-nav touch-device flash — PR #27 (@media hover:hover gate in globals.css)
-- [x] CORS hardening — PR #27 (explicit ACAO in vercel.json overrides Vercel CDN wildcard)
+PR #28 is `feat/interview-booking-cta` — adds the Book Interview scheduling CTA across all pages, UX polish, and branch consolidation (phase3 reference library + data model plan).
+
+### YOU — Pre-merge QA (do before merging PR #28)
+
+- [ ] Run `docs/uat-checklist.md` on the Vercel preview deployment for PR #28
+- [ ] Confirm Book Interview CTA appears in header (all pages), chat hero chip, and resume contact row
+- [ ] Confirm all 12 UAT sections pass
+
+### YOU — Merge PR #28
+
+- [ ] Merge PR #28 on GitHub when UAT passes
 
 ---
 
-## Current: Post-Deploy Verification
+## Post-Merge Verification (PRs #27–28)
 
-### YOU — Mobile browser test (PR #27)
+These tasks were pending after PRs #26 and #27 and still apply after PR #28 deploys to production.
+
+### YOU — Mobile browser test
 
 - [ ] Visit `https://paulprae.com/` → tap "Resume" link → confirm skip-nav does NOT flash
 - [ ] Visit `https://paulprae.com/resume` directly on mobile → confirm no skip-nav flash
 - [ ] On desktop, Tab through resume page → confirm skip-nav appears on first Tab press
+
+### YOU — Book Interview CTA (mobile, production)
+
+- [ ] On mobile: header shows icon-only "Book Interview" button on all three pages
+- [ ] On mobile: tapping the button opens Microsoft Bookings in a new tab
 
 ### YOU — CORS verification
 
 - [ ] Run: `curl -sI https://paulprae.com | grep -i access-control` → should show `https://paulprae.com` (not `*`)
 - [ ] If still showing `*`, Vercel CDN cache may need time to propagate the new header
 
-### YOU — Monitor dashboards (first 48 hours)
+### YOU — Monitor dashboards (first 48 hours post-merge)
 
 - [ ] Monitor Anthropic API costs: console.anthropic.com > Usage
 - [ ] Check Vercel Dashboard > Functions — verify `/api/chat` executions with successful status

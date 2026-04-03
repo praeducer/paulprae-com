@@ -1,15 +1,27 @@
 import fs from "fs";
 import path from "path";
-import Link from "next/link";
 import type { Metadata } from "next";
 import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { stripHtmlComments, stripHeaderBlock } from "../../lib/markdown";
-import { PATHS, RESUME_FILE_BASE } from "../../lib/config";
+import { PATHS } from "../../lib/config";
 import { loadCareerData } from "../../lib/career-data";
-import { slugify } from "../../lib/ui-utils";
-import { SITE_NAME, SITE_SUBTITLE, SITE_URL, SITE_OG_DESCRIPTION } from "../../lib/constants";
+import { slugify, externalLinkProps } from "../../lib/ui-utils";
+import { DownloadIcon } from "../components/Icons";
+import SiteNav from "../components/SiteNav";
+import {
+  SITE_NAME,
+  SITE_SUBTITLE,
+  SITE_DOMAIN,
+  SITE_URL,
+  SITE_OG_DESCRIPTION,
+  GITHUB_URL,
+  FOOTER_LINK_CLASS,
+  CONTACT_LINK_CLASS,
+  RESUME_DOWNLOAD_PATHS,
+  RESUME_PUBLIC_FILE_BASE,
+} from "../../lib/constants";
 import BackToTop from "./components/BackToTop";
 import SectionNav from "./components/SectionNav";
 
@@ -59,22 +71,6 @@ function getFileSize(filePath: string): string | null {
   }
 }
 
-/** Inline SVG download arrow icon (no dependency needed). */
-function DownloadIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      className="h-3.5 w-3.5"
-      aria-hidden="true"
-    >
-      <path d="M10 3a.75.75 0 0 1 .75.75v7.69l2.72-2.72a.75.75 0 1 1 1.06 1.06l-4 4a.75.75 0 0 1-1.06 0l-4-4a.75.75 0 1 1 1.06-1.06l2.72 2.72V3.75A.75.75 0 0 1 10 3Z" />
-      <path d="M3.75 14a.75.75 0 0 1 .75.75v1.5h11v-1.5a.75.75 0 0 1 1.5 0v1.5A1.5 1.5 0 0 1 15.5 17.25h-11A1.5 1.5 0 0 1 3 15.75v-1.5a.75.75 0 0 1 .75-.75Z" />
-    </svg>
-  );
-}
-
 /** Extract H2 sections from markdown for the section navigation bar. */
 function extractSections(markdown: string): { id: string; label: string }[] {
   const matches = markdown.matchAll(/^## (.+)$/gm);
@@ -104,7 +100,7 @@ export default function ResumePage() {
   } catch {
     return (
       <main className="max-w-3xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-bold mb-4">paulprae.com</h1>
+        <h1 className="text-2xl font-bold mb-4">{SITE_DOMAIN}</h1>
         <p className="text-slate-600 dark:text-slate-400">
           Resume not yet generated. Run{" "}
           <code className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-sm">
@@ -123,7 +119,7 @@ export default function ResumePage() {
   if (!careerData) {
     return (
       <main className="max-w-3xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-bold mb-4">paulprae.com</h1>
+        <h1 className="text-2xl font-bold mb-4">{SITE_DOMAIN}</h1>
         <p className="text-slate-600 dark:text-slate-400">
           Career data not found. Run{" "}
           <code className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-sm">
@@ -143,15 +139,15 @@ export default function ResumePage() {
   const cleanMarkdown = stripHtmlComments(resumeMarkdown);
 
   const profile = careerData.profile;
-  const pdfPath = `/${RESUME_FILE_BASE}.pdf`;
-  const docxPath = `/${RESUME_FILE_BASE}.docx`;
-  const mdPath = `/${RESUME_FILE_BASE}.md`;
+  const pdfPath = RESUME_DOWNLOAD_PATHS.pdf;
+  const docxPath = RESUME_DOWNLOAD_PATHS.docx;
+  const mdPath = RESUME_DOWNLOAD_PATHS.md;
 
   // Read file sizes at build time for download button labels
   const publicDir = path.join(process.cwd(), "public");
-  const pdfSize = getFileSize(path.join(publicDir, `${RESUME_FILE_BASE}.pdf`));
-  const docxSize = getFileSize(path.join(publicDir, `${RESUME_FILE_BASE}.docx`));
-  const mdSize = getFileSize(path.join(publicDir, `${RESUME_FILE_BASE}.md`));
+  const pdfSize = getFileSize(path.join(publicDir, `${RESUME_PUBLIC_FILE_BASE}.pdf`));
+  const docxSize = getFileSize(path.join(publicDir, `${RESUME_PUBLIC_FILE_BASE}.docx`));
+  const mdSize = getFileSize(path.join(publicDir, `${RESUME_PUBLIC_FILE_BASE}.md`));
 
   // Strip the header block (H1 + contact line + HR) — already shown in the
   // sticky header, so we don't render it again in the body.
@@ -174,18 +170,11 @@ export default function ResumePage() {
     },
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    a: ({ href, children, node, ...props }) => {
-      const isExternal = href?.startsWith("http");
-      return (
-        <a
-          href={href}
-          {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-          {...props}
-        >
-          {children}
-        </a>
-      );
-    },
+    a: ({ href, children, node, ...props }) => (
+      <a href={href} {...externalLinkProps(href)} {...props}>
+        {children}
+      </a>
+    ),
   };
 
   return (
@@ -195,96 +184,76 @@ export default function ResumePage() {
         Skip to resume content
       </a>
 
-      <header className="no-print sticky top-0 z-40 border-b border-slate-200/60 bg-white/95 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-950/95">
-        <div className="max-w-3xl mx-auto px-6 py-3">
-          {/* Row 1: Name + short title + Chat link */}
-          <div className="flex items-baseline gap-3">
-            <Link
-              href="/"
-              className="text-xl font-bold text-slate-900 hover:text-slate-700 dark:text-slate-100 dark:hover:text-slate-300"
-            >
-              {profile.name}
-            </Link>
-            <p className="hidden sm:block text-sm text-slate-500 dark:text-slate-400 truncate">
-              {SITE_SUBTITLE}
-            </p>
-            <Link
-              href="/"
-              className="ml-auto shrink-0 inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-            >
-              Chat with AI
-            </Link>
-          </div>
-          {/* Row 2: Contact + Downloads — unified text-style links */}
-          <div className="mt-1 flex flex-wrap items-center gap-x-1 gap-y-1">
-            {profile.email && (
-              <a
-                href={`mailto:${profile.email}`}
-                aria-label="Send email to Paul Prae"
-                className="inline-flex min-h-[44px] items-center rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
-              >
-                Email
-              </a>
-            )}
-            {profile.linkedin && (
-              <a
-                href={profile.linkedin}
-                target="_blank"
-                rel="me noopener noreferrer"
-                aria-label="View Paul Prae on LinkedIn"
-                className="inline-flex min-h-[44px] items-center rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
-              >
-                LinkedIn
-              </a>
-            )}
-            {profile.github && (
-              <a
-                href={profile.github}
-                target="_blank"
-                rel="me noopener noreferrer"
-                aria-label="View Paul Prae on GitHub"
-                className="inline-flex min-h-[44px] items-center rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
-              >
-                GitHub
-              </a>
-            )}
-            {/* Separator between contact and download groups */}
-            <span
-              aria-hidden="true"
-              className="select-none px-1.5 text-xs text-slate-300 dark:text-slate-600"
-            >
-              ·
-            </span>
+      <SiteNav sticky={false}>
+        {/* Row 2: Contact + Downloads (resume page only) */}
+        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-2">
+          {profile.email && (
             <a
-              href={pdfPath}
-              download
-              aria-label="Download resume as PDF"
-              className="inline-flex min-h-[44px] items-center gap-1 rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+              href={`mailto:${profile.email}`}
+              aria-label="Send email to Paul Prae"
+              className={CONTACT_LINK_CLASS}
             >
-              <DownloadIcon />
-              PDF{pdfSize && <span className="opacity-60">({pdfSize})</span>}
+              Email
             </a>
+          )}
+          {profile.linkedin && (
             <a
-              href={docxPath}
-              download
-              aria-label="Download resume as DOCX"
-              className="inline-flex min-h-[44px] items-center gap-1 rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+              href={profile.linkedin}
+              target="_blank"
+              rel="me noopener noreferrer"
+              aria-label="View Paul Prae on LinkedIn"
+              className={CONTACT_LINK_CLASS}
             >
-              <DownloadIcon />
-              DOCX{docxSize && <span className="opacity-60">({docxSize})</span>}
+              LinkedIn
             </a>
+          )}
+          {profile.github && (
             <a
-              href={mdPath}
-              download
-              aria-label="Download resume as Markdown"
-              className="inline-flex min-h-[44px] items-center gap-1 rounded-md px-2.5 text-xs text-slate-500 transition-colors hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-100"
+              href={profile.github}
+              target="_blank"
+              rel="me noopener noreferrer"
+              aria-label="View Paul Prae on GitHub"
+              className={CONTACT_LINK_CLASS}
             >
-              <DownloadIcon />
-              MD{mdSize && <span className="opacity-60">({mdSize})</span>}
+              GitHub
             </a>
-          </div>
+          )}
+          {/* Separator between contact and download groups */}
+          <span
+            aria-hidden="true"
+            className="select-none px-1.5 text-xs text-slate-300 dark:text-slate-600"
+          >
+            ·
+          </span>
+          <a
+            href={pdfPath}
+            download
+            aria-label="Download resume as PDF"
+            className={CONTACT_LINK_CLASS}
+          >
+            <DownloadIcon className="h-3.5 w-3.5" />
+            PDF{pdfSize && <span className="opacity-60">({pdfSize})</span>}
+          </a>
+          <a
+            href={docxPath}
+            download
+            aria-label="Download resume as DOCX"
+            className={CONTACT_LINK_CLASS}
+          >
+            <DownloadIcon className="h-3.5 w-3.5" />
+            DOCX{docxSize && <span className="opacity-60">({docxSize})</span>}
+          </a>
+          <a
+            href={mdPath}
+            download
+            aria-label="Download resume as Markdown"
+            className={CONTACT_LINK_CLASS}
+          >
+            <DownloadIcon className="h-3.5 w-3.5" />
+            MD{mdSize && <span className="opacity-60">({mdSize})</span>}
+          </a>
         </div>
-      </header>
+      </SiteNav>
 
       <SectionNav sections={sections} />
 
@@ -299,18 +268,19 @@ export default function ResumePage() {
             {bodyMarkdown}
           </ReactMarkdown>
         </article>
+        {/* Bottom spacer ensures the last resume sections (Projects, Publications)
+            can scroll to the top of the viewport when clicked in the section nav.
+            Without this, the page bottoms out and the heading stays mid-viewport.
+            75vh ensures even the shortest final section can reach the sticky offset.
+            Hidden on print to avoid wasting paper. */}
+        <div className="no-print h-[75vh]" aria-hidden="true" />
       </main>
 
       <footer className="no-print max-w-3xl mx-auto px-6 pb-8 pt-4 border-t border-slate-200 dark:border-slate-800">
         <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-slate-600 dark:text-slate-400">
           <p>
             &copy; {new Date().getFullYear()} {profile.name} &mdash; AI-generated resume &mdash;{" "}
-            <a
-              href="https://github.com/praeducer/paulprae-com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-slate-600 underline hover:text-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:rounded focus-visible:outline-none dark:text-slate-400 dark:hover:text-slate-200"
-            >
+            <a href={GITHUB_URL} {...externalLinkProps(GITHUB_URL)} className={FOOTER_LINK_CLASS}>
               view pipeline on GitHub
             </a>
           </p>

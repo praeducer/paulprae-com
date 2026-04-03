@@ -72,14 +72,22 @@ Install Typst via package manager, release binary, or cargo:
 typst --version
 ```
 
-### 3.3 Claude Code CLI
+### 3.3 Vercel CLI (optional)
+
+```bash
+npm install -g vercel
+```
+
+The Vercel CLI is optional for local development but required for manual deployments. CI/CD workflows handle deployments automatically.
+
+### 3.4 Claude Code CLI
 
 ```bash
 npm install -g @anthropic-ai/claude-code
 claude /login
 ```
 
-### 3.4 Cursor command in WSL (optional)
+### 3.5 Cursor command in WSL (optional)
 
 If `cursor` is not available in native Ubuntu terminal, use the wrapper installed by `install-pipeline-deps.sh`, or create an equivalent script in `~/.local/bin`.
 

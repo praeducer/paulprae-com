@@ -10,20 +10,22 @@
 import { describe, it, expect } from "vitest";
 import { loadCareerContext, buildSystemPrompt } from "../lib/agent/context";
 import { stripEmpty } from "../lib/data-utils";
+import { RESUME_DOWNLOAD_PATHS, BOOK_INTERVIEW_URL } from "../lib/constants";
 
 // ─── loadCareerContext ──────────────────────────────────────────────────────
 
 describe("loadCareerContext", () => {
-  it("returns non-null with profile name Paul Prae", () => {
+  it("loads career data with profile, knowledge base, and company data", () => {
     const ctx = loadCareerContext();
     expect(ctx).not.toBeNull();
     expect(ctx!.careerData.profile.name).toBe("Paul Prae");
+    expect(ctx!.audienceFrameworks).toBeTruthy();
+    expect(Array.isArray(ctx!.companies)).toBe(true);
   });
 
-  it("includes knowledge base files", () => {
+  it("excludes career-objectives.json from context", () => {
     const ctx = loadCareerContext();
-    expect(ctx).not.toBeNull();
-    expect(ctx!.audienceFrameworks).toBeTruthy();
+    expect(ctx).not.toHaveProperty("careerObjectives");
   });
 });
 
@@ -43,10 +45,52 @@ describe("buildSystemPrompt", () => {
     expect(prompt).toContain("Platform Constraints");
   });
 
-  it("resume-generator mode contains tailoring content", () => {
+  it("resume-generator mode loads unified resume-writer prompt", () => {
     const prompt = buildSystemPrompt("resume-generator");
     expect(prompt).not.toBeNull();
     expect(prompt!.toLowerCase()).toMatch(/tailor/);
+    // Unified prompt should contain security rules from the former resume-generator
+    expect(prompt!).toContain("untrusted user data");
+    // Unified prompt should contain quality rules from resume-writer
+    expect(prompt!.toLowerCase()).toContain("acceptance_criteria");
+  });
+
+  it("injects resume download paths into system prompt", () => {
+    const prompt = buildSystemPrompt("chat");
+    expect(prompt).not.toBeNull();
+    // Template variables should be replaced with actual paths, not remain as placeholders
+    expect(prompt).not.toContain("{{RESUME_PDF_PATH}}");
+    expect(prompt).not.toContain("{{RESUME_DOCX_PATH}}");
+    expect(prompt).not.toContain("{{RESUME_MD_PATH}}");
+    expect(prompt).not.toContain("{{RESUME_WEB_PATH}}");
+    // Actual paths should be present
+    expect(prompt).toContain(RESUME_DOWNLOAD_PATHS.pdf);
+    expect(prompt).toContain(RESUME_DOWNLOAD_PATHS.docx);
+    expect(prompt).toContain(RESUME_DOWNLOAD_PATHS.md);
+    expect(prompt).toContain(RESUME_DOWNLOAD_PATHS.web);
+  });
+
+  it("injects booking URL into system prompt", () => {
+    const prompt = buildSystemPrompt("chat");
+    expect(prompt).not.toBeNull();
+    expect(prompt).not.toContain("{{BOOK_INTERVIEW_URL}}");
+    expect(prompt).toContain(BOOK_INTERVIEW_URL);
+  });
+
+  it("injects company data into chat system prompt", () => {
+    const prompt = buildSystemPrompt("chat");
+    expect(prompt).not.toBeNull();
+    expect(prompt).not.toContain("{{COMPANY_DATA}}");
+    // Should contain actual company data (e.g., Arine metrics)
+    expect(prompt).toContain("Arine");
+    expect(prompt).toContain("45+");
+  });
+
+  it("injects company data into resume-generator system prompt", () => {
+    const prompt = buildSystemPrompt("resume-generator");
+    expect(prompt).not.toBeNull();
+    expect(prompt).not.toContain("{{COMPANY_DATA}}");
+    expect(prompt).toContain("Arine");
   });
 
   it("replaces outdated '15 years' in career data with canonical figure", () => {
@@ -58,6 +102,19 @@ describe("buildSystemPrompt", () => {
     const dataSection = prompt!.split("# Career Data").pop()!;
     expect(dataSection).not.toMatch(/With 15 years/i);
     expect(dataSection).toContain("13+ years");
+  });
+
+  it("system prompt uses compact JSON (no pretty-printed indentation)", () => {
+    const ctx = loadCareerContext()!;
+    // Compact serialization must be smaller than pretty-printed
+    const compactLen = JSON.stringify(ctx.careerData).length + JSON.stringify(ctx.companies).length;
+    const indentedLen =
+      JSON.stringify(ctx.careerData, null, 2).length +
+      JSON.stringify(ctx.companies, null, 2).length;
+    expect(compactLen).toBeLessThan(indentedLen);
+    // The assembled prompt must not contain 2-space indented JSON key patterns
+    const prompt = buildSystemPrompt("chat")!;
+    expect(prompt).not.toMatch(/"[^"]+": \{\s*\n\s{4}"/);
   });
 });
 

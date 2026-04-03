@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ArrowUpIcon } from "../../components/Icons";
 
 /**
  * Floating back-to-top button that appears after scrolling down.
@@ -37,19 +38,7 @@ export default function BackToTop() {
         visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
       }`}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        className="h-4 w-4"
-        aria-hidden="true"
-      >
-        <path
-          fillRule="evenodd"
-          d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.573a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-3.961V16.25A.75.75 0 0 1 10 17Z"
-          clipRule="evenodd"
-        />
-      </svg>
+      <ArrowUpIcon className="h-4 w-4" />
     </button>
   );
 }

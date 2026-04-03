@@ -20,7 +20,7 @@ Configured in `vercel.json` as a static header on all routes.
 
 ### Why `'unsafe-inline'` for scripts?
 
-Next.js injects inline scripts for hydration and routing. CSP nonces require dynamic header generation per-request, which conflicts with static `vercel.json` headers. The `X-Frame-Options: DENY` and `frame-ancestors 'none'` directives mitigate the primary clickjacking risk that nonces address.
+Next.js injects inline scripts for client-side hydration and dynamic routing without CSP nonces. Generating per-request nonces would require dynamic headers, which conflicts with static `vercel.json` header configuration. This is a standard Next.js deployment pattern. The risk is mitigated by `frame-ancestors 'none'` and `X-Frame-Options: DENY` (preventing clickjacking), and `connect-src 'self'` (preventing exfiltration to external origins).
 
 ### Why `connect-src 'self'` covers AI API calls
 
@@ -41,7 +41,7 @@ The `/api/chat` route is a same-origin API endpoint. Claude API calls happen **s
 - **CORS**: `proxy.ts` validates `Origin` header against an allowlist of production, preview, and localhost origins
 - **Method restriction**: Only `POST` allowed on `/api/*` routes
 - **Rate limiting**: Upstash Redis sliding window (20 req/min) with in-memory fallback
-- **Input validation**: Body size (100KB), message count (50), per-message length (4,000 chars), total input budget
+- **Input validation**: Body size (256KB), message count (50), per-message length (4,000 chars), total input budget
 - **Prompt injection**: User input wrapped in XML delimiters; system prompt contains security rules S1-S5
 
 ## Chat Security Rules

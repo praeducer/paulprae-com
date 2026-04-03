@@ -56,7 +56,7 @@ If unclear, ask only 1-2 high-impact questions at a time.
 - Review:
   - security headers, CORS/origin controls, rate limiting behavior
   - CDN/cache/deploy behavior and CI/CD alignment
-  - cost controls and runtime guardrails
+  - cost controls and runtime guardrails (warn at $0.10/request, alert at $50/month, flag >5% error rate)
   - prompt/context/tool-calling constraints
 - Validate claims in docs against real code/workflows.
 

@@ -11,6 +11,13 @@ import path from "path";
 import { PATHS } from "../config.js";
 import type { CareerData, KnowledgeEntry } from "../types.js";
 
+/**
+ * Files excluded from the knowledge base — contain private data
+ * (financial goals, compensation targets, personal timelines) that
+ * should never reach the chat agent or any recruiter-facing context.
+ */
+const EXCLUDED_FILES = new Set(["career-objectives.json"]);
+
 /** Recursively find all .json files under a directory. */
 export function findJsonFiles(dir: string): string[] {
   if (!fs.existsSync(dir)) return [];
@@ -21,7 +28,8 @@ export function findJsonFiles(dir: string): string[] {
       results.push(...findJsonFiles(fullPath));
     } else if (
       entry.name.toLowerCase().endsWith(".json") &&
-      entry.name.toLowerCase() !== "example.json"
+      entry.name.toLowerCase() !== "example.json" &&
+      !EXCLUDED_FILES.has(entry.name.toLowerCase())
     ) {
       results.push(fullPath);
     }

@@ -6,13 +6,14 @@
 
 :root {
   color-scheme: light dark;
-  /* --header-height and --nav-height are set dynamically by SectionNav's
-     ResizeObserver. --sticky-offset drives both scroll-padding-top and
-     the JS active-section threshold.
-     --nav-height defaults to 0 because the nav is hidden on mobile
-     (sm:block hidden) — JS sets the real value after hydration. */
-  --header-height: 100px;
-  --nav-height: 0px;
+  /* --header-height is set by SiteNav's ResizeObserver (sticky header).
+     --nav-height is set by SectionNav's ResizeObserver (resume section nav).
+     --sticky-offset drives scroll-padding-top so anchor links land below
+     all sticky elements.
+     Conservative fallbacks so deep links (e.g. /resume#experience) land
+     below sticky elements before JS hydrates. Overwritten after hydration. */
+  --header-height: 64px;
+  --nav-height: 48px;
   --sticky-offset: calc(var(--header-height) + var(--nav-height));
 }
 
@@ -29,7 +30,6 @@ html {
 
 .resume-prose h2 {
   @apply text-xl font-semibold uppercase tracking-wider text-slate-700 border-b border-slate-300 pb-1 mt-8 mb-4;
-  scroll-margin-top: calc(var(--sticky-offset) + 16px);
 }
 
 .resume-prose h3 {
@@ -114,25 +114,69 @@ html {
 
 /* ─── Skip Navigation ────────────────────────────────────────────────────── */
 /* Keyboard-only skip link. Hidden by default via sr-only clipping.
-   Only revealed on :focus-visible AND on hover-capable devices — touch-only
-   devices (hover: none) never show it, preventing the flash caused by some
-   mobile browsers triggering :focus-visible on programmatic focus during
-   Next.js client navigation. */
+   Only revealed on :focus-visible (keyboard Tab) — NOT on programmatic focus.
+   This prevents the popup flash during Next.js client-side navigation, which
+   can trigger :focus on the skip link without user intent. */
 
 .skip-nav {
   @apply sr-only;
 }
 
-@media (hover: hover) {
-  .skip-nav:focus-visible {
-    @apply not-sr-only fixed left-2 top-2 z-50 rounded bg-white px-4 py-2 text-sm text-slate-900 ring-2 ring-blue-500 outline-none;
-  }
+.skip-nav:focus-visible {
+  @apply not-sr-only fixed left-2 top-2 z-50 rounded bg-white px-4 py-2 text-sm text-slate-900 ring-2 ring-blue-500 outline-none;
+}
 
-  @media (prefers-color-scheme: dark) {
-    .skip-nav:focus-visible {
-      @apply bg-slate-900 text-slate-100;
-    }
+@media (prefers-color-scheme: dark) {
+  .skip-nav:focus-visible {
+    @apply bg-slate-900 text-slate-100;
   }
+}
+
+/* ─── Chat Animations ─────────────────────────────────────────────────── */
+/* Message entrance and thinking indicator. GPU-composited (transform + opacity
+   only) for smooth 60fps rendering. prefers-reduced-motion handled below. */
+
+@keyframes message-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-message-in {
+  animation: message-in 0.3s ease-out both;
+}
+
+/* Thinking dots: staggered breathing pulse (scale + opacity wave).
+   Inspired by iMessage/Claude.ai but refined — the scale creates a
+   "breathing" rhythm that feels alive without being distracting. */
+
+@keyframes thinking-dot {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.75);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.thinking-dot {
+  animation: thinking-dot 1.4s ease-in-out infinite;
+}
+
+.thinking-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.thinking-dot:nth-child(3) {
+  animation-delay: 0.3s;
 }
 
 /* ─── Reduced Motion ──────────────────────────────────────────────────────── */

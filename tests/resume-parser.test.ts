@@ -11,7 +11,7 @@ import { parseResume, assembleResume } from "../lib/resume-parser.js";
 
 const SAMPLE_RESUME = `# Paul Prae
 
-Principal AI Engineer & Solutions Architect
+Principal AI Engineer & Architect
 
 ## Professional Experience
 

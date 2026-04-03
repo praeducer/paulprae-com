@@ -30,7 +30,7 @@ Paul-Prae-Resume.md                  /api/chat (streaming)
     ↓ npm run export                     │ system prompt = career data
 PDF + DOCX                               │ + grounding rules
                                          ↓
-                                     Claude Sonnet → SSE stream → UI
+                                     Claude Sonnet 4.6 → SSE stream → UI
 ```
 
 The pipeline and website are independent. Website development requires only Node.js. The chat API requires `ANTHROPIC_API_KEY` at runtime.
@@ -42,9 +42,9 @@ The chat API ([`app/api/chat/route.ts`](app/api/chat/route.ts)) streams response
 - **`generate_tailored_resume`** — accepts a job description, calls Claude to produce a role-specific resume
 - **`get_resume_links`** — returns download URLs for PDF, DOCX, Markdown, and web formats
 
-Career data (~90K tokens) is loaded into the system prompt with [Anthropic prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) (5-min TTL). After the first request, subsequent turns reuse the cached prompt at ~90% cost reduction.
+Career data (~90K tokens) is loaded into the system prompt with [Anthropic prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) (1-hour TTL). After the first request, subsequent turns reuse the cached prompt at ~90% cost reduction. A cron job at `/api/cron` fires every 55 minutes to keep both the chat and resume-generator caches warm, preventing cold-prefill latency for real users and avoiding the silent 15–20s SSE timeout during tailored resume tool calls.
 
-System prompts include grounding rules (G1-G10) that constrain the model to only cite verified career data, and security rules (S1-S5) that defend against prompt injection. Prompts live in [`lib/prompts/`](lib/prompts/) as Markdown files with YAML frontmatter.
+System prompts include grounding rules (G1-G10) that require every fact to be attributed to a specific company and role — preventing hallucination and cross-employer conflation. Security rules (S1-S5) defend against prompt injection. Prompts live in [`lib/prompts/`](lib/prompts/) as Markdown files with YAML frontmatter.
 
 ### Resume Pipeline
 
@@ -112,13 +112,14 @@ npm run pipeline     # ingest → generate → export
 # Development
 npm run dev                # Dev server (Turbopack)
 npm run build              # Production build
-npm test                   # 400+ unit/component tests (~500ms)
+npm test                   # 488+ unit/component tests (~1s)
 npm run test:e2e           # Playwright E2E smoke tests
 npm run check              # Full pre-push checklist (lint + format + test + build + validate)
 
 # Pipeline
-npm run pipeline           # Full: ingest → generate → export
-npm run pipeline:content   # AI steps only: ingest → generate
+npm run pipeline           # Full: ingest → build:prompts → generate → export
+npm run pipeline:content   # AI steps only: ingest → build:prompts → generate
+npm run build:prompts      # Pre-build system prompts → lib/generated/system-prompts.ts
 npm run ingest             # Parse LinkedIn CSVs + knowledge JSONs → career-data.json
 npm run generate           # Claude API → Paul-Prae-Resume.staging.md
 npm run export             # Pandoc + Typst → PDF + DOCX
@@ -132,11 +133,11 @@ Playwright notes:
 
 ## Security
 
-The chat API includes multiple defense layers documented in [`SECURITY.md`](SECURITY.md):
+The chat API includes multiple defense layers documented in [`docs/security.md`](docs/security.md):
 
 - **Origin validation** — [`proxy.ts`](proxy.ts) blocks cross-origin requests from unauthorized domains
 - **Rate limiting** — 20 req/min per IP via Upstash Redis (in-memory fallback when Redis unavailable)
-- **Input validation** — request body size (100KB), message count (50), per-message length (4K chars)
+- **Input validation** — request body size (256KB), message count (50), per-message length (4K chars)
 - **Prompt injection defense** — security rules S1-S5 in all system prompts, XML delimiters around user input in tool calls
 - **Security headers** — CSP, HSTS, X-Frame-Options (DENY), Permissions-Policy via [`vercel.json`](vercel.json)
 
@@ -162,7 +163,7 @@ AI generation runs locally. Vercel only runs `next build` against committed file
 ```
 app/                        Next.js App Router pages and layouts
   api/chat/route.ts         Streaming chat API with tool-calling
-  components/               ChatHome (shared by / and /tools), QuickActions
+  components/               SiteNav, ChatHome, BookInterviewLink, QuickActions, Icons
   resume/                   Resume page with section nav, downloads
   tools/                    Job search content tools (noindex)
 lib/
@@ -190,7 +191,7 @@ docs/                       Technical documentation
 | [`docs/devops.md`](docs/devops.md)                                       | Deployment, smoke tests, rollback, CI/CD              |
 | [`docs/uat-checklist.md`](docs/uat-checklist.md)                         | Manual QA checklist for post-deploy verification      |
 | [`docs/domain-dns-runbook.md`](docs/domain-dns-runbook.md)               | DNS operations, validation, troubleshooting           |
-| [`SECURITY.md`](SECURITY.md)                                             | Security policy, threat model, cost controls          |
+| [`docs/security.md`](docs/security.md)                                   | Security policy, threat model, cost controls          |
 | [`CHANGELOG.md`](CHANGELOG.md)                                           | Release history                                       |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md)                                     | Development workflow and code standards               |
 

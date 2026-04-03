@@ -5,8 +5,10 @@ const nextConfig: NextConfig = {
   // and dynamic rendering. Resume page remains statically pre-rendered.
   poweredByHeader: false,
 
-  // Ensure Vercel's file tracer bundles prompt templates and data files
-  // that are read via fs.readFileSync at runtime in API routes.
+  // Ensure Vercel's file tracer bundles data files read via fs.readFileSync.
+  // lib/generated/system-prompts.ts is a TypeScript import bundled automatically.
+  // lib/prompts/**/*.md are included as a safety net for the runtime fallback
+  // in getSystemPrompt() (dev mode or missing generated file).
   outputFileTracingIncludes: {
     "/api/chat": [
       "./lib/prompts/**/*.md",

@@ -13,20 +13,20 @@
 
 #set page(
   paper: "us-letter",
-  margin: (top: 0.5in, bottom: 0.5in, left: 0.6in, right: 0.6in),
+  margin: (top: 0.4in, bottom: 0.4in, left: 0.55in, right: 0.55in),
 )
 
 // ─── Typography ──────────────────────────────────────────────────────────────
 
 #set text(
   font: ("Inter", "Helvetica Neue", "Arial", "sans-serif"),
-  size: 10pt,
+  size: 9.5pt,
   fill: rgb("#1a1a1a"),
   lang: "en",
 )
 
 #set par(
-  leading: 0.6em,
+  leading: 0.55em,
   justify: false,
 )
 
@@ -34,20 +34,20 @@
 
 // H1 — Candidate name (large, bold)
 #show heading.where(level: 1): it => {
-  set text(size: 22pt, weight: "bold", fill: rgb("#111111"))
-  set block(above: 0.3em, below: 0.2em)
+  set text(size: 20pt, weight: "bold", fill: rgb("#111111"))
+  set block(above: 0.2em, below: 0.15em)
   it
 }
 
 // H2 — Section headers (e.g., Professional Experience, Education)
 #show heading.where(level: 2): it => {
-  set text(size: 12pt, weight: "bold", fill: rgb("#111111"), tracking: 0.03em)
-  set block(above: 0.8em, below: 0.3em)
+  set text(size: 11pt, weight: "bold", fill: rgb("#111111"), tracking: 0.03em)
+  set block(above: 0.65em, below: 0.2em)
   block(
     width: 100%,
     {
       upper(it.body)
-      v(2pt)
+      v(1.5pt)
       line(length: 100%, stroke: 0.5pt + rgb("#cccccc"))
     }
   )
@@ -55,8 +55,8 @@
 
 // H3 — Job titles, degree names
 #show heading.where(level: 3): it => {
-  set text(size: 10.5pt, weight: "bold", fill: rgb("#222222"))
-  set block(above: 0.6em, below: 0.15em)
+  set text(size: 10pt, weight: "bold", fill: rgb("#222222"))
+  set block(above: 0.45em, below: 0.1em)
   it
 }
 
@@ -65,14 +65,15 @@
 // We suppress them since H2 headings already have their own underline.
 // Using a custom command avoids interfering with line() elements in headings.
 
-#let horizontalrule = v(0.3em)
+#let horizontalrule = v(0.2em)
 
 // ─── Lists ───────────────────────────────────────────────────────────────────
 
 #set list(
-  indent: 0.3em,
-  body-indent: 0.5em,
+  indent: 0.2em,
+  body-indent: 0.4em,
   marker: [•],
+  spacing: 0.45em,
 )
 
 // ─── Links ───────────────────────────────────────────────────────────────────

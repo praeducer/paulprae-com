@@ -21,11 +21,12 @@
  *   1  One or more checks failed
  */
 
+import { execFileSync } from "child_process";
+import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import crypto from "crypto";
-import { execFileSync } from "child_process";
 import { PATHS, RESUME_FILE_BASE } from "../lib/config";
+import { stripHtmlComments } from "../lib/markdown";
 import { isDirectRun } from "../lib/script-utils";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -132,10 +133,21 @@ function checkDataFiles(): CheckResult {
 
 function checkPublicDownloads(): CheckResult {
   const start = Date.now();
-  const downloads: { label: string; publicPath: string; sourcePath: string }[] = [
+  const downloads: {
+    label: string;
+    publicPath: string;
+    sourcePath: string;
+    stripComments?: boolean;
+  }[] = [
     { label: "PDF", publicPath: PATHS.publicPdf, sourcePath: PATHS.pdfOutput },
     { label: "DOCX", publicPath: PATHS.publicDocx, sourcePath: PATHS.docxOutput },
-    { label: "MD", publicPath: PATHS.publicMd, sourcePath: PATHS.resumeOutput },
+    // MD public copy has HTML comments stripped (see export-resume.ts copyToPublic)
+    {
+      label: "MD",
+      publicPath: PATHS.publicMd,
+      sourcePath: PATHS.resumeOutput,
+      stripComments: true,
+    },
   ];
 
   const issues: string[] = [];
@@ -143,17 +155,34 @@ function checkPublicDownloads(): CheckResult {
   for (const dl of downloads) {
     if (!fileExists(dl.publicPath)) {
       if (fixMode && fileExists(dl.sourcePath)) {
-        fs.copyFileSync(dl.sourcePath, dl.publicPath);
+        if (dl.stripComments) {
+          const cleaned = stripHtmlComments(fs.readFileSync(dl.sourcePath, "utf-8"));
+          fs.writeFileSync(dl.publicPath, cleaned, "utf-8");
+        } else {
+          fs.copyFileSync(dl.sourcePath, dl.publicPath);
+        }
         console.log(`  → Fixed: copied ${dl.label} to public/`);
       } else {
         issues.push(`missing: public/${RESUME_FILE_BASE}.${dl.label.toLowerCase()}`);
       }
     } else {
       const publicHash = fileHash(dl.publicPath);
-      const sourceHash = fileHash(dl.sourcePath);
+      // For MD, compare against the comment-stripped version of the source
+      let sourceHash: string | null;
+      if (dl.stripComments && fileExists(dl.sourcePath)) {
+        const cleaned = stripHtmlComments(fs.readFileSync(dl.sourcePath, "utf-8"));
+        sourceHash = crypto.createHash("sha256").update(cleaned).digest("hex").slice(0, 12);
+      } else {
+        sourceHash = fileHash(dl.sourcePath);
+      }
       if (sourceHash && publicHash !== sourceHash) {
         if (fixMode) {
-          fs.copyFileSync(dl.sourcePath, dl.publicPath);
+          if (dl.stripComments) {
+            const cleaned = stripHtmlComments(fs.readFileSync(dl.sourcePath, "utf-8"));
+            fs.writeFileSync(dl.publicPath, cleaned, "utf-8");
+          } else {
+            fs.copyFileSync(dl.sourcePath, dl.publicPath);
+          }
           console.log(`  → Fixed: synced ${dl.label} to public/`);
         } else {
           issues.push(`stale: public/ ${dl.label} differs from data/generated/ (hash mismatch)`);
@@ -345,6 +374,42 @@ function checkResumeQuality(): CheckResult {
   };
 }
 
+function checkWSLPaths(): CheckResult {
+  const start = Date.now();
+  let detail = "WSL not detected";
+  let passed = true;
+
+  try {
+    const { ok, output } = runCommand("uname", ["-r"]);
+    if (ok && output.includes("WSL")) {
+      detail = "WSL detected";
+      // Check for slow /mnt/c paths in common locations
+      const slowPaths = ["/mnt/c/dev", "/mnt/c/Users"];
+      const issues: string[] = [];
+      for (const p of slowPaths) {
+        if (fs.existsSync(p)) {
+          issues.push(`${p} exists (use WSL paths instead)`);
+        }
+      }
+      if (issues.length > 0) {
+        detail += ` - ${issues.join(", ")}`;
+        passed = false;
+      } else {
+        detail += " - paths optimized";
+      }
+    }
+  } catch {
+    // uname not available, assume not WSL
+  }
+
+  return {
+    name: "WSL paths",
+    passed,
+    detail,
+    durationMs: Date.now() - start,
+  };
+}
+
 function checkDocs(): CheckResult {
   const start = Date.now();
   const { ok, output } = runCommand("npx", ["tsx", "scripts/validate-docs.ts"]);
@@ -357,8 +422,6 @@ function checkDocs(): CheckResult {
     durationMs: Date.now() - start,
   };
 }
-
-// ─── Main ────────────────────────────────────────────────────────────────────
 
 function main(): void {
   console.log();
@@ -374,6 +437,7 @@ function main(): void {
   results.push(checkDataFiles());
   results.push(checkResumeQuality());
   results.push(checkPublicDownloads());
+  results.push(checkWSLPaths());
 
   if (!quickMode) {
     // Phase 2: Code quality (skip in quick mode)
@@ -460,6 +524,7 @@ export const _testExports = {
   checkDataFiles,
   checkResumeQuality,
   checkPublicDownloads,
+  checkWSLPaths,
   checkBuildOutput,
   fileExists,
   fileSize,
