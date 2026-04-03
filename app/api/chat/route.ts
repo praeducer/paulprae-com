@@ -325,15 +325,19 @@ export async function POST(request: Request) {
 
                 const { text, finishReason } = await generateText({
                   model: getModel(CHAT_MODEL_ID),
-                  system: resumeSystemPrompt,
+                  // Cache control must be on the system message content block, not top-level
+                  // providerOptions — the @ai-sdk/anthropic provider only applies cache_control
+                  // to the Anthropic API when it is set via per-message providerOptions.
+                  system: {
+                    role: "system",
+                    content: resumeSystemPrompt,
+                    providerOptions: {
+                      anthropic: { cacheControl: { type: "ephemeral", ttl: "1h" } },
+                    },
+                  },
                   prompt: userPrompt,
                   maxOutputTokens: CHAT_RESUME_CONFIG.maxOutputTokens,
                   temperature: CHAT_RESUME_CONFIG.temperature,
-                  providerOptions: {
-                    anthropic: {
-                      cacheControl: { type: "ephemeral", ttl: "1h" },
-                    },
-                  },
                 });
 
                 if (!text || text.length < 100) {
@@ -375,27 +379,26 @@ export async function POST(request: Request) {
       : undefined;
 
   try {
-    // Prompt caching: top-level providerOptions.anthropic.cacheControl marks the
-    // system prompt for Anthropic's ephemeral cache with a 1-hour TTL.
-    // The system prompt (~90K tokens with career data) is stable between requests.
-    // 1-hour TTL means virtually all users hit the cache on a personal career site
-    // with sporadic traffic (vs. the default 5-min TTL that expired between visits).
-    // The @ai-sdk/anthropic provider applies cache_control to the last system
-    // content block automatically — no multi-part system message needed.
+    // Prompt caching: cache_control must be on the system message content block.
+    // Passing cacheControl via top-level providerOptions puts it on the API request
+    // root, which Anthropic ignores for caching. Per-message providerOptions is the
+    // correct approach — the SDK only writes cache_control to the content block when
+    // the system message is passed as a SystemModelMessage object (not a string).
     const result = streamText({
       model: getModel(CHAT_MODEL_ID),
-      system: systemPrompt,
+      system: {
+        role: "system",
+        content: systemPrompt,
+        providerOptions: {
+          anthropic: { cacheControl: { type: "ephemeral", ttl: "1h" } },
+        },
+      },
       messages: modelMessages,
       maxOutputTokens: CHAT_CONFIG.maxOutputTokens,
       temperature:
         validMode === "tools" ? CHAT_CONFIG.toolsTemperature : CHAT_CONFIG.chatTemperature,
       tools: chatTools,
       stopWhen: chatTools ? stepCountIs(2) : stepCountIs(1),
-      providerOptions: {
-        anthropic: {
-          cacheControl: { type: "ephemeral", ttl: "1h" },
-        },
-      },
       onError({ error }) {
         const errObj = error instanceof Error ? error : new Error(String(error));
         console.error(

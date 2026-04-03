@@ -35,14 +35,17 @@ export async function GET(request: Request) {
   const warmPrompt = (systemKey: keyof typeof SYSTEM_PROMPTS) =>
     generateText({
       model: anthropic(CHAT_MODEL_ID) as LanguageModel,
-      system: SYSTEM_PROMPTS[systemKey],
-      prompt: "hi",
-      maxOutputTokens: 1,
-      providerOptions: {
-        anthropic: {
-          cacheControl: { type: "ephemeral", ttl: "1h" },
+      // cache_control must be on the system message content block, not top-level
+      // providerOptions — see app/api/chat/route.ts for the full explanation.
+      system: {
+        role: "system",
+        content: SYSTEM_PROMPTS[systemKey],
+        providerOptions: {
+          anthropic: { cacheControl: { type: "ephemeral", ttl: "1h" } },
         },
       },
+      prompt: "hi",
+      maxOutputTokens: 1,
     });
 
   try {
