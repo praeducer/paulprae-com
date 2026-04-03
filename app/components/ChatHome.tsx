@@ -268,18 +268,10 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
     return () => clearTimeout(timer);
   }, [isLoadingChat, chat]);
 
-  // Quick action handler — routes through the composer setText + Send click pipeline,
-  // the same code path as manual user submission. Using runtime.thread.append() directly
-  // causes the stream to arrive but never render (AI SDK 5 `content` format vs SDK 6
-  // `parts` format mismatch in the useAISDKRuntime bridge).
   const handleQuickAction = useCallback(
     (prompt: string) => {
       runtime.thread.composer.setText(prompt);
-      // Defer one tick so React processes setText before the click fires
-      setTimeout(() => {
-        const btn = document.querySelector<HTMLButtonElement>('[aria-label="Send message"]');
-        btn?.click();
-      }, 0);
+      runtime.thread.composer.send();
     },
     [runtime],
   );
