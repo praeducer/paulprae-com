@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   SITE_NAME,
@@ -5,6 +6,10 @@ import {
   BUTTON_PRIMARY_CLASS,
   BUTTON_SECONDARY_CLASS,
 } from "../lib/constants";
+
+export const metadata: Metadata = {
+  title: "404 — Page Not Found",
+};
 
 export default function NotFound() {
   return (
