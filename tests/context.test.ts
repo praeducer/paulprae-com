@@ -103,6 +103,19 @@ describe("buildSystemPrompt", () => {
     expect(dataSection).not.toMatch(/With 15 years/i);
     expect(dataSection).toContain("13+ years");
   });
+
+  it("system prompt uses compact JSON (no pretty-printed indentation)", () => {
+    const ctx = loadCareerContext()!;
+    // Compact serialization must be smaller than pretty-printed
+    const compactLen = JSON.stringify(ctx.careerData).length + JSON.stringify(ctx.companies).length;
+    const indentedLen =
+      JSON.stringify(ctx.careerData, null, 2).length +
+      JSON.stringify(ctx.companies, null, 2).length;
+    expect(compactLen).toBeLessThan(indentedLen);
+    // The assembled prompt must not contain 2-space indented JSON key patterns
+    const prompt = buildSystemPrompt("chat")!;
+    expect(prompt).not.toMatch(/"[^"]+": \{\s*\n\s{4}"/);
+  });
 });
 
 // ─── stripEmpty ─────────────────────────────────────────────────────────────

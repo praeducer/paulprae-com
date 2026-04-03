@@ -95,6 +95,13 @@ export const RESUME_GENERATION_CONFIG = {
   temperature: 0.3,
 } as const;
 
+/** Constrained config for resume generation inside the chat bubble.
+ *  Keeps output to ~500 words so it fits without overflow. CLI pipeline uses RESUME_GENERATION_CONFIG. */
+export const CHAT_RESUME_CONFIG = {
+  maxOutputTokens: 1200,
+  temperature: 0.3,
+} as const;
+
 // ─── Input Limits ───────────────────────────────────────────────────────────
 
 /** Per-message character limit — enforced by both the UI and the API. */

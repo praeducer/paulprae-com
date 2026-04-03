@@ -12,11 +12,12 @@ import {
 } from "ai";
 import { z } from "zod";
 import { buildSystemPrompt } from "../../../lib/agent/context";
+import { SYSTEM_PROMPTS } from "../../../lib/generated/system-prompts";
 import {
   MAX_MESSAGE_CHARS,
   CHAT_MODEL_ID,
   CHAT_CONFIG,
-  RESUME_GENERATION_CONFIG,
+  CHAT_RESUME_CONFIG,
   CHAT_REQUEST_LIMITS,
   RATE_LIMIT_CONFIG,
   RESUME_DOWNLOAD_PATHS,
@@ -73,13 +74,19 @@ export const getResumeLinksInputSchema = z.object({});
 
 /**
  * Wrap untrusted job input in XML tags so prompts treat it as data.
+ * Pass chatFormat=true to constrain output for the chat bubble (~500 words).
  */
 export function buildTailoredResumePrompt(
   jobDescription: string,
   emphasisAreas?: string[],
+  chatFormat?: boolean,
 ): string {
+  const formatConstraint = chatFormat
+    ? `\n\nFormat for chat display — maximum 500 words:\n- Summary: 3–4 sentences\n- Experience: 3 most relevant positions, 2–3 bullets each (action verb + metric)\n- Skills: single compact line\nOmit publications, certifications, education, and older roles unless critical for this role.`
+    : "";
+
   return emphasisAreas?.length
-    ? `Generate a tailored resume for the following job description.
+    ? `Generate a tailored resume for the following job description.${formatConstraint}
 
 <job_description>
 ${jobDescription}
@@ -88,7 +95,7 @@ ${jobDescription}
 <emphasis_areas>
 ${emphasisAreas.join(", ")}
 </emphasis_areas>`
-    : `Generate a tailored resume for the following job description.
+    : `Generate a tailored resume for the following job description.${formatConstraint}
 
 <job_description>
 ${jobDescription}
@@ -161,9 +168,17 @@ async function initRateLimit() {
 
 // ─── Cached System Prompts ──────────────────────────────────────────────────
 
+// In-memory fallback cache for dev mode (when generated file may be stale).
 const promptCache = new Map<string, string>();
 
 function getSystemPrompt(mode: "chat" | "tools" | "resume-generator"): string {
+  // Primary: use pre-built prompt (zero I/O, byte-identical across instances).
+  // Pre-built strings are committed alongside career-data.json and regenerated
+  // by `npm run build:prompts` (called automatically by the pipeline).
+  const prebuilt = SYSTEM_PROMPTS[mode];
+  if (prebuilt) return prebuilt;
+
+  // Fallback: runtime build (dev mode or missing generated file).
   const cached = promptCache.get(mode);
   if (cached) return cached;
 
@@ -306,17 +321,17 @@ export async function POST(request: Request) {
             execute: async ({ jobDescription, emphasisAreas }) => {
               try {
                 const resumeSystemPrompt = getSystemPrompt("resume-generator");
-                const userPrompt = buildTailoredResumePrompt(jobDescription, emphasisAreas);
+                const userPrompt = buildTailoredResumePrompt(jobDescription, emphasisAreas, true);
 
                 const { text } = await generateText({
                   model: getModel(CHAT_MODEL_ID),
                   system: resumeSystemPrompt,
                   prompt: userPrompt,
-                  maxOutputTokens: RESUME_GENERATION_CONFIG.maxOutputTokens,
-                  temperature: RESUME_GENERATION_CONFIG.temperature,
+                  maxOutputTokens: CHAT_RESUME_CONFIG.maxOutputTokens,
+                  temperature: CHAT_RESUME_CONFIG.temperature,
                   providerOptions: {
                     anthropic: {
-                      cacheControl: { type: "ephemeral" },
+                      cacheControl: { type: "ephemeral", ttl: "1h" },
                     },
                   },
                 });
@@ -332,7 +347,7 @@ export async function POST(request: Request) {
                   tailoredResume: text,
                   standardResumeLinks: RESUME_DOWNLOAD_PATHS,
                   instructions:
-                    "Present the FULL tailored resume content below, formatted as markdown. Then tell the user they can: (1) use the copy button on the message to copy the full resume, (2) download Paul's standard resume via the links in the nav bar for comparison. Do NOT just summarize the changes — show the complete tailored resume.",
+                    "Present the tailored resume below, formatted as markdown. Tell the user: copy it with the copy button on this message; download the full standard resume via the PDF link in the navigation bar.",
                 };
               } catch (err) {
                 console.error("[tool:generate_tailored_resume]", err);
@@ -354,8 +369,10 @@ export async function POST(request: Request) {
 
   try {
     // Prompt caching: top-level providerOptions.anthropic.cacheControl marks the
-    // system prompt for Anthropic's ephemeral cache. The system prompt (~50KB with
-    // career data) is stable between requests, making it ideal for caching.
+    // system prompt for Anthropic's ephemeral cache with a 1-hour TTL.
+    // The system prompt (~90K tokens with career data) is stable between requests.
+    // 1-hour TTL means virtually all users hit the cache on a personal career site
+    // with sporadic traffic (vs. the default 5-min TTL that expired between visits).
     // The @ai-sdk/anthropic provider applies cache_control to the last system
     // content block automatically — no multi-part system message needed.
     const result = streamText({
@@ -369,7 +386,7 @@ export async function POST(request: Request) {
       stopWhen: chatTools ? stepCountIs(2) : stepCountIs(1),
       providerOptions: {
         anthropic: {
-          cacheControl: { type: "ephemeral" },
+          cacheControl: { type: "ephemeral", ttl: "1h" },
         },
       },
       onError({ error }) {

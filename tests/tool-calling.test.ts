@@ -120,6 +120,17 @@ describe("XML wrapping of untrusted input", () => {
     const xmlContent = prompt.split("<job_description>")[1].split("</job_description>")[0];
     expect(xmlContent).toContain(maliciousJD);
   });
+
+  it("includes compact format instruction when chatFormat is true", () => {
+    const prompt = buildTailoredResumePrompt("Principal AI Engineer at Acme", undefined, true);
+    expect(prompt).toContain("<job_description>");
+    expect(prompt.toLowerCase()).toMatch(/500 words|format for chat/);
+  });
+
+  it("omits compact format instruction when chatFormat is omitted", () => {
+    const prompt = buildTailoredResumePrompt("Principal AI Engineer at Acme");
+    expect(prompt.toLowerCase()).not.toMatch(/500 words|format for chat/);
+  });
 });
 
 // ─── Tool Output Shape Tests ────────────────────────────────────────────────

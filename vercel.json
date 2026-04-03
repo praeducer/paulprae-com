@@ -2,6 +2,18 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "buildCommand": "npm run build",
+  "fluid": true,
+  "functions": {
+    "app/api/chat/route.ts": {
+      "memory": 1024
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron",
+      "schedule": "*/55 * * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",

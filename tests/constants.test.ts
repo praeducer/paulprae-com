@@ -25,6 +25,7 @@ import {
   RESUME_DOWNLOAD_PATHS,
   CHAT_MODEL_ID,
   CHAT_CONFIG,
+  CHAT_RESUME_CONFIG,
   RESUME_GENERATION_CONFIG,
   MAX_MESSAGE_CHARS,
   CHAT_REQUEST_LIMITS,
@@ -127,6 +128,15 @@ describe("chat AI configuration", () => {
 
   it("resume generation allows more tokens than chat", () => {
     expect(RESUME_GENERATION_CONFIG.maxOutputTokens).toBeGreaterThan(CHAT_CONFIG.maxOutputTokens);
+  });
+
+  it("CHAT_RESUME_CONFIG is smaller than RESUME_GENERATION_CONFIG", () => {
+    expect(CHAT_RESUME_CONFIG.maxOutputTokens).toBeGreaterThan(0);
+    expect(CHAT_RESUME_CONFIG.maxOutputTokens).toBeLessThan(
+      RESUME_GENERATION_CONFIG.maxOutputTokens,
+    );
+    expect(CHAT_RESUME_CONFIG.temperature).toBeGreaterThanOrEqual(0);
+    expect(CHAT_RESUME_CONFIG.temperature).toBeLessThanOrEqual(1);
   });
 });
 

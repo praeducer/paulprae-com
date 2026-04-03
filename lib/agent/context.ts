@@ -105,12 +105,12 @@ export function buildSystemPrompt(mode: PromptMode): string | null {
   // contains "15 years" which the model reads as ground truth, overriding
   // the grounding rule G2. Fixing at the data layer is more reliable than
   // instruction-level overrides.
-  const careerDataJson = JSON.stringify(stripEmpty(context.careerData), null, 2).replace(
+  const careerDataJson = JSON.stringify(stripEmpty(context.careerData)).replace(
     /\b15\s+years?\b/gi,
     `${YEARS_EXPERIENCE} years`,
   );
-  const audienceJson = JSON.stringify(context.audienceFrameworks, null, 2);
-  const companyJson = JSON.stringify(context.companies, null, 2);
+  const audienceJson = JSON.stringify(context.audienceFrameworks);
+  const companyJson = JSON.stringify(context.companies);
 
   let prompt = template
     .replace("{{CAREER_DATA}}", careerDataJson)
@@ -125,10 +125,10 @@ export function buildSystemPrompt(mode: PromptMode): string | null {
   // Tools mode has additional placeholders
   if (mode === "tools") {
     prompt = prompt
-      .replace("{{PLATFORM_CONSTRAINTS}}", JSON.stringify(context.platformConstraints, null, 2))
-      .replace("{{WRITING_FORMULAS}}", JSON.stringify(context.writingFormulas, null, 2))
-      .replace("{{MESSAGE_TEMPLATES}}", JSON.stringify(context.messageTemplates, null, 2))
-      .replace("{{COMMUNICATION_STYLES}}", JSON.stringify(context.communicationStyles, null, 2));
+      .replace("{{PLATFORM_CONSTRAINTS}}", JSON.stringify(context.platformConstraints))
+      .replace("{{WRITING_FORMULAS}}", JSON.stringify(context.writingFormulas))
+      .replace("{{MESSAGE_TEMPLATES}}", JSON.stringify(context.messageTemplates))
+      .replace("{{COMMUNICATION_STYLES}}", JSON.stringify(context.communicationStyles));
   }
 
   return prompt;
