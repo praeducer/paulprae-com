@@ -38,7 +38,7 @@ const CHAT_ACTIONS: Action[] = [
   },
 ];
 
-const TOOLS_ACTIONS_ROW1: Action[] = [
+const TOOLS_ACTIONS: Action[] = [
   {
     label: "Cover Letter",
     prompt: "Generate a tailored cover letter. I'll paste the job description next.",
@@ -58,9 +58,6 @@ const TOOLS_ACTIONS_ROW1: Action[] = [
     prompt:
       "Generate a cold email introduction. I'll provide the recipient's name, company, and context.",
   },
-];
-
-const TOOLS_ACTIONS_ROW2: Action[] = [
   {
     label: "Thank You Note",
     prompt:
@@ -93,7 +90,7 @@ const ctaChipClass =
  * Chat mode appends a BookInterviewLink CTA chip at the end.
  */
 export default function QuickActions({ mode, onAction, onPrefill }: QuickActionsProps) {
-  const actions = mode === "chat" ? CHAT_ACTIONS : [...TOOLS_ACTIONS_ROW1, ...TOOLS_ACTIONS_ROW2];
+  const actions = mode === "chat" ? CHAT_ACTIONS : TOOLS_ACTIONS;
 
   return (
     <div className="flex flex-wrap gap-1.5">

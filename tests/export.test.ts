@@ -20,7 +20,7 @@ import { SAMPLE_RESUME_MD, SAMPLE_RESUME_CLEAN } from "./fixtures/sample-data.js
 
 // ─── Markdown Comment Stripping ─────────────────────────────────────────────
 // The export pipeline strips HTML comment headers before converting.
-// This logic is duplicated in export-resume.ts and page.tsx, so test both patterns.
+// Logic is centralized in lib/markdown.ts; used by export-resume.ts, page.tsx, and release-check.ts.
 
 describe("HTML comment stripping", () => {
   it("strips generation metadata comments", () => {

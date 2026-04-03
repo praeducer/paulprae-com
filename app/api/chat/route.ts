@@ -215,14 +215,6 @@ function messageTextLength(msg: UIMessage): number {
   return total;
 }
 
-function estimateInputChars(messages: UIMessage[]): number {
-  let total = 0;
-  for (const msg of messages) {
-    total += messageTextLength(msg);
-  }
-  return total;
-}
-
 function validateMessages(messages: UIMessage[]): string | null {
   for (let i = 0; i < messages.length; i++) {
     if (messageTextLength(messages[i]) > MAX_MESSAGE_CHARS) {
@@ -290,11 +282,6 @@ export async function POST(request: Request) {
   const msgError = validateMessages(messages);
   if (msgError) {
     return new Response(msgError, { status: 400 });
-  }
-
-  const totalInputChars = estimateInputChars(messages);
-  if (totalInputChars > MAX_MESSAGES * MAX_MESSAGE_CHARS) {
-    return new Response("Total message content exceeds maximum allowed size", { status: 413 });
   }
 
   const validMode = mode === "tools" ? "tools" : "chat";
