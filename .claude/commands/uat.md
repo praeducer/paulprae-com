@@ -89,10 +89,13 @@ list recent Vercel deployments and check production deployment state
 
 ## Post-merge production checklist
 
-After merging to main and deploying to production:
+After merging to main and production deployment is READY on Vercel:
 
-1. Run: `BASE_URL=https://paulprae.com npx playwright test --reporter=list`
-2. Check Vercel runtime logs for `cache_tokens` on first chat request
-3. If `ephemeral_1h > 0`: cron warmup can be reduced; 55-min schedule is sufficient
-4. If only `ephemeral_5m > 0`: manually trigger cron: `curl -H "Authorization: Bearer $CRON_SECRET" https://paulprae.com/api/cron`
-5. Verify no `x-robots-tag: noindex` on production pages
+1. Run full smoke suite: `BASE_URL=https://paulprae.com npx playwright test --reporter=list`
+2. Manually trigger cron warmup (if CRON_SECRET is available):
+   `curl -H "Authorization: Bearer $CRON_SECRET" https://paulprae.com/api/cron`
+3. Send two chat messages — check Vercel logs for `[chat] cache_tokens:` entry:
+   - `cache_read > 0` on second message → caching confirmed ✅
+   - If `ephemeral_1h` shows a number (not `"n/a"`): 1h TTL confirmed ✅
+4. Verify `x-robots-tag: noindex` is ABSENT on `https://paulprae.com` (present on preview only)
+5. Verify title: "Paul Prae — AI Career Assistant | paulprae.com"
