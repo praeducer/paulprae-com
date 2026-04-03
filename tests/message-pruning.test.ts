@@ -87,7 +87,7 @@ describe("multi-turn tool-calling message pipeline", () => {
 
     const modelMessages = pruneMessages({
       messages: rawModelMessages,
-      toolCalls: "never",
+      toolCalls: "none",
       reasoning: "before-last-message",
     }).filter((m) => m.content.length > 0);
 
@@ -98,10 +98,16 @@ describe("multi-turn tool-calling message pipeline", () => {
 
     // Tool call and result are preserved
     const toolCallMsg = modelMessages.find(
-      (m) => m.role === "assistant" && m.content.some((c) => c.type === "tool-call"),
+      (m) =>
+        m.role === "assistant" &&
+        Array.isArray(m.content) &&
+        m.content.some((c) => "type" in c && c.type === "tool-call"),
     );
     const toolResultMsg = modelMessages.find(
-      (m) => m.role === "tool" && m.content.some((c) => c.type === "tool-result"),
+      (m) =>
+        m.role === "tool" &&
+        Array.isArray(m.content) &&
+        m.content.some((c) => "type" in c && c.type === "tool-result"),
     );
     expect(toolCallMsg).toBeDefined();
     expect(toolResultMsg).toBeDefined();
@@ -114,7 +120,7 @@ describe("multi-turn tool-calling message pipeline", () => {
     // Even if pruneMessages were to leave empty content (edge cases), the filter removes them
     const modelMessages = pruneMessages({
       messages: rawModelMessages,
-      toolCalls: "never",
+      toolCalls: "none",
       reasoning: "before-last-message",
     }).filter((m) => m.content.length > 0);
 
@@ -127,13 +133,15 @@ describe("multi-turn tool-calling message pipeline", () => {
 
     const modelMessages = pruneMessages({
       messages: rawModelMessages,
-      toolCalls: "never",
+      toolCalls: "none",
       reasoning: "before-last-message",
     }).filter((m) => m.content.length > 0);
 
     const last = modelMessages[modelMessages.length - 1];
     expect(last.role).toBe("user");
-    expect(last.content.some((c) => c.type === "text")).toBe(true);
+    expect(
+      Array.isArray(last.content) && last.content.some((c) => "type" in c && c.type === "text"),
+    ).toBe(true);
   });
 
   it("regresses: toolCalls 'before-last-message' can leave empty content arrays", async () => {
