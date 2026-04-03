@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState, useEffect } from "react";
 import { useChat } from "@ai-sdk/react";
 import {
   AssistantRuntimeProvider,
@@ -251,13 +251,34 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
   // Keep transport's runtime reference current (needed for model context in requests)
   transport.setRuntime(runtime);
 
-  // Quick action handler — appends a message to the thread
+  // Stream timeout — abort after 60s if still loading with no finish.
+  // Guards against stuck-spinner UX when Anthropic is slow or the network stalls.
+  const [streamTimedOut, setStreamTimedOut] = useState(false);
+  useEffect(() => {
+    const isActive = chat.status === "submitted" || chat.status === "streaming";
+    if (!isActive) {
+      setStreamTimedOut(false);
+      return;
+    }
+    const timer = setTimeout(() => {
+      chat.stop();
+      setStreamTimedOut(true);
+    }, 60_000);
+    return () => clearTimeout(timer);
+  }, [chat.status, chat]);
+
+  // Quick action handler — routes through the composer setText + Send click pipeline,
+  // the same code path as manual user submission. Using runtime.thread.append() directly
+  // causes the stream to arrive but never render (AI SDK 5 `content` format vs SDK 6
+  // `parts` format mismatch in the useAISDKRuntime bridge).
   const handleQuickAction = useCallback(
     (prompt: string) => {
-      runtime.thread.append({
-        role: "user",
-        content: [{ type: "text", text: prompt }],
-      });
+      runtime.thread.composer.setText(prompt);
+      // Defer one tick so React processes setText before the click fires
+      setTimeout(() => {
+        const btn = document.querySelector<HTMLButtonElement>('[aria-label="Send message"]');
+        btn?.click();
+      }, 0);
     },
     [runtime],
   );
@@ -390,6 +411,18 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
               {/* Scroll anchor + Composer */}
               <ThreadPrimitive.ViewportFooter className="sticky bottom-0">
                 <div className="mx-auto w-full max-w-3xl px-6 pb-4">
+                  {streamTimedOut && (
+                    <p className="mb-2 text-center text-xs text-red-500 dark:text-red-400">
+                      Response timed out — please try again.{" "}
+                      <button
+                        type="button"
+                        onClick={() => setStreamTimedOut(false)}
+                        className="underline hover:no-underline focus-visible:outline-none"
+                      >
+                        Dismiss
+                      </button>
+                    </p>
+                  )}
                   <ThreadPrimitive.ScrollToBottom asChild>
                     <button
                       type="button"
