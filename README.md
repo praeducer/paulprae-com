@@ -42,7 +42,7 @@ The chat API ([`app/api/chat/route.ts`](app/api/chat/route.ts)) streams response
 - **`generate_tailored_resume`** — accepts a job description, calls Claude to produce a role-specific resume
 - **`get_resume_links`** — returns download URLs for PDF, DOCX, Markdown, and web formats
 
-Career data (~90K tokens) is loaded into the system prompt with [Anthropic prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) (1-hour TTL). After the first request, subsequent turns reuse the cached prompt at ~90% cost reduction. A cron job at `/api/cron` fires every 55 minutes to keep the cache warm, preventing cold-prefill latency for real users.
+Career data (~90K tokens) is loaded into the system prompt with [Anthropic prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) (1-hour TTL). After the first request, subsequent turns reuse the cached prompt at ~90% cost reduction. A cron job at `/api/cron` fires every 55 minutes to keep both the chat and resume-generator caches warm, preventing cold-prefill latency for real users and avoiding the silent 15–20s SSE timeout during tailored resume tool calls.
 
 System prompts include grounding rules (G1-G10) that require every fact to be attributed to a specific company and role — preventing hallucination and cross-employer conflation. Security rules (S1-S5) defend against prompt injection. Prompts live in [`lib/prompts/`](lib/prompts/) as Markdown files with YAML frontmatter.
 

@@ -85,7 +85,7 @@ vi.mock("@ai-sdk/react", () => ({
 
 vi.mock("@assistant-ui/react-ai-sdk", () => ({
   useAISDKRuntime: () => ({
-    thread: { append: vi.fn() },
+    thread: { append: vi.fn(), composer: { setText: vi.fn() } },
   }),
   AssistantChatTransport: class {
     setRuntime() {}
