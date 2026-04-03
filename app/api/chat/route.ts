@@ -315,11 +315,18 @@ export async function POST(request: Request) {
   }
 
   const rawModelMessages = await convertToModelMessages(messages);
+  // Keep tool-call/result pairs intact ("none") so multi-turn tool exchanges
+  // remain valid for Anthropic's API. Pruning tool calls with "before-last-message"
+  // strips the tool-call block from prior assistant messages, which either leaves an
+  // empty content array (rejected by Anthropic) or an orphaned tool-result — both
+  // cause silent stream failures on the second tailored-resume request. Token budget
+  // is bounded by MAX_MESSAGES (50) and MAX_BODY_BYTES (256KB). Reasoning blocks are
+  // still pruned as they are large and not needed for conversation continuity.
   const modelMessages = pruneMessages({
     messages: rawModelMessages,
-    toolCalls: "before-last-message",
+    toolCalls: "none",
     reasoning: "before-last-message",
-  });
+  }).filter((m) => m.content.length > 0); // never send empty content arrays to Anthropic
 
   const chatTools =
     validMode === "chat"
