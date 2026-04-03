@@ -262,21 +262,17 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
     [runtime],
   );
 
-  // Pre-fill the composer textarea with text (e.g., for tailored resume chip).
-  // Uses native setter + event dispatch to sync with assistant-ui's controlled input.
-  // Dispatches both "input" and "change" events for compat with automated testing tools.
-  const handlePrefill = useCallback((text: string) => {
-    const textarea = document.querySelector<HTMLTextAreaElement>('[aria-label="Chat message"]');
-    if (!textarea) return;
-    const nativeSetter = Object.getOwnPropertyDescriptor(
-      HTMLTextAreaElement.prototype,
-      "value",
-    )?.set;
-    nativeSetter?.call(textarea, text);
-    textarea.dispatchEvent(new Event("input", { bubbles: true }));
-    textarea.dispatchEvent(new Event("change", { bubbles: true }));
-    textarea.focus();
-  }, []);
+  // Pre-fill the composer with text (e.g., for tailored resume chip).
+  // Uses the assistant-ui runtime API directly to set the composer text,
+  // which reliably syncs internal state without DOM hacking.
+  const handlePrefill = useCallback(
+    (text: string) => {
+      runtime.thread.composer.setText(text);
+      const textarea = document.querySelector<HTMLTextAreaElement>('[aria-label="Chat message"]');
+      textarea?.focus();
+    },
+    [runtime],
+  );
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>

@@ -2,9 +2,11 @@
  * Cache warmup cron endpoint.
  *
  * Called by Vercel's scheduler every 55 minutes to keep the Anthropic prompt
- * cache warm (1-hour TTL). A single minimal request refreshes the cache so
- * that real users always hit a warm cache, avoiding the 6–18s cold-prefill
- * penalty on the ~90K-token system prompt.
+ * cache warm (1-hour TTL). Warms both the chat and resume-generator system
+ * prompts so that:
+ *   - Chat requests always hit a warm cache (avoids 6–18s cold-prefill penalty)
+ *   - Tailored resume tool calls avoid a cold cache during execution (which
+ *     causes the SSE stream to go silent for 15–20s, risking client timeouts)
  *
  * Requires CRON_SECRET env var (set in Vercel dashboard). Vercel sends this
  * automatically as `Authorization: Bearer <CRON_SECRET>` on cron invocations.
@@ -16,7 +18,7 @@ import type { LanguageModel } from "ai";
 import { CHAT_MODEL_ID } from "../../../lib/constants";
 import { SYSTEM_PROMPTS } from "../../../lib/generated/system-prompts";
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
@@ -30,11 +32,10 @@ export async function GET(request: Request) {
     return new Response("AI service not configured", { status: 503 });
   }
 
-  try {
-    // Minimal single-token request to write/refresh the Anthropic prompt cache.
-    await generateText({
+  const warmPrompt = (systemKey: keyof typeof SYSTEM_PROMPTS) =>
+    generateText({
       model: anthropic(CHAT_MODEL_ID) as LanguageModel,
-      system: SYSTEM_PROMPTS["chat"],
+      system: SYSTEM_PROMPTS[systemKey],
       prompt: "hi",
       maxOutputTokens: 1,
       providerOptions: {
@@ -43,6 +44,12 @@ export async function GET(request: Request) {
         },
       },
     });
+
+  try {
+    // Warm both system prompt caches concurrently.
+    // chat: the main conversational system prompt (~90K tokens)
+    // resume-generator: used during tailored resume tool execution (~70K tokens)
+    await Promise.all([warmPrompt("chat"), warmPrompt("resume-generator")]);
 
     return new Response("ok", { status: 200 });
   } catch (err) {

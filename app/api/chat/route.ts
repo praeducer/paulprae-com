@@ -323,7 +323,7 @@ export async function POST(request: Request) {
                 const resumeSystemPrompt = getSystemPrompt("resume-generator");
                 const userPrompt = buildTailoredResumePrompt(jobDescription, emphasisAreas, true);
 
-                const { text } = await generateText({
+                const { text, finishReason } = await generateText({
                   model: getModel(CHAT_MODEL_ID),
                   system: resumeSystemPrompt,
                   prompt: userPrompt,
@@ -340,6 +340,13 @@ export async function POST(request: Request) {
                   return {
                     error:
                       "Resume generation produced insufficient output. Please try rephrasing your job description.",
+                  };
+                }
+
+                if (finishReason === "length") {
+                  return {
+                    error:
+                      "The tailored resume was too long to display in chat. Please try a shorter job description, or download the full resume via the PDF link in the navigation bar.",
                   };
                 }
 
