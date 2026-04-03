@@ -5,18 +5,27 @@ allowed-tools: Bash, mcp__playwright__*, mcp__vercel__*
 
 Run UAT smoke tests against a live deployment of paulprae.com.
 
-**Target URLs:**
+**Default target:** `https://paulprae.com` (production)
 
-- Preview (latest PR branch): `https://paulprae-com-git-feat-interview-booking-cta-praeducers-projects.vercel.app`
-- Production: `https://paulprae.com`
+To test a specific preview deployment, first get the URL:
+
+```
+list recent Vercel deployments and find the latest preview URL for this project
+```
+
+Then run:
+
+```bash
+BASE_URL=<preview-url> npx playwright test --reporter=list
+```
 
 ## Automated E2E (preferred — runs full smoke suite)
 
 ```bash
-BASE_URL=<target-url> npx playwright test --reporter=list
+BASE_URL=https://paulprae.com npx playwright test --reporter=list
 ```
 
-This runs all smoke tests (page rendering, navigation, API validation, chat interaction) against the live URL without spinning up a local server.
+This runs all smoke tests (page rendering, navigation, API validation, chat interaction) without spinning up a local server. Takes ~30s.
 
 ## Manual checks via Playwright MCP (use when E2E can't reach a protected URL)
 
@@ -53,12 +62,37 @@ Use the Playwright MCP browser tool to verify each item:
 - [ ] `POST /api/chat` with `{"messages":[]}` → 400
 - [ ] `GET /api/cron` without auth → 401
 
+## Cache health (check after any chat interaction)
+
+```
+check Vercel runtime logs for /api/chat in the last 30 minutes, look for "cache_tokens" log lines
+```
+
+Expected healthy log line:
+
+```
+[chat] cache_tokens: {"cache_read":73923,"cache_write":0,"ephemeral_1h":"n/a","ephemeral_5m":"n/a"}
+```
+
+Key signals:
+
+- `cache_read > 0` on 2nd+ request → cache is working ✅
+- `cache_write > 0` only on cold start → normal ✅
+- `ephemeral_1h > 0` and `ephemeral_5m = 0` → 1-hour TTL active ✅
+- `ephemeral_5m > 0` and `ephemeral_1h = 0` → only 5-minute TTL (cron is critical) ⚠️
+
+## Deployment health check
+
+```
+list recent Vercel deployments and check production deployment state
+```
+
 ## Post-merge production checklist
 
 After merging to main and deploying to production:
 
 1. Run: `BASE_URL=https://paulprae.com npx playwright test --reporter=list`
-2. Check Vercel runtime logs for `cache_creation_input_tokens` on first chat request
-3. Check Vercel runtime logs for `cache_read_input_tokens` on second chat request
-4. Manually trigger cron warmup (if CRON_SECRET is available)
+2. Check Vercel runtime logs for `cache_tokens` on first chat request
+3. If `ephemeral_1h > 0`: cron warmup can be reduced; 55-min schedule is sufficient
+4. If only `ephemeral_5m > 0`: manually trigger cron: `curl -H "Authorization: Bearer $CRON_SECRET" https://paulprae.com/api/cron`
 5. Verify no `x-robots-tag: noindex` on production pages

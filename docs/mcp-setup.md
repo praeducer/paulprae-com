@@ -13,11 +13,12 @@ Both files are generated from the canonical template **`scripts/setup/mcp-server
 
 ## Servers included
 
-| Server     | Transport    | Purpose                                                                                                                      |
-| ---------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| **Vercel** | HTTP (OAuth) | List deployments, get build/runtime logs, manage projects, search Vercel docs. Use to verify deployment or debug production. |
+| Server         | Transport    | Purpose                                                                                                                      |
+| -------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Vercel**     | HTTP (OAuth) | List deployments, get build/runtime logs, manage projects, search Vercel docs. Use to verify deployment or debug production. |
+| **Playwright** | stdio (npx)  | Browser automation for UAT testing. Powers the `/uat` command — navigates pages, checks UI, validates headers.               |
 
-Uses OAuth; no API keys in the config.
+Vercel uses OAuth; no API keys in the config. Playwright runs via `npx @playwright/mcp@latest` (auto-installs on first use).
 
 > **GitHub access:** GitHub MCP (`api.githubcopilot.com`) was removed — it requires a GitHub Copilot subscription for OAuth. Use the `gh` CLI instead, which is more capable and already authenticated via `gh auth login`.
 
