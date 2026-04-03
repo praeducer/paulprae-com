@@ -1,4 +1,4 @@
-import { anthropic } from "@ai-sdk/anthropic";
+import { createAnthropic } from "@ai-sdk/anthropic";
 import { gateway } from "@ai-sdk/gateway";
 import {
   streamText,
@@ -29,6 +29,16 @@ export const maxDuration = 120;
 // ─── Model Provider ─────────────────────────────────────────────────────────
 
 const useGateway = !!process.env.AI_GATEWAY_API_KEY;
+
+// Required beta header for 1-hour prompt cache TTL (extended-cache-ttl feature).
+// Without this header, Anthropic ignores the ttl field and the cache_control block
+// may be silently dropped — resulting in no caching at all.
+// See: https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching
+const anthropic = createAnthropic({
+  headers: {
+    "anthropic-beta": "extended-cache-ttl-2025-04-11",
+  },
+});
 
 function getModel(modelId: string): LanguageModel {
   if (useGateway) {

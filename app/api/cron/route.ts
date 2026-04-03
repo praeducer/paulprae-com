@@ -13,8 +13,15 @@
  */
 
 import { generateText } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
+import { createAnthropic } from "@ai-sdk/anthropic";
 import type { LanguageModel } from "ai";
+
+// Required for the 1-hour cache TTL — see app/api/chat/route.ts for explanation.
+const anthropic = createAnthropic({
+  headers: {
+    "anthropic-beta": "extended-cache-ttl-2025-04-11",
+  },
+});
 import { CHAT_MODEL_ID } from "../../../lib/constants";
 import { SYSTEM_PROMPTS } from "../../../lib/generated/system-prompts";
 
