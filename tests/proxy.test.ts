@@ -147,6 +147,11 @@ describe("proxy route protection", () => {
     expect(res.headers.get("allow")).toContain("POST");
   });
 
+  it("allows GET to /api/cron (Vercel scheduler exception)", () => {
+    const res = proxy(makeRequest("/api/cron", "GET", null) as never);
+    expect(res.status).toBe(200);
+  });
+
   it("passes allowed POST API requests and sets response CORS header", () => {
     const res = proxy(makeRequest("/api/chat", "POST", KNOWN_ALLOWED_ORIGIN) as never);
     expect(res.status).toBe(200);

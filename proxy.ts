@@ -55,8 +55,10 @@ export function proxy(request: NextRequest) {
       });
     }
 
-    // Only allow POST to API routes
-    if (request.method !== "POST") {
+    // Only allow POST to API routes.
+    // Exception: /api/cron uses GET (Vercel scheduler sends GET + Authorization header).
+    const isCron = pathname === "/api/cron";
+    if (!isCron && request.method !== "POST") {
       return new NextResponse("Method Not Allowed", {
         status: 405,
         headers: { Allow: "POST, OPTIONS" },
