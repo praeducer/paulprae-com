@@ -45,9 +45,9 @@ Use the Playwright MCP browser tool to verify each item:
 
 - [ ] "Paul Prae" heading visible
 - [ ] "Professional Summary" section visible
-- [ ] Section nav works (click a section → page scrolls)
+- [ ] Section nav works (click a section → page scrolls to it without blank screen)
 - [ ] PDF download link present in contact row (has file size label)
-- [ ] "Book Interview" link in contact row
+- [ ] "Book Interview" button visible in header nav (blue CTA, top-right)
 
 ### Security checks (verify response headers)
 

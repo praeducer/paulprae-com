@@ -418,17 +418,19 @@ export async function POST(request: Request) {
           errObj.stack ?? "",
         );
       },
-      onFinish({ usage }) {
+      onFinish({ usage, providerMetadata }) {
         // Log cache metrics to confirm 1h TTL is active (not 5m default).
         // In Vercel logs: look for ephemeral_1h > 0 (1h write) vs ephemeral_5m > 0 (5m fallback).
-        const raw = usage.raw as Record<string, unknown> | undefined;
+        // providerMetadata.anthropic.usage contains the raw Anthropic API response fields.
+        const anthropicRaw = (providerMetadata?.anthropic as Record<string, unknown> | undefined)
+          ?.usage as Record<string, unknown> | undefined;
         console.log(
           "[chat] cache_tokens:",
           JSON.stringify({
             cache_read: usage.inputTokenDetails?.cacheReadTokens ?? 0,
             cache_write: usage.inputTokenDetails?.cacheWriteTokens ?? 0,
-            ephemeral_1h: raw?.ephemeral_1h_input_tokens ?? "n/a",
-            ephemeral_5m: raw?.ephemeral_5m_input_tokens ?? "n/a",
+            ephemeral_1h: anthropicRaw?.ephemeral_1h_input_tokens ?? "n/a",
+            ephemeral_5m: anthropicRaw?.ephemeral_5m_input_tokens ?? "n/a",
           }),
         );
       },

@@ -134,8 +134,7 @@ The primary conversion action — verify on every deployment.
 - [ ] Header CTA: has `aria-label="Book interview with Paul (opens in new tab)"`
 - [ ] Chat homepage: "Book Interview" quick action chip visible in the welcome hero
 - [ ] Chat homepage: clicking the chip sends the booking prompt
-- [ ] Resume page: "Book Interview" link appears in the contact row with calendar icon
-- [ ] Resume page: contact row "Book Interview" opens the correct Bookings URL in new tab
+- [ ] Resume page: "Book Interview" CTA visible in header nav (blue button, same as all pages)
 
 ## 5. Resume Page (`/resume`)
 
@@ -146,7 +145,7 @@ The primary conversion action — verify on every deployment.
 - [ ] Direct navigation to `/resume#education` immediately highlights "Education" (no flash of wrong section)
 - [ ] Scrolling to top highlights first section; scrolling to bottom highlights last section
 - [ ] All section labels visible (including last section — not clipped by right-edge fade)
-- [ ] Contact row shows: Email, LinkedIn, GitHub, Book Interview (with calendar icon), separator, PDF, DOCX, MD downloads
+- [ ] Contact row shows: Email, LinkedIn, GitHub, separator, PDF, DOCX, MD downloads
 - [ ] Download links work: PDF opens/downloads, DOCX opens/downloads
 - [ ] "Chat with AI" link in nav has subtle border to distinguish it from plain nav links
 - [ ] Header link (site name) returns to `/`
