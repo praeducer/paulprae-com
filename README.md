@@ -42,7 +42,7 @@ The chat API ([`app/api/chat/route.ts`](app/api/chat/route.ts)) streams response
 - **`generate_tailored_resume`** — accepts a job description, calls Claude to produce a role-specific resume
 - **`get_resume_links`** — returns download URLs for PDF, DOCX, Markdown, and web formats
 
-Career data (~90K tokens) is loaded into the system prompt with [Anthropic prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) (5-min TTL). After the first request, subsequent turns reuse the cached prompt at ~90% cost reduction.
+Career data (~90K tokens) is loaded into the system prompt with [Anthropic prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) (1-hour TTL). After the first request, subsequent turns reuse the cached prompt at ~90% cost reduction. A cron job at `/api/cron` fires every 55 minutes to keep the cache warm, preventing cold-prefill latency for real users.
 
 System prompts include grounding rules (G1-G10) that require every fact to be attributed to a specific company and role — preventing hallucination and cross-employer conflation. Security rules (S1-S5) defend against prompt injection. Prompts live in [`lib/prompts/`](lib/prompts/) as Markdown files with YAML frontmatter.
 
@@ -112,13 +112,14 @@ npm run pipeline     # ingest → generate → export
 # Development
 npm run dev                # Dev server (Turbopack)
 npm run build              # Production build
-npm test                   # 480+ unit/component tests (~1s)
+npm test                   # 488+ unit/component tests (~1s)
 npm run test:e2e           # Playwright E2E smoke tests
 npm run check              # Full pre-push checklist (lint + format + test + build + validate)
 
 # Pipeline
-npm run pipeline           # Full: ingest → generate → export
-npm run pipeline:content   # AI steps only: ingest → generate
+npm run pipeline           # Full: ingest → build:prompts → generate → export
+npm run pipeline:content   # AI steps only: ingest → build:prompts → generate
+npm run build:prompts      # Pre-build system prompts → lib/generated/system-prompts.ts
 npm run ingest             # Parse LinkedIn CSVs + knowledge JSONs → career-data.json
 npm run generate           # Claude API → Paul-Prae-Resume.staging.md
 npm run export             # Pandoc + Typst → PDF + DOCX

@@ -34,7 +34,7 @@ paulprae.com is a chat-first career platform with an AI assistant that answers r
 
 - **Chat (Sonnet):** Recruiter Q&A needs fast responses (~2-5s TTFT). Sonnet at $3/$15 per MTok provides sufficient quality for conversational grounding while keeping per-conversation costs under $0.20.
 - **Pipeline (Opus):** Resume generation is a permanent artifact viewed by hiring managers. Opus with adaptive thinking at max effort ($15/$75 per MTok) provides deeper reasoning for entity-scope binding, cross-reference validation, and quality rule adherence. Cost per generation (~$1-2) is acceptable for an artifact generated weekly.
-- **Resume tailoring tool (Sonnet):** Runtime resume tailoring via tool-calling uses Sonnet (not Opus) to keep latency under 15s. The recruiter-provided JD provides strong constraints that compensate for the lighter model.
+- **Resume tailoring tool (Sonnet):** Runtime resume tailoring via tool-calling uses Sonnet (not Opus) to keep latency under 15s. Output is capped at 1,200 tokens (~500 words) in chat context so it fits in the chat bubble. The recruiter-provided JD provides strong constraints that compensate for the lighter model. The CLI pipeline uses a separate 8,192-token cap for full two-page resume generation.
 
 **Cost comparison per month (estimated 500 chat conversations + 2 pipeline runs):**
 
@@ -52,16 +52,17 @@ paulprae.com is a chat-first career platform with an AI assistant that answers r
 - Input validation (Zod schemas, character limits, message count caps) provides defense in depth at the application layer before content reaches the model.
 - More maintainable than alternatives like output filtering or separate moderation calls, which add latency and cost.
 
-## Decision 4: Ephemeral Prompt Caching
+## Decision 4: Prompt Caching Strategy (1-Hour TTL + Pre-Built Prompts + Cron Warmup)
 
-**Decision:** Use Anthropic's ephemeral caching (5-minute TTL) rather than no caching or persistent caching.
+**Decision:** Use Anthropic's ephemeral caching with 1-hour TTL, pre-built system prompts committed to the repo, and a cron-based cache warmup job.
 
 **Rationale:**
 
-- System prompts contain the full career dataset, which is stable within a conversation session.
-- Ephemeral (5-min TTL) matches the expected recruiter interaction pattern: browse site, ask 3-7 questions over 2-5 minutes, leave.
-- First request pays 1.25x input cost (cache write). Subsequent turns pay only 0.1x (cache read) — ~90% cost reduction per follow-up turn.
-- No persistent cache needed — career data changes only when the pipeline runs (weekly at most), and the 5-min window covers a single session.
+- **1-hour TTL over 5-minute default:** The default 5-min TTL expires between visits on a low-traffic personal career site. Most users would hit a cold cache (6–18s prefill time for a ~90K-token system prompt). The 1-hour TTL costs 2x the write fee but means virtually every user hits a warm cache. Cost-effective given the traffic pattern.
+- **Pre-built prompts (`lib/generated/system-prompts.ts`):** System prompts are assembled at pipeline time (`npm run build:prompts`) and committed as TypeScript constants. This produces byte-identical strings on every request — critical for consistent cache hit rates (any token-level change in the assembled string is a cache miss). Also eliminates runtime file I/O from the request hot path.
+- **Cron warmup (`/api/cron`):** A Vercel cron job fires every 55 minutes (within the 1-hour TTL) to refresh the Anthropic cache using a minimal single-token request. If no users have visited for nearly an hour, the cron ensures the cache is always ready for the next visitor. The endpoint is protected by `CRON_SECRET` and proxied via the GET exception in `proxy.ts`.
+- First request pays 2x input cost (cache write at 1-hour tier). Subsequent turns pay only 0.1x (cache read) — ~90% cost reduction per follow-up turn.
+- No Redis caching of prompts needed — the pre-built TypeScript module is faster (zero network latency), bundled at compile time, and never goes stale mid-session.
 
 ## Decision 5: Single Agent with Tools (Not Multi-Agent)
 
@@ -137,16 +138,16 @@ Platform integrations provide most observability. Additionally, this repo includ
 
 ## Cost Controls
 
-| Control                | Implementation                                              | Location                    |
-| ---------------------- | ----------------------------------------------------------- | --------------------------- |
-| Prompt caching         | Ephemeral 5-min TTL; ~90% cost reduction on follow-up turns | `route.ts` (streamText)     |
-| Output token cap       | Chat: 2,048 tokens; resume generation: 8,192 tokens         | `lib/constants.ts`          |
-| Temperature tuning     | Lower temperature for tools/resume (fewer retries)          | `route.ts` (streamText)     |
-| Rate limiting          | Sliding window per IP via Upstash Redis                     | `route.ts` (rate limiter)   |
-| Input size limits      | Per-message char limit, message count cap, body size cap    | `route.ts` (constants)      |
-| Model tiering          | Sonnet for chat; Opus only for pipeline                     | `route.ts`, `lib/config.ts` |
-| Anthropic spend limits | Configurable monthly cap at console.anthropic.com           | Anthropic Console           |
-| Vercel spend limits    | Configurable at Vercel Dashboard > Settings > Billing       | Vercel Dashboard            |
+| Control                | Implementation                                                                        | Location                    |
+| ---------------------- | ------------------------------------------------------------------------------------- | --------------------------- |
+| Prompt caching         | Ephemeral 1-hr TTL + cron warmup; ~90% cost reduction on follow-up turns              | `route.ts`, `app/api/cron/` |
+| Output token cap       | Chat: 2,048 tokens; tailored resume in chat: 1,200 tokens; CLI pipeline: 8,192 tokens | `lib/constants.ts`          |
+| Temperature tuning     | Lower temperature for tools/resume (fewer retries)                                    | `route.ts` (streamText)     |
+| Rate limiting          | Sliding window per IP via Upstash Redis                                               | `route.ts` (rate limiter)   |
+| Input size limits      | Per-message char limit, message count cap, body size cap                              | `route.ts` (constants)      |
+| Model tiering          | Sonnet for chat; Opus only for pipeline                                               | `route.ts`, `lib/config.ts` |
+| Anthropic spend limits | Configurable monthly cap at console.anthropic.com                                     | Anthropic Console           |
+| Vercel spend limits    | Configurable at Vercel Dashboard > Settings > Billing                                 | Vercel Dashboard            |
 
 ---
 

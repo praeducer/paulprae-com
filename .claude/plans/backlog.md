@@ -2,7 +2,7 @@
 
 Actionable coding and documentation tasks for Claude Code. No human-only tasks here (those are in `human-tasks.md`).
 
-> Last reconciled: 2026-04-02 against `feat/interview-booking-cta` (PR #28, ready to merge — UAT is the only remaining gate).
+> Last reconciled: 2026-04-03 against `feat/interview-booking-cta` (PR #28, ready to merge — UAT is the only remaining gate).
 
 ---
 
@@ -26,7 +26,7 @@ Options to evaluate in order:
 1. **Reduce thinking effort from "max" to "high":** May save 30-50% on output tokens. Run A/B comparison with `npm run compare --judge` to measure quality delta.
 2. **Try Sonnet 4.6 instead of Opus 4.6:** ~10x cheaper. Run A/B comparison. If quality is within 5%, switch default to Sonnet and reserve Opus for final/production generations.
 3. **Reduce max_tokens from 128K to 16K:** The resume is ~8K chars. 128K is excessive headroom.
-4. **Verify prompt caching:** Already implemented. Check `cache_read_input_tokens` in generation telemetry to confirm it's working.
+4. **Prompt caching:** Implemented — 1-hour TTL + cron warmup + pre-built prompts. Verify `cache_read_input_tokens` in Anthropic Console logs to confirm hitting.
 
 Acceptance criteria: quality score must stay >=395 for any optimization to be accepted.
 
