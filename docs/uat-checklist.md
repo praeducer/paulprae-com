@@ -10,7 +10,7 @@ Run this checklist after every major deployment. Automated tests (unit, E2E, CI 
 
 ```bash
 npm run check:quick   # data files, resume quality, public download sync
-npx vitest run        # unit + component tests (480+ tests)
+npx vitest run        # unit + component tests (493+ tests)
 npx tsc --noEmit      # TypeScript compilation
 npx eslint .          # linting
 ```
@@ -39,6 +39,10 @@ The primary value proposition. Test this first on every deployment.
 - [ ] Tool-calling triggers (may take 30-60s) and returns a formatted tailored resume
 - [ ] Tailored resume references content from the actual career data
 - [ ] Click "Download resume" chip — returns links to PDF, DOCX, Markdown, and web resume
+- [ ] **Multi-turn tailored resume (regression test for BUG-NEW-01):**
+  - Turn 1: click "Tailored resume", paste "Principal AI Engineer at a healthcare SaaS company", send → resume renders ✅
+  - Turn 2 (same session): send "Now tailor it for a Senior ML Engineer at a fintech startup building fraud detection" → resume renders, NOT blank ✅
+  - A blank assistant bubble on Turn 2 means the `emphasisAreas` Zod schema is rejecting the tool input
 
 ### Quick Action Chips
 
@@ -123,6 +127,7 @@ Test before every production push — these are trust-critical.
 ### Security Headers
 
 - [ ] View response headers (DevTools → Network): CSP, HSTS, X-Frame-Options, X-Content-Type-Options present
+- [ ] `cross-origin-opener-policy: same-origin` present (added in PR #33)
 
 ## 4. Book Interview CTA
 
@@ -166,6 +171,8 @@ The primary conversion action — verify on every deployment.
 - [ ] Chat composer is visible at bottom with placeholder text
 - [ ] Dark mode: toggle system theme, verify no color clashes or unreadable text
 - [ ] Skip-to-content link appears on Tab press (no visible flash on page load or client-side navigation)
+- [ ] Hero description text is legible (dark slate, sufficient contrast — not washed-out light gray)
+- [ ] Footer text ("paulprae.com — Built with…") is legible with good contrast
 
 ### Accessibility
 
@@ -211,7 +218,7 @@ Test on a real phone or browser DevTools (375px width):
 
 - [ ] First page load under 3 seconds on broadband
 - [ ] Chat first response (TTFT) under 5 seconds
-- [ ] Lighthouse score: Performance ≥ 90, Accessibility ≥ 90, SEO ≥ 90
+- [ ] Lighthouse score: Performance ≥ 90, Accessibility = 100, Best Practices ≥ 96, SEO = 100
 - [ ] Check Vercel Dashboard > Functions — `/api/chat` executions appear
 - [ ] Check Anthropic Console > Usage — requests appear, within spend limits
 - [ ] Check Upstash Console — rate limiting counters active under `paulprae:chat` prefix
