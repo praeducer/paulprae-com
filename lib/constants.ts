@@ -110,9 +110,9 @@ export const MAX_MESSAGE_CHARS = 4_000;
 export const CHAT_REQUEST_LIMITS = {
   maxMessages: 50,
   maxBodyBytes: 256_000,
-  maxJobDescriptionChars: 10_000,
+  maxJobDescriptionChars: 50_000,
   maxEmphasisItems: 10,
-  maxEmphasisChars: 200,
+  maxEmphasisChars: 500,
 } as const;
 
 // ─── Rate Limiting ──────────────────────────────────────────────────────────
