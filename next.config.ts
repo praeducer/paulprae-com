@@ -16,6 +16,18 @@ const nextConfig: NextConfig = {
       "./data/sources/knowledge/**/*.json",
     ],
   },
+
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          // Prevent cross-origin popups from retaining opener access (fixes COOP inspector issue).
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
