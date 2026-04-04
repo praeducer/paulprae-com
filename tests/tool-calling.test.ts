@@ -60,7 +60,7 @@ describe("generate_tailored_resume schema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects emphasis area exceeding 200 characters", () => {
+  it("rejects emphasis area exceeding max character limit", () => {
     const result = generateTailoredResumeInputSchema.safeParse({
       jobDescription: "Valid JD.",
       emphasisAreas: ["x".repeat(CHAT_REQUEST_LIMITS.maxEmphasisChars + 1)],

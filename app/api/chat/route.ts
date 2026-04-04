@@ -65,7 +65,7 @@ export const generateTailoredResumeInputSchema = z.object({
     .describe("The job description or role requirements to tailor the resume for"),
   emphasisAreas: z
     .array(
-      z
+      z.coerce
         .string()
         .max(
           CHAT_REQUEST_LIMITS.maxEmphasisChars,
@@ -76,7 +76,7 @@ export const generateTailoredResumeInputSchema = z.object({
       CHAT_REQUEST_LIMITS.maxEmphasisItems,
       `Maximum ${CHAT_REQUEST_LIMITS.maxEmphasisItems} emphasis areas`,
     )
-    .optional()
+    .nullish()
     .describe("Specific areas to emphasize (e.g., 'AI/ML', 'healthcare', 'leadership')"),
 });
 
@@ -324,8 +324,12 @@ export async function POST(request: Request) {
             inputSchema: generateTailoredResumeInputSchema,
             execute: async ({ jobDescription, emphasisAreas }) => {
               try {
+                // Truncate as a safety net in case the model produces verbose content
+                // that approaches schema limits. null → undefined for buildTailoredResumePrompt.
+                const safeJD = jobDescription.slice(0, CHAT_REQUEST_LIMITS.maxJobDescriptionChars);
+                const safeEmphasis = emphasisAreas ?? undefined;
                 const resumeSystemPrompt = getSystemPrompt("resume-generator");
-                const userPrompt = buildTailoredResumePrompt(jobDescription, emphasisAreas, true);
+                const userPrompt = buildTailoredResumePrompt(safeJD, safeEmphasis, true);
 
                 const { text, finishReason } = await generateText({
                   model: getModel(CHAT_MODEL_ID),

@@ -330,7 +330,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                           <p className="mt-2 sm:mt-3 hidden sm:block max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                             {HERO_DESCRIPTION}
                           </p>
-                          <p className="mt-2 max-w-lg text-xs text-slate-400 dark:text-slate-500">
+                          <p className="mt-2 max-w-lg text-xs text-slate-600 dark:text-slate-400">
                             Ask about Paul&apos;s experience, download his resume, or request a
                             tailored resume for your open role.
                           </p>
@@ -433,7 +433,7 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
         </main>
 
         <footer className="shrink-0 py-1.5 text-center">
-          <p className="text-xs text-slate-400 dark:text-slate-500">
+          <p className="text-xs text-slate-600 dark:text-slate-400">
             {SITE_DOMAIN} &mdash; Built with Next.js, Claude AI, and Tailwind CSS &mdash;{" "}
             <a href={GITHUB_URL} {...externalLinkProps(GITHUB_URL)} className={FOOTER_LINK_CLASS}>
               view source

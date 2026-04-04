@@ -53,6 +53,7 @@ Use the Playwright MCP browser tool to verify each item:
 
 - [ ] `x-frame-options: DENY`
 - [ ] `strict-transport-security` present
+- [ ] `cross-origin-opener-policy: same-origin` present
 - [ ] `x-robots-tag: noindex` is **absent** on production (present on preview — expected)
 - [ ] CORS: `access-control-allow-origin` is `https://paulprae.com` (not `*`)
 
@@ -61,6 +62,12 @@ Use the Playwright MCP browser tool to verify each item:
 - [ ] `POST /api/chat` with empty body → 400
 - [ ] `POST /api/chat` with `{"messages":[]}` → 400
 - [ ] `GET /api/cron` without auth → 401
+
+### Multi-turn tailored resume (regression: BUG-NEW-01)
+
+- [ ] Send "Tailor my resume for a Principal AI Engineer role at a healthcare SaaS company" → resume renders (not blank)
+- [ ] In the **same session**, send "Now tailor it for a Senior ML Engineer at a fintech startup building fraud detection" → second resume renders (not blank)
+- [ ] Blank bubble on Turn 2 = `tool-input-error` regression; check Vercel logs for `[tool:generate_tailored_resume]` error
 
 ## Cache health (check after any chat interaction)
 
