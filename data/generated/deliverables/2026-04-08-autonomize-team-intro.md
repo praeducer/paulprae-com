@@ -11,7 +11,7 @@
 
 Team — please join me in welcoming **Paul Prae**, who joins us on **April 13** as a **Solutions Architect** on Solutions & Delivery Engineering.
 
-Paul is an AI and data engineering leader with 13+ years building production systems across healthcare, life sciences, and financial services. Most recently he served as Chief AI Architect at Booz Allen Hamilton, leading AI and analytics solution development for healthcare and life science clients in FedRAMP- and HIPAA-compliant environments. Before that he was an Enterprise AI/ML Solutions Architect at AWS, where he guided Fortune 500 accounts through cloud-native AI architectures, and he got his start in healthcare and life sciences analytics consulting at Slalom, delivering a statewide behavioral health forecasting system in Georgia.
+Paul is an AI and data engineering leader with 13+ years building production systems across healthcare, life sciences, and financial services. His background includes serving as Chief AI Architect at Booz Allen Hamilton, where he led AI and analytics solution development for healthcare and life science clients in FedRAMP- and HIPAA-compliant environments; as an Enterprise AI/ML Solutions Architect at AWS, guiding Fortune 500 accounts through cloud-native AI architectures; and as an analytics consultant at Slalom, delivering a statewide behavioral health forecasting system in Georgia.
 
 He's a four-time AWS-certified architect (including ML Engineer and ML Specialty), a published neuroinformatics researcher, and founder of Modular Earth, a non-profit building open-source AI agents. He's genuinely excited to help our customers across healthcare and life sciences ship AI that moves the needle on care and research.
 
@@ -29,9 +29,9 @@ Paul brings 13+ years of AI and data engineering leadership across healthcare, l
 
 A few highlights from his journey:
 
-🏥 **Healthcare & life sciences AI leadership** — Former Chief AI Architect at Booz Allen Hamilton, where he led AI and analytics solution development for healthcare and life science clients in FedRAMP- and HIPAA-compliant environments, harnessing clinical, behavioral, and genomic data for population health and predictive medicine.
+🏥 **Healthcare & life sciences AI leadership** — Chief AI Architect experience at Booz Allen Hamilton, leading AI and analytics solution development for healthcare and life science clients in FedRAMP- and HIPAA-compliant environments, harnessing clinical, behavioral, and genomic data for population health and predictive medicine.
 
-☁️ **Enterprise cloud architecture** — Former Enterprise AI/ML Solutions Architect at AWS, partnering with Fortune 500 accounts on cloud-native AI. Four-time AWS certified, including ML Engineer and ML Specialty.
+☁️ **Enterprise cloud architecture** — Enterprise AI/ML Solutions Architect experience at AWS, partnering with Fortune 500 accounts on cloud-native AI. Four-time AWS certified, including ML Engineer and ML Specialty.
 
 🔬 **Research credibility** — Co-authored peer-reviewed work in *Frontiers in Neuroinformatics* on federated analysis and differential privacy for protected health data.
 
@@ -49,6 +49,6 @@ Learn more at **paulprae.com**.
 
 - Every claim is sourced from `data/generated/career-data.json` — no invented metrics, no embellished titles.
 - **HL7 / FHIR / EDI 837/835** are JD requirements but are not explicitly listed on Paul's resume, so they are intentionally not claimed here. HIPAA and FedRAMP experience carry the regulatory weight.
-- Per Paul's instruction, Arine and Avahi are omitted; the current role is referenced only obliquely ("13+ years…").
+- Per Paul's instruction, his two most recent roles are omitted. Recency phrasing ("most recently," "former") has been removed so the intro lists prior experience without implying it was his last job.
 - "Customers across healthcare and life sciences" replaces earlier payer-centric framing per team feedback that the public website over-emphasizes payers.
 - Photo handled separately by Paul.
