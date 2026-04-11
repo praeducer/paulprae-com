@@ -90,20 +90,9 @@ export function loadCareerData(): CareerData {
   return JSON.parse(raw) as CareerData;
 }
 
-/** Load writing-rules.json from knowledge sources. */
-export function loadWritingRules(): unknown {
-  const rulesPath = path.join(PATHS.knowledgeDir, "content", "writing-rules.json");
-  if (!fs.existsSync(rulesPath)) {
-    console.warn("   \u26a0 writing-rules.json not found, skipping writing rules injection");
-    return null;
-  }
-  try {
-    return JSON.parse(fs.readFileSync(rulesPath, "utf-8"));
-  } catch {
-    console.warn("   \u26a0 Failed to parse writing-rules.json, skipping");
-    return null;
-  }
-}
+/** Load writing-rules.json via the centralized typed loader (Phase A1 SSOT). */
+import { getRulesPayload } from "./writing-rules";
+export const loadWritingRules = getRulesPayload;
 
 // ─── Company Data Loader ────────────────────────────────────────────────────
 

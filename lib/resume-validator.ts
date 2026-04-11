@@ -22,6 +22,7 @@
  */
 
 import type { CareerData } from "./types.js";
+import { getSuppressedSkills } from "./writing-rules.js";
 
 /**
  * Validate a generated resume markdown against deterministic quality rules.
@@ -281,34 +282,11 @@ export function validateResume(markdown: string, careerData: CareerData): string
 }
 
 /**
- * Load the suppressed-skills list from writing-rules.json.
+ * Load the suppressed-skills list from writing-rules.json via the typed loader.
  * Falls back to an empty array if the file is missing or malformed.
  */
 function loadSuppressedSkills(): string[] {
-  try {
-    // Lazy require to avoid forcing config imports on consumers that only
-    // want the validator's type signature.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const fs = require("fs") as typeof import("fs");
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const path = require("path") as typeof import("path");
-    const rulesPath = path.join(
-      process.cwd(),
-      "data",
-      "sources",
-      "knowledge",
-      "content",
-      "writing-rules.json",
-    );
-    if (!fs.existsSync(rulesPath)) return [];
-    const raw = JSON.parse(fs.readFileSync(rulesPath, "utf-8")) as {
-      suppress_from_output?: { skills?: string[] };
-      data?: { suppress_from_output?: { skills?: string[] } };
-    };
-    return raw.data?.suppress_from_output?.skills ?? raw.suppress_from_output?.skills ?? [];
-  } catch {
-    return [];
-  }
+  return getSuppressedSkills();
 }
 
 /** Back-compat alias for legacy callers importing the old name. */

@@ -17,6 +17,7 @@
 import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
+import { getSuppressedSkills } from "../lib/writing-rules";
 
 const KNOWLEDGE_DIR = path.join(process.cwd(), "data", "sources", "knowledge", "career");
 const CAREER_DATA = path.join(process.cwd(), "data", "generated", "career-data.json");
@@ -204,13 +205,8 @@ describe("data consistency — career-data.json", () => {
   });
 
   it("no suppressed skills appear in position descriptions", () => {
-    // Read the suppressed list from writing-rules.json at runtime
-    const rules = loadJson<{
-      suppress_from_output?: { skills?: string[] };
-      data?: { suppress_from_output?: { skills?: string[] } };
-    }>(path.join(process.cwd(), "data", "sources", "knowledge", "content", "writing-rules.json"));
-    const suppressed =
-      rules.data?.suppress_from_output?.skills ?? rules.suppress_from_output?.skills ?? [];
+    // Phase A1: use the centralized typed loader instead of raw JSON.parse
+    const suppressed = getSuppressedSkills();
 
     const leaks: string[] = [];
     for (const pos of career.positions) {

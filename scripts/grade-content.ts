@@ -48,15 +48,17 @@ interface GradeResult {
   categories: CategoryScore[];
 }
 
-// ─── Writing Rules Loader ───────────────────────────────────────────────────
+// ─── Writing Rules Loader (Phase A1: centralized typed loader) ──────────────
+
+import { getRulesPayload } from "../lib/writing-rules";
 
 function loadWritingRules(): Record<string, unknown> {
-  const rulesPath = path.join(PATHS.knowledgeDir, "content", "writing-rules.json");
-  if (!fs.existsSync(rulesPath)) {
+  const rules = getRulesPayload();
+  if (!rules) {
     console.error("❌ writing-rules.json not found");
     process.exit(1);
   }
-  return JSON.parse(fs.readFileSync(rulesPath, "utf-8"));
+  return rules as unknown as Record<string, unknown>;
 }
 
 /**
