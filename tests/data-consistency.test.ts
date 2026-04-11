@@ -92,6 +92,25 @@ describe("data consistency — career-data.json", () => {
     expect(summary).not.toMatch(/\b(14|15|16|17|18|19|20)\s+years\s+of\s+experience/i);
   });
 
+  // Authoritative dates confirmed by Paul on 2026-04-11 after a memory-file
+  // regression cycle. If these assertions fail, CHECK PAUL'S LINKEDIN BEFORE
+  // editing — do NOT edit these assertions based on a memory file.
+  // Root cause of the 2026-04-11 regression documented in
+  // C:\Users\paulp\.claude\projects\C--dev-paulprae-com\memory\user_career_timeline.md
+  it("Arine position has authoritative start/end dates (Sep 2025 → Mar 2026)", () => {
+    const arine = career.positions.find((p) => p.company === "Arine");
+    expect(arine, "Arine position must exist in career-data.json").toBeDefined();
+    expect(arine?.startDate).toBe("2025-09");
+    expect(arine?.endDate).toBe("2026-03");
+  });
+
+  it("Hyperbloom position has authoritative start/end dates (Jan 2020 → Aug 2025)", () => {
+    const hyperbloom = career.positions.find((p) => p.company === "Hyperbloom");
+    expect(hyperbloom, "Hyperbloom position must exist").toBeDefined();
+    expect(hyperbloom?.startDate).toBe("2020-01");
+    expect(hyperbloom?.endDate).toBe("2025-08");
+  });
+
   it("no suppressed skills appear in position descriptions", () => {
     // Read the suppressed list from writing-rules.json at runtime
     const rules = loadJson<{

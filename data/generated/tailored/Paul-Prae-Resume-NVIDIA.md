@@ -18,7 +18,7 @@ AI engineering leader with 13+ years delivering enterprise AI solutions for heal
 
 ### Staff AI DataOps Engineer
 
-**Arine** | Remote | Mar 2025 – Mar 2026
+**Arine** | Remote | Sep 2025 – Mar 2026
 
 - Managed the enterprise data platform on Snowflake and Amazon Web Services, processing petabytes of healthcare data from hundreds of heterogeneous sources in support of Arine's medication management and clinical decision support products (Arine serves 45+ health plans and over 30 million members).
 - Built HIPAA-compliant AI coding assistants including a Data Engineering Agent that autonomously generated, deployed, and tested Extract-Transform-Load (ETL) pipelines.
@@ -36,7 +36,7 @@ AI engineering leader with 13+ years delivering enterprise AI solutions for heal
 
 ### Chief AI Officer, Founder
 
-**Hyperbloom** | United States | Jan 2020 – Feb 2025
+**Hyperbloom** | United States | Jan 2020 – Aug 2025
 
 - Grew healthcare AI consulting practice from $40K investment to $1.4M ARR, delivering cloud-based AI and data solutions across healthcare, life science, and financial services.
 - Led full sales cycle with teams of sales coordinators, account managers, and solutions architects, building go-to-market strategies and partner co-sell motions with AWS and research organizations.
