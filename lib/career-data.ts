@@ -60,31 +60,19 @@ export function getCurrentEmployer(data: CareerData): string {
   return getCurrentRole(data)?.company ?? "";
 }
 
-/** Current employer's website URL, derived from companies.json (SSOT). */
-export function getCurrentEmployerUrl(employerName: string): string {
-  try {
-    const fs = require("fs") as typeof import("fs");
-    const path = require("path") as typeof import("path");
-    const companiesPath = path.join(
-      process.cwd(),
-      "data",
-      "sources",
-      "knowledge",
-      "career",
-      "companies.json",
-    );
-    if (!fs.existsSync(companiesPath)) return "";
-    const raw = JSON.parse(fs.readFileSync(companiesPath, "utf-8"));
-    const entries = raw.data ?? raw;
-    const list = Array.isArray(entries) ? entries : [entries];
-    const match = list.find(
-      (c: Record<string, unknown>) =>
-        typeof c.name === "string" && c.name.toLowerCase() === employerName.toLowerCase(),
-    );
-    return (match?.website as string) ?? "";
-  } catch {
-    return "";
-  }
+/**
+ * Current employer's website URL from a pre-loaded companies list.
+ * Caller (build-prompts.ts) reads companies.json and passes the array in,
+ * keeping this file free of fs/path imports (safe for client bundles).
+ */
+export function getCurrentEmployerUrl(
+  employerName: string,
+  companies: Array<Record<string, unknown>>,
+): string {
+  const match = companies.find(
+    (c) => typeof c.name === "string" && c.name.toLowerCase() === employerName.toLowerCase(),
+  );
+  return (match?.website as string) ?? "";
 }
 
 /**
