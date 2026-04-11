@@ -20,7 +20,7 @@ AI engineering leader with 13+ years delivering enterprise AI solutions for heal
 
 **Arine** | Remote | Sep 2025 – Mar 2026
 
-- Managed the enterprise data platform on Snowflake and AWS, processing petabytes of healthcare data from hundreds of heterogeneous sources in support of Arine's medication-optimization platform (Arine serves 45+ health plans and 30M+ client members).
+- Managed the enterprise data platform on Snowflake and Amazon Web Services, processing petabytes of healthcare data from hundreds of heterogeneous sources in support of Arine's medication management and clinical decision support products (Arine serves 45+ health plans and over 30 million members).
 - Built HIPAA-compliant AI coding assistants including a Data Engineering Agent that autonomously generated, deployed, and tested Extract-Transform-Load (ETL) pipelines.
 - Led AI enablement workshops training up to 100 engineers on AI-first development practices and AI governance standards.
 - Built observability pipeline for Arine's autonomous pharmacist AI agent, ingesting production behavior data from DynamoDB into Snowflake and visualizing performance metrics in QuickSight dashboards.
@@ -56,10 +56,10 @@ AI engineering leader with 13+ years delivering enterprise AI solutions for heal
 
 **Amazon Web Services** | Atlanta, GA | Aug 2018 – May 2021
 
-- Managed 10+ enterprise accounts including Cox Enterprises, Equifax, and NCR, co-selling with GSI partners Accenture and Deloitte on joint AI and cloud solutions.
-- Built C-suite relationships to define technical and business strategies including go-to-market planning, cost management, and technical recruiting.
-- Created technical white papers, reference architectures, and presentations, engaging nationally as a subject matter expert in AI and ML.
-- Drove AWS adoption and revenue by partnering with sales teams, building proof-of-concept solutions, and running benchmarking experiments.
+- Managed a portfolio of 10+ enterprise accounts including Cox Enterprises, Equifax, Jostens, and NCR, serving as a national subject matter expert in artificial intelligence and machine learning.
+- Collaborated with Accenture and Deloitte as Global Systems Integrator co-sell partners on joint AI and machine learning solutions for shared enterprise customers.
+- Built C-suite executive relationships that shaped technical and business strategies across go-to-market planning, cost management, and technical recruiting.
+- Authored technical white papers, reference architectures, and proof-of-concept solutions that advanced Amazon Web Services adoption and enterprise deals.
 
 ### Senior AI Engineer
 

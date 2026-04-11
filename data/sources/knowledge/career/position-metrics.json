@@ -88,9 +88,20 @@
   {
     "category": "achievement",
     "title": "Slalom Consulting — Multi-Engagement Analytics Practice",
-    "content": "Delivered 7+ client engagements over 2.5 years at Slalom Consulting, a modern consulting firm with 12,000+ employees. Key engagements included: (1) Behavioral healthcare service review application generating $2M+ in consulting revenue, (2) Statewide demand forecasting of behavioral health crisis services across dozens of facilities in Georgia, (3) Solution assessment comparing Azure Bot Service to Amazon Lex for a Fortune 100 insurance company, (4) Multiple public presentations on Azure Machine Learning, AI democratization, and cloud bot architecture. Recognized nationally as a subject matter expert in NLP and machine learning. Known as a domain expert in public sector, healthcare, digital marketing, and AI.",
-    "tags": ["consulting", "analytics", "healthcare", "presentations", "nlp", "azure"],
-    "relatedPositions": ["Advanced Analytics Consultant at Slalom Consulting"]
+    "content": "Delivered 7+ client engagements over 2.5 years at Slalom Consulting, a modern consulting firm with 12,000+ employees. Key engagements included: (1) Behavioral healthcare service review application for Georgia's Department of Behavioral Health and Developmental Disabilities (DBHDD), generating $2M+ in consulting revenue, (2) Statewide demand forecasting of behavioral health crisis services across dozens of facilities in Georgia (also DBHDD), (3) Solution assessment comparing Azure Bot Service to Amazon Lex for a Fortune 100 insurance company, (4) Multiple public presentations on Azure Machine Learning, AI democratization, and cloud bot architecture. Recognized nationally as a subject matter expert in NLP and machine learning. Known as a domain expert in public sector, healthcare, digital marketing, and AI.",
+    "tags": ["consulting", "analytics", "healthcare", "presentations", "nlp", "azure", "dbhdd", "georgia"],
+    "relatedPositions": ["Advanced Analytics Consultant at Slalom Consulting"],
+    "confidence": "verified",
+    "source": "position description + Paul's confirmed client engagement history"
+  },
+  {
+    "category": "achievement",
+    "title": "Personal AI Infrastructure — GPU Hardware and Local LLM Stack",
+    "content": "Runs local AI development infrastructure on NVIDIA consumer GPU hardware including RTX 4090 and RTX 5090 workstations. Uses the hardware for local Large Language Model (LLM) development with Ollama, LM Studio, and Open WebUI running open-source models from the Mistral, Qwen, Llama, and DeepSeek families. Also deploys on AWS and Azure cloud GPU instances for production ML workloads. This personal infrastructure supports Paul's Modular Earth nonprofit AI projects and ongoing AI engineering experimentation. SCOPE: This is Paul's personal development hardware, not a professional engagement. Mention when relevant to candidate-role GPU credibility context.",
+    "tags": ["gpu", "nvidia", "rtx-4090", "rtx-5090", "ollama", "llm", "local-ai", "modular-earth"],
+    "relatedPositions": ["Principal AI Engineer & Architect, Founder at Modular Earth"],
+    "confidence": "verified",
+    "source": "Paul's personal development environment"
   },
   {
     "category": "achievement",
