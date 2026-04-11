@@ -59,6 +59,19 @@ function loadWritingRules(): Record<string, unknown> {
   return JSON.parse(fs.readFileSync(rulesPath, "utf-8"));
 }
 
+/**
+ * Load verified career data sources the grader should treat as ground truth.
+ * Without this, the grader flags every specific number it can't independently
+ * verify (E6/G4/G8 false positives).
+ */
+function loadGroundedSources(): { companies: string; positionMetrics: string } {
+  const companiesPath = path.join(PATHS.knowledgeDir, "career", "companies.json");
+  const metricsPath = path.join(PATHS.knowledgeDir, "career", "position-metrics.json");
+  const companies = fs.existsSync(companiesPath) ? fs.readFileSync(companiesPath, "utf-8") : "[]";
+  const positionMetrics = fs.existsSync(metricsPath) ? fs.readFileSync(metricsPath, "utf-8") : "[]";
+  return { companies, positionMetrics };
+}
+
 // ─── Grading ────────────────────────────────────────────────────────────────
 
 async function gradeContent(filePath: string): Promise<GradeResult> {
@@ -70,6 +83,7 @@ async function gradeContent(filePath: string): Promise<GradeResult> {
   const raw = fs.readFileSync(filePath, "utf-8");
   const content = stripHtmlComments(raw);
   const rules = loadWritingRules();
+  const groundedSources = loadGroundedSources();
   const isCoverLetter = filePath.toLowerCase().includes("cover-letter");
 
   console.log("\n📊 Content Quality Grader\n");
@@ -85,6 +99,16 @@ async function gradeContent(filePath: string): Promise<GradeResult> {
 <writing_rules>
 ${JSON.stringify(rules, null, 2)}
 </writing_rules>
+
+<grounded_sources>
+The following files contain verified facts Paul can cite in the document. Numbers, company metrics, scope boundaries, and achievement details in these sources are ground truth — do NOT flag them as unverified fabrications (E6, G4, G8) when they appear in the content being graded.
+
+companies.json — verified company-level metrics with metricsAsOf timestamps:
+${groundedSources.companies}
+
+position-metrics.json — verified achievements and scope boundaries per position, including client engagement attributions:
+${groundedSources.positionMetrics}
+</grounded_sources>
 
 <content>
 ${content}
@@ -210,6 +234,11 @@ Examples:
   gradeContent(args[0])
     .then((result) => {
       displayResult(result);
+      // Persist the full report alongside the source so iterations are
+      // diffable across sessions (survives Claude Code crashes).
+      const reportPath = args[0].replace(/\.md$/, ".grade.json");
+      fs.writeFileSync(reportPath, JSON.stringify(result, null, 2), "utf-8");
+      console.log(`   💾 Report written to: ${reportPath}\n`);
       // Exit with non-zero if critical violations found
       const criticals = result.categories
         .flatMap((c) => c.violations)
