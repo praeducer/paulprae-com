@@ -20,6 +20,7 @@ import { stripEmpty } from "../data-utils";
 import type { CareerData } from "../types";
 import { loadPrompt } from "../prompts/loader";
 import { YEARS_EXPERIENCE, BOOK_INTERVIEW_URL, RESUME_DOWNLOAD_PATHS } from "../constants";
+import { renderRulesAsProse, renderSuppressedSkills } from "../prompts/hydrate-rules";
 
 // ─── Knowledge Base Paths ────────────────────────────────────────────────────
 
@@ -135,7 +136,9 @@ export function buildSystemPrompt(mode: PromptMode): string | null {
     .replace(/\{\{RESUME_PDF_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.pdf)
     .replace(/\{\{RESUME_DOCX_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.docx)
     .replace(/\{\{RESUME_MD_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.md)
-    .replace(/\{\{RESUME_WEB_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.web);
+    .replace(/\{\{RESUME_WEB_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.web)
+    .replace(/\{\{WRITING_RULES\}\}/g, renderRulesAsProse())
+    .replace(/\{\{SUPPRESSED_SKILLS\}\}/g, renderSuppressedSkills());
 
   // Tools mode has additional placeholders
   if (mode === "tools") {
