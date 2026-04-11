@@ -8,7 +8,7 @@ Actionable coding and documentation tasks for Claude Code. No human-only tasks h
 
 ## Post-Merge Automation
 
-- [ ] Bump `package.json` version to `2.0.0` after merging PR #28 to main (currently `0.1.0`)
+- [x] Bump `package.json` version to `2.0.0` after merging PR #28 to main (completed — already at 2.0.0)
 - [ ] Add CI route validation — `test -d .next/server/app/resume` to verify specific routes exist in build output
 
 ## Observability
