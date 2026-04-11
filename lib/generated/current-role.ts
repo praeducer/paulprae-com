@@ -4,7 +4,7 @@
 // lib/constants.ts and client components can reference the current
 // employer without importing server-only modules.
 
-export const CURRENT_ROLE_TITLE = "Staff AI DataOps Engineer";
-export const CURRENT_EMPLOYER = "Arine";
-export const CURRENT_ROLE_SENTENCE = "Currently he's a Staff AI DataOps Engineer at Arine.";
-export const CURRENT_ROLE_HERO = "Currently Staff AI DataOps Engineer at Arine.";
+export const CURRENT_ROLE_TITLE = "Solutions Architect";
+export const CURRENT_EMPLOYER = "Autonomize AI";
+export const CURRENT_ROLE_SENTENCE = "Currently he's a Solutions Architect at Autonomize AI.";
+export const CURRENT_ROLE_HERO = "Currently Solutions Architect at Autonomize AI.";
