@@ -15,14 +15,14 @@
   {
     "id": "modular-earth",
     "title": "Modular Earth",
-    "description": "Not-for-profit organization supporting free and open-source development of AI-driven applications for social good. Mission is to make wealth accessible to working-class people in an increasingly volatile job market.",
+    "description": "Not-for-profit organization supporting free and open-source development of AI-driven applications for social good. Mission is to make wealth accessible to working-class people in an increasingly volatile job market. Active AI projects include a career assistant to help workers execute an effective go-to-market strategy and a financial assistant to help families save and invest their money. Software architectures enforce open-source, local-first, portable, decentralized design principles with portable AI architectures that minimize reliance on centralized cloud providers. Vision is to deploy AI-as-a-public-service in local libraries across the United States at no cost to individuals looking for work.",
     "url": "https://github.com/Modular-Earth-LLC",
     "start_date": "2022-12",
     "end_date": null,
     "status": "active",
-    "technologies": ["AI", "Blockchain", "Open Source"],
+    "technologies": ["AI", "Open Source"],
     "outcomes": [],
-    "position_id": "modular-earth-principal-ai-architect-2022",
+    "position_id": null,
     "project_type": "nonprofit"
   },
   {
@@ -35,7 +35,7 @@
     "status": "active",
     "technologies": ["AI", "LLM", "NLP"],
     "outcomes": [],
-    "position_id": "modular-earth-principal-ai-architect-2022",
+    "position_id": null,
     "project_type": "open-source"
   },
   {
@@ -48,21 +48,34 @@
     "status": "active",
     "technologies": ["AI", "LLM", "Financial Analysis"],
     "outcomes": [],
-    "position_id": "modular-earth-principal-ai-architect-2022",
+    "position_id": null,
     "project_type": "open-source"
   },
   {
     "id": "open-source-local-first-ai-stack",
     "title": "My Open Source and Local-First AI Tech Stack",
-    "description": "I am building an AI agent/app to help people develop a career strategy and apply for jobs. I'm obsessed with open source, self-hosted, local first, multi-agent workflows. The tech stack is centered around libraries like Ollama, LangChain, n8n, and Neo4j. I use Rust and TypeScript as my programming languages. I'm focused on getting people off big tech cloud providers for benefits related to cost, privacy, security, intellectual property, control, and simplicity. The only hosting providers I plan on using are highly principled companies like Hugging Face, Mistral.ai, Together.ai, and Storj.io when local computing or storage doesn't fit the use case. The app doesn't need an internet connection, so I focus on local desktop apps for Mac, Windows, and Linux. I specialize in local-first app frameworks like Tauri, so I never have to deploy this app to multi-tier cloud environments, which lets me keep it hella simple and private/secure.",
+    "description": "Building AI agents and applications to help people develop a career strategy and apply for jobs. Focused on open-source, self-hosted, local-first, multi-agent workflows centered around Ollama and TypeScript. Prioritizing cost, privacy, security, intellectual property, control, and simplicity by minimizing reliance on big tech cloud providers. Leveraging principled hosting providers like Hugging Face, Mistral.ai, Together.ai, and Storj.io only when local computing or storage doesn't fit the use case. The app doesn't need an internet connection, so focusing on local desktop apps for Mac, Windows, and Linux using local-first app frameworks like Tauri to keep the architecture simple and private.",
     "url": null,
     "start_date": "2024-01",
     "end_date": null,
     "status": "active",
-    "technologies": ["Ollama", "LangChain", "n8n", "Neo4j", "Rust", "TypeScript", "Tauri"],
+    "technologies": ["Ollama", "TypeScript", "Tauri"],
     "outcomes": [],
-    "position_id": "modular-earth-principal-ai-architect-2022",
+    "position_id": null,
     "project_type": "open-source"
+  },
+  {
+    "id": "local-ai-environment",
+    "title": "Local AI Development Environment",
+    "description": "Hardware and software configurations for running open-source, local-first, portable, multi-agent AI workflows. Desktop workstation powered by an NVIDIA GeForce RTX 4090 (24GB VRAM) with Intel Core i9 processor. Laptop powered by an NVIDIA GeForce RTX 5090. Software stack includes Ollama for model management, LM Studio for local model interaction, Open WebUI for chat interfaces, CUDA 12.8 for GPU acceleration, and Docker with NVIDIA Container Toolkit for containerized inference. Used daily for LLM development, evaluation, and benchmarking across Mistral, Qwen, Llama, and DeepSeek model families.",
+    "url": "https://github.com/praeducer/my-local-ai-env",
+    "start_date": "2024-01",
+    "end_date": null,
+    "status": "active",
+    "technologies": ["Ollama", "LM Studio", "Open WebUI", "CUDA", "Docker", "NVIDIA Container Toolkit"],
+    "outcomes": ["Daily LLM development and evaluation across open-weight model families"],
+    "position_id": null,
+    "project_type": "infrastructure"
   },
   {
     "id": "coinstac-neuroinformatics-platform",

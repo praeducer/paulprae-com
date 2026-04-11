@@ -1,0 +1,201 @@
+{
+  "version": "1.0",
+  "description": "Centralized writing rules for all AI-generated career content. This is the SINGLE SOURCE OF TRUTH — all generation pipelines (resume, cover letter, outreach) inject these rules as context. System prompts reference this file instead of duplicating rules inline.",
+  "rules": {
+    "grounding": [
+      {
+        "id": "G1",
+        "name": "Entity-scope binding",
+        "rule": "Every metric, number, or achievement in a bullet point must be attributed to exactly ONE company and ONE role. Never merge metrics from different companies into a single sentence or bullet point.",
+        "bad_example": "Built ML pipelines serving 50M+ health plan members (merges ML work from Company A with member count from Company B)",
+        "good_example": "Managed enterprise data platform processing petabytes of healthcare data across 45+ health plans (single company's data, single company's metric)"
+      },
+      {
+        "id": "G2",
+        "name": "Role-work alignment",
+        "rule": "A bullet point for Position X must ONLY describe work actually performed in that role. Do not attribute capabilities or outcomes from other positions. Before writing each bullet, ask: Did the candidate actually do THIS specific work at THIS specific company? If the answer is uncertain, do not include it.",
+        "violations_to_avoid": [
+          "Attributing ML pipeline work to a data operations role",
+          "Attributing data engineering work to a consulting/advisory role",
+          "Combining a company's scale metric with a different company's technical work"
+        ]
+      },
+      {
+        "id": "G3",
+        "name": "Temporal freshness",
+        "rule": "When the career data includes company entries with metrics and metricsAsOf fields, ALWAYS use those verified numbers. Never use approximations, round-ups, or numbers from other sources that contradict the verified metrics.",
+        "example": "If a company entry says healthPlans: 45+ with metricsAsOf: 2026-03, use '45+ health plans' — not 50+, not 30+."
+      },
+      {
+        "id": "G4",
+        "name": "Source grounding",
+        "rule": "When knowledge base entries have source and confidence fields, treat entries with confidence: verified as authoritative. When entries have confidence: estimated, use ranges rather than precise numbers."
+      },
+      {
+        "id": "G5",
+        "name": "Cross-reference prohibition",
+        "rule": "Do NOT combine a company's scale metric (e.g., member count, revenue) with a different company's technical work (e.g., ML pipelines, platform architecture) to create compound claims.",
+        "bad_example": "ML pipelines for clinical decision support covering 50M+ health plan members (ML pipelines were at NeuroLex/Slalom; member count is Arine's)",
+        "good_example": "Architected automated ML pipelines for healthcare voice computing — collecting, cleaning, training, and deploying models for neurodegenerative disease prediction (NeuroLex work described with NeuroLex context only)"
+      },
+      {
+        "id": "G6",
+        "name": "Professional summary integrity",
+        "rule": "The Professional Summary must not create novel compound claims by chaining facts from different roles. Each clause should be traceable to a specific position or clearly stated as a career-spanning capability. List capabilities separately rather than merging them into misleading run-on constructions."
+      },
+      {
+        "id": "G7",
+        "name": "SCOPE BOUNDARY markers",
+        "rule": "Some knowledge base entries contain SCOPE BOUNDARY notes that explicitly state what work was and was NOT performed in a given role. These markers are mandatory constraints — never generate content that contradicts a SCOPE BOUNDARY."
+      },
+      {
+        "id": "G8",
+        "name": "Self-check before finalizing",
+        "rule": "Before finalizing any generated content, verify: (1) Every number cited appears in the provided data and is attributed to the correct company. (2) No bullet merges facts from different companies. (3) The Professional Summary does not contain compound claims that conflate different roles. (4) All company metrics match the metrics fields in company data when available."
+      }
+    ],
+    "ethics": [
+      {
+        "id": "E1",
+        "name": "Interview-readiness test",
+        "rule": "Never mention technologies the candidate cannot discuss in an interview. Every technology, framework, or tool named must be something the candidate has hands-on experience with and can speak to in detail."
+      },
+      {
+        "id": "E2",
+        "name": "Verified facts only",
+        "rule": "Never include public facts the candidate has not personally verified. External information about companies, products, or industry events must come from the career data or knowledge base — not from general knowledge."
+      },
+      {
+        "id": "E3",
+        "name": "Tense accuracy",
+        "rule": "Never use present tense for past roles. Current positions use present tense; all completed positions use past tense consistently."
+      },
+      {
+        "id": "E4",
+        "name": "No aspirational claims",
+        "rule": "Never claim readiness for specific technologies not in career data. If the candidate has not used a technology, do not imply proficiency or readiness."
+      },
+      {
+        "id": "E5",
+        "name": "Verifiable public claims",
+        "rule": "Every public-internet fact must be verifiable against multiple authoritative sources. Do not include claims that cannot be independently confirmed."
+      },
+      {
+        "id": "E6",
+        "name": "No fabrication",
+        "rule": "Never fabricate or hallucinate any facts, metrics, or claims. Every data point must trace back to the career data, knowledge base, or company entries provided. If data does not exist, do not invent it."
+      }
+    ],
+    "voice": [
+      {
+        "id": "V1",
+        "name": "No sycophancy",
+        "rule": "No sycophancy, pandering, or telling the audience things they already know. Do not waste the reader's time with obvious observations or flattery."
+      },
+      {
+        "id": "V2",
+        "name": "No arrogance",
+        "rule": "No arrogant or presumptuous tone. Confidence is earned through specifics, not through self-aggrandizing language."
+      },
+      {
+        "id": "V3",
+        "name": "No violent language",
+        "rule": "No violent or competitive language. Avoid words like wrestle, muscle, fight, crush, dominate, attack, conquer, destroy, or battle. Use constructive, collaborative framing instead."
+      },
+      {
+        "id": "V4",
+        "name": "Transparent mapping",
+        "rule": "Map background to role requirements transparently — do not set up the reader like a salesperson. State the connection plainly without manipulative narrative arcs or artificial tension-and-resolution structures."
+      },
+      {
+        "id": "V5",
+        "name": "No superfluous commentary",
+        "rule": "No superfluous editorial commentary. Avoid filler phrases like 'the exact', 'the same', 'directly analogous', 'precisely the kind of', 'uniquely positioned'. Let the facts speak for themselves."
+      },
+      {
+        "id": "V6",
+        "name": "No third-person self-references",
+        "rule": "No third-person self-references in documents written as if by the candidate. Cover letters and outreach messages are written from the candidate's perspective — never refer to the candidate by name or in the third person within these formats.",
+        "note": "Resumes use third-person professional perspective by convention. This rule applies to cover letters, outreach messages, and other first-person formats."
+      },
+      {
+        "id": "V7",
+        "name": "Candidate-focused",
+        "rule": "No advertisements for the target company — focus on the candidate. Do not spend space praising the company's achievements, mission, or products. The document is about why the candidate is a fit, not a press release about the employer."
+      },
+      {
+        "id": "V8",
+        "name": "No irrelevant name-dropping",
+        "rule": "No long lists of partners, products, or technologies the candidate has no relation to. Only reference external entities the candidate has directly worked with or has meaningful experience involving."
+      }
+    ],
+    "quality": [
+      {
+        "id": "Q1",
+        "name": "No fluff",
+        "rule": "Remove all fluff, repetition, and superfluous sentences. Every sentence must earn its place. If removing a sentence does not reduce the document's information content, remove it."
+      },
+      {
+        "id": "Q2",
+        "name": "Clear acronyms",
+        "rule": "Avoid uncommon or ambiguous acronyms. If an acronym is not universally recognized in the target industry (e.g., AI, ML, AWS are fine; CDSS, EHR need context), either spell it out on first use or avoid it."
+      },
+      {
+        "id": "Q3",
+        "name": "Consistent structure",
+        "rule": "Maintain consistent bullet structure across all positions. If bullets in one role follow Action-Verb-What-Impact format, all roles should follow the same pattern."
+      },
+      {
+        "id": "Q4",
+        "name": "One achievement per bullet",
+        "rule": "Do not condense too many facts into a single bullet — one key achievement per bullet. If a bullet contains multiple independent accomplishments, split them."
+      },
+      {
+        "id": "Q5",
+        "name": "Purposeful emphasis",
+        "rule": "Only bold career-defining themes the candidate can discuss in depth. Bold formatting signals importance — do not dilute it by bolding routine items."
+      },
+      {
+        "id": "Q6",
+        "name": "No unproven readiness claims",
+        "rule": "Do not make claims like 'ready on day one' for unproven technologies. Readiness claims must be backed by demonstrated experience in the career data."
+      }
+    ],
+    "cover_letter": [
+      {
+        "id": "CL1",
+        "name": "Candidate fit focus",
+        "rule": "Focus on the candidate's fit, not the company's achievements. The cover letter answers 'why should they hire this candidate' — not 'why is this company great'."
+      },
+      {
+        "id": "CL2",
+        "name": "Not a press release",
+        "rule": "Do not read like a news release or press announcement. Avoid corporate-speak, promotional language, and paragraph structures that mirror press releases."
+      },
+      {
+        "id": "CL3",
+        "name": "Concise and honest",
+        "rule": "Be concise, honest, humble, and tell them exactly what they want to hear. Get to the point quickly. Do not pad with filler. Align directly with what the role requires."
+      },
+      {
+        "id": "CL4",
+        "name": "Familiar but distinctive",
+        "rule": "Follow familiar cover letter structure while standing out. Use standard sections (intro, body, close) but make the content specific and memorable. Do not deviate from expected format in ways that confuse the reader."
+      },
+      {
+        "id": "CL5",
+        "name": "Human-written feel",
+        "rule": "Do not make the candidate seem like they used AI to generate a cover letter. Avoid perfectly parallel sentence structures, overly polished transitions, and the mechanical pattern-matching that signals AI generation. Vary sentence length and structure naturally."
+      }
+    ]
+  },
+  "source_references": {
+    "grounding_rules": "Migrated from lib/prompts/resume-writer.system.md G1-G8",
+    "ethics_rules": "Consolidated from user feedback on content accuracy and integrity",
+    "voice_rules": "Consolidated from user feedback, data/sources/knowledge/brand/communication-styles.json, and resume-writer brand voice",
+    "quality_rules": "Consolidated from user feedback and resume-writer quality rules",
+    "cover_letter_rules": "Consolidated from user feedback on cover letter generation",
+    "writing_formulas": "See data/sources/knowledge/content/writing-formulas.json for STAR, AIDA, PAS, BAB frameworks",
+    "communication_styles": "See data/sources/knowledge/brand/communication-styles.json for tone and format guidance"
+  }
+}

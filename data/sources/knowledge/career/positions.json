@@ -19,27 +19,6 @@
     "sort_order": 1
   },
   {
-    "id": "modular-earth-principal-ai-architect-2022",
-    "title": "Principal AI Architect and Engineer, Founder",
-    "company": "Modular Earth",
-    "company_id": "modular-earth",
-    "location": "Buford, Georgia, United States",
-    "start_date": "2022-12",
-    "end_date": null,
-    "is_current": true,
-    "employment_type": "self-employed",
-    "description": "Modular Earth is a not-for-profit organization that supports the free and open-source development of AI-driven applications for social good. Modular Earth's mission is to make wealth accessible to working-class people in an increasingly volatile job market. My active AI projects include a career assistant to help workers execute an effective go-to-market strategy and a financial assistant to help families save and invest their money. My principles maximize accessibility, privacy, trust, and creative control while minimizing cost. My software architectures enforce open-source, local-first, portable, and distributed design principles, often integrating emerging technologies such as AI and blockchain. My vision is to deploy AI-as-a-public-service in local libraries across the United States at no cost to individuals looking for work.",
-    "highlights": [
-      "Modular Earth is a not-for-profit organization that supports the free and open-source development of AI-driven applications for social good",
-      "Active AI projects include a career assistant to help workers execute an effective go-to-market strategy and a financial assistant to help families save and invest their money",
-      "Software architectures enforce open-source, local-first, portable, and distributed design principles, often integrating emerging technologies such as AI and blockchain",
-      "Vision is to deploy AI-as-a-public-service in local libraries across the United States at no cost to individuals looking for work"
-    ],
-    "technologies": ["AI", "Blockchain", "Open Source"],
-    "industries": ["Technology", "Social Impact"],
-    "sort_order": 2
-  },
-  {
     "id": "hyperbloom-chief-ai-officer-2020",
     "title": "Chief AI Officer, Founder",
     "company": "Hyperbloom",

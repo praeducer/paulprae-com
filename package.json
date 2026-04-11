@@ -14,6 +14,7 @@
     "ingest": "tsx scripts/ingest-linkedin.ts",
     "generate": "tsx scripts/generate-resume.ts",
     "generate:tailored": "tsx scripts/generate-tailored-resume.ts",
+    "generate:cover-letter": "tsx scripts/generate-tailored-cover-letter.ts",
     "export": "tsx scripts/export-resume.ts",
     "export:pdf": "tsx scripts/export-resume.ts --format pdf",
     "export:docx": "tsx scripts/export-resume.ts --format docx",

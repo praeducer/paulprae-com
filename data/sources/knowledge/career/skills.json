@@ -270,15 +270,6 @@
     "related_skills": ["sql", "data-engineering"]
   },
   {
-    "id": "neo4j",
-    "name": "Neo4j",
-    "category": "databases",
-    "proficiency": "advanced",
-    "years_experience": 2,
-    "is_featured": false,
-    "related_skills": ["postgresql", "data-engineering"]
-  },
-  {
     "id": "distributed-systems",
     "name": "Distributed Systems",
     "category": "technologies",
