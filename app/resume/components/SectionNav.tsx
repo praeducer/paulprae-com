@@ -137,7 +137,7 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
       style={{ top: "var(--header-height, 0px)" }}
       className="no-print sticky z-30 hidden overflow-x-auto border-b border-slate-200/80 bg-white/95 backdrop-blur-sm scrollbar-none sm:block dark:border-slate-700/80 dark:bg-slate-950/95"
     >
-      <div className="mx-auto flex max-w-3xl items-center gap-1 overflow-x-auto px-6 pr-12 py-1.5 text-xs scrollbar-none">
+      <div className="mx-auto flex max-w-3xl items-center gap-0.5 overflow-x-auto px-4 py-1.5 text-xs scrollbar-none">
         {sections.map((s) => (
           <a
             key={s.id}
@@ -153,7 +153,7 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
                 clickOverrideRef.current = null;
               }, 1000);
             }}
-            className={`inline-flex min-h-[44px] shrink-0 items-center rounded-md px-2.5 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none ${
+            className={`inline-flex min-h-[44px] shrink-0 items-center rounded-md px-2 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:outline-none ${
               activeId === s.id
                 ? "bg-slate-200 font-medium text-slate-900 dark:bg-slate-700 dark:text-slate-100"
                 : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
