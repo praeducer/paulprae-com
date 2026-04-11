@@ -1,129 +1,124 @@
-# UAT Mega-Merge Implementation Plan
+# UAT Mega-Merge Implementation Plan v2
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** Execute with Claude Opus on max effort. This plan requires complex merge conflict resolution, data pipeline regeneration, and comprehensive verification. Use subagent-driven-development or executing-plans skill. Steps use `- [ ]` checkboxes for tracking.
+
+**Goal:** Merge all 7 non-main branches into a single UAT branch, regenerate the full pipeline, run comprehensive QA, create a single PR to main, and verify no work was lost — all before Paul starts at Autonomize AI on Monday April 13, 2026.
+
+**Architecture:** Fresh `uat/mega-merge-apr-2026` branch from `main`. Merge in dependency order: 4 safe branches → autonomize career transition → custom-resume pipeline → cherry-pick copilot review artifact. Regenerate all pipeline outputs on the final merged state. Phase A SSOT refactor is deferred to a post-merge follow-up PR.
+
+**Tech Stack:** Git (ORT strategy), WSL Ubuntu (`~/dev/paulprae-com`), SSH remote (`git@github.com:praeducer/paulprae-com.git`), Node.js, Next.js 16, Vitest, Pandoc + Typst, Claude API (Opus 4.6), GitHub CLI (`gh` — must be in PATH)
+
+---
+
+## Branch Inventory (7 branches + main)
+
+| #   | Branch                                    | Commits | Files | PR   | CI       | Risk                               |
+| --- | ----------------------------------------- | ------- | ----- | ---- | -------- | ---------------------------------- |
+| 1   | `docs/backlog-apr4-lighthouse-ux`         | 1       | 1     | none | —        | Zero                               |
+| 2   | `docs/autonomize-intro-deliverable`       | 2       | 1     | #36  | PASS     | Zero                               |
+| 3   | `chore/audit-fix-and-regen`               | 1       | 1     | #34  | PASS     | Zero                               |
+| 4   | `chore/add-project-settings`              | 2       | 2     | #35  | PASS     | Zero (depends on #3)               |
+| 5   | `feat/autonomize-ai-career-update`        | 10      | 26    | #38  | FAIL\*   | Medium (9 files overlap with #6)   |
+| 6   | `feat/custom-resume-gen`                  | 33      | 43    | #37  | PASS\*\* | High (largest branch, fraud fixes) |
+| 7   | `copilot/featautonomize-ai-career-update` | 10      | 26    | none | —        | Zero (artifact, 1 useful file)     |
+
+\*PR #38 CI fails on "stale public/ MD hash mismatch" — expected; pipeline regen fixes it.
+\*\*PR #37 CI "fails" on cosmetic "Post Setup Node.js" cache-saving error only; all substantive steps (validate, lint, format, test, build, check:quick) pass.
+
+**Dependency graph:**
+
+```
+main (HEAD)
+├── docs/backlog-apr4-lighthouse-ux [1 commit] — no PR
+├── docs/autonomize-intro-deliverable [2 commits] — PR #36
+├── chore/audit-fix-and-regen [1 commit] — PR #34
+│   └── chore/add-project-settings [+1 commit] — PR #35
+├── feat/autonomize-ai-career-update [10 commits] — PR #38
+│   └── copilot/featautonomize-ai-career-update [+1 commit, diverged] — no PR
+└── feat/custom-resume-gen [33 commits] — PR #37
+```
+
+---
+
+## Copilot Branch — Mystery Solved
+
+`copilot/featautonomize-ai-career-update` was created by **GitHub Copilot's SWE Agent** (`copilot-swe-agent[bot]`) on April 11, 2026. It is an automated review branch, not human-created work.
+
+**How it was created:** Someone invoked GitHub Copilot Workspace to audit the mega-merge-strategy.md plan. The Copilot agent automatically forked `feat/autonomize-ai-career-update` at commit `e9b5a7d` and committed its review work to a `copilot/` prefixed branch. A session URL is embedded in the commit: `github.com/praeducer/paulprae-com/sessions/3d91b87f-...`
+
+**What it contains:** One unique commit (`1b6d2da`) adding:
+
+- `.claude/plans/mega-merge-review-prompt.md` — 906-line comprehensive review document cataloging 30 issues across 4 severity tiers
+- Minor update to `mega-merge-strategy.md` adding a caution callout linking to the review prompt
+
+**Resolution in this plan:** Cherry-pick the review prompt file into UAT (Phase 4). Delete the copilot branch during cleanup (Phase 10). The review prompt's 30 issues have already been incorporated into this plan.
+
+---
+
+## Conflict Matrix (9 files between the two major branches)
+
+These files are modified by BOTH `feat/autonomize-ai-career-update` and `feat/custom-resume-gen`:
+
+| File                         | autonomize branch                       | custom-resume branch                                                                               | Resolution                                                                                                                                            |
+| ---------------------------- | --------------------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CLAUDE.md`                  | +Autonomize AI to brand voice (line 72) | +plans README redirect (top of file)                                                               | **Auto-merge expected** (different hunks). Review post-merge: the plans README redirect references custom-resume working state and may need updating. |
+| `positions.json`             | +Autonomize, end-date Arine (Sep 2025)  | +Autonomize, end-date Arine, end-date Hyperbloom, remove Modular Earth, fix NeuroLex/Decooda dates | **Accept custom-resume** (has fraud fixes) + verify Autonomize entry                                                                                  |
+| `companies.json`             | +Autonomize entry (12 lines)            | +Autonomize entry (9 lines)                                                                        | **Accept custom-resume** + verify Autonomize fields                                                                                                   |
+| `resume-writer.system.md`    | +1 line (Autonomize in differentiators) | -54/+3 (grounding rules → external reference)                                                      | **Accept custom-resume** + manually add Autonomize to differentiators                                                                                 |
+| `resume-quality.ts`          | +Autonomize AI to MAJOR_COMPANIES       | -Modular Earth from MAJOR_COMPANIES                                                                | **Manual merge**: apply BOTH changes                                                                                                                  |
+| `career-data.json`           | Regenerated                             | Regenerated                                                                                        | **Regenerate fresh** (Phase 5)                                                                                                                        |
+| `system-prompts.ts`          | Regenerated                             | Regenerated                                                                                        | **Regenerate fresh** (Phase 5)                                                                                                                        |
+| `Paul-Prae-Resume.md`        | Regenerated                             | Minor edits                                                                                        | **Regenerate fresh** (Phase 5)                                                                                                                        |
+| `public/Paul-Prae-Resume.md` | Regenerated                             | Minor edits                                                                                        | **Regenerate fresh** (Phase 5)                                                                                                                        |
+
+**Non-conflicting files unique to each branch:**
+
+- **autonomize-only (16):** `lib/career-data.ts`, `lib/generated/current-role.ts`, `lib/constants.ts`, `scripts/build-prompts.ts`, `lib/agent/context.ts`, `career-chat.few-shot.md`, `QuickActions.tsx`, `uat-checklist.md`, `resume-writer.few-shot.md`, `VERSIONS.md`, `target-market.json`, `.claude/plans/autonomize-transition-*`, `.claude/plans/mega-merge-strategy.md`, `.claude/plans/backlog.md`, `public/Paul-Prae-Resume.{pdf,docx}`
+- **custom-resume-only (30):** `lib/tailored.ts`, `lib/resume-validator.ts`, `scripts/generate-tailored-*.ts`, `scripts/grade-content.ts`, `scripts/generate-resume.ts`, `scripts/release-check.ts`, `scripts/validate-docs.ts`, `lib/prompts/cover-letter-writer.*`, `lib/prompts/career-chat.system.md`, `writing-rules.json`, `data/prompts/tailored/nvidia.json`, `data/generated/tailored/*`, `tests/data-consistency.test.ts`, `tests/fixtures/sample-data.ts`, `tests/generate.test.ts`, `tests/resume-parser.test.ts`, `profile.json`, `skills.json`, `position-metrics.json`, `projects.json`, `.claude/plans/remaining-phases-ssot.md`, `.claude/plans/content-quality-system-design.md`, `.claude/plans/README.md`, `.gitignore`, `.npmrc`, `package.json`, `package-lock.json`
+
+---
+
+## Ground-Truth Career Dates (CORRECTED — Paul-verified April 11, 2026)
 
 > [!CAUTION]
-> **This plan was reviewed by GitHub Copilot (April 11, 2026) and found 30 issues across 4 severity tiers.**
-> Critical and High issues have been fixed inline below. Read the full review prompt at:
-> `.claude/plans/mega-merge-review-prompt.md` (on `copilot/featautonomize-ai-career-update` branch).
->
-> **Critical issues fixed:** C1 shallow clone, C2 branch alias, C3 PR #36 contradiction, C4 no CI gate, C5 tag collision, C6 test gate before AI call
-> **High issues fixed:** H1 approve fragility, H2 hardcoded gh path, H3 branch exists guard, H4 no rollback, H5 non-draft PR, H6 subjective precondition, H7 deploy workflow, H8 stale backlog, H9 no SSOT issue, H10 hotfix not tracked
+> **The v1 plan had WRONG ground-truth dates** sourced from a memory file (`user_career_timeline.md`) that no longer exists and contradicted the actual test assertions and LinkedIn data. The dates below are from `tests/data-consistency.test.ts` on `feat/custom-resume-gen`, which were explicitly verified by Paul on 2026-04-11 and contain fraud-detection comments explaining the reasoning.
 
-**Goal:** Merge all 6 non-main branches into a single UAT branch, QA holistically, then deploy to production before Paul starts at Autonomize AI on Monday April 13, 2026.
+| Role                                     | Company             | Start        | End          | Notes                                                                                                              |
+| ---------------------------------------- | ------------------- | ------------ | ------------ | ------------------------------------------------------------------------------------------------------------------ |
+| Solutions Architect                      | **Autonomize AI**   | Apr 2026     | Present      | Current role (starts Mon Apr 13)                                                                                   |
+| Staff AI DataOps Engineer                | **Arine**           | **Sep 2025** | Mar 2026     | OLD PLAN SAID Mar 2025 — WRONG                                                                                     |
+| Chief AI Architect, Senior Manager       | Booz Allen Hamilton | Jul 2024     | Mar 2025     | Concurrent with Hyperbloom                                                                                         |
+| Chief AI Officer, Founder                | **Hyperbloom**      | **Jun 2021** | **Aug 2025** | OLD PLAN SAID Jan 2020–Feb 2025 — WRONG. Jan 2020 is LinkedIn fabrication (implies running business while at AWS). |
+| Senior AI Engineer                       | **NeuroLex Labs**   | **Feb 2018** | **Jul 2018** | Part-time moonlight. LinkedIn said Jan 2018–May 2020 — WRONG (fabrication).                                        |
+| Senior AI Solutions Architect            | **Decooda**         | **Feb 2018** | **Jul 2018** | LinkedIn said Jan 2018–Aug 2018.                                                                                   |
+| Enterprise AI and ML Solutions Architect | Amazon Web Services | Aug 2018     | May 2021     |                                                                                                                    |
+| Advanced Analytics Consultant            | Slalom Consulting   | Jul 2015     | Jan 2018     |                                                                                                                    |
 
-**Architecture:** Fresh `uat/mega-merge-apr-2026` branch from `main`. Merge 4 safe branches first, then `feat/autonomize-ai-career-update` (career tooling), then `feat/custom-resume-gen` (tailored pipeline + data corrections). Regenerate all pipeline outputs on the final merged state. Phase A SSOT refactor is deferred to a follow-up PR per the parallel agent's recommendation.
+**Why the old dates were wrong:** The v1 plan cited `~/.claude/projects/.../memory/user_career_timeline.md` as the source of truth. That file no longer exists and contained dates that:
 
-**Tech Stack:** Git (ORT strategy), WSL Ubuntu (~/dev/paulprae-com), SSH remote (`git@github.com:praeducer/paulprae-com.git`), Node.js, Next.js 16, Vitest, Pandoc + Typst, Claude API (Opus 4.6), GitHub CLI (`gh` — must be in PATH)
+1. Used the fraudulent LinkedIn "Jan 2020" Hyperbloom start (implies overlap with AWS employment)
+2. Used "Mar 2025" for Arine start (contradicts LinkedIn CSV which says Sep 2025)
+3. Used "Feb 2025" for Hyperbloom end (off by 6 months from Paul-verified Aug 2025)
 
----
+**The test file is authoritative.** `tests/data-consistency.test.ts` was written specifically to prevent date drift and contains inline comments explaining each fraud-detection assertion.
 
-## State Recovery (start here on resume)
+### LinkedIn CSV Patches Required (4 positions, 8 field changes)
 
-If picking up a partially-complete merge, determine current state before doing anything:
+The LinkedIn CSV (`data/sources/linkedin/Positions.csv`) is gitignored but used as input to `npm run ingest`. The local WSL copy has dates that don't match Paul's verified timeline. ALL of these must be patched BEFORE running ingest:
 
-```bash
-git log --oneline uat/mega-merge-apr-2026 2>/dev/null \
-  || echo "Branch not created yet — start at Task 1"
-git log --oneline uat/mega-merge-apr-2026 \
-  | grep -E "pre-merge|feat:|chore:|docs:" | head -20
-git tag | grep pre-merge
-```
+| Company       | Field       | CSV Value (wrong) | Correct Value | Why                                                              |
+| ------------- | ----------- | ----------------- | ------------- | ---------------------------------------------------------------- |
+| Hyperbloom    | Started On  | Jan 2020          | Jun 2021      | Fraud: implies running business while employed at AWS            |
+| Hyperbloom    | Finished On | Sep 2025          | Aug 2025      | One month before Arine start (back-to-back)                      |
+| NeuroLex Labs | Started On  | Jan 2018          | Feb 2018      | Fraud: overlaps with Slalom end (Jan 2018)                       |
+| NeuroLex Labs | Finished On | May 2020          | Jul 2018      | Fraud: 2-year fabrication (was part-time moonlight with Decooda) |
+| Decooda       | Started On  | Jan 2018          | Feb 2018      | Overlaps with Slalom end (Jan 2018)                              |
+| Decooda       | Finished On | Aug 2018          | Jul 2018      | Minor correction                                                 |
+| Arine         | Started On  | Sep 2025          | _(no change)_ | CSV is CORRECT. Old plan would have changed to Mar 2025 — WRONG. |
+| Arine         | Finished On | Mar 2026          | _(no change)_ | CSV is correct.                                                  |
 
-Compare output against the task checklist to determine the resume point.
-
----
-
-## Pre-Conditions
-
-Before executing this plan, verify:
-
-1. **Unshallow clone + full fetch:**
-
-```bash
-git fetch --unshallow origin 2>/dev/null || echo "Already full clone, continuing..."
-git fetch --all --prune
-```
-
-2. **`gh` CLI available and authenticated:**
-
-```bash
-which gh || { echo "ERROR: gh CLI not found in PATH. Install from https://cli.github.com/"; exit 1; }
-gh auth status || { echo "ERROR: gh not authenticated. Run: gh auth login"; exit 1; }
-```
-
-3. **PR #37 is CI-clean** (programmatic check — do NOT rely on PR body text):
-
-```bash
-gh pr checks 37
-# Expected: all substantive steps pass (validate, lint, format, test, build, check:quick)
-# NOTE: "Post Setup Node.js" cache-saving error is a known cosmetic CI issue — safe to ignore.
-# If any of validate/lint/format/test/build steps FAIL: stop and fix before proceeding.
-```
-
-4. **feat/custom-resume-gen has sufficient commits:**
-
-```bash
-git log --oneline origin/main..origin/feat/custom-resume-gen | wc -l
-# Expected: >= 26
-```
-
-5. **Stale tags from previous attempts:**
-
-```bash
-git tag | grep pre-merge
-# If any exist, note them — the plan uses `git tag -f` throughout (idempotent)
-```
-
-6. **Check `.gitignore` for cross-branch conflicts:**
-
-```bash
-git diff origin/main...origin/feat/custom-resume-gen -- .gitignore | head -30
-git diff origin/main...origin/feat/autonomize-ai-career-update -- .gitignore | head -30
-# If both show changes, verify they don't conflict before merging
-```
-
-7. **Hotfix status check:**
-
-```bash
-# Verify whether the multi-resume bug (hotfix-multi-resume-bug.md) has been fixed
-# on either feat/custom-resume-gen or main. If unfixed, it stays as a post-merge GitHub issue.
-grep -r "multi.*resume\|resume.*multi" tests/ --include="*.ts" -l 2>/dev/null
-# Do NOT mix any hotfix into the UAT branch
-```
-
-8. **All commands run in WSL Ubuntu** (`wsl -d Ubuntu -- bash -lc '...'` or native terminal)
-
-9. **Ground-truth career dates** (from `~/.claude/projects/.../memory/user_career_timeline.md`):
-   - Hyperbloom: Jan 2020 → Feb 2025 (NOT Aug 2025 — that was a fraud-fix overcorrection)
-   - Arine: Mar 2025 → Mar 2026 (NOT Sep 2025)
-   - Autonomize AI: Apr 2026 → Present
-   - Booz Allen: Jul 2024 → Mar 2025 (concurrent with Hyperbloom wind-down)
-
-**IMPORTANT:** The parallel agent discovered and fixed **two fraud incidents** during their session — fabricated date ranges for Hyperbloom, NeuroLex, and Decooda. Their corrections are pinned in `tests/data-consistency.test.ts`. Do NOT override these dates during the merge. If in doubt, the test file is authoritative.
-
----
-
-## Actual Conflict Zones (8 files, updated April 11)
-
-These are the files modified by BOTH `feat/autonomize-ai-career-update` and `feat/custom-resume-gen`:
-
-| File                         | autonomize branch                       | custom-resume branch                                                                                          | Resolution                                                                      |
-| ---------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `positions.json`             | +Autonomize, end-date Arine (Sep 2025)  | +Autonomize, end-date Arine (Mar 2025), end-date Hyperbloom, remove Modular Earth, fix NeuroLex/Decooda dates | **Accept custom-resume** (correct dates, fraud fixes) + verify Autonomize entry |
-| `companies.json`             | +Autonomize entry (12 lines)            | +Autonomize entry (9 lines)                                                                                   | **Accept custom-resume** + merge any missing fields from autonomize             |
-| `resume-writer.system.md`    | +1 line (Autonomize in differentiators) | -54/+3 (grounding rules → external reference)                                                                 | **Accept custom-resume** + manually add Autonomize to differentiators line      |
-| `resume-quality.ts`          | +1 line (Autonomize AI)                 | -1 line (Modular Earth)                                                                                       | **Manual merge**: apply BOTH — add Autonomize AI AND remove Modular Earth       |
-| `career-data.json`           | Regenerated                             | Regenerated                                                                                                   | **Regenerate fresh** after merge                                                |
-| `system-prompts.ts`          | Regenerated                             | Regenerated                                                                                                   | **Regenerate fresh** after merge                                                |
-| `Paul-Prae-Resume.md`        | Regenerated                             | Minor edits                                                                                                   | **Regenerate fresh** after merge                                                |
-| `public/Paul-Prae-Resume.md` | Regenerated                             | Minor edits                                                                                                   | **Regenerate fresh** after merge                                                |
-
-**Files that do NOT conflict** (unique to each branch):
-
-autonomize-only: `lib/career-data.ts`, `lib/generated/current-role.ts`, `lib/constants.ts`, `scripts/build-prompts.ts`, `lib/agent/context.ts`, `career-chat.few-shot.md`, `QuickActions.tsx`, `uat-checklist.md`, `resume-writer.few-shot.md`, `.claude/plans/autonomize-*`
-
-custom-resume-only: `lib/tailored.ts`, `lib/resume-validator.ts`, `scripts/generate-tailored-*.ts`, `scripts/grade-content.ts`, `lib/prompts/cover-letter-writer.*`, `writing-rules.json`, `data/prompts/tailored/nvidia.json`, `data/generated/tailored/*`, `tests/data-consistency.test.ts`, `profile.json`, `skills.json`, `position-metrics.json`, `projects.json`, `.claude/plans/remaining-phases-ssot.md`, `.claude/plans/content-quality-system-design.md`
+> [!WARNING]
+> **The v1 plan's CSV patch script only changed Arine start to "Mar 2025" — this was WRONG and would have broken 7 data-consistency tests.** The corrected script in Phase 5 patches all 4 companies to match Paul-verified dates.
 
 ---
 
@@ -131,189 +126,183 @@ custom-resume-only: `lib/tailored.ts`, `lib/resume-validator.ts`, `scripts/gener
 
 **Created on UAT branch:**
 
-- `.claude/plans/merge-strategy-framework.md` (from Appendix A of previous plan)
-- `.claude/plans/merge-strategy-analysis.md` (from Appendix B of previous plan)
+- `.claude/plans/merge-strategy-framework.md` (from Appendix A extraction)
+- `.claude/plans/merge-strategy-analysis.md` (from Appendix B extraction)
 
 **Modified during merge conflict resolution:**
 
-- `data/sources/knowledge/career/positions.json` (accept custom-resume version)
+- `data/sources/knowledge/career/positions.json` (accept custom-resume)
 - `data/sources/knowledge/career/companies.json` (accept custom-resume + verify)
 - `lib/prompts/resume-writer.system.md` (accept custom-resume + add Autonomize)
 - `lib/resume-quality.ts` (manual: +Autonomize AI, -Modular Earth)
-- `data/sources/linkedin/Positions.csv` (local only, fix Arine start to Mar 2025)
+- `data/sources/linkedin/Positions.csv` (local only, patch 4 positions)
 
 **Regenerated after merge:**
 
-- `data/generated/career-data.json`
-- `lib/generated/system-prompts.ts`
-- `lib/generated/current-role.ts`
+- `data/generated/career-data.json`, `lib/generated/system-prompts.ts`, `lib/generated/current-role.ts`
 - `data/generated/Paul-Prae-Resume.md` + `.pdf` + `.docx`
 - `public/Paul-Prae-Resume.md` + `.pdf` + `.docx`
 
 ---
 
-### Task 1: Create UAT branch + companion docs
+## State Recovery (start here if resuming a partial run)
 
-**Files:**
+```bash
+git log --oneline uat/mega-merge-apr-2026 2>/dev/null \
+  || echo "Branch not created yet — start at Phase 1"
+git log --oneline uat/mega-merge-apr-2026 \
+  | grep -E "pre-merge|feat:|chore:|docs:" | head -20
+git tag | grep pre-merge
+# Compare output against the phase checklist below to determine resume point
+```
 
-- Create: `.claude/plans/merge-strategy-framework.md`
-- Create: `.claude/plans/merge-strategy-analysis.md`
+---
 
-- [ ] **Step 1: Fetch, unshallow, and create branch**
+## Pre-Conditions
+
+- [ ] **1. Full clone + fetch:**
 
 ```bash
 cd ~/dev/paulprae-com
-
-# C1: Unshallow if needed (handles CI/Codespace shallow clones)
-git fetch --unshallow origin 2>/dev/null || echo "Already full clone, continuing..."
+git fetch --unshallow origin 2>/dev/null || echo "Already full clone"
 git fetch --all --prune
+```
 
-# C2: Ensure feat/autonomize-ai-career-update resolves (has a copilot/ alias)
-git fetch origin feat/autonomize-ai-career-update:refs/remotes/origin/feat/autonomize-ai-career-update 2>/dev/null || true
-git log --oneline origin/feat/autonomize-ai-career-update -3 \
-  || { echo "ERROR: branch not found — fetch failed"; exit 1; }
+- [ ] **2. `gh` CLI available and authenticated:**
 
-# H2: Verify gh CLI
+```bash
 which gh || { echo "ERROR: gh not in PATH"; exit 1; }
-gh auth status || { echo "ERROR: gh not authenticated"; exit 1; }
+gh auth status || { echo "ERROR: not authenticated"; exit 1; }
+```
 
-git checkout main
-git pull --ff-only
+- [ ] **3. Verify all 7 branches exist on remote:**
 
-# H3: Idempotent branch creation
+```bash
+for b in docs/backlog-apr4-lighthouse-ux docs/autonomize-intro-deliverable \
+  chore/audit-fix-and-regen chore/add-project-settings \
+  feat/autonomize-ai-career-update feat/custom-resume-gen \
+  copilot/featautonomize-ai-career-update; do
+  git rev-parse --verify "origin/$b" >/dev/null 2>&1 \
+    && echo "OK: $b" || echo "MISSING: $b"
+done
+```
+
+- [ ] **4. PR #37 substantive CI is clean:**
+
+```bash
+gh pr checks 37
+# All steps EXCEPT "Post Setup Node.js" must pass.
+# "Post Setup Node.js" cache error is cosmetic — safe to ignore.
+```
+
+- [ ] **5. LinkedIn CSV exists locally (gitignored):**
+
+```bash
+test -f data/sources/linkedin/Positions.csv \
+  && echo "CSV found" \
+  || { echo "MISSING: Positions.csv — copy from LinkedIn export before proceeding"; exit 1; }
+```
+
+- [ ] **6. System dependencies:**
+
+```bash
+which pandoc && which typst || echo "WARNING: pandoc/typst missing — export step will fail"
+node --version  # Expected: v24.x
+npm --version
+```
+
+---
+
+## Phase 1: Create UAT branch + merge safe branches
+
+### Task 1.1: Create UAT branch
+
+- [ ] **Create branch from main:**
+
+```bash
+git checkout main && git pull --ff-only
 git checkout uat/mega-merge-apr-2026 2>/dev/null \
   || git checkout -b uat/mega-merge-apr-2026
-
-# If branch already exists remotely, sync:
 git pull origin uat/mega-merge-apr-2026 --ff-only 2>/dev/null || true
 ```
 
-Expected: on `uat/mega-merge-apr-2026`, no errors.
-
-- [ ] **Step 2: Verify preconditions**
+- [ ] **Extract appendix docs (if they exist on the plan file):**
 
 ```bash
-git log --oneline origin/main..origin/feat/custom-resume-gen | wc -l
-# Expected: >= 26
-git log --oneline origin/main..origin/feat/autonomize-ai-career-update | wc -l
-# Expected: >= 7 (6 commits + 1 plan doc commit)
-
-# M5: Check .gitignore conflicts between branches
-git diff origin/main...origin/feat/custom-resume-gen -- .gitignore | head -30
-git diff origin/main...origin/feat/autonomize-ai-career-update -- .gitignore | head -30
-```
-
-- [ ] **Step 3: Create merge-strategy-framework.md**
-
-Use Python for reliable extraction (avoids `grep -A 500` truncation):
-
-```bash
-git show origin/feat/autonomize-ai-career-update:.claude/plans/mega-merge-strategy.md \
+# These are supplementary docs; create empty placeholders if extraction fails
+git show origin/feat/autonomize-ai-career-update:.claude/plans/mega-merge-strategy.md 2>/dev/null \
   | python3 -c "
 import sys
 content = sys.stdin.read()
 sections = content.split('## Appendix ')
-if len(sections) < 2:
-    print('ERROR: No Appendix sections found — create merge-strategy-framework.md manually')
-    sys.exit(1)
-with open('.claude/plans/merge-strategy-framework.md', 'w') as f:
-    f.write('## Appendix ' + sections[1].split('## Appendix')[0].strip())
-print('Created merge-strategy-framework.md')
-"
-```
-
-If the extraction produces an empty file, create manually with the framework content (branch classification, merge order algorithm, conflict resolution protocol, validation gates, rollback protocol).
-
-- [ ] **Step 4: Create merge-strategy-analysis.md**
-
-```bash
-git show origin/feat/autonomize-ai-career-update:.claude/plans/mega-merge-strategy.md \
-  | python3 -c "
-import sys
-content = sys.stdin.read()
-sections = content.split('## Appendix ')
+if len(sections) >= 2:
+    with open('.claude/plans/merge-strategy-framework.md', 'w') as f:
+        f.write('## Appendix ' + sections[1].split('## Appendix')[0].strip())
+    print('Created merge-strategy-framework.md')
 if len(sections) >= 3:
     with open('.claude/plans/merge-strategy-analysis.md', 'w') as f:
         f.write('## Appendix ' + sections[2].strip())
     print('Created merge-strategy-analysis.md')
-else:
-    print('WARNING: Appendix B not found — create merge-strategy-analysis.md manually')
-"
+" 2>/dev/null || echo "No appendix sections found — skipping"
 ```
 
-If empty, create manually with the Mermaid diagrams (branch topology, merge sequence flowchart, conflict resolution matrix, branch statistics table).
-
-- [ ] **Step 5: Push initial UAT branch**
+- [ ] **Commit and push:**
 
 ```bash
-git add .claude/plans/merge-strategy-framework.md .claude/plans/merge-strategy-analysis.md
-git commit -m "docs: add merge strategy framework + analysis for UAT mega-merge
+git add .claude/plans/merge-strategy-*.md 2>/dev/null
+git diff --cached --quiet || git commit -m "docs: add merge strategy framework + analysis for UAT mega-merge
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 git push -u origin uat/mega-merge-apr-2026
 ```
 
-Expected: branch pushed, no errors.
+### Task 1.2: Merge 4 safe branches (zero conflicts expected)
 
----
+Each merge follows: tag → merge → verify → push. Tags use `-f` for idempotent re-runs.
 
-### Task 2: Phase 1 merges — safe branches (zero conflicts)
-
-**Files:** `.claude/plans/backlog.md`, `data/generated/deliverables/*`, `.claude/settings.json`, `package-lock.json`
-
-- [ ] **Step 1: Tag + merge docs/backlog-apr4-lighthouse-ux**
+- [ ] **Merge docs/backlog-apr4-lighthouse-ux:**
 
 ```bash
-git tag -f pre-merge-backlog   # -f: idempotent on re-run (C5)
+git tag -f pre-merge-backlog
 git merge origin/docs/backlog-apr4-lighthouse-ux --no-edit
-git push
 ```
 
-Expected: clean merge, 1 file changed.
+Expected: 1 file changed (`.claude/plans/backlog.md` — rate-limiting UX bug + Lighthouse backlog items).
 
-- [ ] **Step 2: Tag + merge docs/autonomize-intro-deliverable**
+- [ ] **Merge docs/autonomize-intro-deliverable:**
 
-> **Decision (C3):** `docs/autonomize-intro-deliverable` IS included in this mega-merge.
-> The handoff doc's "out of scope" was specific to the `feat/autonomize-ai-career-update` branch work, not to this mega-merge initiative which covers ALL open branches.
-> **After the UAT PR merges to main, PR #36 will auto-close** (or close it manually in Task 9).
+> **Note:** The autonomize handoff doc said PR #36 is "out of scope." That applied to the `feat/autonomize-ai-career-update` branch work — this mega-merge covers all branches. PR #36 will auto-close when its branch is deleted.
 
 ```bash
-git tag -f pre-merge-intro     # -f: idempotent on re-run (C5)
+git tag -f pre-merge-intro
 git merge origin/docs/autonomize-intro-deliverable --no-edit
-git push
 ```
 
-Expected: clean merge, 1 file changed.
+Expected: 1 file changed (`data/generated/deliverables/2026-04-08-autonomize-team-intro.md`).
 
-- [ ] **Step 3: Tag + merge chore/audit-fix-and-regen**
+- [ ] **Merge chore/audit-fix-and-regen:**
 
 ```bash
-git tag -f pre-merge-audit     # -f: idempotent on re-run (C5)
+git tag -f pre-merge-audit
 git merge origin/chore/audit-fix-and-regen --no-edit
-git push
 ```
 
-Expected: clean merge. If package-lock.json conflicts, run `npm install` to regenerate.
+Expected: 1 file changed (`package-lock.json` — npm audit fixes).
 
-- [ ] **Step 4: Tag + merge chore/add-project-settings**
+- [ ] **Merge chore/add-project-settings:**
 
 ```bash
-git tag -f pre-merge-settings  # -f: idempotent on re-run (C5)
+git tag -f pre-merge-settings
 git merge origin/chore/add-project-settings --no-edit
-git push
 ```
 
-Expected: possible package-lock.json conflict (same base commit as audit-fix). If conflict:
+Expected: 2 files (`.claude/settings.json`, `package-lock.json`). If `package-lock.json` conflicts:
 
 ```bash
-git checkout --theirs package-lock.json
-npm install
-git add package-lock.json
-git commit --no-edit
-git push
+git checkout --theirs package-lock.json && npm install && git add package-lock.json && git commit --no-edit
 ```
 
-- [ ] **Step 5: Phase 1 validation gate**
+### Task 1.3: Phase 1 validation gate
 
 ```bash
 npm install
@@ -321,212 +310,179 @@ npm test
 npm run build
 ```
 
-Expected: all tests pass, build succeeds. Commit any regenerated files if needed.
-
----
-
-### Task 3: Phase 2 merge — feat/autonomize-ai-career-update
-
-**Files:** 24 files (career-data, prompts, constants, generated outputs, handoff docs)
-
-- [ ] **Step 1: Tag + merge**
+- [ ] All tests pass, build succeeds. Commit + push:
 
 ```bash
-git tag -f pre-merge-autonomize   # -f: idempotent on re-run (C5)
-git merge origin/feat/autonomize-ai-career-update --no-edit
 git push
 ```
 
-Expected: clean merge — no overlap with Phase 1 branches.
+---
 
-- [ ] **Step 2: Verify current-role derivation**
+## Phase 2: Merge feat/autonomize-ai-career-update
+
+**Scope:** 26 files — career transition tooling, current-role derivation, prompt placeholders, handoff docs, and plan files (including this mega-merge plan itself).
+
+- [ ] **Tag + merge:**
+
+```bash
+git tag -f pre-merge-autonomize
+git merge origin/feat/autonomize-ai-career-update --no-edit
+```
+
+Expected: clean merge — no file overlap with Phase 1 branches.
+
+- [ ] **Verify key derivation:**
 
 ```bash
 grep "Autonomize AI" lib/generated/current-role.ts
 # Expected: CURRENT_EMPLOYER = "Autonomize AI"
 ```
 
-- [ ] **Step 3: Validation gate**
+- [ ] **Validation gate:**
 
 ```bash
-npm test
-npm run build
+npm test && npm run build
 ```
 
-Expected: all tests pass, build clean.
-
----
-
-### Task 4: Phase 3 merge — feat/custom-resume-gen (THE HARD ONE)
-
-**Files:** 41 files, 3363 additions, 669 deletions. 8 conflict zones.
-
-#### Task 4 Recovery Protocol
-
-If any step in Task 4 goes wrong (H4):
-
-1. **Abort the merge:** `git merge --abort`
-2. **Verify clean state:** `git status` — should show "nothing to commit"
-3. **Clean up the tag:** `git tag -d pre-merge-custom-resume`
-4. **Start Task 4 fresh:** Re-run from Step 1
-
-If you committed a bad merge and need to revert:
+- [ ] **Push:**
 
 ```bash
-# Creates a new commit that undoes the merge — does NOT rewrite history
-git revert -m 1 HEAD
 git push
 ```
 
-Never use `git reset --hard` or `git push --force` — prohibited per the guardrails.
-
 ---
 
-- [ ] **Step 1: Tag + merge with --no-commit**
+## Phase 3: Merge feat/custom-resume-gen (THE HARD ONE)
+
+**Scope:** 43 files, 3534 additions, 669 deletions. 9 conflict zones with autonomize branch.
+
+### Task 3.0: Recovery Protocol
+
+If any step goes wrong during conflict resolution:
 
 ```bash
-git tag -f pre-merge-custom-resume   # -f: idempotent on re-run (C5)
+git merge --abort            # Undo the in-progress merge
+git status                   # Verify clean state
+git tag -d pre-merge-custom-resume  # Remove tag
+# Then restart Phase 3 from the beginning
+```
+
+If you committed a bad merge:
+
+```bash
+git revert -m 1 HEAD        # Creates a new undo commit (no history rewriting)
+git push
+```
+
+**Never use `git reset --hard` or `git push --force`.**
+
+### Task 3.1: Start merge
+
+- [ ] **Tag + merge with --no-commit:**
+
+```bash
+git tag -f pre-merge-custom-resume
 git merge origin/feat/custom-resume-gen --no-commit
 ```
 
-Expected: merge stops with conflicts. `git status` will show conflicted files.
-
-- [ ] **Step 2: List conflicts**
+- [ ] **Inventory conflicts:**
 
 ```bash
 git diff --name-only --diff-filter=U
 ```
 
-Expected: some subset of the 8 files listed in the conflict matrix above.
+### Task 3.2: Resolve conflicts
 
-- [ ] **Step 3: Resolve positions.json — accept custom-resume version**
+- [ ] **positions.json — accept custom-resume (has fraud fixes):**
 
 ```bash
 git checkout --theirs data/sources/knowledge/career/positions.json
-# M8: Validate JSON immediately after accepting
 python3 -m json.tool data/sources/knowledge/career/positions.json > /dev/null \
-  && echo "positions.json is valid JSON" \
-  || { echo "INVALID JSON — fix before proceeding"; exit 1; }
+  || { echo "INVALID JSON"; exit 1; }
 git add data/sources/knowledge/career/positions.json
+# Verify:
+grep -c "autonomize" data/sources/knowledge/career/positions.json  # >= 1
+grep -c "Modular Earth" data/sources/knowledge/career/positions.json  # 0
 ```
 
-Then verify: `grep -c "autonomize" data/sources/knowledge/career/positions.json` should return ≥ 1 (Autonomize AI entry exists). `grep -c "Modular Earth" data/sources/knowledge/career/positions.json` should return 0 (removed).
-
-- [ ] **Step 4: Resolve companies.json — accept custom-resume, verify Autonomize**
+- [ ] **companies.json — accept custom-resume:**
 
 ```bash
 git checkout --theirs data/sources/knowledge/career/companies.json
-# M8: Validate JSON immediately
 python3 -m json.tool data/sources/knowledge/career/companies.json > /dev/null \
-  && echo "companies.json is valid JSON" \
-  || { echo "INVALID JSON — fix before proceeding"; exit 1; }
+  || { echo "INVALID JSON"; exit 1; }
 git add data/sources/knowledge/career/companies.json
+grep "autonomize-ai" data/sources/knowledge/career/companies.json  # match found
 ```
 
-Verify: `grep "autonomize-ai" data/sources/knowledge/career/companies.json` returns a match.
-
-- [ ] **Step 5: Resolve resume-writer.system.md — accept custom-resume + add Autonomize**
+- [ ] **resume-writer.system.md — accept custom-resume + add Autonomize:**
 
 ```bash
 git checkout --theirs lib/prompts/resume-writer.system.md
-```
-
-Then check if "Autonomize AI" appears in the key differentiators line:
-
-```bash
-grep -n "Autonomize" lib/prompts/resume-writer.system.md
-```
-
-If NOT found, manually edit the differentiators line (around line 28) to include "Autonomize AI, Arine, BCBS, Humana ecosystem". Then:
-
-```bash
+grep "Autonomize" lib/prompts/resume-writer.system.md || echo "MANUAL EDIT NEEDED: add Autonomize AI to differentiators line"
 git add lib/prompts/resume-writer.system.md
 ```
 
-- [ ] **Step 6: Resolve resume-quality.ts — manual merge (add + remove)**
+If "Autonomize" is NOT found, edit the differentiators line (~line 28) to include "Autonomize AI, Arine, BCBS, Humana ecosystem".
 
-Read the file to see which lines are conflicted. The goal: the MAJOR_COMPANIES array should have "Autonomize AI" added (from autonomize branch) AND "Modular Earth" removed (from custom-resume branch). Both changes at different array positions.
+- [ ] **resume-quality.ts — manual merge (BOTH changes):**
 
-```bash
-# View the conflict markers
-head -50 lib/resume-quality.ts
-```
-
-Edit to resolve: ensure the array contains "Autonomize AI" and does NOT contain "Modular Earth". Then:
+Read the conflict markers. Goal: `MAJOR_COMPANIES` array must contain `"Autonomize AI"` (from autonomize) and must NOT contain `"Modular Earth"` (removed by custom-resume).
 
 ```bash
+# After editing:
 git add lib/resume-quality.ts
 ```
 
-- [ ] **Step 7: Resolve auto-generated files**
-
-These will be regenerated in Task 5, so just accept either side:
+- [ ] **Auto-generated files (will be regenerated in Phase 5):**
 
 ```bash
-git checkout --theirs data/generated/career-data.json data/generated/Paul-Prae-Resume.md public/Paul-Prae-Resume.md lib/generated/system-prompts.ts 2>/dev/null
-git checkout --ours lib/generated/current-role.ts 2>/dev/null
-git add data/generated/career-data.json data/generated/Paul-Prae-Resume.md public/Paul-Prae-Resume.md lib/generated/system-prompts.ts lib/generated/current-role.ts 2>/dev/null
+for f in data/generated/career-data.json data/generated/Paul-Prae-Resume.md \
+  public/Paul-Prae-Resume.md lib/generated/system-prompts.ts; do
+  git checkout --theirs "$f" 2>/dev/null && git add "$f"
+done
+git checkout --ours lib/generated/current-role.ts 2>/dev/null && git add lib/generated/current-role.ts
 ```
 
-- [ ] **Step 8: Resolve package-lock.json (if conflicted)**
+- [ ] **package-lock.json (if conflicted):**
 
 ```bash
-git checkout --theirs package-lock.json 2>/dev/null
-npm install
-git add package-lock.json
+git checkout --theirs package-lock.json 2>/dev/null && npm install && git add package-lock.json
 ```
 
-- [ ] **Step 9: Check for remaining conflicts**
+- [ ] **CLAUDE.md (if conflicted — should auto-merge since different hunks):**
+
+If git flags CLAUDE.md: both changes are in different parts (brand voice at line 72 vs plans redirect at top). Manually combine both changes.
+
+- [ ] **Any remaining conflicts:**
 
 ```bash
 git diff --name-only --diff-filter=U
+# Must be empty. Resolve any remaining files case-by-case.
 ```
 
-Expected: empty (all resolved). If files remain, resolve them case-by-case using the conflict matrix above.
-
-- [ ] **Step 10: Verify Modular Earth transformation (human review required if missing)**
+### Task 3.3: Verify Modular Earth transformation
 
 ```bash
-echo "positions.json Modular Earth count (should be 0):"
-grep -c "Modular Earth" data/sources/knowledge/career/positions.json
-
-echo "projects.json Modular Earth count (should be >= 1):"
-grep -c "Modular Earth" data/sources/knowledge/career/projects.json 2>/dev/null || echo "0"
+grep -c "Modular Earth" data/sources/knowledge/career/positions.json  # 0 (removed from positions)
+grep -c "Modular Earth" data/sources/knowledge/career/projects.json   # >= 1 (moved to projects)
 ```
 
-> **M3 — Do NOT auto-add career content.** If Modular Earth is NOT in `projects.json`, do NOT auto-insert it. Instead, flag it in the PR description:
-> _"ACTION REQUIRED (Paul): Modular Earth was removed from positions.json but is not in projects.json. Add it manually if you want it to appear as a project."_
+If Modular Earth is NOT in projects.json, do NOT auto-add. Flag in PR description for Paul.
 
-- [ ] **Step 11: Commit the merge**
+### Task 3.4: Commit the merge
 
 ```bash
 git add -A
-git status  # Verify: no unexpected files, all conflicts resolved
+git status  # Review: no unexpected files
 git commit -m "feat: merge custom-resume-gen — tailored pipeline + data corrections + fraud fixes
 
 Conflicts resolved:
-- positions.json: accept custom-resume (correct Arine Mar 2025, Hyperbloom
-  fraud fixes, Autonomize AI entry)
-- companies.json: accept custom-resume (Autonomize AI entry present)
+- positions.json: accept custom-resume (fraud-fixed dates, Autonomize entry)
+- companies.json: accept custom-resume (Autonomize entry present)
 - resume-writer.system.md: accept custom-resume refactor + verify Autonomize
-  in differentiators
-- resume-quality.ts: +Autonomize AI, -Modular Earth (both changes applied)
-- Auto-generated files: accepted, will regenerate in next step
-
-Preserves from autonomize branch:
-- getCurrentRole() derivation (lib/career-data.ts)
-- lib/generated/current-role.ts
-- {{CURRENT_ROLE_SENTENCE}} placeholder
-- HERO_DESCRIPTION derivation (lib/constants.ts)
-
-Preserves from custom-resume branch:
-- Tailored pipeline (lib/tailored.ts)
-- LLM-as-judge grader (scripts/grade-content.ts)
-- Resume validator (lib/resume-validator.ts)
-- Writing rules SSOT (writing-rules.json)
-- NVIDIA submission-ready content (95%/92%)
-- Data consistency tests
-- Fraud-fix date corrections
+- resume-quality.ts: +Autonomize AI, -Modular Earth (both applied)
+- Auto-generated files: accepted, regenerated in next phase
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 git push
@@ -534,83 +490,117 @@ git push
 
 ---
 
-### Task 5: Post-merge regeneration
+## Phase 4: Cherry-pick Copilot Review Artifact
 
-**Files:** `career-data.json`, `system-prompts.ts`, `current-role.ts`, resume outputs
+The `copilot/featautonomize-ai-career-update` branch has one useful file: the 906-line mega-merge review prompt document (`mega-merge-review-prompt.md`). The rest of its changes are superseded by our work.
 
-- [ ] **Step 1: Fix Positions.csv dates (local, gitignored)**
+- [ ] **Extract the review prompt file:**
 
-```python
-# M1: Added error guard — file is gitignored, may not exist on fresh clone
+```bash
+git show origin/copilot/featautonomize-ai-career-update:.claude/plans/mega-merge-review-prompt.md \
+  > .claude/plans/mega-merge-review-prompt.md
+```
+
+- [ ] **Commit:**
+
+```bash
+git add .claude/plans/mega-merge-review-prompt.md
+git commit -m "docs: add Copilot SWE Agent review prompt (cherry-picked from copilot/ branch)
+
+The copilot/featautonomize-ai-career-update branch was auto-created by
+GitHub Copilot's SWE Agent on April 11, 2026 to review the mega-merge
+plan. This 906-line review prompt catalogs 30 issues (6 Critical, 10
+High, 9 Medium, 5 Low) that have been addressed in the v2 plan.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
+git push
+```
+
+---
+
+## Phase 5: Data Pipeline Regeneration
+
+### Task 5.1: Patch LinkedIn CSV (4 positions, all fraud-fix corrections)
+
+```bash
+python3 << 'PYEOF'
 import csv, os, sys
 
 csv_path = 'data/sources/linkedin/Positions.csv'
 if not os.path.exists(csv_path):
-    print(f'WARNING: {csv_path} not found. This file is gitignored.')
-    print('Manual action required: create/update Positions.csv with correct Arine start date (Mar 2025).')
-    sys.exit(1)  # Stop here — do not proceed to ingest with wrong data
+    print(f'ERROR: {csv_path} not found. This file is gitignored.')
+    print('Copy Positions.csv from LinkedIn export before proceeding.')
+    sys.exit(1)
+
+# Paul-verified date corrections (2026-04-11)
+# Source: tests/data-consistency.test.ts on feat/custom-resume-gen
+PATCHES = {
+    'Hyperbloom':    {'Started On': 'Jun 2021', 'Finished On': 'Aug 2025'},
+    'NeuroLex Labs': {'Started On': 'Feb 2018', 'Finished On': 'Jul 2018'},
+    'Decooda':       {'Started On': 'Feb 2018', 'Finished On': 'Jul 2018'},
+    # Arine: NO CHANGE. CSV already says Sep 2025 (correct).
+    # The v1 plan would have patched Arine to Mar 2025 — that was WRONG.
+}
 
 rows = []
+patched = []
 with open(csv_path, newline='') as f:
     reader = csv.DictReader(f)
     fieldnames = reader.fieldnames
     for row in reader:
-        if row['Company Name'] == 'Arine':
-            row['Started On'] = 'Mar 2025'
+        company = row.get('Company Name', '')
+        if company in PATCHES:
+            for field, value in PATCHES[company].items():
+                old = row[field]
+                row[field] = value
+                patched.append(f'  {company}: {field} {old} -> {value}')
         rows.append(row)
+
 with open(csv_path, 'w', newline='') as f:
     writer = csv.DictWriter(f, fieldnames=fieldnames)
     writer.writeheader()
     writer.writerows(rows)
-print('Fixed Arine start date to Mar 2025 in Positions.csv')
+
+if patched:
+    print(f'Patched {len(patched)} fields:')
+    for p in patched:
+        print(p)
+else:
+    print('No patches needed (CSV already correct)')
+PYEOF
 ```
 
-Run with: `python3 -c "$(cat <<'PYEOF'
-... paste script above ...
-PYEOF
-)"`
-
-- [ ] **Step 2: Run ingest**
+### Task 5.2: Run ingest + build prompts
 
 ```bash
 npm run ingest -- --force
-```
+# Expected: 17 positions ingested, Autonomize AI first
 
-Expected: 17 positions ingested, Autonomize AI first.
-
-- [ ] **Step 3: Run build:prompts**
-
-```bash
 npm run build:prompts
+# Expected: 3 prompts written, current-role.ts shows CURRENT_EMPLOYER = "Autonomize AI"
 ```
 
-Expected: 3 prompts written + current-role.ts shows `CURRENT_EMPLOYER = "Autonomize AI"`.
-
-- [ ] **Step 4: Validate data**
+### Task 5.3: Quick validation
 
 ```bash
 npm run check:quick
 ```
 
-Expected: all data checks pass (WSL path warning is pre-existing, ignore).
-
-- [ ] **Step 5: Run full test suite (mandatory gate)**
+### Task 5.4: MANDATORY test gate
 
 ```bash
 npm test
 ```
 
-Expected: 499+ tests pass (includes new data-consistency tests from custom-resume branch). Pay special attention to `tests/data-consistency.test.ts` — these are the fraud-fix date assertions. **STOP if any tests fail.**
+**Expected:** 499+ tests pass. **Pay special attention to `tests/data-consistency.test.ts`** — this validates all fraud-fixed dates. If ANY test fails, STOP. Fix the data before proceeding to the expensive AI generation step.
 
-- [ ] **Step 6: Build**
+### Task 5.5: Build
 
 ```bash
 npm run build
 ```
 
-Expected: zero TypeScript errors, all pages compiled.
-
-- [ ] **Step 7: Commit regenerated intermediates**
+### Task 5.6: Commit intermediates
 
 ```bash
 git add data/generated/career-data.json lib/generated/system-prompts.ts lib/generated/current-role.ts
@@ -622,46 +612,36 @@ git push
 
 ---
 
-### Task 6: Resume regeneration (~$2.90–$3.70 — do once on final state)
+## Phase 6: Resume Regeneration (~$2.90–$3.70 AI cost — run once)
 
-**Files:** `Paul-Prae-Resume.md`, `.pdf`, `.docx`, `public/` copies
-
-> **Cost note (M4):** ~$2.90–$3.70 per run (Claude Opus 4.6, max effort). First run after a data change may be higher due to cache miss. Run ONCE on the final merged state.
-
-- [ ] **Step 0: Final test gate before expensive AI call (C6)**
+### Task 6.1: Final test gate before expensive AI call
 
 ```bash
 npm test -- --reporter=verbose 2>&1 | tail -20
-# Pay special attention to: tests/data-consistency.test.ts
-# If ANY test fails: STOP. Do not run generate. Fix the data first.
+# ALL tests must pass. If data-consistency tests fail, fix data first.
 ```
 
-- [ ] **Step 1: Generate resume via Claude API**
+### Task 6.2: Generate resume
 
 ```bash
 npm run generate -- --force
 ```
 
-Expected: ~10 min, produces staging.md. Quality score should be ≥ 400.
+Expected: ~10 min, produces `Paul-Prae-Resume.staging.md`. Quality score should be >= 400.
 
-- [ ] **Step 2: Approve staging resume (H1)**
+### Task 6.3: Approve
 
 ```bash
-# Use --force flag (built-in to approve-resume.ts) — avoids piped stdin fragility
 npm run approve -- --force
 ```
 
-Expected: staging → approved.
-
-- [ ] **Step 3: Export to PDF/DOCX**
+### Task 6.4: Export to PDF/DOCX
 
 ```bash
 npm run export -- --force
 ```
 
-Expected: PDF + DOCX generated, public/ copies synced.
-
-- [ ] **Step 4: Spot-check resume content**
+### Task 6.5: Spot-check resume content
 
 ```bash
 head -40 data/generated/Paul-Prae-Resume.md
@@ -669,21 +649,23 @@ head -40 data/generated/Paul-Prae-Resume.md
 
 Verify:
 
-- Autonomize AI is first position with "Apr 2026 – Present"
-- Arine has "Mar 2025 – Mar 2026" (NOT Sep 2025)
+- Autonomize AI first position with "Apr 2026 – Present"
+- Arine has "Sep 2025 – Mar 2026" (NOT Mar 2025)
+- Hyperbloom has "Jun 2021 – Aug 2025" (NOT Jan 2020)
 - Professional summary says "13+ years" (not 15)
-- Modular Earth in Projects (not Professional Experience)
+- Modular Earth in Projects section (not Professional Experience)
+- NeuroLex and Decooda are Feb 2018 – Jul 2018
 
-- [ ] **Step 5: Check for suppressed skills (L2)**
+### Task 6.6: Check suppressed skills
 
 ```bash
-# Derive suppressed list from writing-rules.json if available
 SUPPRESSED=$(python3 -c "
-import json, sys
+import json
 try:
-    with open('data/generated/writing-rules.json') as f:
+    with open('data/sources/knowledge/content/writing-rules.json') as f:
         rules = json.load(f)
-    skills = rules.get('suppressed_skills', [])
+    skills = rules.get('suppress_from_output', {}).get('skills', []) or \
+             rules.get('data', {}).get('suppress_from_output', {}).get('skills', [])
     if skills:
         print('|'.join(r'\b' + s + r'\b' for s in skills))
 except Exception:
@@ -691,20 +673,18 @@ except Exception:
 " 2>/dev/null)
 if [ -n "$SUPPRESSED" ]; then
   grep -iE "$SUPPRESSED" data/generated/Paul-Prae-Resume.md \
-    && echo "WARNING: Suppressed skills found!" || echo "No suppressed skills"
+    && echo "WARNING: Suppressed skills found" || echo "OK: No suppressed skills"
 else
-  # Fallback to known list if writing-rules.json not available
   grep -iE "\b(dbt|langchain|n8n|rust)\b" data/generated/Paul-Prae-Resume.md \
-    && echo "WARNING: Suppressed skills found!" || echo "No suppressed skills (fallback list)"
+    && echo "WARNING: Suppressed skills found" || echo "OK: No suppressed skills (fallback list)"
 fi
 ```
 
-Expected: no matches.
-
-- [ ] **Step 6: Commit resume outputs**
+### Task 6.7: Commit resume outputs
 
 ```bash
-git add data/generated/Paul-Prae-Resume.md data/generated/VERSIONS.md public/Paul-Prae-Resume.md public/Paul-Prae-Resume.pdf public/Paul-Prae-Resume.docx
+git add data/generated/Paul-Prae-Resume.md data/generated/VERSIONS.md \
+  public/Paul-Prae-Resume.md public/Paul-Prae-Resume.pdf public/Paul-Prae-Resume.docx
 git commit -m "feat: regenerate resume on final mega-merged state
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
@@ -713,72 +693,140 @@ git push
 
 ---
 
-### Task 7: Cleanup pass
+## Phase 7: Verification — No Work Lost
 
-**Files:** `.npmrc` (delete), positions.json (verify), resume-quality.ts (verify), backlog.md (update), uat-checklist.md (review)
+This phase ensures every branch's work is fully captured in the UAT branch.
 
-- [ ] **Step 1: Remove Windows-specific .npmrc**
+### Task 7.1: File-level verification (all branches accounted for)
 
-```bash
-test -f .npmrc && git rm .npmrc && git commit -m "chore: remove Windows-specific .npmrc" && git push
-```
-
-- [ ] **Step 2: Verify Modular Earth transformation**
+For each source branch, verify that its unique files exist on the UAT branch:
 
 ```bash
-echo "positions.json Modular Earth count:"
-grep -c "Modular Earth" data/sources/knowledge/career/positions.json
-echo "projects.json Modular Earth count:"
-grep -c "Modular Earth" data/sources/knowledge/career/projects.json
+echo "=== Verifying all branch work is captured ==="
+
+# Branch 1: docs/backlog-apr4-lighthouse-ux
+grep "Rate limiting blank bubble" .claude/plans/backlog.md && echo "OK: backlog" || echo "MISSING: backlog items"
+
+# Branch 2: docs/autonomize-intro-deliverable
+test -f data/generated/deliverables/2026-04-08-autonomize-team-intro.md && echo "OK: intro deliverable" || echo "MISSING: intro deliverable"
+
+# Branch 3: chore/audit-fix-and-regen — package-lock.json changes absorbed
+echo "OK: audit-fix (package-lock absorbed)"
+
+# Branch 4: chore/add-project-settings
+test -f .claude/settings.json && echo "OK: project settings" || echo "MISSING: project settings"
+
+# Branch 5: feat/autonomize-ai-career-update
+test -f lib/generated/current-role.ts && echo "OK: current-role.ts" || echo "MISSING: current-role.ts"
+test -f lib/career-data.ts && grep "getCurrentRole" lib/career-data.ts > /dev/null && echo "OK: getCurrentRole()" || echo "MISSING: getCurrentRole()"
+test -f scripts/build-prompts.ts && echo "OK: build-prompts.ts" || echo "MISSING: build-prompts.ts"
+grep "CURRENT_ROLE_SENTENCE" lib/prompts/career-chat.few-shot.md > /dev/null && echo "OK: role placeholder" || echo "MISSING: role placeholder"
+test -f .claude/plans/autonomize-transition-agent-handoff.md && echo "OK: handoff docs" || echo "MISSING: handoff docs"
+
+# Branch 6: feat/custom-resume-gen
+test -f lib/tailored.ts && echo "OK: tailored.ts" || echo "MISSING: tailored.ts"
+test -f lib/resume-validator.ts && echo "OK: resume-validator.ts" || echo "MISSING: resume-validator.ts"
+test -f scripts/grade-content.ts && echo "OK: grade-content.ts" || echo "MISSING: grade-content.ts"
+test -f scripts/generate-tailored-resume.ts && echo "OK: tailored resume script" || echo "MISSING: tailored resume script"
+test -f scripts/generate-tailored-cover-letter.ts && echo "OK: tailored cover letter script" || echo "MISSING: tailored cover letter script"
+test -f tests/data-consistency.test.ts && echo "OK: data-consistency tests" || echo "MISSING: data-consistency tests"
+test -f data/sources/knowledge/content/writing-rules.json && echo "OK: writing-rules.json" || echo "MISSING: writing-rules.json"
+test -f data/sources/knowledge/career/projects.json && echo "OK: projects.json" || echo "MISSING: projects.json"
+test -f data/prompts/tailored/nvidia.json && echo "OK: NVIDIA prompt" || echo "MISSING: NVIDIA prompt"
+test -f .claude/plans/remaining-phases-ssot.md && echo "OK: SSOT roadmap" || echo "MISSING: SSOT roadmap"
+test -f .claude/plans/content-quality-system-design.md && echo "OK: quality system design" || echo "MISSING: quality system design"
+
+# Branch 7: copilot/featautonomize-ai-career-update
+test -f .claude/plans/mega-merge-review-prompt.md && echo "OK: review prompt" || echo "MISSING: review prompt"
+
+echo ""
+echo "=== DONE — all lines should say OK ==="
 ```
 
-Expected: 0 in positions, ≥1 in projects.
-
-- [ ] **Step 3: Verify Hyperbloom end-date**
+### Task 7.2: Diff-level verification (no silent regressions)
 
 ```bash
-grep -A5 "hyperbloom" data/sources/knowledge/career/positions.json | grep end_date
+# Compare UAT against each source branch — look for unexpected deletions
+for branch in docs/backlog-apr4-lighthouse-ux docs/autonomize-intro-deliverable \
+  chore/audit-fix-and-regen chore/add-project-settings \
+  feat/autonomize-ai-career-update feat/custom-resume-gen; do
+  echo "=== Files on origin/$branch NOT on UAT (potential lost work) ==="
+  # Files that exist on the source branch but not on UAT
+  git diff "origin/$branch"..HEAD --name-only --diff-filter=D 2>/dev/null | grep -v "\.staging\." | head -10
+done
 ```
 
-Expected: `"end_date": "2025-02"` (NOT null, NOT Sep 2025, NOT Aug 2025).
+Any files listed (except `.staging.md` files) need investigation.
 
-- [ ] **Step 4: Lint check**
+### Task 7.3: Data integrity checks
 
 ```bash
-npx eslint . --max-warnings=0 2>&1 | tail -5
+# Verify key data points survive the merge
+echo "=== Data integrity ==="
+grep "Autonomize AI" data/generated/career-data.json > /dev/null && echo "OK: Autonomize in career-data" || echo "FAIL"
+grep "Autonomize AI" lib/generated/current-role.ts > /dev/null && echo "OK: Autonomize in current-role" || echo "FAIL"
+grep -c "Modular Earth" data/sources/knowledge/career/positions.json | grep -q "^0$" && echo "OK: Modular Earth removed from positions" || echo "FAIL"
+grep "Modular Earth" data/sources/knowledge/career/projects.json > /dev/null && echo "OK: Modular Earth in projects" || echo "FAIL"
+grep "Autonomize AI" lib/resume-quality.ts > /dev/null && echo "OK: Autonomize in MAJOR_COMPANIES" || echo "FAIL"
+grep -c "Modular Earth" lib/resume-quality.ts | grep -q "^0$" && echo "OK: Modular Earth removed from MAJOR_COMPANIES" || echo "FAIL"
 ```
 
-- [ ] **Step 5: Full release check**
+### Task 7.4: Verify package.json scripts from custom-resume
+
+```bash
+# These scripts were added by feat/custom-resume-gen
+node -e "const p=require('./package.json'); ['generate:cover-letter','grade'].forEach(s => console.log(s + ':', p.scripts[s] ? 'OK' : 'MISSING'))"
+```
+
+---
+
+## Phase 8: Automated QA + Local UAT
+
+### Task 8.1: Full release check
 
 ```bash
 npm run check
 ```
 
-Expected: all checks pass (WSL path warning is acceptable).
+Expected: ALL checks pass. WSL path warning is acceptable.
 
-- [ ] **Step 6: Update backlog.md (H8 — version bump already done)**
-
-Mark the package version bump as complete in `backlog.md` — `package.json` is already at `2.0.0`:
+### Task 8.2: Full test suite (final run)
 
 ```bash
-# Change: - [ ] Bump `package.json` version to `2.0.0` after merging PR #28 to main (currently `0.1.0`)
-# To:     - [x] Bump `package.json` version to `2.0.0` after merging PR #28 to main (completed — already at 2.0.0)
+npm test -- --reporter=verbose
 ```
 
-- [ ] **Step 7: Review UAT checklist for new capabilities (M6)**
+Expected: 499+ tests pass, 0 failures.
+
+### Task 8.3: Lint + format
 
 ```bash
-git diff origin/main...HEAD -- docs/uat-checklist.md
+npx eslint . --max-warnings=0
+npm run format:check
 ```
 
-Review: does the checklist cover tailored resume generation (new from custom-resume-gen)?
-If not, add: `- [ ] Tailored resume: generate a tailored resume in chat, verify it renders`
+### Task 8.4: Build verification
 
----
+```bash
+npm run build
+test -d .next && test -f .next/BUILD_ID && echo "Build OK" || echo "Build FAILED"
+```
 
-### Task 8: QA + PR creation
+### Task 8.5: Cleanup stale files
 
-- [ ] **Step 1: Local smoke test**
+```bash
+# Remove Windows .npmrc if present
+test -f .npmrc && git rm .npmrc && git commit -m "chore: remove Windows-specific .npmrc
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>" && git push
+```
+
+### Task 8.6: Update backlog
+
+Mark the version bump as done in `backlog.md` (package.json is already at 2.0.0):
+Change `- [ ] Bump package.json version to 2.0.0...` to `- [x] Bump package.json version to 2.0.0... (completed — already at 2.0.0)`.
+
+### Task 8.7: Local smoke test
 
 ```bash
 npm run dev
@@ -788,233 +836,239 @@ Open `http://localhost:3000` and verify:
 
 - Hero text: "Currently Solutions Architect at Autonomize AI"
 - Chat: "Where do you work now?" → Autonomize AI
-- Chat: "Tell me about Arine" → past tense, Mar 2025 – Mar 2026
+- Chat: "Tell me about Arine" → past tense, Sep 2025 – Mar 2026
 - `/resume` page: Autonomize AI first position
 - PDF download works
 - `/tools` page works
 
-- [ ] **Step 2: Verify Vercel GitHub App is installed (H7)**
+---
+
+## Phase 9: Create UAT PR (the only PR)
+
+### Task 9.1: Verify Vercel GitHub App
 
 ```bash
-# The Vercel GitHub App (not deploy.yml) creates preview URLs for PRs
-# deploy.yml only runs on main — it does NOT create PR previews
 gh api /repos/praeducer/paulprae-com/installations 2>/dev/null \
   | python3 -c "
 import json, sys
 data = json.load(sys.stdin)
 vercel = [i for i in data if 'vercel' in i.get('app_slug','').lower()]
 print('Vercel App installed:', bool(vercel))
-"
-# If not installed: previews will NOT appear in PR comments
+" || echo "Could not verify — check Vercel dashboard manually"
 ```
 
-- [ ] **Step 3: Create PR as DRAFT (H5)**
+### Task 9.2: Create draft PR
 
 ```bash
 gh pr create --base main --head uat/mega-merge-apr-2026 --draft \
   --title "feat: mega-merge — Autonomize transition + tailored pipeline + quality infra" \
-  --body "## Summary
-UAT branch combining all 6 non-main branches:
-- Autonomize AI career transition + derived current-role tooling
-- NVIDIA tailored resume/cover letter pipeline (95%/92% grader scores)
-- LLM-as-judge grader + resume validator
-- Career data fraud fixes (Hyperbloom, NeuroLex, Decooda dates)
-- Data consistency tests (pinned date assertions)
-- Writing rules SSOT (v1, Phase A refactor deferred)
-- npm audit fixes + project-scoped plugin settings
+  --body "$(cat <<'PRBODY'
+## Summary
 
-## Test plan
-- [x] npm test: 499+ tests pass
-- [x] npm run build: zero TypeScript errors
-- [x] npm run check: all release checks pass
-- [x] Resume: Autonomize AI first, Arine Mar 2025–Mar 2026
-- [x] No suppressed skills in generated output
-- [ ] CI: all checks green (gh pr checks <PR_NUMBER>)
-- [ ] Vercel preview: all pages render
-- [ ] Chat works on preview URL
-- [ ] PDF downloads work on preview
+UAT branch combining **all 7 non-main branches** into a single, pipeline-regenerated, fully-tested merge.
 
-## Post-merge follow-up (Phase A SSOT refactor)
-See .claude/plans/remaining-phases-ssot.md and GitHub issue (created in Task 8).
+### Branches merged (in order)
 
-Generated with Claude Code"
+1. **docs/backlog-apr4-lighthouse-ux** (PR n/a) — Rate-limiting UX bug report + Lighthouse performance backlog items
+2. **docs/autonomize-intro-deliverable** (PR #36) — Autonomize AI team intro deliverable for Paul's first week
+3. **chore/audit-fix-and-regen** (PR #34) — npm audit vulnerability fixes + system prompt regeneration
+4. **chore/add-project-settings** (PR #35) — Project-scoped Claude Code plugin settings
+5. **feat/autonomize-ai-career-update** (PR #38) — Autonomize AI career transition + derived current-role tooling (getCurrentRole(), current-role.ts, {{CURRENT_ROLE_SENTENCE}} placeholder, HERO_DESCRIPTION derivation)
+6. **feat/custom-resume-gen** (PR #37) — NVIDIA tailored resume/cover letter pipeline (95%/92% grader scores), LLM-as-judge grader, resume validator, writing rules SSOT, data consistency tests, career data fraud fixes (Hyperbloom, NeuroLex, Decooda dates)
+7. **copilot/featautonomize-ai-career-update** (no PR) — Cherry-picked Copilot SWE Agent review prompt (906-line review document, 30 issues cataloged)
+
+### Merge process
+
+- Phase 1: 4 safe branches merged cleanly (zero conflicts)
+- Phase 2: feat/autonomize-ai-career-update merged cleanly
+- Phase 3: feat/custom-resume-gen merged with manual conflict resolution for 9 overlapping files (positions.json, companies.json, resume-writer.system.md, resume-quality.ts, CLAUDE.md, and 4 auto-generated files)
+- Phase 4: Copilot review prompt cherry-picked
+- Phase 5: Full pipeline regeneration with LinkedIn CSV fraud-fix patches for 4 positions (Hyperbloom, NeuroLex, Decooda dates — Paul-verified 2026-04-11)
+- Phase 6: Resume regenerated on final merged state via Claude Opus 4.6
+- Phase 7: Comprehensive verification — all branch work accounted for, zero regressions
+- Phase 8: Full automated QA suite passed
+
+### Key data decisions
+
+- **Arine:** Sep 2025 – Mar 2026 (LinkedIn-sourced, matching career-data.json)
+- **Hyperbloom:** Jun 2021 – Aug 2025 (fraud-fixed — LinkedIn had Jan 2020 which implied overlap with AWS)
+- **NeuroLex Labs:** Feb 2018 – Jul 2018 (fraud-fixed — LinkedIn had Jan 2018–May 2020)
+- **Decooda:** Feb 2018 – Jul 2018 (fraud-fixed — LinkedIn had Jan 2018–Aug 2018)
+- **Modular Earth:** Moved from positions to projects (not-for-profit, not employment)
+
+### Next steps before merging to main
+
+- [ ] **CI passes** — `gh pr checks <PR_NUMBER> --watch`
+- [ ] **Vercel preview deployed** — check PR comments for preview URL
+- [ ] **UAT on preview** — run docs/uat-checklist.md against preview URL
+  - [ ] All pages load (/, /resume, /tools)
+  - [ ] Chat works: current role → Autonomize AI
+  - [ ] Chat works: past role → Arine (past tense, Sep 2025–Mar 2026)
+  - [ ] PDF download renders correctly
+  - [ ] Resume shows Autonomize AI first
+- [ ] **Mark PR ready** — `gh pr ready <PR_NUMBER>`
+- [ ] **Paul approves** — human review of resume content + data decisions
+
+### Post-merge follow-up
+
+- **Phase A SSOT refactor** — See .claude/plans/remaining-phases-ssot.md (GitHub issue to be created)
+- **Multi-resume hotfix** — See .claude/plans/hotfix-multi-resume-bug.md (GitHub issue to be created)
+
+Generated with Claude Code
+PRBODY
+)"
 ```
 
-- [ ] **Step 4: Wait for CI to pass (C4)**
+### Task 9.3: Wait for CI
 
 ```bash
 gh pr checks <PR_NUMBER> --watch
-# Expected: all checks pass (validate / lint / format / test / build / check:quick / validate build output)
-# NOTE: "Post Setup Node.js" cache-saving error is a known cosmetic issue — safe to ignore.
-# Do NOT merge to main until all substantive checks are green.
+# ALL substantive checks must pass.
+# "Post Setup Node.js" cache error is cosmetic — safe to ignore.
 ```
 
-- [ ] **Step 5: Verify Vercel preview URL**
-
-The Vercel GitHub App automatically comments on the PR with a preview URL within 2–5 minutes:
+### Task 9.4: Verify Vercel preview
 
 ```bash
-gh pr view <PR_NUMBER> --json comments \
-  --jq '.comments[].body' | grep -i "vercel.app" | head -5
+gh pr view <PR_NUMBER> --json comments --jq '.comments[].body' | grep -i "vercel.app" | head -5
 ```
 
-Open the preview URL and run `docs/uat-checklist.md` manually.
+Open the preview URL. Run `docs/uat-checklist.md`.
 
-- [ ] **Step 6: Mark PR ready after UAT passes (H5)**
+### Task 9.5: Create tracking issues
+
+```bash
+# Phase A SSOT refactor
+gh issue create \
+  --title "Phase A: SSOT refactor (writing-rules, prompt hydration, duplication removal)" \
+  --body "Deferred from mega-merge-apr-2026. Full plan: .claude/plans/remaining-phases-ssot.md.
+Priority: A6 (fraud prevention) > A1+A3+A4+A5 (SSOT) > A7-A9 (advanced)." \
+  --label "enhancement" --assignee "@me"
+
+# Multi-resume hotfix
+gh issue create \
+  --title "Bug: Second tailored resume in same chat session fails without refresh" \
+  --body "See .claude/plans/hotfix-multi-resume-bug.md for details." \
+  --label "bug" --assignee "@me"
+```
+
+### Task 9.6: Mark PR ready (after UAT passes)
 
 ```bash
 gh pr ready <PR_NUMBER>
 ```
 
-- [ ] **Step 7: Create SSOT tracking issue (H9)**
+---
 
-```bash
-gh issue create \
-  --title "Phase A: SSOT refactor (writing-rules, prompt hydration, duplication removal)" \
-  --body "## Background
-Deferred from mega-merge-apr-2026. Full plan in .claude/plans/remaining-phases-ssot.md.
+## Phase 10: Post-Merge Cleanup (after Paul merges PR to main)
 
-## Phases
-- Phase A1: writing-rules.json v2 schema
-- Phase A3: Prompt hydration system
-- Phase A4: Prompt cutovers
-- Phase A5: Duplication removal
-- Phase A6: Position-overlap invariant detector (fraud prevention — highest priority)
-- Phase A7-A9: RAG grounding, fix-fact CLI, provenance manifests
-
-## Priority Order
-A6 > A1+A3+A4+A5 > A7-A9" \
-  --label "enhancement" \
-  --assignee "@me"
-```
-
-- [ ] **Step 8: Merge to main (Sunday April 12 or later)**
+### Task 10.1: Merge PR
 
 ```bash
 gh pr merge <PR_NUMBER> --merge
 ```
 
----
-
-### Task 9: Post-deploy verification + cleanup
-
-- [ ] **Step 1: Verify production**
+### Task 10.2: Verify production
 
 Open `https://paulprae.com` and run through `docs/uat-checklist.md`.
 
-- [ ] **Step 2: Audit Vercel environment variables (M7)**
+Check Vercel dashboard for environment variables: `ANTHROPIC_API_KEY`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `CRON_SECRET`, `VERCEL_AUTOMATION_BYPASS_SECRET`.
 
-Check Vercel dashboard manually to confirm these are set for production:
-`ANTHROPIC_API_KEY`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `CRON_SECRET`, `VERCEL_AUTOMATION_BYPASS_SECRET`
-
-If any new env vars were added by the merged branches, set them on Vercel now.
-
-- [ ] **Step 3: Delete merged branches (C2 — includes copilot/ alias)**
-
-Only after verified production deployment:
+### Task 10.3: Delete ALL merged branches (remote + local)
 
 ```bash
 for branch in docs/backlog-apr4-lighthouse-ux docs/autonomize-intro-deliverable \
   chore/audit-fix-and-regen chore/add-project-settings \
   feat/autonomize-ai-career-update copilot/featautonomize-ai-career-update \
-  feat/custom-resume-gen; do
+  feat/custom-resume-gen uat/mega-merge-apr-2026; do
   git push origin --delete "$branch" 2>/dev/null \
-    && echo "deleted $branch" || echo "skipped $branch (already gone)"
+    && echo "Deleted remote: $branch" || echo "Skipped (already gone): $branch"
   git branch -d "$branch" 2>/dev/null || true
 done
 ```
 
-- [ ] **Step 4: Close stale PRs (M9 — idempotent with comment)**
-
-PRs auto-close when head branches are deleted. This step closes any that don't:
+### Task 10.4: Close stale PRs
 
 ```bash
 for pr in 34 35 36 37 38; do
   gh pr close $pr \
     --comment "Absorbed into uat/mega-merge-apr-2026 and merged to main." 2>/dev/null \
-    && echo "Closed PR #$pr" || echo "PR #$pr already closed (ok)"
+    && echo "Closed PR #$pr" || echo "PR #$pr already closed"
 done
 ```
 
-- [ ] **Step 5: Create multi-resume hotfix issue (L4)**
+### Task 10.5: Sync local main
 
 ```bash
-gh issue create \
-  --title "Bug: Second tailored resume in same chat session fails without refresh" \
-  --body "$(cat .claude/plans/hotfix-multi-resume-bug.md 2>/dev/null \
-    || echo 'See .claude/plans/hotfix-multi-resume-bug.md for full details.
-Generating more than one tailored resume in the same chat session without refreshing fails after the first one.')" \
-  --label "bug" \
-  --assignee "@me"
+git checkout main
+git pull --ff-only
+git branch  # Should show only: main
+git branch -r  # Should show only: origin/HEAD -> origin/main, origin/main
 ```
+
+**End state:** One branch (`main`), no stale PRs, no stale remote branches, production verified.
 
 ---
 
 ## Guardrails
 
-1. **Commit and push after EVERY task.** If the machine crashes, GitHub has everything.
+1. **Commit and push after EVERY phase.** If the machine crashes, GitHub has everything.
 2. **Never `git push --force` or `git reset --hard`.** No history rewriting.
-3. **Tag before every merge:** `git tag -f pre-merge-BRANCHNAME` (the `-f` flag makes re-runs idempotent).
+3. **Tag before every merge:** `git tag -f pre-merge-BRANCHNAME` (the `-f` makes re-runs idempotent).
 4. **Run `npm test` after every merge.** Stop if tests fail.
-5. **Do NOT run `npm run generate` until Task 6.** ~$2.90–$3.70/run — only on final state.
-6. **In WSL Ubuntu, use SSH remote** (`git@github.com:...`). The HTTPS credential helper may fail in WSL due to missing keychain integration. In other environments (macOS, Codespaces, CI), HTTPS with token auth works. Check your remote: `git remote -v`.
-7. **Positions.csv is gitignored.** Fix dates locally before ingest. Script has an error guard — it will stop if the file is missing.
-8. **Ground-truth dates are in `tests/data-consistency.test.ts`** (pinned assertions). If any position dates conflict during merge, the test file is authoritative.
-9. **Plan docs from custom-resume branch** (remaining-phases-ssot.md, content-quality-system-design.md) will be brought in automatically during Task 4 merge. Verify they exist on UAT branch after merge.
-10. **Phase A SSOT refactor is OUT OF SCOPE for this merge.** Ship as follow-up PR on main (tracked via GitHub issue created in Task 8).
-11. **Use `gh` (not `/home/praeducer/.local/bin/gh`)** throughout — must be in PATH (verified in Pre-Conditions).
-
-## Post-Merge Roadmap (from remaining-phases-ssot.md)
-
-These phases ship as separate PRs AFTER the mega-merge lands on main:
-
-1. **Phase 0.5** — Atomic facts store (`data/facts/*.yaml`), derive pipeline, eliminate 11-copy fact storage
-2. **Phase A1** — writing-rules.json v2 schema + typed loader (`lib/writing-rules.ts`)
-3. **Phase A3** — Prompt hydration system (`lib/prompts/hydrate-rules.ts`)
-4. **Phase A4** — Prompt cutovers (4 system prompts → placeholder substitution)
-5. **Phase A5** — Duplication removal (CRITICAL REMINDERS, MAJOR_COMPANIES, Brand Voice block)
-6. **Phase A6** — Position-overlap invariant detector (fraud prevention)
-7. **Phase A7** — RAG-style fact grounding in generation
-8. **Phase A8** — `fix-fact` CLI for atomic corrections
-9. **Phase A9** — Provenance manifests + citation grading
-
-Priority order: A6 (fraud prevention) > A1+A3+A4+A5 (SSOT) > 0.5 (atomic facts) > A7-A9 (advanced).
+5. **Do NOT run `npm run generate` until Phase 6.** ~$2.90–$3.70/run — only on final merged state.
+6. **In WSL Ubuntu, use SSH remote** (`git@github.com:...`). HTTPS credential helper may fail in WSL. In other environments, HTTPS works.
+7. **Positions.csv is gitignored.** Patch dates locally before ingest. The Phase 5 script has an error guard.
+8. **`tests/data-consistency.test.ts` is the source of truth for career dates** (Paul-verified April 11, 2026). If dates conflict, the test file is authoritative.
+9. **Phase A SSOT refactor is OUT OF SCOPE.** Ship as follow-up PR on main (tracked via GitHub issue).
+10. **Use bare `gh`** (not hardcoded paths). Must be in PATH (verified in Pre-Conditions).
+11. **Do NOT auto-insert career content.** Modular Earth, career descriptions, etc. are human decisions. Flag for Paul instead.
 
 ---
 
-## Known Issues Fixed (April 2026)
+## Known Issues Fixed (v2 vs v1)
 
-This section documents all issues found by GitHub Copilot's review and fixed in this revision.
+### Critical Corrections
 
-| ID  | Severity | Issue                                                                            | Fix Applied                                                                                         |
-| --- | -------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | --- | -------------------- |
-| C1  | Critical | Shallow clone causes merge failures in CI/Codespaces                             | Added `git fetch --unshallow origin` in Pre-Conditions + Task 1 Step 1                              |
-| C2  | Critical | `feat/autonomize-ai-career-update` has `copilot/` alias — not fetched explicitly | Added explicit fetch in Task 1 Step 1; added `copilot/` to branch delete loop                       |
-| C3  | Critical | PR #36 contradiction: handoff says "out of scope", plan merges it                | **Decision: Option A** — include in mega-merge (handoff's scope was branch-specific, not plan-wide) |
-| C4  | Critical | No explicit CI gate before merging to main                                       | Added `gh pr checks <PR_NUMBER> --watch` in Task 8 Step 4                                           |
-| C5  | Critical | `git tag` fails on re-run (tag already exists)                                   | Changed all `git tag` to `git tag -f` throughout                                                    |
-| C6  | Critical | Resume generation ($3-4 AI call) runs without test gate                          | Added `npm test` gate as Task 6 Step 0                                                              |
-| H1  | High     | `echo "y" \| npm run approve` may fail silently in non-TTY                       | Changed to `npm run approve -- --force` (uses built-in `hasForceFlag()`)                            |
-| H2  | High     | Hardcoded `/home/praeducer/.local/bin/gh` path is machine-specific               | Replaced all with bare `gh`; added `which gh` check in Pre-Conditions                               |
-| H3  | High     | `git checkout -b` fails if branch already exists on resume                       | Changed to idempotent `checkout uat/...                                                             |     | checkout -b uat/...` |
-| H4  | High     | No rollback protocol for Task 4 (the hard merge)                                 | Added Task 4 Recovery Protocol block                                                                |
-| H5  | High     | PR created as non-draft — premature review requests                              | Added `--draft` flag + `gh pr ready` step after UAT passes                                          |
-| H6  | High     | Precondition #2 checks PR body text (subjective)                                 | Replaced with `gh pr checks 37` (programmatic CI check)                                             |
-| H7  | High     | Plan implies deploy.yml creates preview URLs — it doesn't                        | Clarified that Vercel GitHub App creates previews; added verification step                          |
-| H8  | High     | Backlog still shows version bump as TODO — package.json is already 2.0.0         | Added Task 7 Step 6 to mark backlog item complete                                                   |
-| H9  | High     | Phase A SSOT refactor has no GitHub issue — exists only in plan files            | Added `gh issue create` in Task 8 Step 7                                                            |
-| H10 | High     | Multi-resume hotfix bug not tracked post-merge                                   | Added hotfix status check in Pre-Conditions; GitHub issue in Task 9 Step 5                          |
-| M1  | Medium   | Python CSV patch has no guard if Positions.csv is absent (gitignored)            | Added `os.path.exists` guard with `sys.exit(1)`                                                     |
-| M2  | Medium   | `grep -A 500` appendix extraction can truncate silently                          | Replaced with Python `content.split()` extraction                                                   |
-| M3  | Medium   | Task 4 Step 10 auto-inserts Modular Earth as career content                      | Changed to verification-only; flags for human review if missing                                     |
-| M4  | Medium   | Cost estimate "$3.70" conflicts with backlog's "$2.90"                           | Updated to "~$2.90–$3.70 (cache miss vs hit)" range                                                 |
-| M5  | Medium   | .gitignore conflicts across branches not checked                                 | Added `.gitignore` diff checks to Pre-Conditions and Task 1 Step 2                                  |
-| M6  | Medium   | UAT checklist may be stale after custom-resume-gen merge                         | Added Task 7 Step 7 to review + update checklist                                                    |
-| M7  | Medium   | Vercel env vars not audited post-deploy                                          | Added Task 9 Step 2 manual env var audit                                                            |
-| M8  | Medium   | No JSON validation after `git checkout --theirs` for JSON files                  | Added `python3 -m json.tool ... \|\| exit 1` after Steps 3 and 4                                    |
-| M9  | Medium   | `gh pr close` produces errors for already-closed PRs                             | Added `2>/dev/null` + success/skip messaging; idempotent loop                                       |
-| L1  | Low      | SSH-only guardrail stated as universal — it's WSL-specific                       | Rewritten to clarify WSL context; HTTPS works on macOS/Codespaces/CI                                |
-| L2  | Low      | Suppressed skills grep hardcodes list — may miss writing-rules.json additions    | Derive from `writing-rules.json` with fallback to hardcoded list                                    |
-| L3  | Low      | Co-author format uses "Opus 4.6 (1M context)" (non-standard)                     | Updated to `Claude Sonnet 4.6 <noreply@anthropic.com>` (current model)                              |
-| L4  | Low      | Multi-resume hotfix bug has no GitHub issue                                      | Added `gh issue create` in Task 9 Step 5                                                            |
-| L5  | Low      | No state recovery procedure for partial/resumed runs                             | Added State Recovery section at top of plan                                                         |
+| Issue              | v1 Plan (WRONG)                       | v2 Plan (CORRECT)                                                          | Impact if unfixed                        |
+| ------------------ | ------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------- |
+| Arine start date   | "Mar 2025" (from deleted memory file) | **Sep 2025** (LinkedIn CSV + Paul-verified test)                           | 7 test failures, wrong resume dates      |
+| Hyperbloom dates   | "Jan 2020 → Feb 2025"                 | **Jun 2021 → Aug 2025** (Paul-verified fraud fix)                          | Fraud: implies business overlap with AWS |
+| CSV patches needed | Only patched Arine (incorrectly)      | **4 positions patched** (Hyperbloom, NeuroLex, Decooda + Arine left alone) | 7 data-consistency test failures         |
+| Conflict files     | 8 files listed                        | **9 files** (CLAUDE.md was missing)                                        | Unexpected merge conflict                |
+| copilot/ branch    | Not explained                         | **Solved** — Copilot SWE Agent artifact, cherry-pick useful file           | Orphan branch forever                    |
+
+### Copilot Review Issues Applied (30 total)
+
+| ID  | Severity | Issue                             | Fix                                       |
+| --- | -------- | --------------------------------- | ----------------------------------------- |
+| C1  | Critical | Shallow clone                     | `git fetch --unshallow` in Pre-Conditions |
+| C2  | Critical | `copilot/` branch alias           | Explicit fetch + delete in cleanup        |
+| C3  | Critical | PR #36 contradiction              | Decision: include in mega-merge           |
+| C4  | Critical | No CI gate                        | `gh pr checks --watch` before merge       |
+| C5  | Critical | Tag collision on re-run           | `git tag -f` throughout                   |
+| C6  | Critical | No test gate before AI call       | `npm test` gate in Phase 6                |
+| H1  | High     | `echo "y" \| approve` fragility   | `npm run approve -- --force`              |
+| H2  | High     | Hardcoded `gh` path               | Bare `gh` + PATH check                    |
+| H3  | High     | Branch exists guard               | Idempotent `checkout \|\| checkout -b`    |
+| H4  | High     | No Task 4 rollback                | Recovery Protocol added                   |
+| H5  | High     | Non-draft PR                      | `--draft` + `gh pr ready`                 |
+| H6  | High     | Subjective precondition           | `gh pr checks 37`                         |
+| H7  | High     | Deploy vs preview confusion       | Vercel App clarification                  |
+| H8  | High     | Stale backlog version             | Mark version bump complete                |
+| H9  | High     | No SSOT tracking issue            | `gh issue create`                         |
+| H10 | High     | Hotfix not tracked                | Bug issue created                         |
+| M1  | Medium   | CSV missing-file guard            | `os.path.exists` check                    |
+| M2  | Medium   | `grep -A 500` fragility           | Python extraction                         |
+| M3  | Medium   | Auto-insert career data           | Verification-only                         |
+| M4  | Medium   | Stale cost estimate               | $2.90–$3.70 range                         |
+| M5  | Medium   | .gitignore not checked            | Conflict check added                      |
+| M6  | Medium   | UAT checklist stale               | Review step added                         |
+| M7  | Medium   | Vercel env vars not audited       | Manual audit step                         |
+| M8  | Medium   | No JSON validation after --theirs | `python3 -m json.tool`                    |
+| M9  | Medium   | PR close errors                   | Idempotent loop                           |
+| L1  | Low      | SSH-only universal                | WSL-scoped                                |
+| L2  | Low      | Hardcoded suppressed skills       | Derived from writing-rules.json           |
+| L3  | Low      | Co-author format                  | Standardized                              |
+| L4  | Low      | No hotfix issue                   | Issue created                             |
+| L5  | Low      | No state recovery                 | Recovery section added                    |
