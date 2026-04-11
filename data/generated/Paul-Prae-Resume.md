@@ -10,7 +10,7 @@
 
 ## Professional Summary
 
-AI engineering leader with 13+ years building production AI systems for healthcare, life sciences, and financial services. Architects enterprise solutions spanning data platforms, ML infrastructure, and cloud systems across HIPAA, FedRAMP, and GDPR-compliant environments, with deep expertise in clinical decision support, medication optimization, and neuroinformatics. Led cross-functional teams and served Fortune 500 clients at Amazon Web Services, Microsoft, Booz Allen Hamilton ($9B+ revenue), and Slalom Consulting. Currently leading healthcare AI solution design at Autonomize AI, with hands-on experience building AI agents, data platforms, and generative AI applications on AWS and Snowflake.
+AI engineering leader with 13+ years building production AI systems for healthcare, life sciences, and consulting. Architects enterprise solutions spanning data platforms, ML infrastructure, and cloud systems across HIPAA, FedRAMP, and GDPR-compliant environments, with deep expertise in clinical decision support, medication optimization, and neuroinformatics. Led cross-functional teams and served Fortune 500 clients at Amazon Web Services, Microsoft, Booz Allen Hamilton ($9B+ revenue), and Slalom Consulting. Currently leading healthcare AI solution design at Autonomize AI, with hands-on experience building AI agents, data platforms, and generative AI applications on AWS and Snowflake.
 
 ---
 
@@ -45,7 +45,7 @@ AI engineering leader with 13+ years building production AI systems for healthca
 
 **Hyperbloom** | United States | Jun 2021 – Aug 2025
 
-- Grew AI consulting business to $1.4M ARR from a $40K investment, delivering cloud-based AI and data solutions across healthcare, life science, and financial services
+- Grew AI consulting business to $1.4M ARR from a $40K investment, delivering cloud-based AI and data solutions across healthcare, life science, and consulting
 - Led teams of sales coordinators, account managers, and solutions architects through the full sales cycle for enterprise AI products and services
 - Architected disaster recovery solutions for a clinical-trial management platform supporting 10,000+ research sites across 45 countries
 
@@ -112,7 +112,7 @@ Graduated Cum Laude | Dean's List | HOPE Scholarship
 
 **Programming Languages:** Python, SQL, JavaScript, C#, Bash, PowerShell
 
-**AI Tools & Platforms:** Ollama, Open WebUI, Cursor AI, GitHub Copilot, Azure Machine Learning
+**AI Tools & Platforms:** Anthropic Claude (Code, API, Console), Ollama, Open WebUI, Cursor AI, GitHub Copilot
 
 **Leadership:** Engineering Team Management, Solutions Architecture, Enterprise Consulting, Executive Coaching, Agile/Scrum
 
