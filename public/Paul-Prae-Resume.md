@@ -1,117 +1,116 @@
 # Paul Prae
 
-**Principal AI Engineer & Architect** | Buford, GA | hireme@paulprae.com | [linkedin.com/in/paulprae](https://www.linkedin.com/in/paulprae) | [github.com/praeducer](https://github.com/praeducer) | [paulprae.com](https://paulprae.com)
+**Principal AI Engineer & Architect** | Buford, Georgia, United States | hireme@paulprae.com | [LinkedIn](https://www.linkedin.com/in/paulprae) | [GitHub](https://github.com/praeducer) | [paulprae.com](https://paulprae.com)
 
 ---
 
 ## Professional Summary
 
-AI and data engineering leader with 13+ years building enterprise solutions across healthcare, life sciences, and financial services. Currently managing Arine's enterprise data platform on Snowflake and AWS, supporting a medication-optimization platform serving 45+ health plans and >30 million members. Previous roles span enterprise AI/ML solutions architecture at Amazon Web Services, healthcare AI practice leadership at Booz Allen Hamilton ($9B+ revenue), and automated ML pipeline development at NeuroLex Labs. Brings deep expertise in AI agents, cloud-native data platforms, and HIPAA-compliant systems alongside engineering leadership across data operations, platform architecture, and team development.
+AI engineering leader with 13+ years building production AI systems for healthcare, life sciences, and financial services. Architects enterprise solutions spanning data platforms, ML infrastructure, and cloud systems across HIPAA, FedRAMP, and GDPR-compliant environments, with deep expertise in clinical decision support, medication optimization, and neuroinformatics. Led cross-functional teams and served Fortune 500 clients at Amazon Web Services, Microsoft, Booz Allen Hamilton ($9B+ revenue), and Slalom Consulting. Currently leading healthcare AI solution design at Autonomize AI, with hands-on experience building AI agents, data platforms, and generative AI applications on AWS and Snowflake.
 
 ---
 
 ## Professional Experience
 
-### Staff AI DataOps Engineer
+### Solutions Architect
 
-**Arine** | Remote | Sep 2025 – Present
+**Autonomize AI** | Remote | Apr 2026 – Present
 
-- Managed enterprise data platform on Snowflake and AWS, processing petabytes of healthcare data from hundreds of sources for a medication-optimization platform serving 45+ health plans and >30M members (Inc. 5000 #5 in AI)
-- Designed the AI DataOps Toolkit — an agentic framework with HIPAA-compliant coding assistants including a Data Engineering Agent for autonomous ETL pipeline generation and a Dev Environment Agent that eliminated multi-day developer onboarding
-- Built observability pipeline monitoring Arine's autonomous pharmacist AI agent, ingesting production behavior data from DynamoDB into Snowflake, transforming with dbt, and surfacing metrics in QuickSight dashboards
-- Led AI enablement workshops training groups of up to 100 engineers on AI-first development practices and tools
-- Engineered high-throughput CDC pipelines from PostgreSQL to Snowflake using serverless, event-driven architectures (Lambda, Step Functions, EventBridge)
+- Lead solution design and deployment for healthcare and life sciences customers adopting Autonomize AI's enterprise AI platform
+- Own technical discovery, architecture design, and integration strategy across the full customer lifecycle
+- Develop HIPAA-compliant solution blueprints for clinical review, risk adjustment, claims processing, and knowledge automation use cases
+
+### Staff Data Operations Engineer
+
+**Arine** | Remote | Sep 2025 – Mar 2026
+
+- Managed enterprise data platform on Snowflake and AWS, processing petabytes of healthcare data from hundreds of sources supporting Arine's medication-optimization platform (45+ health plans, >30M client members)
+- Developed HIPAA-compliant AI coding assistants — a Data Engineering Agent that autonomously generated, deployed, and tested ETL pipelines, and a Dev Environment Agent that eliminated multi-day developer onboarding delays
+- Built an observability pipeline monitoring Arine's autonomous pharmacist AI agent, ingesting production behavior data from DynamoDB into Snowflake and visualizing metrics in QuickSight dashboards
+- Led AI enablement workshops training groups of up to 100 engineers on AI-first software development practices
 
 ### Chief AI Architect, Senior Manager
 
-**Booz Allen Hamilton** | Atlanta, GA | Jul 2024 – Mar 2025
+**Booz Allen Hamilton** | Atlanta, Georgia | Jul 2024 – Mar 2025
 
-- Led AI and analytics solution development at a Fortune 500 consulting firm (27,000+ employees, $9B+ revenue), designing products leveraging clinical, behavioral, and genomic data for population health and predictive medicine
-- Delivered AI products across FedRAMP and HIPAA-compliant environments, mitigating algorithmic bias and privacy risks for healthcare and life science clients
-- Drove cross-functional collaboration with engineers, data scientists, and domain experts to address clinical, regulatory, and technological requirements
-
-### Principal AI Architect, Founder
-
-**Modular Earth** | Buford, GA | Dec 2022 – Present
-
-- Launched a not-for-profit building open-source AI agents for working-class families, delivering career planning and financial advisory tools using Ollama, LangChain, n8n, and Neo4j
-- Designed local-first, privacy-preserving multi-agent architectures using Tauri, Rust, and TypeScript that operate without cloud infrastructure dependencies
-- Architected a 6-stage agent workflow with role-based permissions, structured handoffs, and knowledge management for decentralized AI applications
-
-### Neuroinformatics Data Platform Architect
-
-**TReNDS Center** | Atlanta, GA | Jan 2022 – Sep 2023
-
-- Architected AWS cloud infrastructure for COINSTAC, an open-source platform enabling federated neuroimaging and genomics research across institutions with differential privacy protections for PHI
-- Built GPU compute infrastructure for deep learning workloads and drove commercialization through SBIR grant writing, open-source contributor recruitment, and industry partnerships
-- Spearheaded product roadmap as Scrum master, contributing to peer-reviewed research published in Frontiers in Neuroinformatics (2023)
+- Led AI and analytics solution development at a Fortune 500 consulting firm (27,000+ employees, $9B+ revenue), designing products harnessing clinical, behavioral, and genomic data for population health and predictive medicine
+- Collaborated with cross-functional teams of engineers, data scientists, and domain experts to deliver AI solutions addressing algorithmic bias and data privacy risks across FedRAMP and HIPAA-compliant environments
+- Contributed to AI governance policy development for FDA's Center for Devices and Radiological Health (CDRH) and supported federal healthcare AI initiatives
 
 ### Chief AI Officer, Founder
 
 **Hyperbloom** | United States | Jun 2021 – Aug 2025
 
-- Grew AI consulting business to $1.4M ARR from a $40K initial investment over ~4 years, delivering cloud-based AI and data solutions across healthcare, life science, and financial services
-- Architected disaster recovery solutions for clinical trial software supporting 10,000+ research sites across 45 countries with 5.5M monthly remote monitoring activities
-- Designed a blockchain-based data platform for secure life science data exchange, meeting CCPA, GDPR, and HIPAA requirements with HL7 and CDISC interoperability standards
+- Grew AI consulting business to $1.4M ARR from a $40K investment, delivering cloud-based AI and data solutions across healthcare, life science, and financial services
+- Led teams of sales coordinators, account managers, and solutions architects through the full sales cycle for enterprise AI products and services
+- Architected disaster recovery solutions for a clinical-trial management platform supporting 10,000+ research sites across 45 countries
+
+### Neuroinformatics Data Platform Architect
+
+**TReNDS Center** | Atlanta, Georgia | Jan 2022 – Sep 2023
+
+- Architected COINSTAC, an open-source platform enabling decentralized neuroimaging and genomics research with differential privacy, contributing to a peer-reviewed publication in Frontiers in Neuroinformatics
+- Built GPU-focused compute infrastructure for deep learning workloads and managed AWS cloud architecture including container orchestration and service decoupling
+- Drove commercialization through SBIR grant writing, open-source contributor recruitment, and strategic industry partnerships
 
 ### Enterprise AI and ML Solutions Architect
 
-**Amazon Web Services** | Greater Atlanta Area | Aug 2018 – May 2021
+**Amazon Web Services** | Atlanta, Georgia | Aug 2018 – May 2021
 
-- Managed a portfolio of 10+ enterprise accounts including Cox Enterprises, Cox Automotive, Equifax, NCR, Accenture, and Deloitte, delivering AI/ML architecture guidance and driving AWS adoption
-- Created technical white papers, reference architectures, and presentations; engaged nationally as a subject matter expert in AI and machine learning
-- Built deep relationships with C-suite executives to define technical and business strategies encompassing go-to-market planning, cost management, and technical recruiting
+- Managed a portfolio of 10+ enterprise accounts including Cox Enterprises, Equifax, NCR, Accenture, and Deloitte, providing AI/ML architecture guidance and driving AWS platform adoption
+- Engaged nationally as a subject matter expert in AI and machine learning, authoring technical white papers, reference architectures, and delivering proof-of-concept solutions
+- Partnered with C-suite executives to define technical and business strategies including go-to-market planning, cost optimization, and technical recruiting
 
 ### Senior AI Engineer
 
-**NeuroLex Labs** | Greater Atlanta Area | Feb 2018 – Jul 2018
+**NeuroLex Labs** | Atlanta, Georgia | Feb 2018 – Jul 2018
 
 - Architected automated ML pipelines for healthcare voice computing — collecting, cleaning, training, and deploying models processing text and audio data for neurodegenerative disease prediction
-- Drove TDD adoption across the engineering team with 4 testing types (regression, functional, load, integration); mentored international fellows in the Tribe program for neurodegenerative disease research
+- Mentored fellows in the Tribe program for neurodegenerative disease research and drove test-driven development practices across the engineering team
 
 ### Advanced Analytics Consultant
 
-**Slalom Consulting** | Greater Atlanta Area | Jul 2015 – Jan 2018
+**Slalom Consulting** | Atlanta, Georgia | Jul 2015 – Jan 2018
 
 - Delivered 7+ client engagements generating $2M+ in consulting revenue, including a statewide behavioral health demand forecasting system across dozens of facilities in Georgia
-- Deployed data science experiments into cloud-based production systems on Microsoft Azure; recognized nationally as a subject matter expert in NLP and machine learning
+- Designed intelligent software applications on Microsoft Azure and AWS; recognized nationally as a subject matter expert in NLP and machine learning
 
 ### Software Engineer
 
-**Red Ventures** | Fort Mill, SC | Mar 2014 – Jul 2015
+**Red Ventures** | Fort Mill, South Carolina | Mar 2014 – Jul 2015
 
-- Engineered full-stack marketing platform on the LAMP stack serving 16+ clients including DirecTV, Verizon, AT&T, Liberty Mutual, and Progressive, developing proprietary CMS, BI framework, and hundreds of high-traffic websites
+- Engineered full-stack web applications serving 16+ Fortune 500 clients including DirecTV, Verizon, AT&T, and Liberty Mutual, maintaining hundreds of high-traffic consumer-facing websites
 
 ### Senior Support Engineer
 
-**Microsoft** | Charlotte, NC | Jul 2012 – Mar 2014
+**Microsoft** | Charlotte, North Carolina | Jul 2012 – Mar 2014
 
-- Automated deployment and testing workflows using PowerShell and C# while delivering advanced technical support to Fortune 100 customers including Chevron, Walmart, and Intel; nominated for "Entrepreneur of the Year" (2013)
+- Delivered advanced technical support to Fortune 100 clients including Chevron, Walmart, Intel, and Bank of America; nominated for Global Business Support's "Entrepreneur of the Year" (2013)
 
 ---
 
 ## Education
 
-### Bachelor of Science, Computer Science (AI Emphasis) & Bachelor of Arts, Cognitive Science (AI Foundation)
+### Bachelor of Science in Computer Science (AI Emphasis) & Bachelor of Arts in Cognitive Science (AI Foundation)
 
 **University of Georgia** | 2008 – 2012
-Graduated Cum Laude. Dean's List. HOPE Scholarship.
+Graduated Cum Laude | Dean's List | HOPE Scholarship
 
 ---
 
 ## Technical Skills
 
-**AI & Machine Learning:** Large Language Models, Multi-agent Systems, Generative AI, Natural Language Processing, MLOps, Predictive Analytics, Prompt Engineering, Conversational AI, Deep Learning
+**AI & Machine Learning:** Generative AI, Large Language Models (LLMs), Multi-agent Systems, Natural Language Processing, Machine Learning, MLOps, Deep Learning, Prompt Engineering, Predictive Analytics
 
-**Cloud & Infrastructure:** AWS (Bedrock, SageMaker, ECS/EKS, Lambda, Step Functions, S3, DynamoDB, QuickSight), Azure (Machine Learning, Bot Service, Cognitive Services), Snowflake, Docker
+**Cloud & Infrastructure:** AWS (SageMaker, Bedrock, ECS/EKS, Lambda, S3, Glue, QuickSight, DynamoDB), Microsoft Azure, Snowflake, Docker, NVIDIA GPU Computing (CUDA)
 
-**Data Engineering:** dbt, Apache Kafka, PostgreSQL, SQL Server, MySQL, Neo4j, ETL/CDC Pipelines, Data Governance, HIPAA/GDPR Compliance
+**Data Engineering:** ETL/CDC Pipelines, Data Governance, HIPAA/GDPR/FedRAMP Compliance, PostgreSQL, Apache Kafka, Data Warehousing
 
-**Programming Languages:** Python, SQL, JavaScript, C#, Bash, PowerShell, Rust, TypeScript
+**Programming Languages:** Python, SQL, JavaScript, C#, Bash, PowerShell
 
-**AI Tools & Frameworks:** Cursor AI, Claude Code, GitHub Copilot, LangChain, Ollama, n8n, Open WebUI, MCP Tools
+**AI Tools & Platforms:** Ollama, Open WebUI, Cursor AI, GitHub Copilot, Azure Machine Learning
 
-**Leadership & Strategy:** Engineering Team Management, AI Strategy & Governance, Technical Coaching, Solutions Architecture, Pre-Sales Engineering, Agile/Scrum
+**Leadership:** Engineering Team Management, Solutions Architecture, Enterprise Consulting, Executive Coaching, Agile/Scrum
 
 ---
 
@@ -124,8 +123,16 @@ Graduated Cum Laude. Dean's List. HOPE Scholarship.
 
 ---
 
+## Projects
+
+### [Modular Earth](https://github.com/Modular-Earth-LLC)
+
+Not-for-profit organization building free, open-source AI agents to help working-class entrepreneurs generate wealth. Active projects include a career assistant and a financial advisor built on local-first, privacy-preserving architectures using Ollama, open-weight LLMs, and NVIDIA GPU hardware (RTX 4090/5090). Vision: deploy AI-as-a-public-service in local libraries across the United States.
+
+---
+
 ## Publications
 
-### [Enhancing Collaborative Neuroimaging Research: COINSTAC Vaults for Federated Analysis](https://www.frontiersin.org/journals/neuroinformatics/articles/10.3389/fninf.2023.1207721/full)
+### [Enhancing Collaborative Neuroimaging Research: Introducing COINSTAC Vaults for Federated Analysis and Reproducibility](https://www.frontiersin.org/journals/neuroinformatics/articles/10.3389/fninf.2023.1207721/full)
 
-Frontiers in Neuroinformatics (Jun 2023). Co-authored research on federated analysis for collaborative neuroimaging, enabling researchers to analyze datasets across institutions without sharing raw data using differential privacy.
+Frontiers in Neuroinformatics (Jun 2023). Co-authored peer-reviewed research on federated analysis enabling multi-site neuroimaging studies without sharing raw data, using differential privacy and decentralized computation.
