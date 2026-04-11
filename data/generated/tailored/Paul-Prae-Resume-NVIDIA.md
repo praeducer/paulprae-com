@@ -36,7 +36,7 @@ AI engineering leader with 13+ years delivering enterprise AI solutions for heal
 
 ### Chief AI Officer, Founder
 
-**Hyperbloom** | United States | Jan 2020 – Aug 2025
+**Hyperbloom** | United States | Jun 2021 – Aug 2025
 
 - Grew healthcare AI consulting practice from $40K investment to $1.4M ARR, delivering cloud-based AI and data solutions across healthcare, life science, and financial services.
 - Led full sales cycle with teams of sales coordinators, account managers, and solutions architects, building go-to-market strategies and partner co-sell motions with AWS and research organizations.

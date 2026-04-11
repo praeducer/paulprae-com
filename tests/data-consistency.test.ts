@@ -104,11 +104,34 @@ describe("data consistency — career-data.json", () => {
     expect(arine?.endDate).toBe("2026-03");
   });
 
-  it("Hyperbloom position has authoritative start/end dates (Jan 2020 → Aug 2025)", () => {
+  it("Hyperbloom position has authoritative start/end dates (Jun 2021 → Aug 2025)", () => {
+    // CRITICAL: Paul founded Hyperbloom in June 2021 AFTER leaving AWS in
+    // May 2021. Do NOT use Jan 2020 as the start date — that is a
+    // fabrication that falsely implies Paul was running a business while
+    // employed at AWS. This is a fraud-detection check flagged by Paul
+    // directly on 2026-04-11.
     const hyperbloom = career.positions.find((p) => p.company === "Hyperbloom");
     expect(hyperbloom, "Hyperbloom position must exist").toBeDefined();
-    expect(hyperbloom?.startDate).toBe("2020-01");
+    expect(hyperbloom?.startDate).toBe("2021-06");
     expect(hyperbloom?.endDate).toBe("2025-08");
+  });
+
+  it("AWS end date precedes Hyperbloom start date (no overlap)", () => {
+    // Paul quit AWS before founding Hyperbloom. The career data must
+    // reflect this — AWS endDate must be earlier than Hyperbloom startDate.
+    const aws = career.positions.find((p) => p.company === "Amazon Web Services");
+    const hyperbloom = career.positions.find((p) => p.company === "Hyperbloom");
+    expect(aws).toBeDefined();
+    expect(hyperbloom).toBeDefined();
+    expect(aws?.endDate).toBeTruthy();
+    expect(hyperbloom?.startDate).toBeTruthy();
+    // Lexicographic comparison works for ISO YYYY-MM strings.
+    const awsEnd = aws?.endDate ?? "";
+    const hyperbloomStart = hyperbloom?.startDate ?? "";
+    expect(
+      awsEnd < hyperbloomStart,
+      `AWS ${awsEnd} must end before Hyperbloom ${hyperbloomStart}`,
+    ).toBe(true);
   });
 
   it("no suppressed skills appear in position descriptions", () => {

@@ -48,9 +48,9 @@ AI and data engineering leader with 13+ years building enterprise solutions acro
 
 ### Chief AI Officer, Founder
 
-**Hyperbloom** | United States | Jan 2020 – Sep 2025
+**Hyperbloom** | United States | Jun 2021 – Aug 2025
 
-- Grew AI consulting business to $1.4M ARR from a $40K investment over 5+ years, delivering cloud-based AI and data solutions across healthcare, life science, and financial services
+- Grew AI consulting business to $1.4M ARR from a $40K initial investment over ~4 years, delivering cloud-based AI and data solutions across healthcare, life science, and financial services
 - Architected disaster recovery solutions for clinical trial software supporting 10,000+ research sites across 45 countries with 5.5M monthly remote monitoring activities
 - Designed a blockchain-based data platform for secure life science data exchange, meeting CCPA, GDPR, and HIPAA requirements with HL7 and CDISC interoperability standards
 
