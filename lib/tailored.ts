@@ -144,10 +144,12 @@ export function buildTailoredContext(
   const sections: string[] = [
     contentTypeInstruction,
     "",
-    "CRITICAL REMINDERS:",
-    "1. Before writing each position's bullet points, verify that every fact and metric belongs to THAT specific company and role. Never merge facts across companies.",
-    "2. Check the suppress_from_output.skills list in writing-rules.json. Do NOT mention any suppressed skill in Technical Skills sections or bullet points. Replace with generic equivalents if needed.",
-    "3. Use past tense for all completed positions. Only use present tense for positions where is_current is true AND end_date is null in the career data.",
+    "CRITICAL REMINDERS (violations will cause rejection):",
+    "1. GROUNDING: Before writing each position's bullet points, verify that every fact and metric belongs to THAT specific company and role. Never merge facts across companies.",
+    "2. SKILL SUPPRESSION: The writing-rules.json suppress_from_output.skills list contains: dbt, LangChain, n8n, Rust. These words must NEVER appear anywhere in your output — not in Technical Skills, not in bullet points, not in summaries. Replace with generic equivalents (e.g., 'data transformation pipelines' instead of 'dbt').",
+    "3. TENSE: Use past tense for ALL positions EXCEPT those explicitly marked as current in additional_context. If the additional_context says to use past tense for a role, use past tense regardless of career data flags.",
+    "4. BULLET DISCIPLINE: One key achievement per bullet. If a bullet contains more than two independent facts (e.g., a metric + a technology + a client + a geographic scope), split it into separate bullets.",
+    "5. ACRONYMS: Spell out uncommon acronyms on first use. Common: AI, ML, AWS, API. Must spell out: SBIR (Small Business Innovation Research), CDC (Change Data Capture), ETL (Extract-Transform-Load on first use).",
     "",
   ];
 
