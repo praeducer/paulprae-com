@@ -97,6 +97,15 @@ describe("data consistency — career-data.json", () => {
   // editing — do NOT edit these assertions based on a memory file.
   // Root cause of the 2026-04-11 regression documented in
   // C:\Users\paulp\.claude\projects\C--dev-paulprae-com\memory\user_career_timeline.md
+  it("Autonomize AI position exists with correct dates (Apr 2026 → present)", () => {
+    // Paul starts at Autonomize AI on April 13, 2026 as Solutions Architect.
+    // This is the current role — endDate must be null.
+    const autonomize = career.positions.find((p) => p.company === "Autonomize AI");
+    expect(autonomize, "Autonomize AI position must exist in career-data.json").toBeDefined();
+    expect(autonomize?.startDate).toBe("2026-04");
+    expect(autonomize?.endDate).toBeNull();
+  });
+
   it("Arine position has authoritative start/end dates (Sep 2025 → Mar 2026)", () => {
     const arine = career.positions.find((p) => p.company === "Arine");
     expect(arine, "Arine position must exist in career-data.json").toBeDefined();
