@@ -137,7 +137,7 @@ export default function SectionNav({ sections }: { sections: Section[] }) {
       style={{ top: "var(--header-height, 0px)" }}
       className="no-print sticky z-30 hidden overflow-x-auto border-b border-slate-200/80 bg-white/95 backdrop-blur-sm scrollbar-none sm:block dark:border-slate-700/80 dark:bg-slate-950/95"
     >
-      <div className="mx-auto flex max-w-3xl items-center gap-0.5 overflow-x-auto px-4 py-1.5 text-xs scrollbar-none">
+      <div className="mx-auto flex max-w-3xl items-center gap-1 overflow-x-auto px-4 py-2 text-xs scrollbar-none">
         {sections.map((s) => (
           <a
             key={s.id}

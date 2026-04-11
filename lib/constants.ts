@@ -4,7 +4,12 @@
  * client components can import from it.
  */
 
-import { CURRENT_ROLE_HERO } from "./generated/current-role";
+import {
+  CURRENT_ROLE_HERO,
+  CURRENT_EMPLOYER,
+  CURRENT_EMPLOYER_URL,
+  CURRENT_ROLE_TITLE,
+} from "./generated/current-role";
 
 // ─── Site Identity ──────────────────────────────────────────────────────────
 // Single source of truth for branding strings used across layout, pages,
@@ -26,11 +31,18 @@ export const SITE_DESCRIPTION = `Chat with an AI assistant about ${SITE_NAME}'s 
 /** OG / Twitter meta description — punchier, lead with tagline. */
 export const SITE_OG_DESCRIPTION = `${SITE_TAGLINE}. ${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and consulting.`;
 
-/** Hero description shown on the chat homepage.
+/** First sentence of the hero description — career experience summary. */
+export const HERO_EXPERIENCE = `${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and consulting.`;
+
+/** Hero description (plain text) for meta tags, tests, screen readers.
  *  The second sentence is derived from career-data.json via the generated
  *  current-role constants (no hardcoded employer name). Regenerate with
  *  `npm run build:prompts` when Paul's role changes. */
-export const HERO_DESCRIPTION = `${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and consulting. ${CURRENT_ROLE_HERO}`;
+export const HERO_DESCRIPTION = `${HERO_EXPERIENCE} ${CURRENT_ROLE_HERO}`;
+
+// Re-export generated current-role constants for components that need
+// structured access (e.g., to render the employer as a hyperlink).
+export { CURRENT_EMPLOYER, CURRENT_EMPLOYER_URL, CURRENT_ROLE_TITLE };
 
 // ─── External Links ─────────────────────────────────────────────────────────
 

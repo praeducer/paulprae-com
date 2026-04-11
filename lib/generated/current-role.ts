@@ -6,5 +6,6 @@
 
 export const CURRENT_ROLE_TITLE = "Solutions Architect";
 export const CURRENT_EMPLOYER = "Autonomize AI";
+export const CURRENT_EMPLOYER_URL = "https://autonomize.ai";
 export const CURRENT_ROLE_SENTENCE = "Currently he's a Solutions Architect at Autonomize AI.";
 export const CURRENT_ROLE_HERO = "Currently Solutions Architect at Autonomize AI.";

@@ -17,6 +17,7 @@ import {
   loadCareerData,
   getCurrentRole,
   getCurrentEmployer,
+  getCurrentEmployerUrl,
   formatCurrentRoleSentence,
   formatCurrentRoleHero,
 } from "../lib/career-data";
@@ -91,6 +92,7 @@ export type PromptMode = keyof typeof SYSTEM_PROMPTS;
 
 export const CURRENT_ROLE_TITLE = ${JSON.stringify(role?.title ?? "")};
 export const CURRENT_EMPLOYER = ${JSON.stringify(getCurrentEmployer(careerData))};
+export const CURRENT_EMPLOYER_URL = ${JSON.stringify(getCurrentEmployerUrl(getCurrentEmployer(careerData)))};
 export const CURRENT_ROLE_SENTENCE = ${JSON.stringify(formatCurrentRoleSentence(careerData))};
 export const CURRENT_ROLE_HERO = ${JSON.stringify(formatCurrentRoleHero(careerData))};
 `;
