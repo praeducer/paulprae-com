@@ -144,7 +144,10 @@ export function buildTailoredContext(
   const sections: string[] = [
     contentTypeInstruction,
     "",
-    "CRITICAL REMINDER: Before writing each position's bullet points, verify that every fact and metric belongs to THAT specific company and role. Never merge facts across companies.",
+    "CRITICAL REMINDERS:",
+    "1. Before writing each position's bullet points, verify that every fact and metric belongs to THAT specific company and role. Never merge facts across companies.",
+    "2. Check the suppress_from_output.skills list in writing-rules.json. Do NOT mention any suppressed skill in Technical Skills sections or bullet points. Replace with generic equivalents if needed.",
+    "3. Use past tense for all completed positions. Only use present tense for positions where is_current is true AND end_date is null in the career data.",
     "",
   ];
 

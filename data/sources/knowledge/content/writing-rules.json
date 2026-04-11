@@ -189,6 +189,11 @@
       }
     ]
   },
+  "suppress_from_output": {
+    "description": "Technologies and tools that exist in career data but should NEVER appear in generated resumes, cover letters, or skills sections. The candidate is not confident discussing these in interviews. They may still appear in project architecture docs and technical backlogs.",
+    "skills": ["dbt", "LangChain", "n8n", "Rust"],
+    "note": "This list is checked by the generation pipeline. If a skill appears here, omit it from Technical Skills sections and do not feature it in bullet points. If the skill appears in a position description as part of past work, replace with a generic equivalent (e.g., 'data transformation pipelines' instead of 'dbt')."
+  },
   "source_references": {
     "grounding_rules": "Migrated from lib/prompts/resume-writer.system.md G1-G8",
     "ethics_rules": "Consolidated from user feedback on content accuracy and integrity",
