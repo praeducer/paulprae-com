@@ -69,7 +69,7 @@ When generating resume content or any copy for paulprae.com, follow these guidel
 - **Perspective:** Third-person professional (no "I" statements)
 - **Emphasis areas:**
   - AI engineering leadership and architecture
-  - Healthcare domain expertise (Arine, BCBS, Humana ecosystem)
+  - Healthcare domain expertise (Autonomize AI, Arine, BCBS, Humana ecosystem)
   - Fortune 500 and enterprise delivery track record (AWS, Microsoft, Slalom)
   - Full-stack capability spanning data engineering, ML systems, and cloud infrastructure
 - **Quantify impact** wherever data supports it (e.g., "reduced pipeline failures by 40%")

@@ -1,22 +1,43 @@
 [
   {
+    "id": "autonomize-ai-solutions-architect-2026",
+    "title": "Solutions Architect",
+    "company": "Autonomize AI",
+    "company_id": "autonomize-ai",
+    "location": "Remote, United States",
+    "start_date": "2026-04",
+    "end_date": null,
+    "is_current": true,
+    "employment_type": "full-time",
+    "description": "Leading solution design and deployment for healthcare and life sciences customers adopting Autonomize AI's enterprise AI platform. Owning technical discovery, architecture design, and integration strategy across the customer lifecycle. Partnering with product, engineering, sales, and customer success teams to ship scalable, secure, HIPAA-compliant AI solutions for use cases such as clinical review, risk adjustment, claims processing, and knowledge automation.",
+    "highlights": [
+      "Owns technical discovery, architecture design, and integration strategy for new and existing healthcare and life sciences customers",
+      "Translates business requirements into scalable AI-enabled architectures grounded in healthcare data standards and HIPAA compliance",
+      "Partners with product and engineering on POC development, iterative deployment cycles, and customer feedback loops",
+      "Contributes enterprise architecture best practices around security, governance, and interoperability for regulated healthcare AI"
+    ],
+    "technologies": ["Generative AI", "LLMs", "AWS", "HIPAA", "Solution Architecture", "Healthcare Data"],
+    "industries": ["Healthcare", "Life Sciences", "AI"],
+    "sort_order": 1
+  },
+  {
     "id": "arine-staff-data-ops-2025",
     "title": "Staff Data Operations Engineer",
     "company": "Arine",
     "company_id": "arine",
     "location": "Remote, United States",
-    "start_date": "2025-03",
-    "end_date": null,
-    "is_current": true,
+    "start_date": "2025-09",
+    "end_date": "2026-03",
+    "is_current": false,
     "employment_type": "full-time",
-    "description": "Leading data operations and infrastructure for healthcare technology platform focused on medication management and clinical decision support. Responsible for data pipeline architecture, MLOps implementation, and ensuring HIPAA-compliant data processing workflows that support patient care optimization and clinical outcomes analysis.",
+    "description": "Led data operations and infrastructure for healthcare technology platform focused on medication management and clinical decision support. Responsible for data pipeline architecture, MLOps implementation, and ensuring HIPAA-compliant data processing workflows that support patient care optimization and clinical outcomes analysis.",
     "highlights": [
-      "Leading data operations and infrastructure for healthcare technology platform focused on medication management and clinical decision support",
-      "Responsible for data pipeline architecture, MLOps implementation, and ensuring HIPAA-compliant data processing workflows that support patient care optimization and clinical outcomes analysis"
+      "Led data operations and infrastructure for healthcare technology platform focused on medication management and clinical decision support",
+      "Responsible for data pipeline architecture, MLOps implementation, and ensuring HIPAA-compliant data processing workflows"
     ],
     "technologies": ["MLOps", "HIPAA", "Data Pipelines"],
     "industries": ["Healthcare Technology"],
-    "sort_order": 1
+    "sort_order": 2
   },
   {
     "id": "modular-earth-principal-ai-architect-2022",

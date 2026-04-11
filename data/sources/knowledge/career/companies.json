@@ -1,5 +1,17 @@
 [
   {
+    "id": "autonomize-ai",
+    "name": "Autonomize AI",
+    "industry": "Healthcare AI",
+    "size": "startup",
+    "type": "employer",
+    "website": "https://autonomize.ai",
+    "description": "VC-backed startup combining data and context to streamline knowledge workflows, reduce administrative burden, and improve patient outcomes across healthcare and life sciences.",
+    "metrics": {},
+    "metricsAsOf": "2026-04",
+    "metricsSource": "https://autonomize.ai"
+  },
+  {
     "id": "arine",
     "name": "Arine",
     "industry": "Healthcare Technology",

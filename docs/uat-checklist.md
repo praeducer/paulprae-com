@@ -59,7 +59,7 @@ The goal: earn trust through **absolute honesty and accuracy** and leave a **mem
 > Give me a quick overview of Paul.
 
 - [ ] Response is 150-300 words (concise, not a wall of text)
-- [ ] Mentions current role (Arine), key past employers (AWS, Microsoft, Booz Allen Hamilton, Slalom)
+- [ ] Mentions current role (Autonomize AI), key past employers (Arine, AWS, Microsoft, Booz Allen Hamilton, Slalom)
 - [ ] Includes healthcare domain expertise
 - [ ] No emojis in headings or body text
 - [ ] Ends with follow-up suggestions (plain dashes, no emojis)
@@ -79,7 +79,7 @@ The goal: earn trust through **absolute honesty and accuracy** and leave a **mem
 Send these in sequence:
 
 > 1. "Does Paul have experience with data pipelines?"
-> 2. "Tell me more about the Arine work."
+> 2. "Tell me more about Paul's time at Arine."
 > 3. "How does that compare to what he did at AWS?"
 
 - [ ] Turn 1: cites specific roles with data pipeline work (Arine, Slalom, TReNDS)

@@ -50,4 +50,4 @@ BAD: "Proven ability to drive results in fast-paced environments"
 GOOD: "Grew AI consulting business to $1.4M ARR from a $40K investment"
 
 BAD: "Passionate about leveraging cutting-edge AI"
-GOOD: "Currently building healthcare AI infrastructure and multi-agent systems at Arine"
+GOOD: "Currently leading solution design for healthcare AI deployments at Autonomize AI"
