@@ -4,6 +4,8 @@
  * client components can import from it.
  */
 
+import { CURRENT_ROLE_HERO } from "./generated/current-role";
+
 // ─── Site Identity ──────────────────────────────────────────────────────────
 // Single source of truth for branding strings used across layout, pages,
 // components, and metadata. Update here to change everywhere.
@@ -24,8 +26,11 @@ export const SITE_DESCRIPTION = `Chat with an AI assistant about ${SITE_NAME}'s 
 /** OG / Twitter meta description — punchier, lead with tagline. */
 export const SITE_OG_DESCRIPTION = `${SITE_TAGLINE}. ${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.`;
 
-/** Hero description shown on the chat homepage. */
-export const HERO_DESCRIPTION = `${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance. Currently building AI agents and data platforms at Arine.`;
+/** Hero description shown on the chat homepage.
+ *  The second sentence is derived from career-data.json via the generated
+ *  current-role constants (no hardcoded employer name). Regenerate with
+ *  `npm run build:prompts` when Paul's role changes. */
+export const HERO_DESCRIPTION = `${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance. ${CURRENT_ROLE_HERO}`;
 
 // ─── External Links ─────────────────────────────────────────────────────────
 

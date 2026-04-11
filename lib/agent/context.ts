@@ -10,7 +10,12 @@
 import fs from "fs";
 import path from "path";
 import { PATHS } from "../config";
-import { loadCareerData } from "../career-data";
+import {
+  loadCareerData,
+  formatCurrentRoleSentence,
+  formatCurrentRoleHero,
+  getCurrentEmployer,
+} from "../career-data";
 import { stripEmpty } from "../data-utils";
 import type { CareerData } from "../types";
 import { loadPrompt } from "../prompts/loader";
@@ -112,11 +117,21 @@ export function buildSystemPrompt(mode: PromptMode): string | null {
   const audienceJson = JSON.stringify(context.audienceFrameworks);
   const companyJson = JSON.stringify(context.companies);
 
+  // Derive current-role strings at prompt-bake time so that changes to
+  // career-data.json propagate to every prompt automatically, without any
+  // hardcoded employer names in the .md templates.
+  const currentRoleSentence = formatCurrentRoleSentence(context.careerData);
+  const currentRoleHero = formatCurrentRoleHero(context.careerData);
+  const currentEmployer = getCurrentEmployer(context.careerData);
+
   let prompt = template
     .replace("{{CAREER_DATA}}", careerDataJson)
     .replace("{{AUDIENCE_FRAMEWORKS}}", audienceJson)
     .replace("{{COMPANY_DATA}}", companyJson)
     .replace("{{BOOK_INTERVIEW_URL}}", BOOK_INTERVIEW_URL)
+    .replace(/\{\{CURRENT_ROLE_SENTENCE\}\}/g, currentRoleSentence)
+    .replace(/\{\{CURRENT_ROLE_HERO\}\}/g, currentRoleHero)
+    .replace(/\{\{CURRENT_EMPLOYER\}\}/g, currentEmployer)
     .replace(/\{\{RESUME_PDF_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.pdf)
     .replace(/\{\{RESUME_DOCX_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.docx)
     .replace(/\{\{RESUME_MD_PATH\}\}/g, RESUME_DOWNLOAD_PATHS.md)
