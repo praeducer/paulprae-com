@@ -129,6 +129,6 @@ After testing, fill in this table:
 - Section 5: Autonomize AI first position, correct dates
 - Section 6: PDF renders correctly
 
-**Tested by:** **_
-**Date:** _**
+**Tested by:** **\_
+**Date:** \_**
 **URL tested:** \_\_\_
