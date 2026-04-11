@@ -83,11 +83,15 @@ function fileHash(filePath: string): string {
 
 function runCommand(cmd: string, cmdArgs: string[]): { ok: boolean; output: string } {
   try {
+    // On Windows, Node can't execute shell-script commands like `npx` directly —
+    // they're `.cmd` wrappers. `shell: true` lets the Windows shell resolve the
+    // extension; on Unix it's a no-op that still works.
     const output = execFileSync(cmd, cmdArgs, {
       cwd: ROOT,
       stdio: ["pipe", "pipe", "pipe"],
       timeout: 120_000,
       encoding: "utf-8",
+      shell: process.platform === "win32",
     });
     return { ok: true, output: output.trim() };
   } catch (err: unknown) {

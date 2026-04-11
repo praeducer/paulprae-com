@@ -35,7 +35,6 @@ export const MAJOR_COMPANIES = [
   "Red Ventures",
   "Microsoft",
   "Hyperbloom",
-  "Modular Earth",
   "Mento",
   "TReNDS",
   "NeuroLex",

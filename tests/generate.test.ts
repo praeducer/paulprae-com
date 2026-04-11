@@ -82,18 +82,13 @@ describe("SYSTEM_PROMPT", () => {
     }
   });
 
-  it("contains grounding rules to prevent hallucination", () => {
-    const groundingRules = [
-      "<grounding_rules>",
-      "Entity-Scope Binding",
-      "Role-Work Alignment",
-      "Temporal Freshness",
-      "Cross-Reference Prohibition",
-      "SCOPE BOUNDARY",
-    ];
-    for (const rule of groundingRules) {
-      expect(SYSTEM_PROMPT).toContain(rule);
-    }
+  it("contains grounding rules reference to centralized writing rules", () => {
+    // Grounding rules are now centralized in writing-rules.json and injected
+    // via the user message. The system prompt references them.
+    expect(SYSTEM_PROMPT).toContain("<grounding_rules>");
+    expect(SYSTEM_PROMPT).toContain("writing_rules");
+    expect(SYSTEM_PROMPT).toContain("entity-scope binding");
+    expect(SYSTEM_PROMPT).toContain("scope boundary");
   });
 
   it("is long enough for prompt caching (>1024 tokens ≈ 4000 chars)", () => {

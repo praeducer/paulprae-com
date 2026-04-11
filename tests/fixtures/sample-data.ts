@@ -335,10 +335,10 @@ Computer Science
 
 ## Technical Skills
 
-**AI/ML:** PyTorch, TensorFlow, LangChain, Claude API, OpenAI API, Hugging Face
+**AI/ML:** PyTorch, TensorFlow, Claude API, OpenAI API, Hugging Face, Ollama
 **Cloud & Infrastructure:** AWS, Azure, GCP, Kubernetes, Docker, Terraform
-**Programming Languages:** Python, TypeScript, Rust, Go, SQL
-**Data Engineering:** Apache Spark, Airflow, dbt, PostgreSQL, Redis
+**Programming Languages:** Python, TypeScript, Go, SQL
+**Data Engineering:** Apache Spark, Airflow, Snowflake, PostgreSQL, Redis
 **Leadership & Strategy:** Technical Architecture, Team Building, Agile, OKRs
 
 ---

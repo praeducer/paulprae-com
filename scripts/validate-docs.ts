@@ -73,8 +73,11 @@ function findMarkdownFiles(dir: string): string[] {
       const relPath = path.relative(ROOT, fullPath);
 
       if (entry.isDirectory()) {
+        // Normalize path separators so SKIP_DIRS entries using forward slashes
+        // match on Windows (where relPath uses backslashes).
+        const normalizedRel = relPath.split(path.sep).join("/");
         const shouldSkip = [...SKIP_DIRS].some(
-          (skip) => relPath === skip || relPath.startsWith(skip + path.sep),
+          (skip) => normalizedRel === skip || normalizedRel.startsWith(skip + "/"),
         );
         if (!shouldSkip) walk(fullPath);
       } else if (entry.isFile() && entry.name.endsWith(".md")) {

@@ -1,15 +1,15 @@
 /**
- * generate-tailored-resume.ts — Generate tailored resumes from prompt files.
+ * generate-tailored-cover-letter.ts — Generate tailored cover letters from prompt files.
  *
- * Thin wrapper around lib/tailored.ts for resume-specific generation.
+ * Thin wrapper around lib/tailored.ts for cover-letter-specific generation.
  *
  * Usage:
- *   npm run generate:tailored -- phoenix-technologies
- *   npm run generate:tailored -- data/prompts/tailored/phoenix-technologies.json
- *   npx tsx scripts/generate-tailored-resume.ts phoenix-technologies
+ *   npm run generate:cover-letter -- phoenix-technologies
+ *   npm run generate:cover-letter -- data/prompts/tailored/phoenix-technologies.json
+ *   npx tsx scripts/generate-tailored-cover-letter.ts phoenix-technologies
  *
  * Prompt files live in data/prompts/tailored/ and follow TailoredPrompt schema.
- * Output: data/generated/tailored/Paul-Prae-Resume-<Company-Slug>.md
+ * Output: data/generated/tailored/Paul-Prae-Cover-Letter-<Company-Slug>.md
  *
  * Requires: ANTHROPIC_API_KEY in .env.local
  */
@@ -19,7 +19,6 @@ import path from "path";
 import {
   PROMPTS_DIR,
   OUTPUT_DIR,
-  RESUME_FILE_BASE,
   CLAUDE,
   slugify,
   resolvePromptPath,
@@ -33,12 +32,13 @@ import {
   classifyError,
   isDirectRun,
 } from "../lib/tailored.js";
-import { validateResume } from "../lib/resume-validator.js";
 
-// ─── Resume-Specific Configuration ─────────────────────────────────────────
+// ─── Cover Letter Configuration ─────────────────────────────────────────────
 
-const RESUME_INSTRUCTION =
-  "Generate a tailored resume for the following job description. Apply all formatting, grounding, and quality rules from your instructions.";
+const COVER_LETTER_FILE_BASE = "Paul-Prae-Cover-Letter";
+
+const COVER_LETTER_INSTRUCTION =
+  "Generate a tailored cover letter for the following job description. Apply all formatting, grounding, and quality rules from your instructions.";
 
 // ─── Main Generation ────────────────────────────────────────────────────────
 
@@ -46,9 +46,9 @@ async function generate(promptInput: string): Promise<void> {
   const promptPath = resolvePromptPath(promptInput);
   const prompt = loadPromptFile(promptPath);
   const companySlug = slugify(prompt.company);
-  const outputFile = path.join(OUTPUT_DIR, `${RESUME_FILE_BASE}-${companySlug}.md`);
+  const outputFile = path.join(OUTPUT_DIR, `${COVER_LETTER_FILE_BASE}-${companySlug}.md`);
 
-  console.log("\n\ud83c\udfaf Tailored Resume Generation\n");
+  console.log("\n\u2709\ufe0f  Tailored Cover Letter Generation\n");
   console.log(`   Company: ${prompt.company}`);
   console.log(`   Role: ${prompt.role}`);
   if (prompt.url) console.log(`   URL: ${prompt.url}`);
@@ -60,7 +60,7 @@ async function generate(promptInput: string): Promise<void> {
   // Skip if output is newer than prompt file (unless --force)
   if (shouldSkip(promptPath, outputFile)) {
     console.log(
-      "\n   \u2705 Tailored resume is up to date (prompt unchanged). Skipping generation.",
+      "\n   \u2705 Tailored cover letter is up to date (prompt unchanged). Skipping generation.",
     );
     console.log("   Use --force to override.\n");
     return;
@@ -80,10 +80,10 @@ async function generate(promptInput: string): Promise<void> {
   console.log("   \u23f3 Calling Claude API (this may take 30-90 seconds with max effort)...\n");
 
   // Build user message with tailoring context
-  const userMessage = buildTailoredContext(careerData, prompt, RESUME_INSTRUCTION);
+  const userMessage = buildTailoredContext(careerData, prompt, COVER_LETTER_INSTRUCTION);
 
   // Call Claude via the AI service layer
-  const response = await generateWithPrompt("resume-writer", userMessage);
+  const response = await generateWithPrompt("cover-letter-writer", userMessage);
 
   // Warn if output was truncated
   if (response.stopReason === "max_tokens") {
@@ -94,20 +94,6 @@ async function generate(promptInput: string): Promise<void> {
     console.error("\u274c Claude returned empty text content.\n");
     console.error("   Response stop reason:", response.stopReason);
     process.exit(1);
-  }
-
-  // Post-generation validation (warn-only — tailored pipeline)
-  // Shares lib/resume-validator.ts with the main generator so both paths
-  // enforce the same deterministic quality checks.
-  const validationWarnings = validateResume(response.text, careerData);
-  if (validationWarnings.length > 0) {
-    console.log(`\n   \u26a0 Validator warnings (${validationWarnings.length}):`);
-    for (const warning of validationWarnings) {
-      console.log(`      - ${warning}`);
-    }
-    console.log();
-  } else {
-    console.log("\n   \u2705 Validator: no warnings\n");
   }
 
   // Format with Prettier
@@ -128,18 +114,18 @@ async function generate(promptInput: string): Promise<void> {
 
 function printUsage(): void {
   console.log(`
-Usage: npm run generate:tailored -- <prompt-name>
+Usage: npm run generate:cover-letter -- <prompt-name>
 
   <prompt-name>  Name of prompt file in data/prompts/tailored/ (without .json)
                  or full path to a prompt JSON file.
 
 Examples:
-  npm run generate:tailored -- phoenix-technologies
-  npm run generate:tailored -- phoenix-technologies --force
-  npx tsx scripts/generate-tailored-resume.ts phoenix-technologies
+  npm run generate:cover-letter -- phoenix-technologies
+  npm run generate:cover-letter -- phoenix-technologies --force
+  npx tsx scripts/generate-tailored-cover-letter.ts phoenix-technologies
 
 Prompt files: data/prompts/tailored/*.json
-Output:       data/generated/tailored/<Resume-Base>-<Company-Slug>.md
+Output:       data/generated/tailored/Paul-Prae-Cover-Letter-<Company-Slug>.md
 `);
 
   // List available prompts
@@ -160,7 +146,7 @@ Output:       data/generated/tailored/<Resume-Base>-<Company-Slug>.md
   }
 }
 
-if (isDirectRun("generate-tailored-resume")) {
+if (isDirectRun("generate-tailored-cover-letter")) {
   // Find the prompt argument (skip --force and other flags)
   const args = process.argv.slice(2).filter((a) => !a.startsWith("--"));
 
@@ -170,7 +156,7 @@ if (isDirectRun("generate-tailored-resume")) {
   }
 
   generate(args[0]).catch((err) => {
-    console.error("\n\u274c Tailored resume generation failed:\n");
+    console.error("\n\u274c Tailored cover letter generation failed:\n");
     const classified = classifyError(err);
     console.error(`   ${classified.message}`);
     process.exit(1);

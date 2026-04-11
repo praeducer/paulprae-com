@@ -9,16 +9,12 @@
     "end_date": null,
     "is_current": true,
     "employment_type": "full-time",
-    "description": "Leading solution design and deployment for healthcare and life sciences customers adopting Autonomize AI's enterprise AI platform. Owning technical discovery, architecture design, and integration strategy across the customer lifecycle. Partnering with product, engineering, sales, and customer success teams to ship scalable, secure, HIPAA-compliant AI solutions for use cases such as clinical review, risk adjustment, claims processing, and knowledge automation.",
-    "highlights": [
-      "Owns technical discovery, architecture design, and integration strategy for new and existing healthcare and life sciences customers",
-      "Translates business requirements into scalable AI-enabled architectures grounded in healthcare data standards and HIPAA compliance",
-      "Partners with product and engineering on POC development, iterative deployment cycles, and customer feedback loops",
-      "Contributes enterprise architecture best practices around security, governance, and interoperability for regulated healthcare AI"
-    ],
-    "technologies": ["Generative AI", "LLMs", "AWS", "HIPAA", "Solution Architecture", "Healthcare Data"],
-    "industries": ["Healthcare", "Life Sciences", "AI"],
-    "sort_order": 1
+    "description": "Incoming role. Paul starts at Autonomize AI on April 13, 2026 as a Solutions Architect at a healthcare AI startup.",
+    "highlights": [],
+    "technologies": ["AI", "Healthcare AI"],
+    "industries": ["Healthcare AI"],
+    "exclude_from_tailored": ["nvidia"],
+    "sort_order": 0
   },
   {
     "id": "arine-staff-data-ops-2025",
@@ -33,42 +29,21 @@
     "description": "Led data operations and infrastructure for healthcare technology platform focused on medication management and clinical decision support. Responsible for data pipeline architecture, MLOps implementation, and ensuring HIPAA-compliant data processing workflows that support patient care optimization and clinical outcomes analysis.",
     "highlights": [
       "Led data operations and infrastructure for healthcare technology platform focused on medication management and clinical decision support",
-      "Responsible for data pipeline architecture, MLOps implementation, and ensuring HIPAA-compliant data processing workflows"
+      "Responsible for data pipeline architecture, MLOps implementation, and ensuring HIPAA-compliant data processing workflows that support patient care optimization and clinical outcomes analysis"
     ],
     "technologies": ["MLOps", "HIPAA", "Data Pipelines"],
     "industries": ["Healthcare Technology"],
-    "sort_order": 2
+    "sort_order": 1
   },
   {
-    "id": "modular-earth-principal-ai-architect-2022",
-    "title": "Principal AI Architect and Engineer, Founder",
-    "company": "Modular Earth",
-    "company_id": "modular-earth",
-    "location": "Buford, Georgia, United States",
-    "start_date": "2022-12",
-    "end_date": null,
-    "is_current": true,
-    "employment_type": "self-employed",
-    "description": "Modular Earth is a not-for-profit organization that supports the free and open-source development of AI-driven applications for social good. Modular Earth's mission is to make wealth accessible to working-class people in an increasingly volatile job market. My active AI projects include a career assistant to help workers execute an effective go-to-market strategy and a financial assistant to help families save and invest their money. My principles maximize accessibility, privacy, trust, and creative control while minimizing cost. My software architectures enforce open-source, local-first, portable, and distributed design principles, often integrating emerging technologies such as AI and blockchain. My vision is to deploy AI-as-a-public-service in local libraries across the United States at no cost to individuals looking for work.",
-    "highlights": [
-      "Modular Earth is a not-for-profit organization that supports the free and open-source development of AI-driven applications for social good",
-      "Active AI projects include a career assistant to help workers execute an effective go-to-market strategy and a financial assistant to help families save and invest their money",
-      "Software architectures enforce open-source, local-first, portable, and distributed design principles, often integrating emerging technologies such as AI and blockchain",
-      "Vision is to deploy AI-as-a-public-service in local libraries across the United States at no cost to individuals looking for work"
-    ],
-    "technologies": ["AI", "Blockchain", "Open Source"],
-    "industries": ["Technology", "Social Impact"],
-    "sort_order": 2
-  },
-  {
-    "id": "hyperbloom-chief-ai-officer-2020",
+    "id": "hyperbloom-chief-ai-officer-2021",
     "title": "Chief AI Officer, Founder",
     "company": "Hyperbloom",
     "company_id": "hyperbloom",
     "location": "United States",
-    "start_date": "2020-01",
-    "end_date": null,
-    "is_current": true,
+    "start_date": "2021-06",
+    "end_date": "2025-08",
+    "is_current": false,
     "employment_type": "self-employed",
     "description": "Hyperbloom is an IT services and consulting business that I own and operate. As the head of the organization, I: + Collaborate closely with other executives, founders, and business owners to define and execute effective go-to-market and product development strategies. + Design and deliver cloud-based AI and data solutions to many industries with a focus on healthcare, life science, and financial services. + Lead teams of sales coordinators, account managers, and solutions architects in executing the full sales cycle for our products and services. + Partner with research organizations, technology vendors, and other consulting companies. + Recruit mission-driven people who specialize in building emerging technology. + Support product developers as they incubate AI businesses in our community. + Train engineers and architects on how to be entrepreneurs and live the life they want to live. Teach them to target high-demand, low supply markets and develop multiple income streams while living a meaningful and fulfilling life. + Build decentralized, autonomous talent platforms and consulting infrastructure to support our mission to bring self-sovereignty to independent contractors and working-class entrepreneurs.",
     "highlights": [
@@ -188,10 +163,10 @@
     "company": "NeuroLex Labs",
     "company_id": "neurolex-labs",
     "location": "Greater Atlanta Area",
-    "start_date": "2018-01",
-    "end_date": "2020-05",
+    "start_date": "2018-02",
+    "end_date": "2018-07",
     "is_current": false,
-    "employment_type": "full-time",
+    "employment_type": "part-time",
     "description": "+ Architected and developed software applications, web services, and data pipelines that made voice computing accessible to everyone. + Designed automated machine learning workflows that collect data, clean data, train models, and deploy models. These systems primarily process text and audio data. + Worked with executive leadership, researchers, and customers to design new features and products that delighted users, had a great technical foundation, were easy to support, and delivered on the key performance metrics and goals of the business. + Collaborated weekly with a highly distributed, cross-functional team. + Assured quality through test-driven development. I advocated for, and drove the implementation of, regression, functional, load, and integration testing. + Primary contributor to our technical documentation. I wrote robust documentation that all levels of engineers and scientists could understand. + Mentored members of our Tribe, a fellowship program where outstanding students and researchers from around the world came together to discover new applications for the prediction and prevention of neurodegenerative diseases. + Evangelized the company and recruited new team members.",
     "highlights": [
       "Architected and developed software applications, web services, and data pipelines that made voice computing accessible to everyone",
@@ -213,8 +188,8 @@
     "company": "Decooda",
     "company_id": "decooda",
     "location": "Greater Atlanta Area",
-    "start_date": "2018-01",
-    "end_date": "2018-08",
+    "start_date": "2018-02",
+    "end_date": "2018-07",
     "is_current": false,
     "employment_type": "full-time",
     "description": "+ Architected AI solutions that detect and predict human behavior. These solutions were cloud-first and built to scale with a focus on unstructured data. + Designed next generation data science tools for the customer experience industry. I pioneered new products and features by bridging customer feedback back into product development. + Led client service delivery operations for our engineering and data science teams. I established processes and tooling to improve the efficiency and effectiveness of the organization. + Acted as the technical lead and project manager on client-facing projects. + Managed diverse teams of data scientists, software engineers, and customer experience experts as we delivered quality solutions on aggressive timelines. + Executed multiple agile software development and data science process life cycles in tandem. + Took ownership of any gaps in my team's abilities, acting in a variety of roles including software engineer, data engineer, data scientist, and data storyteller. I did everything from building web services to presenting research results. + Automated everything I possibly could, from analytics reports to the development and deployment of our software applications. + Supported the sales cycle by contributing to statements of work, responding to requests for proposals, and building demos. + Engaged weekly in the recruiting and hiring process. + Inspired a culture of radical transparency with a passion for people. + Clients served: Principal, FLEETCOR, Veloxiti.",

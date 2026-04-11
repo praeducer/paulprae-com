@@ -1,0 +1,61 @@
+{
+  "file": "data/generated/tailored/Paul-Prae-Cover-Letter-NVIDIA.md",
+  "overallScore": 47,
+  "maxScore": 50,
+  "categories": [
+    {
+      "category": "grounding",
+      "score": 9,
+      "maxScore": 10,
+      "violations": [
+        {
+          "ruleId": "G7",
+          "ruleName": "SCOPE BOUNDARY markers",
+          "severity": "info",
+          "excerpt": "Florence operates 10,000+ research sites across 45 countries",
+          "explanation": "The scope boundary for the Florence Healthcare engagement explicitly states: 'These 10,000+ sites / 45 countries / 5.5M monthly activities metrics describe Florence Healthcare's platform scale (the client), not Paul's personal scope or team size. Always attribute the platform scale to Florence Healthcare, not to Paul or Hyperbloom as a whole.' The letter does parenthetically attribute these to Florence, which partially satisfies the requirement, but the phrasing embeds Florence's scale metrics within a paragraph about Paul's Hyperbloom engagements in a way that could imply Hyperbloom operated at that scale. This is a minor issue since 'Florence operates' does attribute correctly."
+        }
+      ]
+    },
+    {
+      "category": "ethics",
+      "score": 10,
+      "maxScore": 10,
+      "violations": []
+    },
+    {
+      "category": "voice",
+      "score": 9,
+      "maxScore": 10,
+      "violations": [
+        {
+          "ruleId": "V5",
+          "ruleName": "No superfluous commentary",
+          "severity": "warning",
+          "excerpt": "are all in my background today",
+          "explanation": "The phrase 'are all in my background today' is a mild instance of superfluous editorial commentary — the preceding sentence already establishes the claim. It's not as egregious as the listed examples ('uniquely positioned', 'precisely the kind of') but follows the same pattern of telling the reader what to conclude rather than letting the facts speak."
+        }
+      ]
+    },
+    {
+      "category": "quality",
+      "score": 9,
+      "maxScore": 10,
+      "violations": [
+        {
+          "ruleId": "Q1",
+          "ruleName": "No fluff",
+          "severity": "info",
+          "excerpt": "I'd welcome a conversation about this role and am available at your convenience.",
+          "explanation": "This is a standard closing line but carries zero information content. It is formulaic filler — every applicant is available. Removing it would not reduce the document's substance."
+        }
+      ]
+    },
+    {
+      "category": "cover_letter",
+      "score": 10,
+      "maxScore": 10,
+      "violations": []
+    }
+  ]
+}
