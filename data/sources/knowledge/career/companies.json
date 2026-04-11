@@ -1,5 +1,14 @@
 [
   {
+    "id": "autonomize-ai",
+    "name": "Autonomize AI",
+    "industry": "Healthcare AI",
+    "size": "startup",
+    "type": "employer",
+    "website": "https://autonomize.ai",
+    "description": "Healthcare AI startup. Paul starts as Solutions Architect on April 13, 2026."
+  },
+  {
     "id": "arine",
     "name": "Arine",
     "industry": "Healthcare Technology",

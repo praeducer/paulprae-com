@@ -46,11 +46,21 @@
   {
     "category": "achievement",
     "title": "Hyperbloom — AI Consulting Business",
-    "content": "Founded and operated Hyperbloom, an IT services and consulting business delivering cloud-based AI and data solutions across healthcare, life science, and financial services industries. Led cross-functional teams of sales coordinators, account managers, and solutions architects through the full sales cycle. Grew the business to $1.4M ARR from a $40K initial investment. Built strategic partnerships with research organizations, technology vendors, and consulting firms. Trained engineers on entrepreneurship and mission-driven technology development. Developed product incubation programs supporting new AI ventures. Recruited and retained mission-driven technologists. Operated the business for 5+ years (2020-2025).",
+    "content": "Founded and operated Hyperbloom, an IT services and consulting business delivering cloud-based AI and data solutions across healthcare, life science, and financial services industries. Led cross-functional teams of sales coordinators, account managers, and solutions architects through the full sales cycle. Grew the business to $1.4M ARR from a $40K initial investment. Built strategic partnerships with research organizations, technology vendors, and consulting firms. Trained engineers on entrepreneurship and mission-driven technology development. Developed product incubation programs supporting new AI ventures. Recruited and retained mission-driven technologists. Operated the business for ~5.5 years (Jan 2020 – Aug 2025); wound down business operations the month before transitioning full-time to Arine.",
     "tags": ["entrepreneurship", "ai-consulting", "healthcare", "sales", "leadership", "startup"],
     "relatedPositions": ["Chief AI Officer, Founder at Hyperbloom"],
-    "asOf": "2025-09",
+    "asOf": "2025-08",
     "source": "position description + hyperbloom.ai",
+    "confidence": "verified"
+  },
+  {
+    "category": "achievement",
+    "title": "Hyperbloom — Florence Healthcare Disaster Recovery Engagement",
+    "content": "Architected disaster recovery solutions for Florence Healthcare's clinical-trial management platform as a Hyperbloom consulting engagement. Florence Healthcare operates a clinical-trial platform supporting 10,000+ research sites across 45 countries with 5.5 million remote monitoring activities monthly. SCOPE BOUNDARY: These 10,000+ sites / 45 countries / 5.5M monthly activities metrics describe Florence Healthcare's platform scale (the client), not Paul's personal scope or team size. Paul's individual contribution was the disaster recovery architecture design. Always attribute the platform scale to Florence Healthcare, not to Paul or Hyperbloom as a whole.",
+    "tags": ["hyperbloom", "florence-healthcare", "disaster-recovery", "clinical-trials", "consulting-engagement"],
+    "relatedPositions": ["Chief AI Officer, Founder at Hyperbloom"],
+    "asOf": "2024-12",
+    "source": "Florence Healthcare public materials (platform scale); Paul's engagement scope (DR architecture)",
     "confidence": "verified"
   },
   {
@@ -70,7 +80,7 @@
   {
     "category": "leadership",
     "title": "Engineering Management — Cross-Position Leadership Thread",
-    "content": "Progressive engineering leadership spanning 10+ years across multiple organizations. At Booz Allen Hamilton: collaborated with cross-functional teams to design and deploy AI products for healthcare clients. At AWS: built deep relationships with C-suite executives, led private and public technical events, partnered with sales teams to drive adoption and revenue. At NeuroLex Labs: mentored fellows in the Tribe program for neurodegenerative disease research, evangelized the company and recruited team members, drove TDD implementation across the engineering team. At Decooda: managed diverse teams of data scientists, software engineers, and CX experts; led client service delivery operations; established processes and tooling to improve organizational efficiency; engaged weekly in recruiting and hiring. At Slalom: delivered technical training to audiences spanning executives, nurses, and developers; grew the AI business through workshops and sales support. At Hyperbloom: led teams of sales coordinators, account managers, and solutions architects; trained engineers on entrepreneurship; recruited mission-driven technologists. At Mento: delivered science-backed executive coaching with 93% client-reported performance improvement and 100% leadership satisfaction.",
+    "content": "Cross-organization engineering leadership over 10+ years across multiple companies. At Booz Allen Hamilton: collaborated with cross-functional teams to design and deploy AI products for healthcare clients. At AWS: built deep relationships with C-suite executives, led private and public technical events, partnered with sales teams to drive adoption and revenue. At NeuroLex Labs: mentored fellows in the Tribe program for neurodegenerative disease research, evangelized the company and recruited team members, drove TDD implementation across the engineering team. At Decooda: managed diverse teams of data scientists, software engineers, and CX experts; led client service delivery operations; established processes and tooling to improve organizational efficiency; engaged weekly in recruiting and hiring. At Slalom: delivered technical training to audiences spanning executives, nurses, and developers; grew the AI business through workshops and sales support. At Hyperbloom: led teams of sales coordinators, account managers, and solutions architects; trained engineers on entrepreneurship; recruited mission-driven technologists. At Mento: delivered science-backed executive coaching with 93% client-reported performance improvement and 100% leadership satisfaction.",
     "tags": ["leadership", "management", "mentoring", "hiring", "coaching", "team-building"],
     "relatedPositions": [
       "Chief AI Architect, Senior Manager at Booz Allen Hamilton",
