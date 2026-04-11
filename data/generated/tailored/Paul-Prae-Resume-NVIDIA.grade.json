@@ -13,7 +13,7 @@
           "ruleName": "Professional summary integrity",
           "severity": "info",
           "excerpt": "AI engineering leader with 13+ years delivering enterprise AI solutions for healthcare and life sciences.",
-          "explanation": "The '13+ years' claim is a career-spanning aggregation. While Paul's career data starts around 2012 (Microsoft) which would support ~13-14 years by 2026, the claim of 'delivering enterprise AI solutions' for that entire span is a stretch — his earliest roles (Microsoft support engineer, Red Ventures software engineer) were not AI-focused. The AI-specific work begins around 2015 at Slalom. This is a minor compound claim that overstates the duration of AI-specific work."
+          "explanation": "The '13+ years' claim is a career-spanning claim that is plausible (career data shows roles from ~2012 onward), but not all of those years involved 'enterprise AI solutions for healthcare and life sciences' specifically. The Microsoft role (2012-2014) was technical support, Red Ventures was marketing tech, and early roles were not healthcare AI. This slightly overstates the healthcare AI tenure. However, it could be interpreted as a general career span statement. Minor concern."
         }
       ]
     },
@@ -39,7 +39,7 @@
           "ruleName": "One achievement per bullet",
           "severity": "warning",
           "excerpt": "Managed the enterprise data platform on Snowflake and Amazon Web Services, processing petabytes of healthcare data from hundreds of heterogeneous sources in support of Arine's medication management and clinical decision support products (Arine serves 45+ health plans and over 30 million members).",
-          "explanation": "This bullet packs together the platform management responsibility, the data scale (petabytes from hundreds of sources), the product context (medication management and clinical decision support), and the company metrics (45+ health plans, 30 million members) into a single dense sentence. While the metrics are properly attributed to Arine, the bullet could be clearer if the company-scale context were separated from the technical achievement."
+          "explanation": "This bullet combines platform management, data processing scale, product context, and company metrics into a single dense sentence. While the metrics are correctly attributed to Arine, the bullet packs multiple facts (platform management + scale description + company metrics) that could be separated for clarity."
         }
       ]
     }

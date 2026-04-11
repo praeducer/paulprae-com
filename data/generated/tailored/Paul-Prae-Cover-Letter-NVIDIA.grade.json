@@ -1,6 +1,6 @@
 {
   "file": "data/generated/tailored/Paul-Prae-Cover-Letter-NVIDIA.md",
-  "overallScore": 46,
+  "overallScore": 47,
   "maxScore": 50,
   "categories": [
     {
@@ -9,11 +9,11 @@
       "maxScore": 10,
       "violations": [
         {
-          "ruleId": "G1",
-          "ruleName": "Entity-scope binding",
+          "ruleId": "G7",
+          "ruleName": "SCOPE BOUNDARY markers",
           "severity": "info",
-          "excerpt": "managed the enterprise data platform supporting AI-driven medication management for a company that serves 45+ health plans and over 30 million members — building HIPAA-compliant AI agents and observability tooling for an autonomous pharmacist AI system",
-          "explanation": "This sentence chains Arine's company-level metrics (45+ health plans, 30 million members) directly into Paul's personal work description (building AI agents and observability tooling) in a single long clause. While all facts are from Arine, the dash-connected construction could imply Paul's individual work touched all 45+ health plans and 30M members. The grounded source explicitly describes those as company-level metrics. This is borderline — the phrasing 'for a company that serves' does provide attribution — but the tight coupling is worth noting."
+          "excerpt": "Florence operates 10,000+ research sites across 45 countries",
+          "explanation": "The scope boundary for the Florence Healthcare engagement explicitly states: 'These 10,000+ sites / 45 countries / 5.5M monthly activities metrics describe Florence Healthcare's platform scale (the client), not Paul's personal scope or team size. Always attribute the platform scale to Florence Healthcare, not to Paul or Hyperbloom as a whole.' The letter does parenthetically attribute these to Florence, which partially satisfies the requirement, but the phrasing embeds Florence's scale metrics within a paragraph about Paul's Hyperbloom engagements in a way that could imply Hyperbloom operated at that scale. This is a minor issue since 'Florence operates' does attribute correctly."
         }
       ]
     },
@@ -31,9 +31,9 @@
         {
           "ruleId": "V5",
           "ruleName": "No superfluous commentary",
-          "severity": "info",
+          "severity": "warning",
           "excerpt": "are all in my background today",
-          "explanation": "The closing phrase 'are all in my background today' is mildly superfluous — the entire letter has just demonstrated this. It approaches a 'precisely the kind of' or 'uniquely positioned' feel, though it is more restrained. Minor deduction."
+          "explanation": "The phrase 'are all in my background today' is a mild instance of superfluous editorial commentary — the preceding sentence already establishes the claim. It's not as egregious as the listed examples ('uniquely positioned', 'precisely the kind of') but follows the same pattern of telling the reader what to conclude rather than letting the facts speak."
         }
       ]
     },
@@ -47,23 +47,15 @@
           "ruleName": "No fluff",
           "severity": "info",
           "excerpt": "I'd welcome a conversation about this role and am available at your convenience.",
-          "explanation": "This is a generic closing line that adds no information content. It is standard cover letter convention, but under strict Q1 it is a sentence that could be removed without reducing information content."
+          "explanation": "This is a standard closing line but carries zero information content. It is formulaic filler — every applicant is available. Removing it would not reduce the document's substance."
         }
       ]
     },
     {
       "category": "cover_letter",
-      "score": 9,
+      "score": 10,
       "maxScore": 10,
-      "violations": [
-        {
-          "ruleId": "CL5",
-          "ruleName": "Human-written feel",
-          "severity": "warning",
-          "excerpt": "My healthcare AI work spans payors, clinical trials, genomics, and neuroimaging. Most recently at Arine, I managed the enterprise data platform... At Booz Allen Hamilton, I worked on AI products...",
-          "explanation": "The body paragraphs follow a mechanical pattern: topic sentence followed by 'At [Company], I did X. At [Company], I did Y.' repeated across paragraphs 2, 3, and 4. This parallel structure across multiple paragraphs creates a pattern-matching feel that could signal AI generation. Varying the paragraph structures more would help."
-        }
-      ]
+      "violations": []
     }
   ]
 }

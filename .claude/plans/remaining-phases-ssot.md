@@ -163,6 +163,33 @@ Each cutover is a single commit with a regenerate + grade gate. Order matters: s
 21. **Cutover `lib/prompts/cover-letter-writer.system.md`** — replace voice/grounding blocks with placeholders. Regenerate NVIDIA cover letter with `--force`, re-grade. **Gate:** score must not drop more than 1 point from the current 46/50.
 22. **Cutover `lib/prompts/resume-writer.system.md`** — highest risk, biggest payoff. Replace `<brand_voice>` DO/DONT lists (lines 31-47), `<quality_rules>` Rules 1-10 (lines 138-217), `<acceptance_criteria>` (lines 231-244) with `{{ACTION_VERBS}}` + `{{PHRASE_BLOCKLIST_PROSE}}` + `{{FORMAT_RULES_PROSE}}` + `{{WRITING_RULES_PROSE}}`. Keep structural sections inline (`<resume_format>`, `<tailoring_strategy>`, `<knowledge_base_strategy>`, `<security_rules>`, `<output_instructions>`). Regenerate main resume AND NVIDIA resume. Diff both outputs against pre-cutover. Run grader. **Gate:** grader score drop ≤1 point, validator warning count ≤ previous count + 1.
 
+### Phase A6 — Position-overlap detector (fraud prevention)
+
+**Motivation:** During the 2026-04-11 session, Paul caught two fraud-detection issues in the career data (Hyperbloom falsely starting Jan 2020 while Paul was at AWS; NeuroLex/Decooda falsely extending Jan 2018 – May 2020 overlapping Slalom + AWS). Both were pre-existing drift from stale LinkedIn CSV data. The existing validator and grader did not catch them because they had no temporal-overlap invariant — only structural/semantic rules. Paul had to spot them by manual review.
+
+A general position-overlap detector in `lib/resume-validator.ts` would catch this class of error automatically. Rules:
+
+1. **Two positions with `employment_type: "full-time"` cannot overlap temporally.** If `posA.endDate > posB.startDate` and both are full-time at different companies, flag as a warning (or error, if strict mode).
+2. **`employment_type: "self-employed"` can overlap anything** (own-business roles legitimately coexist with W2 employment).
+3. **`employment_type: "part-time"` can overlap full-time** (moonlighting is legitimate).
+4. **`employment_type: "contract"` and "internship" can overlap** each other and full-time roles.
+5. **Positions in the same company with different role IDs** (e.g., promotions) are allowed to overlap or touch by 0 months.
+6. **Current position** (`is_current: true`) has effective end date = today.
+
+Proposed file: `lib/resume-validator.ts` gains a `detectOverlaps(careerData)` helper called from the main `validateResume()` entry point. The helper walks the positions array pairwise, applies the rules above, and adds warnings like:
+
+```
+Position overlap: "NeuroLex Labs" (2018-01 → 2020-05, full-time) overlaps "Amazon Web Services" (2018-08 → 2021-05, full-time). Either one is part-time/self-employed, or one of the dates is wrong.
+```
+
+The `employment_type` metadata for each position needs to be available in `careerData.positions` for this check to work. Today `positions.json` has `employment_type` but `career-data.json` positions may not (they come from LinkedIn CSV which doesn't always export employment type). The Phase A1 schema work should normalize `employment_type` onto every position.
+
+**Test coverage for Phase A6:** add a test that synthesizes a fake overlapping positions.json and asserts the validator flags it. Snapshot the current real data to prove it passes.
+
+**Priority:** Medium. Both historical fraud issues are now pinned in `tests/data-consistency.test.ts` as hardcoded assertions, so the specific regressions cannot recur. The generalized detector is nice-to-have for future career data changes but not urgent.
+
+---
+
 ### Phase A5 — Remove duplications
 
 23. Delete the `CRITICAL REMINDERS` block from `lib/tailored.ts:144-154`. Rules are now in the system prompt via hydration. Regenerate NVIDIA → re-grade. Gate: no score drop.
