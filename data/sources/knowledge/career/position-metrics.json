@@ -2,7 +2,7 @@
   {
     "category": "achievement",
     "title": "Arine — Healthcare Data Operations Platform",
-    "content": "Staff-level data operations engineering at Arine, a healthcare technology platform that has touched over 30 million client members across 45+ health plans and produces over 40 million recommendations annually. Built HIPAA-compliant AI coding assistants (Data Engineering Agent for autonomous ETL pipeline generation/deployment/testing, Dev Environment Agent for developer onboarding). Managed enterprise data platform on Snowflake and AWS, ingesting and processing petabytes of healthcare data from hundreds of sources. Built observability pipeline for Arine's autonomous pharmacist AI agent (DynamoDB → Snowflake → dbt → QuickSight). Led AI enablement workshops training up to 100 engineers on AI-first development practices. SCOPE BOUNDARY: Paul's role at Arine is data operations engineering (Snowflake, ETL, AI agents, dbt, observability). He does NOT build ML models or ML pipelines at Arine. ML pipeline work was performed at NeuroLex Labs (voice computing) and Slalom Consulting (behavioral health forecasting). Never attribute ML model development to the Arine position.",
+    "content": "Staff-level data operations engineering at Arine, a healthcare technology platform that has touched over 30 million client members across 45+ health plans and produces over 40 million recommendations annually. Built HIPAA-compliant AI coding assistants (Data Engineering Agent for autonomous ETL pipeline generation/deployment/testing, Dev Environment Agent for developer onboarding). Managed enterprise data platform on Snowflake and AWS, ingesting and processing petabytes of healthcare data from hundreds of sources. Built observability pipeline for Arine's autonomous pharmacist AI agent (DynamoDB → Snowflake → transformation layer → QuickSight). Led AI enablement workshops training up to 100 engineers on AI-first development practices. SCOPE BOUNDARY: Paul's role at Arine is data operations engineering (Snowflake, ETL, AI agents, transformation pipelines, observability). He does NOT build ML models or ML pipelines at Arine. ML pipeline work was performed at NeuroLex Labs (voice computing) and Slalom Consulting (behavioral health forecasting). Never attribute ML model development to the Arine position.",
     "tags": ["healthcare", "data-ops", "ai-agents", "snowflake", "aws", "hipaa"],
     "relatedPositions": ["Staff AI DataOps Engineer at Arine"],
     "asOf": "2026-03",
@@ -12,16 +12,20 @@
   {
     "category": "achievement",
     "title": "Booz Allen Hamilton — Healthcare AI Practice Leadership",
-    "content": "Led AI and analytics solution development at Booz Allen Hamilton, a Fortune 500 management consulting firm (27,000+ employees, $9B+ revenue). Operated within their healthcare and life science practice, designing and deploying AI solutions across FedRAMP and HIPAA-compliant environments. Collaborated with cross-functional teams of engineers, data scientists, and domain experts to deliver AI products that harnessed clinical, behavioral, and genomic data for population health, predictive medicine, and research advancements. Addressed algorithmic bias and privacy risks in regulated healthcare AI deployments.",
-    "tags": ["healthcare", "ai", "leadership", "fortune-500", "compliance", "consulting"],
-    "relatedPositions": ["Chief AI Architect, Senior Manager at Booz Allen Hamilton"]
+    "content": "Led AI and analytics solution development at Booz Allen Hamilton, a Fortune 500 management consulting firm (27,000+ employees, $9B+ revenue). Operated within their healthcare and life science practice, designing and deploying AI solutions across FedRAMP and HIPAA-compliant environments. Collaborated with cross-functional teams of engineers, data scientists, and domain experts to deliver AI products that harnessed clinical, behavioral, and genomic data for population health, predictive medicine, and research advancements. Addressed algorithmic bias and privacy risks in regulated healthcare AI deployments. Specific engagements: contributed to AI governance policy development for the FDA Center for Devices and Radiological Health (CDRH) responding to federal AI regulatory requirements; supported vaccine supply chain analytics initiatives; delivered federal healthcare AI workloads in partnership with AWS within Booz Allen's matrixed government contracting ecosystem.",
+    "tags": ["healthcare", "ai", "leadership", "fortune-500", "compliance", "consulting", "fda", "cdrh", "federal"],
+    "relatedPositions": ["Chief AI Architect, Senior Manager at Booz Allen Hamilton"],
+    "confidence": "verified",
+    "source": "position description + Paul's confirmed engagement history"
   },
   {
     "category": "achievement",
     "title": "AWS — Enterprise AI/ML Solutions Architecture Portfolio",
-    "content": "Managed a portfolio of 10+ enterprise accounts as an AI/ML Solutions Architect at Amazon Web Services, serving clients including Cox Enterprises, Cox Automotive (Autotrader, Dealer.com, Kelley Blue Book, Manheim, VinSolutions), Equifax, Jostens, NCR, Accenture, and Deloitte. Engaged nationally as a subject matter expert in artificial intelligence and machine learning. Built proof-of-concept solutions and ran benchmarking experiments that drove production adoption. Delivered technical white papers, presentations, and reference architectures. Partnered with C-suite executives to define technical and business strategies including go-to-market, cost management, and technical recruiting. Spoke at private and public AWS events with diverse stakeholder groups.",
-    "tags": ["aws", "enterprise", "solutions-architecture", "ai", "ml", "c-suite"],
-    "relatedPositions": ["Enterprise AI and ML Solutions Architect at Amazon Web Services"]
+    "content": "Managed a portfolio of 10+ enterprise accounts as an AI/ML Solutions Architect at Amazon Web Services, serving clients including Cox Enterprises, Cox Automotive (Autotrader, Dealer.com, Kelley Blue Book, Manheim, VinSolutions), Equifax, Jostens, NCR, Accenture, and Deloitte. Engaged nationally as a subject matter expert in artificial intelligence and machine learning. Built proof-of-concept solutions and ran benchmarking experiments that drove production adoption. Delivered technical white papers, presentations, and reference architectures. Partnered with C-suite executives to define technical and business strategies including go-to-market, cost management, and technical recruiting. Spoke at private and public AWS events with diverse stakeholder groups. Accenture and Deloitte relationships spanned both roles: they were enterprise accounts in Paul's portfolio AND Global Systems Integrator (GSI) co-sell partners that Paul collaborated with on joint AI/ML solutions and go-to-market motions for other AWS customers.",
+    "tags": ["aws", "enterprise", "solutions-architecture", "ai", "ml", "c-suite", "gsi", "co-sell", "accenture", "deloitte"],
+    "relatedPositions": ["Enterprise AI and ML Solutions Architect at Amazon Web Services"],
+    "confidence": "verified",
+    "source": "position description + Paul's confirmed GSI co-sell engagements"
   },
   {
     "category": "achievement",
@@ -36,29 +40,68 @@
   {
     "category": "achievement",
     "title": "NeuroLex Labs — Healthcare Voice Computing Platform",
-    "content": "Senior AI engineer building voice computing software for the prediction and prevention of neurodegenerative diseases. Architected automated ML pipelines that collected, cleaned, trained, and deployed models processing text and audio data. Drove TDD implementation across the engineering team — introducing regression, functional, load, and integration testing practices. Mentored fellows in the Tribe fellowship program focused on predicting neurodegenerative diseases using voice biomarkers. Evangelized the company and recruited technical team members. Collaborated with executive leadership, researchers, and customers to design features and products. SCOPE BOUNDARY: Paul built ML pipelines and voice computing applications at NeuroLex Labs. This is where his ML model development work happened — not at Arine (where he does data ops).",
-    "tags": ["voice-computing", "ml-pipelines", "healthcare", "tdd", "mentorship", "neurodegenerative"],
+    "content": "Senior AI engineer (part-time/moonlight) building voice computing software for the prediction and prevention of neurodegenerative diseases. Architected automated ML pipelines that collected, cleaned, trained, and deployed models processing text and audio data. Drove TDD implementation across the engineering team — introducing regression, functional, load, and integration testing practices. Mentored fellows in the Tribe fellowship program focused on predicting neurodegenerative diseases using voice biomarkers. Evangelized the company and recruited technical team members. Collaborated with executive leadership, researchers, and customers to design features and products. SCOPE BOUNDARY: Paul worked at NeuroLex as a moonlight/part-time role from Feb 2018 – Jul 2018 while concurrently employed full-time at Decooda (also Feb 2018 – Jul 2018). The ML pipeline and voice computing work at NeuroLex was his ML model development experience — not Arine (where he does data ops).",
+    "tags": ["voice-computing", "ml-pipelines", "healthcare", "tdd", "mentorship", "neurodegenerative", "moonlight"],
     "relatedPositions": ["Senior AI Engineer at NeuroLex Labs"],
-    "asOf": "2020-05",
+    "asOf": "2018-07",
     "source": "position description + neurolex.ai",
     "confidence": "verified"
   },
   {
     "category": "achievement",
     "title": "Hyperbloom — AI Consulting Business",
-    "content": "Founded and operated Hyperbloom, an IT services and consulting business delivering cloud-based AI and data solutions across healthcare, life science, and financial services industries. Led cross-functional teams of sales coordinators, account managers, and solutions architects through the full sales cycle. Grew the business to $1.4M ARR from a $40K initial investment. Built strategic partnerships with research organizations, technology vendors, and consulting firms. Trained engineers on entrepreneurship and mission-driven technology development. Developed product incubation programs supporting new AI ventures. Recruited and retained mission-driven technologists. Operated the business for 5+ years (2020-2025).",
+    "content": "Founded and operated Hyperbloom, an IT services and consulting business delivering cloud-based AI and data solutions across healthcare, life science, and financial services industries. Led cross-functional teams of sales coordinators, account managers, and solutions architects through the full sales cycle. Grew the business to $1.4M ARR from a $40K initial investment. Built strategic partnerships with research organizations, technology vendors, and consulting firms. Trained engineers on entrepreneurship and mission-driven technology development. Developed product incubation programs supporting new AI ventures. Recruited and retained mission-driven technologists. Founded in June 2021 after leaving AWS in May 2021; operated the business for ~4 years (Jun 2021 – Aug 2025); wound down business operations the month before transitioning full-time to Arine in September 2025.",
     "tags": ["entrepreneurship", "ai-consulting", "healthcare", "sales", "leadership", "startup"],
     "relatedPositions": ["Chief AI Officer, Founder at Hyperbloom"],
-    "asOf": "2025-09",
+    "asOf": "2025-08",
     "source": "position description + hyperbloom.ai",
     "confidence": "verified"
   },
   {
     "category": "achievement",
+    "title": "Hyperbloom — Life Science Data Exchange Architecture",
+    "content": "Designed a blockchain-based data exchange architecture for secure life-science data interoperability as a Hyperbloom consulting engagement. The architecture ensured compliance with HIPAA, GDPR, HL7, and CDISC (Clinical Data Interchange Standards Consortium) interoperability standards. Decentralized data exchange design enabled life-science organizations to share research data while maintaining patient privacy and regulatory compliance.",
+    "tags": ["hyperbloom", "blockchain", "life-sciences", "interoperability", "hipaa", "gdpr", "hl7", "cdisc"],
+    "relatedPositions": ["Chief AI Officer, Founder at Hyperbloom"],
+    "confidence": "verified",
+    "source": "Paul's confirmed engagement history + Hyperbloom portfolio"
+  },
+  {
+    "category": "achievement",
+    "title": "Hyperbloom — Genomics Data Lake on AWS",
+    "content": "Built a genomics data lake on AWS as a Hyperbloom consulting engagement, enabling life-science research organizations to ingest, store, and analyze genomics data at scale. The data lake supported downstream analytics and machine learning workloads on AWS-native services.",
+    "tags": ["hyperbloom", "aws", "genomics", "data-lake", "life-sciences"],
+    "relatedPositions": ["Chief AI Officer, Founder at Hyperbloom"],
+    "confidence": "verified",
+    "source": "Paul's confirmed engagement history"
+  },
+  {
+    "category": "achievement",
+    "title": "Hyperbloom — Florence Healthcare Disaster Recovery Engagement",
+    "content": "Architected disaster recovery solutions for Florence Healthcare's clinical-trial management platform as a Hyperbloom consulting engagement. Florence Healthcare operates a clinical-trial platform supporting 10,000+ research sites across 45 countries with 5.5 million remote monitoring activities monthly. SCOPE BOUNDARY: These 10,000+ sites / 45 countries / 5.5M monthly activities metrics describe Florence Healthcare's platform scale (the client), not Paul's personal scope or team size. Paul's individual contribution was the disaster recovery architecture design. Always attribute the platform scale to Florence Healthcare, not to Paul or Hyperbloom as a whole.",
+    "tags": ["hyperbloom", "florence-healthcare", "disaster-recovery", "clinical-trials", "consulting-engagement"],
+    "relatedPositions": ["Chief AI Officer, Founder at Hyperbloom"],
+    "asOf": "2024-12",
+    "source": "Florence Healthcare public materials (platform scale); Paul's engagement scope (DR architecture)",
+    "confidence": "verified"
+  },
+  {
+    "category": "achievement",
     "title": "Slalom Consulting — Multi-Engagement Analytics Practice",
-    "content": "Delivered 7+ client engagements over 2.5 years at Slalom Consulting, a modern consulting firm with 12,000+ employees. Key engagements included: (1) Behavioral healthcare service review application generating $2M+ in consulting revenue, (2) Statewide demand forecasting of behavioral health crisis services across dozens of facilities in Georgia, (3) Solution assessment comparing Azure Bot Service to Amazon Lex for a Fortune 100 insurance company, (4) Multiple public presentations on Azure Machine Learning, AI democratization, and cloud bot architecture. Recognized nationally as a subject matter expert in NLP and machine learning. Known as a domain expert in public sector, healthcare, digital marketing, and AI.",
-    "tags": ["consulting", "analytics", "healthcare", "presentations", "nlp", "azure"],
-    "relatedPositions": ["Advanced Analytics Consultant at Slalom Consulting"]
+    "content": "Delivered 7+ client engagements over 2.5 years at Slalom Consulting, a modern consulting firm with 12,000+ employees. Key engagements included: (1) Behavioral healthcare service review application for Georgia's Department of Behavioral Health and Developmental Disabilities (DBHDD), generating $2M+ in consulting revenue, (2) Statewide demand forecasting of behavioral health crisis services across dozens of facilities in Georgia (also DBHDD), (3) Solution assessment comparing Azure Bot Service to Amazon Lex for a Fortune 100 insurance company, (4) Multiple public presentations on Azure Machine Learning, AI democratization, and cloud bot architecture. Recognized nationally as a subject matter expert in NLP and machine learning. Known as a domain expert in public sector, healthcare, digital marketing, and AI.",
+    "tags": ["consulting", "analytics", "healthcare", "presentations", "nlp", "azure", "dbhdd", "georgia"],
+    "relatedPositions": ["Advanced Analytics Consultant at Slalom Consulting"],
+    "confidence": "verified",
+    "source": "position description + Paul's confirmed client engagement history"
+  },
+  {
+    "category": "achievement",
+    "title": "Personal AI Infrastructure — GPU Hardware and Local LLM Stack",
+    "content": "Runs local AI development infrastructure on NVIDIA consumer GPU hardware including RTX 4090 and RTX 5090 workstations. Uses the hardware for local Large Language Model (LLM) development with Ollama, LM Studio, and Open WebUI running open-source models from the Mistral, Qwen, Llama, and DeepSeek families. Also deploys on AWS and Azure cloud GPU instances for production ML workloads. This personal infrastructure supports Paul's Modular Earth nonprofit AI projects and ongoing AI engineering experimentation. SCOPE: This is Paul's personal development hardware, not a professional engagement. Mention when relevant to candidate-role GPU credibility context.",
+    "tags": ["gpu", "nvidia", "rtx-4090", "rtx-5090", "ollama", "llm", "local-ai", "modular-earth"],
+    "relatedPositions": ["Principal AI Engineer & Architect, Founder at Modular Earth"],
+    "confidence": "verified",
+    "source": "Paul's personal development environment"
   },
   {
     "category": "achievement",
@@ -70,7 +113,7 @@
   {
     "category": "leadership",
     "title": "Engineering Management — Cross-Position Leadership Thread",
-    "content": "Progressive engineering leadership spanning 10+ years across multiple organizations. At Booz Allen Hamilton: collaborated with cross-functional teams to design and deploy AI products for healthcare clients. At AWS: built deep relationships with C-suite executives, led private and public technical events, partnered with sales teams to drive adoption and revenue. At NeuroLex Labs: mentored fellows in the Tribe program for neurodegenerative disease research, evangelized the company and recruited team members, drove TDD implementation across the engineering team. At Decooda: managed diverse teams of data scientists, software engineers, and CX experts; led client service delivery operations; established processes and tooling to improve organizational efficiency; engaged weekly in recruiting and hiring. At Slalom: delivered technical training to audiences spanning executives, nurses, and developers; grew the AI business through workshops and sales support. At Hyperbloom: led teams of sales coordinators, account managers, and solutions architects; trained engineers on entrepreneurship; recruited mission-driven technologists. At Mento: delivered science-backed executive coaching with 93% client-reported performance improvement and 100% leadership satisfaction.",
+    "content": "Cross-organization engineering leadership over 10+ years across multiple companies. At Booz Allen Hamilton: collaborated with cross-functional teams to design and deploy AI products for healthcare clients. At AWS: built deep relationships with C-suite executives, led private and public technical events, partnered with sales teams to drive adoption and revenue. At NeuroLex Labs: mentored fellows in the Tribe program for neurodegenerative disease research, evangelized the company and recruited team members, drove TDD implementation across the engineering team. At Decooda: managed diverse teams of data scientists, software engineers, and CX experts; led client service delivery operations; established processes and tooling to improve organizational efficiency; engaged weekly in recruiting and hiring. At Slalom: delivered technical training to audiences spanning executives, nurses, and developers; grew the AI business through workshops and sales support. At Hyperbloom: led teams of sales coordinators, account managers, and solutions architects; trained engineers on entrepreneurship; recruited mission-driven technologists. At Mento: delivered science-backed executive coaching with 93% client-reported performance improvement and 100% leadership satisfaction.",
     "tags": ["leadership", "management", "mentoring", "hiring", "coaching", "team-building"],
     "relatedPositions": [
       "Chief AI Architect, Senior Manager at Booz Allen Hamilton",

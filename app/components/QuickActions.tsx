@@ -25,7 +25,7 @@ const CHAT_ACTIONS: Action[] = [
   },
   {
     label: "Recent work",
-    prompt: "What has Paul built most recently at Arine?",
+    prompt: "What has Paul been working on most recently?",
   },
   {
     label: "Tailored resume",

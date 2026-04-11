@@ -25,7 +25,7 @@ Generate a professional resume in Markdown format from the structured career dat
 - **Resume headline:** "Principal AI Engineer & Architect" (use this exact title in the resume header — this is the canonical brand title)
 - **Target roles:** Principal AI Engineer, Solutions Architect, Director of AI, Head of AI Engineering
 - **Target companies:** NVIDIA, Microsoft, AWS, Google, Anthropic, Perplexity, Cursor, Mistral, and well-funded AI startups
-- **Key differentiators:** AI engineering leadership, healthcare domain expertise (Arine, BCBS, Humana ecosystem), Fortune 500 enterprise delivery (AWS, Microsoft, Slalom), full-stack spanning data engineering, ML systems, and cloud infrastructure
+- **Key differentiators:** AI engineering leadership, healthcare domain expertise (Autonomize AI, Arine, BCBS, Humana ecosystem), Fortune 500 enterprise delivery (AWS, Microsoft, Slalom), full-stack spanning data engineering, ML systems, and cloud infrastructure
   </candidate_profile>
 
 <brand_voice>
@@ -130,61 +130,10 @@ IMPORTANT: Insert a blank line between each category so they render as separate 
 </resume_format>
 
 <grounding_rules>
-These rules are MANDATORY. They prevent the most common and damaging errors in AI-generated resumes: hallucinated metrics, cross-entity conflation, and misattributed work.
+Follow ALL grounding, ethics, voice, and quality rules provided in the <writing_rules> section of the user message. These rules are mandatory and override any conflicting instructions.
 
-### Rule G1: Entity-Scope Binding
-
-Every metric, number, or achievement in a bullet point must be attributed to exactly ONE company and ONE role. Never merge metrics from different companies into a single sentence or bullet point.
-
-BAD: "Built ML pipelines serving 50M+ health plan members" (merges ML work from Company A with member count from Company B)
-GOOD: "Managed enterprise data platform processing petabytes of healthcare data across 45+ health plans" (single company's data, single company's metric)
-
-### Rule G2: Role-Work Alignment
-
-A bullet point for Position X must ONLY describe work actually performed in that role. Do not attribute capabilities or outcomes from other positions.
-
-Before writing each bullet, ask: "Did the candidate actually do THIS specific work at THIS specific company?" If the answer is uncertain, do not include it.
-
-Examples of violations to avoid:
-
-- Attributing ML pipeline work to a data operations role
-- Attributing data engineering work to a consulting/advisory role
-- Combining a company's scale metric with a different company's technical work
-
-### Rule G3: Temporal Freshness
-
-When the career data includes company entries with `metrics` and `metricsAsOf` fields, ALWAYS use those verified numbers. Never use approximations, round-ups, or numbers from other sources that contradict the verified metrics.
-
-If a company entry says `"healthPlans": "45+"` with `"metricsAsOf": "2026-03"`, use "45+ health plans" — not "50+", not "30+".
-
-### Rule G4: Source Grounding
-
-When knowledge base entries have `source` and `confidence` fields, treat entries with `confidence: "verified"` as authoritative. When entries have `confidence: "estimated"`, use ranges rather than precise numbers.
-
-### Rule G5: Cross-Reference Prohibition
-
-Do NOT combine a company's scale metric (e.g., member count, revenue) with a different company's technical work (e.g., ML pipelines, platform architecture) to create compound claims.
-
-BAD: "ML pipelines for clinical decision support covering 50M+ health plan members" (ML pipelines were at NeuroLex/Slalom; member count is Arine's)
-GOOD: "Architected automated ML pipelines for healthcare voice computing — collecting, cleaning, training, and deploying models for neurodegenerative disease prediction" (NeuroLex work described with NeuroLex context only)
-
-### Rule G6: Professional Summary Integrity
-
-The Professional Summary must not create novel compound claims by chaining facts from different roles. Each clause should be traceable to a specific position or clearly stated as a career-spanning capability. List capabilities separately rather than merging them into misleading run-on constructions.
-
-### Rule G7: SCOPE BOUNDARY Markers
-
-Some knowledge base entries contain "SCOPE BOUNDARY" notes that explicitly state what work was and was NOT performed in a given role. These markers are mandatory constraints — never generate content that contradicts a SCOPE BOUNDARY.
-
-### Rule G8: Self-Check Before Finalizing
-
-Before finalizing the resume, verify:
-
-1. Every number cited appears in the provided data and is attributed to the correct company
-2. No bullet merges facts from different companies
-3. The Professional Summary does not contain compound claims that conflate different roles
-4. All company metrics match the `metrics` fields in company data (when available)
-   </grounding_rules>
+The writing rules cover: entity-scope binding, role-work alignment, temporal freshness, source grounding, cross-reference prohibition, summary integrity, scope boundary markers, self-check verification, and content ethics. Refer to the specific rule IDs (G1-G8, E1-E6, V1-V8, Q1-Q6) for details.
+</grounding_rules>
 
 <quality_rules>
 

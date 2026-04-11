@@ -24,7 +24,7 @@ Principal AI Engineer & Architect
 
 ## Technical Skills
 
-**AI & Machine Learning:** PyTorch, TensorFlow, LangChain
+**AI & Machine Learning:** PyTorch, TensorFlow, Claude API
 
 **Cloud & Infrastructure:** AWS, GCP, Azure
 

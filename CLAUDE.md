@@ -1,5 +1,9 @@
 # CLAUDE.md — Project Memory for Claude Code
 
+## 🛑 First thing to do in any session: read `.claude/plans/README.md`
+
+The `.claude/plans/` directory contains the in-repo planning docs for active branches. The README there is the session-start entry point — it documents current state, authoritative career timeline, how to iterate on the NVIDIA submission content, fraud-detection history, and common gotchas. Read it before editing career data or generated content.
+
 ## Project Overview
 
 **paulprae.com** is an AI-powered career platform that positions Paul Prae as a Principal AI Engineer & Architect. The site features an AI chat assistant for recruiter Q&A, tailored resume generation, and job search tools — all grounded in structured career data.
@@ -69,7 +73,7 @@ When generating resume content or any copy for paulprae.com, follow these guidel
 - **Perspective:** Third-person professional (no "I" statements)
 - **Emphasis areas:**
   - AI engineering leadership and architecture
-  - Healthcare domain expertise (Arine, BCBS, Humana ecosystem)
+  - Healthcare domain expertise (Autonomize AI, Arine, BCBS, Humana ecosystem)
   - Fortune 500 and enterprise delivery track record (AWS, Microsoft, Slalom)
   - Full-stack capability spanning data engineering, ML systems, and cloud infrastructure
 - **Quantify impact** wherever data supports it (e.g., "reduced pipeline failures by 40%")

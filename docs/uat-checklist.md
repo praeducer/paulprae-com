@@ -10,7 +10,7 @@ Run this checklist after every major deployment. Automated tests (unit, E2E, CI 
 
 ```bash
 npm run check:quick   # data files, resume quality, public download sync
-npx vitest run        # unit + component tests (493+ tests)
+npx vitest run        # unit + component tests (535+ tests)
 npx tsc --noEmit      # TypeScript compilation
 npx eslint .          # linting
 ```
@@ -59,7 +59,7 @@ The goal: earn trust through **absolute honesty and accuracy** and leave a **mem
 > Give me a quick overview of Paul.
 
 - [ ] Response is 150-300 words (concise, not a wall of text)
-- [ ] Mentions current role (Arine), key past employers (AWS, Microsoft, Booz Allen Hamilton, Slalom)
+- [ ] Mentions current role (Autonomize AI), key past employers (Arine, AWS, Microsoft, Booz Allen Hamilton, Slalom)
 - [ ] Includes healthcare domain expertise
 - [ ] No emojis in headings or body text
 - [ ] Ends with follow-up suggestions (plain dashes, no emojis)
@@ -79,7 +79,7 @@ The goal: earn trust through **absolute honesty and accuracy** and leave a **mem
 Send these in sequence:
 
 > 1. "Does Paul have experience with data pipelines?"
-> 2. "Tell me more about the Arine work."
+> 2. "Tell me more about Paul's time at Arine."
 > 3. "How does that compare to what he did at AWS?"
 
 - [ ] Turn 1: cites specific roles with data pipeline work (Arine, Slalom, TReNDS)
@@ -227,6 +227,35 @@ Test on a real phone or browser DevTools (375px width):
 
 - [ ] Chrome: all features work
 - [ ] Safari/Firefox: basic chat flow works, no layout breaks
+
+---
+
+## 13. Autonomize AI Transition (April 2026 deployment)
+
+Critical assertions for the career data update. All must pass before merging PR #39.
+
+### Resume Content
+
+- [ ] `/resume` page: **Autonomize AI** is the FIRST position under Professional Experience
+- [ ] Autonomize AI shows "Apr 2026 – Present" and "Solutions Architect"
+- [ ] Arine shows "Sep 2025 – Mar 2026" (past tense, NOT current)
+- [ ] Hyperbloom shows "Jun 2021 – Aug 2025" (NOT Jan 2020)
+- [ ] Professional Summary says "13+ years" (NOT 15)
+- [ ] Professional Summary mentions "Autonomize AI"
+- [ ] No mention of dbt, LangChain, n8n, or Rust anywhere on the resume page
+- [ ] PDF download opens and shows Autonomize AI as first position
+
+### Chat Verification
+
+- [ ] Ask "Where does Paul work now?" → response mentions **Autonomize AI**, Solutions Architect
+- [ ] Ask "Tell me about Paul's time at Arine" → response uses **past tense**, dates Sep 2025 – Mar 2026
+- [ ] Ask "What is Paul's current role?" → response says Solutions Architect at Autonomize AI
+- [ ] Hero description says "Currently Solutions Architect at Autonomize AI"
+
+### Data Integrity
+
+- [ ] No "at Arine" appears in quick action chips or hero description
+- [ ] "Book Interview" CTA still works (not affected by career data changes)
 
 ---
 

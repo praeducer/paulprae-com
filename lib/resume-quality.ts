@@ -27,6 +27,7 @@ export interface ResumeQualityScore {
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 export const MAJOR_COMPANIES = [
+  "Autonomize AI",
   "Arine",
   "Booz Allen Hamilton",
   "Amazon Web Services",
@@ -34,7 +35,6 @@ export const MAJOR_COMPANIES = [
   "Red Ventures",
   "Microsoft",
   "Hyperbloom",
-  "Modular Earth",
   "Mento",
   "TReNDS",
   "NeuroLex",

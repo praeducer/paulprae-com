@@ -39,8 +39,9 @@ data/generated/resume.docx
 # Pipeline: staging resume (transient, not yet approved for deploy)
 data/generated/*.staging.md
 
-# Pipeline: tailored resumes (generated on-demand, contain company-specific content)
-data/generated/tailored/
+# Pipeline: tailored resume/cover-letter binary exports (regenerable via pandoc)
+data/generated/tailored/*.pdf
+data/generated/tailored/*.docx
 
 # Pipeline: skip-logic hash (machine-local, regenerated each run)
 data/generated/.ingest-hash

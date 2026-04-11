@@ -23,7 +23,10 @@ import {
   SITE_NAME,
   SITE_SUBTITLE,
   SITE_DOMAIN,
-  HERO_DESCRIPTION,
+  HERO_EXPERIENCE,
+  CURRENT_EMPLOYER,
+  CURRENT_EMPLOYER_URL,
+  CURRENT_ROLE_TITLE,
   GITHUB_URL,
   GITHUB_PROFILE_URL,
   CONTACT_EMAIL,
@@ -327,8 +330,20 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                           <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
                             {SITE_SUBTITLE}
                           </p>
-                          <p className="mt-2 sm:mt-3 hidden sm:block max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-                            {HERO_DESCRIPTION}
+                          <p className="mt-3 hidden max-w-lg text-sm leading-relaxed text-slate-500 sm:block dark:text-slate-400">
+                            {HERO_EXPERIENCE} Currently {CURRENT_ROLE_TITLE} at{" "}
+                            {CURRENT_EMPLOYER_URL ? (
+                              <a
+                                href={CURRENT_EMPLOYER_URL}
+                                className="text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-blue-700 hover:decoration-blue-300 dark:text-slate-300 dark:decoration-slate-600 dark:hover:text-blue-400"
+                                {...externalLinkProps(CURRENT_EMPLOYER_URL)}
+                              >
+                                {CURRENT_EMPLOYER}
+                              </a>
+                            ) : (
+                              CURRENT_EMPLOYER
+                            )}
+                            .
                           </p>
                           <p className="mt-2 max-w-lg text-xs text-slate-600 dark:text-slate-400">
                             Ask about Paul&apos;s experience, download his resume, or request a
