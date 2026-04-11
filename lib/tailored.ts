@@ -20,7 +20,7 @@ import { estimateCost, logGeneration, formatTelemetrySummary } from "./ai/index.
 import type { GenerationTelemetry, FullGenerationResponse } from "./ai/index.js";
 
 // Load environment variables from .env.local
-config({ path: PATHS.envFile });
+config({ path: PATHS.envFile, override: true });
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

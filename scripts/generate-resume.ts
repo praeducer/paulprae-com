@@ -38,7 +38,7 @@ import type { GenerationTelemetry } from "../lib/ai/index.js";
 import { scoreResume, formatScoreReport, MAJOR_COMPANIES } from "../lib/resume-quality.js";
 
 // Load environment variables from .env.local
-config({ path: PATHS.envFile });
+config({ path: PATHS.envFile, override: true });
 
 // ─── Skip Logic ──────────────────────────────────────────────────────────────
 
