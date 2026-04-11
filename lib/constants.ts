@@ -21,16 +21,16 @@ export const BOOK_INTERVIEW_URL =
 export const YEARS_EXPERIENCE = "13+";
 
 /** Default meta description for the homepage / layout. */
-export const SITE_DESCRIPTION = `Chat with an AI assistant about ${SITE_NAME}'s career. ${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.`;
+export const SITE_DESCRIPTION = `Chat with an AI assistant about ${SITE_NAME}'s career. ${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and consulting.`;
 
 /** OG / Twitter meta description — punchier, lead with tagline. */
-export const SITE_OG_DESCRIPTION = `${SITE_TAGLINE}. ${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance.`;
+export const SITE_OG_DESCRIPTION = `${SITE_TAGLINE}. ${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and consulting.`;
 
 /** Hero description shown on the chat homepage.
  *  The second sentence is derived from career-data.json via the generated
  *  current-role constants (no hardcoded employer name). Regenerate with
  *  `npm run build:prompts` when Paul's role changes. */
-export const HERO_DESCRIPTION = `${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and insurance. ${CURRENT_ROLE_HERO}`;
+export const HERO_DESCRIPTION = `${YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and Fortune 500 across healthcare, life science, and consulting. ${CURRENT_ROLE_HERO}`;
 
 // ─── External Links ─────────────────────────────────────────────────────────
 

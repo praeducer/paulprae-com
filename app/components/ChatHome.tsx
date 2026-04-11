@@ -24,6 +24,7 @@ import {
   SITE_SUBTITLE,
   SITE_DOMAIN,
   HERO_DESCRIPTION,
+  YEARS_EXPERIENCE,
   GITHUB_URL,
   GITHUB_PROFILE_URL,
   CONTACT_EMAIL,
@@ -328,7 +329,17 @@ export default function ChatHome({ mode = "chat" }: ChatHomeProps) {
                             {SITE_SUBTITLE}
                           </p>
                           <p className="mt-2 sm:mt-3 hidden sm:block max-w-lg text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-                            {HERO_DESCRIPTION}
+                            {YEARS_EXPERIENCE} years delivering enterprise AI at AWS, Microsoft, and
+                            Fortune 500 across healthcare, life science, and consulting. Currently
+                            Solutions Architect at{" "}
+                            <a
+                              href="https://autonomize.ai"
+                              className="text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-blue-700 hover:decoration-blue-300 dark:text-slate-300 dark:decoration-slate-600 dark:hover:text-blue-400"
+                              {...externalLinkProps("https://autonomize.ai")}
+                            >
+                              Autonomize AI
+                            </a>
+                            .
                           </p>
                           <p className="mt-2 max-w-lg text-xs text-slate-600 dark:text-slate-400">
                             Ask about Paul&apos;s experience, download his resume, or request a
