@@ -40,10 +40,10 @@
   {
     "category": "achievement",
     "title": "NeuroLex Labs — Healthcare Voice Computing Platform",
-    "content": "Senior AI engineer building voice computing software for the prediction and prevention of neurodegenerative diseases. Architected automated ML pipelines that collected, cleaned, trained, and deployed models processing text and audio data. Drove TDD implementation across the engineering team — introducing regression, functional, load, and integration testing practices. Mentored fellows in the Tribe fellowship program focused on predicting neurodegenerative diseases using voice biomarkers. Evangelized the company and recruited technical team members. Collaborated with executive leadership, researchers, and customers to design features and products. SCOPE BOUNDARY: Paul built ML pipelines and voice computing applications at NeuroLex Labs. This is where his ML model development work happened — not at Arine (where he does data ops).",
-    "tags": ["voice-computing", "ml-pipelines", "healthcare", "tdd", "mentorship", "neurodegenerative"],
+    "content": "Senior AI engineer (part-time/moonlight) building voice computing software for the prediction and prevention of neurodegenerative diseases. Architected automated ML pipelines that collected, cleaned, trained, and deployed models processing text and audio data. Drove TDD implementation across the engineering team — introducing regression, functional, load, and integration testing practices. Mentored fellows in the Tribe fellowship program focused on predicting neurodegenerative diseases using voice biomarkers. Evangelized the company and recruited technical team members. Collaborated with executive leadership, researchers, and customers to design features and products. SCOPE BOUNDARY: Paul worked at NeuroLex as a moonlight/part-time role from Feb 2018 – Jul 2018 while concurrently employed full-time at Decooda (also Feb 2018 – Jul 2018). The ML pipeline and voice computing work at NeuroLex was his ML model development experience — not Arine (where he does data ops).",
+    "tags": ["voice-computing", "ml-pipelines", "healthcare", "tdd", "mentorship", "neurodegenerative", "moonlight"],
     "relatedPositions": ["Senior AI Engineer at NeuroLex Labs"],
-    "asOf": "2020-05",
+    "asOf": "2018-07",
     "source": "position description + neurolex.ai",
     "confidence": "verified"
   },

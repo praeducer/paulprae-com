@@ -63,7 +63,7 @@ AI engineering leader with 13+ years delivering enterprise AI solutions for heal
 
 ### Senior AI Engineer
 
-**NeuroLex Labs** | Atlanta, GA | Jan 2018 – May 2020
+**NeuroLex Labs** | Atlanta, GA | Feb 2018 – Jul 2018
 
 - Architected automated ML pipelines for healthcare voice computing — collecting, cleaning, training, and deploying models processing text and audio data for neurodegenerative disease prediction.
 - Drove test-driven development practices across the engineering team, introducing regression, functional, load, and integration testing.

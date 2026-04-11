@@ -68,7 +68,7 @@ AI and data engineering leader with 13+ years building enterprise solutions acro
 
 ### Senior AI Engineer
 
-**NeuroLex Labs** | Greater Atlanta Area | Jan 2018 – May 2020
+**NeuroLex Labs** | Greater Atlanta Area | Feb 2018 – Jul 2018
 
 - Architected automated ML pipelines for healthcare voice computing — collecting, cleaning, training, and deploying models processing text and audio data for neurodegenerative disease prediction
 - Drove TDD adoption across the engineering team with 4 testing types (regression, functional, load, integration); mentored international fellows in the Tribe program for neurodegenerative disease research

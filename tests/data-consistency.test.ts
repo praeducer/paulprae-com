@@ -116,6 +116,66 @@ describe("data consistency — career-data.json", () => {
     expect(hyperbloom?.endDate).toBe("2025-08");
   });
 
+  it("NeuroLex Labs position has authoritative dates (Feb 2018 → Jul 2018, part-time moonlight)", () => {
+    // CRITICAL: Paul moonlighted at NeuroLex Labs as a part-time role while
+    // full-time at Decooda from Feb 2018 – Jul 2018. Any longer duration
+    // (e.g., "Jan 2018 – May 2020" that was on LinkedIn) is a fabrication
+    // that overlaps with Slalom (ended Jan 2018) and AWS (started Aug 2018).
+    // Fraud-detection check flagged by Paul on 2026-04-11.
+    const neurolex = career.positions.find((p) => p.company === "NeuroLex Labs");
+    expect(neurolex, "NeuroLex Labs position must exist").toBeDefined();
+    expect(neurolex?.startDate).toBe("2018-02");
+    expect(neurolex?.endDate).toBe("2018-07");
+  });
+
+  it("Decooda position has authoritative dates (Feb 2018 → Jul 2018, full-time)", () => {
+    // CRITICAL: Paul was at Decooda full-time Feb 2018 – Jul 2018 between
+    // Slalom and AWS. Any other dates are stale LinkedIn data. Fraud-
+    // detection check flagged by Paul on 2026-04-11.
+    const decooda = career.positions.find((p) => p.company === "Decooda");
+    expect(decooda, "Decooda position must exist").toBeDefined();
+    expect(decooda?.startDate).toBe("2018-02");
+    expect(decooda?.endDate).toBe("2018-07");
+  });
+
+  it("Slalom end date precedes NeuroLex and Decooda start dates (no overlap)", () => {
+    const slalom = career.positions.find((p) => p.company === "Slalom Consulting");
+    const neurolex = career.positions.find((p) => p.company === "NeuroLex Labs");
+    const decooda = career.positions.find((p) => p.company === "Decooda");
+    expect(slalom?.endDate).toBeTruthy();
+    expect(neurolex?.startDate).toBeTruthy();
+    expect(decooda?.startDate).toBeTruthy();
+    const slalomEnd = slalom?.endDate ?? "";
+    const neurolexStart = neurolex?.startDate ?? "";
+    const decoodaStart = decooda?.startDate ?? "";
+    expect(
+      slalomEnd < neurolexStart,
+      `Slalom ${slalomEnd} must end before NeuroLex ${neurolexStart}`,
+    ).toBe(true);
+    expect(
+      slalomEnd < decoodaStart,
+      `Slalom ${slalomEnd} must end before Decooda ${decoodaStart}`,
+    ).toBe(true);
+  });
+
+  it("NeuroLex and Decooda end dates precede AWS start date (no overlap)", () => {
+    const neurolex = career.positions.find((p) => p.company === "NeuroLex Labs");
+    const decooda = career.positions.find((p) => p.company === "Decooda");
+    const aws = career.positions.find((p) => p.company === "Amazon Web Services");
+    expect(neurolex?.endDate).toBeTruthy();
+    expect(decooda?.endDate).toBeTruthy();
+    expect(aws?.startDate).toBeTruthy();
+    const neurolexEnd = neurolex?.endDate ?? "";
+    const decoodaEnd = decooda?.endDate ?? "";
+    const awsStart = aws?.startDate ?? "";
+    expect(neurolexEnd < awsStart, `NeuroLex ${neurolexEnd} must end before AWS ${awsStart}`).toBe(
+      true,
+    );
+    expect(decoodaEnd < awsStart, `Decooda ${decoodaEnd} must end before AWS ${awsStart}`).toBe(
+      true,
+    );
+  });
+
   it("AWS end date precedes Hyperbloom start date (no overlap)", () => {
     // Paul quit AWS before founding Hyperbloom. The career data must
     // reflect this — AWS endDate must be earlier than Hyperbloom startDate.
