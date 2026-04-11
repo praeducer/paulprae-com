@@ -95,14 +95,27 @@ Each logical unit is its own commit, and EVERY commit is pushed immediately to o
 
 Do NOT merge to main. The PR stays open for Paul to merge Sunday April 12.
 
-## Checkpoints if I (the current agent) don't finish
+## STATUS: COMPLETE — PR #38 open and ready for review
 
-After every commit + push, this file is up-to-date. The branch on GitHub is the canonical state. If a new agent picks up:
+All 5 commits landed, pushed, and passing:
 
-1. `git checkout feat/autonomize-ai-career-update && git pull`
-2. Read this file top to bottom.
-3. `git log origin/main..HEAD --oneline` to see what's done.
-4. Continue from the next unchecked commit in the sequence above.
+1. ✅ `docs: autonomize transition handoff docs`
+2. ✅ `feat: derive current role from career data at build time` (Phase 2 tooling)
+3. ✅ `feat: add Autonomize AI and end-date Arine in career data` (Phase 1 data)
+4. ✅ `chore: regenerate career-data.json + system prompts for Autonomize`
+5. ✅ `feat: regenerate resume + exports for Autonomize AI role`
+
+PR: https://github.com/praeducer/paulprae-com/pull/38
+Tests: 493 passed, 0 failed
+Build: clean, zero TypeScript errors
+Resume quality: 423 (+5% over previous)
+
+Remaining manual QA (Paul to do before merge):
+
+- Chat: "Where do you work now?" → expect Autonomize AI
+- `/resume` page: Autonomize first position
+- PDF download: renders correctly
+- Professional summary: says "13+ years" (not 15)
 
 ## Known gotchas
 
