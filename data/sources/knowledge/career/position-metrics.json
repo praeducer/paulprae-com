@@ -12,16 +12,20 @@
   {
     "category": "achievement",
     "title": "Booz Allen Hamilton — Healthcare AI Practice Leadership",
-    "content": "Led AI and analytics solution development at Booz Allen Hamilton, a Fortune 500 management consulting firm (27,000+ employees, $9B+ revenue). Operated within their healthcare and life science practice, designing and deploying AI solutions across FedRAMP and HIPAA-compliant environments. Collaborated with cross-functional teams of engineers, data scientists, and domain experts to deliver AI products that harnessed clinical, behavioral, and genomic data for population health, predictive medicine, and research advancements. Addressed algorithmic bias and privacy risks in regulated healthcare AI deployments.",
-    "tags": ["healthcare", "ai", "leadership", "fortune-500", "compliance", "consulting"],
-    "relatedPositions": ["Chief AI Architect, Senior Manager at Booz Allen Hamilton"]
+    "content": "Led AI and analytics solution development at Booz Allen Hamilton, a Fortune 500 management consulting firm (27,000+ employees, $9B+ revenue). Operated within their healthcare and life science practice, designing and deploying AI solutions across FedRAMP and HIPAA-compliant environments. Collaborated with cross-functional teams of engineers, data scientists, and domain experts to deliver AI products that harnessed clinical, behavioral, and genomic data for population health, predictive medicine, and research advancements. Addressed algorithmic bias and privacy risks in regulated healthcare AI deployments. Specific engagements: contributed to AI governance policy development for the FDA Center for Devices and Radiological Health (CDRH) responding to federal AI regulatory requirements; supported vaccine supply chain analytics initiatives; delivered federal healthcare AI workloads in partnership with AWS within Booz Allen's matrixed government contracting ecosystem.",
+    "tags": ["healthcare", "ai", "leadership", "fortune-500", "compliance", "consulting", "fda", "cdrh", "federal"],
+    "relatedPositions": ["Chief AI Architect, Senior Manager at Booz Allen Hamilton"],
+    "confidence": "verified",
+    "source": "position description + Paul's confirmed engagement history"
   },
   {
     "category": "achievement",
     "title": "AWS — Enterprise AI/ML Solutions Architecture Portfolio",
-    "content": "Managed a portfolio of 10+ enterprise accounts as an AI/ML Solutions Architect at Amazon Web Services, serving clients including Cox Enterprises, Cox Automotive (Autotrader, Dealer.com, Kelley Blue Book, Manheim, VinSolutions), Equifax, Jostens, NCR, Accenture, and Deloitte. Engaged nationally as a subject matter expert in artificial intelligence and machine learning. Built proof-of-concept solutions and ran benchmarking experiments that drove production adoption. Delivered technical white papers, presentations, and reference architectures. Partnered with C-suite executives to define technical and business strategies including go-to-market, cost management, and technical recruiting. Spoke at private and public AWS events with diverse stakeholder groups.",
-    "tags": ["aws", "enterprise", "solutions-architecture", "ai", "ml", "c-suite"],
-    "relatedPositions": ["Enterprise AI and ML Solutions Architect at Amazon Web Services"]
+    "content": "Managed a portfolio of 10+ enterprise accounts as an AI/ML Solutions Architect at Amazon Web Services, serving clients including Cox Enterprises, Cox Automotive (Autotrader, Dealer.com, Kelley Blue Book, Manheim, VinSolutions), Equifax, Jostens, NCR, Accenture, and Deloitte. Engaged nationally as a subject matter expert in artificial intelligence and machine learning. Built proof-of-concept solutions and ran benchmarking experiments that drove production adoption. Delivered technical white papers, presentations, and reference architectures. Partnered with C-suite executives to define technical and business strategies including go-to-market, cost management, and technical recruiting. Spoke at private and public AWS events with diverse stakeholder groups. Accenture and Deloitte relationships spanned both roles: they were enterprise accounts in Paul's portfolio AND Global Systems Integrator (GSI) co-sell partners that Paul collaborated with on joint AI/ML solutions and go-to-market motions for other AWS customers.",
+    "tags": ["aws", "enterprise", "solutions-architecture", "ai", "ml", "c-suite", "gsi", "co-sell", "accenture", "deloitte"],
+    "relatedPositions": ["Enterprise AI and ML Solutions Architect at Amazon Web Services"],
+    "confidence": "verified",
+    "source": "position description + Paul's confirmed GSI co-sell engagements"
   },
   {
     "category": "achievement",
@@ -52,6 +56,24 @@
     "asOf": "2025-08",
     "source": "position description + hyperbloom.ai",
     "confidence": "verified"
+  },
+  {
+    "category": "achievement",
+    "title": "Hyperbloom — Life Science Data Exchange Architecture",
+    "content": "Designed a blockchain-based data exchange architecture for secure life-science data interoperability as a Hyperbloom consulting engagement. The architecture ensured compliance with HIPAA, GDPR, HL7, and CDISC (Clinical Data Interchange Standards Consortium) interoperability standards. Decentralized data exchange design enabled life-science organizations to share research data while maintaining patient privacy and regulatory compliance.",
+    "tags": ["hyperbloom", "blockchain", "life-sciences", "interoperability", "hipaa", "gdpr", "hl7", "cdisc"],
+    "relatedPositions": ["Chief AI Officer, Founder at Hyperbloom"],
+    "confidence": "verified",
+    "source": "Paul's confirmed engagement history + Hyperbloom portfolio"
+  },
+  {
+    "category": "achievement",
+    "title": "Hyperbloom — Genomics Data Lake on AWS",
+    "content": "Built a genomics data lake on AWS as a Hyperbloom consulting engagement, enabling life-science research organizations to ingest, store, and analyze genomics data at scale. The data lake supported downstream analytics and machine learning workloads on AWS-native services.",
+    "tags": ["hyperbloom", "aws", "genomics", "data-lake", "life-sciences"],
+    "relatedPositions": ["Chief AI Officer, Founder at Hyperbloom"],
+    "confidence": "verified",
+    "source": "Paul's confirmed engagement history"
   },
   {
     "category": "achievement",

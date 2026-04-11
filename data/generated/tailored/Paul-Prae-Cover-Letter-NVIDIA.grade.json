@@ -1,0 +1,112 @@
+{
+  "file": "data/generated/tailored/Paul-Prae-Cover-Letter-NVIDIA.md",
+  "overallScore": 43,
+  "maxScore": 50,
+  "categories": [
+    {
+      "category": "grounding",
+      "score": 8,
+      "maxScore": 10,
+      "violations": [
+        {
+          "ruleId": "G1",
+          "ruleName": "Entity-scope binding",
+          "severity": "warning",
+          "excerpt": "At Arine, I managed the enterprise data platform supporting AI-driven medication management for a company that serves 45+ health plans and 30M+ members, building HIPAA-compliant AI agents and observability for an autonomous pharmacist AI system.",
+          "explanation": "This sentence bundles Arine's company-level metrics (45+ health plans, 30M+ members) with Paul's individual technical work (AI agents, observability) into a single sentence. While the metrics are correctly attributed to Arine, the dense compound construction risks implying Paul's personal work touched all 30M+ members. The scope boundary notes that Paul's role is data operations engineering. This is a minor concern — the phrasing 'for a company that serves' does provide some separation, but could be cleaner."
+        },
+        {
+          "ruleId": "G3",
+          "ruleName": "Temporal freshness",
+          "severity": "info",
+          "excerpt": "30M+ members",
+          "explanation": "The verified metric in companies.json is '>30 million' (clientMembersTouched). The cover letter uses '30M+ members' which is a reasonable shorthand but technically the verified figure is '>30 million'. This is a negligible discrepancy but noted for thoroughness."
+        },
+        {
+          "ruleId": "G7",
+          "ruleName": "SCOPE BOUNDARY markers",
+          "severity": "info",
+          "excerpt": "Florence operates 10,000+ research sites across 45 countries",
+          "explanation": "The scope boundary for the Florence Healthcare engagement explicitly states: 'These 10,000+ sites / 45 countries / 5.5M monthly activities metrics describe Florence Healthcare's platform scale (the client), not Paul's personal scope or team size.' The cover letter does correctly attribute this to Florence ('Florence operates 10,000+ research sites across 45 countries') using parenthetical framing, which respects the boundary. However, it's embedded within a paragraph about Paul's own consulting engagements, which could subtly conflate Florence's scale with Paul's work scope. The attribution is technically correct but the proximity warrants note."
+        }
+      ]
+    },
+    {
+      "category": "ethics",
+      "score": 8,
+      "maxScore": 10,
+      "violations": [
+        {
+          "ruleId": "E2",
+          "ruleName": "Verified facts only",
+          "severity": "warning",
+          "excerpt": "my GPU experience is with NVIDIA consumer hardware (RTX 4090 and RTX 5090 workstations I run locally)",
+          "explanation": "The RTX 4090 and RTX 5090 are not mentioned anywhere in the provided career data, knowledge base, or company entries. While the candidate is disclosing a gap honestly (which is commendable), the specific hardware models cited (RTX 4090, RTX 5090) are unverified facts not present in the grounded sources. These should only appear if confirmed in career data."
+        },
+        {
+          "ruleId": "E2",
+          "ruleName": "Verified facts only",
+          "severity": "warning",
+          "excerpt": "a $2M+ behavioral health application for Georgia's Department of Behavioral Health and Developmental Disabilities",
+          "explanation": "The position-metrics mention 'Behavioral healthcare service review application generating $2M+ in consulting revenue' and 'Statewide demand forecasting of behavioral health crisis services across dozens of facilities in Georgia' but the specific client name 'Georgia's Department of Behavioral Health and Developmental Disabilities' does not appear in the grounded sources. This is an external fact not verified in the career data."
+        },
+        {
+          "ruleId": "E4",
+          "ruleName": "No aspirational claims",
+          "severity": "info",
+          "excerpt": "I learn products quickly",
+          "explanation": "This is a mild aspirational/self-assessment claim not backed by specific career data. It's mitigated by the transparency of the surrounding context, but it is technically an ungrounded self-assessment."
+        }
+      ]
+    },
+    {
+      "category": "voice",
+      "score": 9,
+      "maxScore": 10,
+      "violations": [
+        {
+          "ruleId": "V5",
+          "ruleName": "No superfluous commentary",
+          "severity": "info",
+          "excerpt": "the healthcare domain credibility, GSI operating experience, and cross-functional leadership this role requires took me years to build",
+          "explanation": "This borders on superfluous editorial commentary. The phrase 'took me years to build' is a subjective assessment that doesn't add concrete information. The facts already demonstrate the depth of experience; this sentence tells the reader how to feel about them rather than letting the facts speak."
+        }
+      ]
+    },
+    {
+      "category": "quality",
+      "score": 9,
+      "maxScore": 10,
+      "violations": [
+        {
+          "ruleId": "Q2",
+          "ruleName": "Clear acronyms",
+          "severity": "info",
+          "excerpt": "CDISC interoperability standards",
+          "explanation": "CDISC (Clinical Data Interchange Standards Consortium) is not a universally recognized acronym. While it is spelled out in the grounded sources, it is used without expansion in the cover letter. The target audience for a GSI Lead role in Healthcare and Life Sciences may know this, but the rule states uncommon acronyms should be spelled out on first use."
+        },
+        {
+          "ruleId": "Q4",
+          "ruleName": "One achievement per bullet",
+          "severity": "info",
+          "excerpt": "Those engagements included a disaster recovery architecture for Florence Healthcare's clinical-trial management platform (Florence operates 10,000+ research sites across 45 countries), a genomics data lake on AWS, and a blockchain-based life-science data exchange architecture meeting HIPAA, GDPR, HL7, and CDISC interoperability standards.",
+          "explanation": "This single sentence packs three distinct consulting engagements into one construction. While cover letters use prose rather than bullets, this sentence is very dense and could benefit from being split for clarity."
+        }
+      ]
+    },
+    {
+      "category": "cover_letter",
+      "score": 9,
+      "maxScore": 10,
+      "violations": [
+        {
+          "ruleId": "CL5",
+          "ruleName": "Human-written feel",
+          "severity": "info",
+          "excerpt": "At Arine, I managed... At Booz Allen Hamilton's healthcare... Through Hyperbloom... At AWS... At Slalom...",
+          "explanation": "The body paragraphs follow a somewhat mechanical pattern of 'At [Company], I did X' repeated across paragraphs. While each paragraph varies its internal structure, the paragraph-level opener pattern is repetitive in a way that can signal AI generation. Varying the paragraph openings would improve the human-written feel."
+        }
+      ]
+    }
+  ]
+}
