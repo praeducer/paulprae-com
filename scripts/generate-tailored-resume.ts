@@ -33,6 +33,7 @@ import {
   classifyError,
   isDirectRun,
 } from "../lib/tailored.js";
+import { validateResume } from "../lib/resume-validator.js";
 
 // ─── Resume-Specific Configuration ─────────────────────────────────────────
 
@@ -93,6 +94,20 @@ async function generate(promptInput: string): Promise<void> {
     console.error("\u274c Claude returned empty text content.\n");
     console.error("   Response stop reason:", response.stopReason);
     process.exit(1);
+  }
+
+  // Post-generation validation (warn-only — tailored pipeline)
+  // Shares lib/resume-validator.ts with the main generator so both paths
+  // enforce the same deterministic quality checks.
+  const validationWarnings = validateResume(response.text, careerData);
+  if (validationWarnings.length > 0) {
+    console.log(`\n   \u26a0 Validator warnings (${validationWarnings.length}):`);
+    for (const warning of validationWarnings) {
+      console.log(`      - ${warning}`);
+    }
+    console.log();
+  } else {
+    console.log("\n   \u2705 Validator: no warnings\n");
   }
 
   // Format with Prettier
