@@ -2,7 +2,7 @@
 
 Actionable coding and documentation tasks for Claude Code. No human-only tasks here (those are in `human-tasks.md`).
 
-> Last reconciled: 2026-04-03 against `feat/interview-booking-cta` (PR #28 — MERGED ✅)
+> Last reconciled: 2026-04-11 against `uat/mega-merge-apr-2026` (PR #39 — OPEN, CI green)
 
 ---
 
@@ -25,7 +25,7 @@ Actionable coding and documentation tasks for Claude Code. No human-only tasks h
 
 ## Cost Optimization
 
-Current generation cost: ~$2.90 per run (Claude Opus 4.6, max effort, ~453s).
+Current generation cost: ~$3.20 per run (Claude Opus 4.6, max effort, ~540s). Latest run: $3.24, score 415.
 
 Options to evaluate in order:
 
@@ -34,7 +34,7 @@ Options to evaluate in order:
 3. **Reduce max_tokens from 128K to 16K:** The resume is ~8K chars. 128K is excessive headroom.
 4. **Prompt caching:** Implemented and confirmed working — `cache_read: 73,923` tokens on every warm request. 1-hour TTL intent present; see Observability backlog for TTL confirmation steps.
 
-Acceptance criteria: quality score must stay >=395 for any optimization to be accepted.
+Acceptance criteria: quality score must stay >=400 for any optimization to be accepted (raised from 395; current baseline 415).
 
 ## UX Enhancements
 

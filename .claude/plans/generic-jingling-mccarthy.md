@@ -1,151 +1,141 @@
-# Mega-Merge Execution Plan
+# UAT Branch Finalization Plan
 
-> Execute `.claude/plans/mega-merge-strategy.md` (v2, 999 lines, 10 phases) with corrections discovered during pre-flight analysis.
+> Consolidate plans, verify Autonomize content, execute safe SSOT work on `uat/mega-merge-apr-2026` before merge to main.
 
 ## Context
 
-Paul starts at Autonomize AI on Monday April 13, 2026. Today is April 11. This merge combines 7 branches into `uat/mega-merge-apr-2026`, regenerates the full pipeline, and opens a single PR to main. The system gets: Autonomize career transition + tailored resume/cover-letter pipeline + data fraud fixes + quality infrastructure.
+PR #39 is open with all 7 branches merged, 511 tests passing, CI green, resume score 415. Paul starts at Autonomize AI Monday April 13 (2 days). Before merging to main, we need to clean up plan files, verify all Autonomize content is correct, and execute the safe SSOT phases that improve code quality without risking regressions.
 
-**Primary source plan:** `.claude/plans/mega-merge-strategy.md` (v2, 999 lines, 10 phases)
-**Executing model:** Claude Opus 4.6 (1M context) on max effort
-**End state:** UAT PR ready for Paul to squash-merge to main
+## Part 1: Plan Consolidation & Cleanup
 
-## Corrections to the Written Plan
+### Problem
 
-| #   | Issue                                                  | Fix                                                                         |
-| --- | ------------------------------------------------------ | --------------------------------------------------------------------------- |
-| 1   | `Co-Authored-By: Claude Sonnet 4.6` (7 occurrences)    | Change to `Claude Opus 4.6 <noreply@anthropic.com>`                         |
-| 2   | .npmrc removal deferred to Phase 8.5                   | Move to immediately after Phase 3 merge (Windows cache path breaks WSL npm) |
-| 3   | Appendix extraction in Phase 1.1 (lines 232-247)       | Skip — no appendix sections exist in the file                               |
-| 4   | resume-quality.ts: "Manual merge" via conflict markers | Simpler: accept --theirs, then add "Autonomize AI" as first entry           |
-| 5   | package-lock.json: conditional regeneration            | Unconditionally run `npm install` after Phase 3 merge                       |
-| 6   | custom-resume-gen commit count: "33 commits" in plan   | Actually 27 commits ahead of main (minor doc inaccuracy)                    |
+15 plan-related files across `.claude/plans/` — some complete, some executing, some obsolete. Need a clean state for main.
 
-## Execution Blocks (6 blocks, 4 human gates)
+### Action: Archive obsolete, update active, consolidate
 
-### Block A — Merge Operations (Phases 1-4)
+**Archive (mark as historical reference, move to a `completed/` section in README):**
 
-1. Create `uat/mega-merge-apr-2026` from main
-2. Merge 4 safe branches: backlog → intro-deliverable → audit-fix → add-project-settings
-3. Run `npm install && npm test && npm run build` (Phase 1 gate)
-4. Merge feat/autonomize-ai-career-update → test + build (Phase 2 gate)
-5. Merge feat/custom-resume-gen with manual conflict resolution for 9 files
-   - positions.json: accept --theirs (has fraud fixes + Autonomize)
-   - companies.json: accept --theirs (verify Autonomize entry)
-   - resume-writer.system.md: accept --theirs + manually add "Autonomize AI" to differentiators
-   - resume-quality.ts: accept --theirs + manually add "Autonomize AI" to MAJOR_COMPANIES
-   - CLAUDE.md: should auto-merge (different hunks)
-   - 4 generated files: accept either side (will be regenerated)
-6. Remove .npmrc immediately (Windows cache path)
-7. Run `npm install` to regenerate clean package-lock
-8. Verify all Autonomize mentions (5-grep gate)
-9. Test + build (Phase 3 gate)
-10. Extract copilot review prompt file via `git show` (Phase 4)
+- `mega-merge-strategy.md` — fully executed, historical reference only
+- `mega-merge-review-prompt.md` — Copilot review artifact, all 30 issues addressed
+- `autonomize-transition-agent-handoff.md` — complete, PR #38 work absorbed into UAT
+- `autonomize-transition-human-runbook.md` — complete, reference for future career changes
+- `generic-jingling-mccarthy.md` — this session's execution plan, superseded by this plan
 
-### Block B — Data Pipeline (Phase 5)
+**Update:**
 
-1. Patch LinkedIn CSV (4 positions: Hyperbloom, NeuroLex, Decooda dates)
-2. `npm run ingest --force` → `npm run build:prompts`
-3. `npm run check:quick`
-4. `npm test` — MANDATORY gate (data-consistency tests validate fraud fixes)
-5. `npm run build`
-6. Commit intermediates
+- `README.md` — rewrite as canonical entry point for UAT/post-merge state (not stale custom-resume-gen state)
+- `backlog.md` — reconcile against current UAT state (last reconciled Apr 3)
 
-### Block C — Resume Generation (Phase 6, quality-maximized)
+**Keep as-is (still active):**
 
-1. Final test gate
-2. `npm run generate --force` (~10 min, Claude Opus 4.6)
-3. Quality check — if score < 420, retry (iterative until maximized)
-4. `npm run approve --force`
-5. `npm run export --force`
-6. Spot-check: Autonomize first, correct dates, suppressed skills, ~2 pages, NVIDIA-ready positioning
-7. Commit resume outputs
+- `remaining-phases-ssot.md` — roadmap for SSOT work (phases we'll execute below)
+- `content-quality-system-design.md` — architecture reference (locked)
+- `human-tasks.md` — Paul's manual tasks
+- `hotfix-multi-resume-bug.md` — tracked as issue #41
+- `production-monitoring.md` — reference for post-deploy
+- `production-qa-plan.md` — reference for pre-merge QA
+- `data-model-and-knowledge-base.md` — Phase 3 deferred
 
-### Block D — Verification + QA (Phases 7-8)
+**Files modified:** `README.md`, `backlog.md`
+**Estimated:** ~20 min
 
-1. File-level verification: all 7 branches' unique files present
-2. Diff-level verification: no silent deletions
-3. Data integrity: Autonomize in career-data, Modular Earth in projects not positions
-4. `npm run check` (full release checklist)
-5. `npm test --reporter=verbose` (final full suite)
-6. `npm run build` (final build)
-7. Local smoke test on localhost:3000 (**human step**)
+## Part 2: Autonomize Content Verification
 
-### Block E — PR Creation (Phase 9)
+### Status: VERIFIED COMPLETE
 
-1. Create draft PR with comprehensive description
-2. Wait for CI
-3. Verify Vercel preview deployment
-4. Create tracking issues (Phase A SSOT, multi-resume hotfix)
-5. **Human UAT on preview URL** → mark PR ready
+All content correctly references Autonomize AI as current employer:
 
-### Block F — Post-Merge Cleanup (Phase 10, human-triggered)
+| Category              | Files Checked                                                                             | Status |
+| --------------------- | ----------------------------------------------------------------------------------------- | ------ |
+| Source data (5 files) | positions.json, companies.json, profile.json, target-market.json, position-metrics.json   | PASS   |
+| Generated (4 files)   | career-data.json, current-role.ts, system-prompts.ts, Paul-Prae-Resume.md                 | PASS   |
+| UI/Frontend (2 files) | constants.ts (uses generated import), QuickActions.tsx (generic phrasing)                 | PASS   |
+| Prompts (3 files)     | career-chat.few-shot.md ({{CURRENT_ROLE_SENTENCE}}), resume-writer.system.md, few-shot.md | PASS   |
+| Docs (3 files)        | CLAUDE.md, uat-checklist.md, README.md                                                    | PASS   |
+| Tests (1 file)        | data-consistency.test.ts (Autonomize assertion at lines 100-107)                          | PASS   |
+| Stale refs            | Zero "at Arine" hardcoded strings in app/components                                       | PASS   |
 
-1. Merge PR to main
-2. Verify production
-3. Delete all 8 branches (7 source + UAT)
-4. Close stale PRs (34, 35, 36, 37, 38)
+**No action needed.** All Autonomize content is correct.
+
+## Part 3: SSOT Work on UAT Branch
+
+### What's already done (from `feat/custom-resume-gen`)
+
+- `writing-rules.json` created with G1-G8, E1-E6, V1-V8, Q1-Q6, CL1-CL5, suppress list
+- `lib/resume-validator.ts` reads writing-rules.json (direct JSON import, not typed loader)
+- `scripts/grade-content.ts` reads writing-rules.json for full rules payload
+- `tests/data-consistency.test.ts` pins all fraud-prevention dates
+- NVIDIA tailored resume (95%) + cover letter (92%) generated
+
+### What's actionable now (safe, won't regress quality)
+
+**Phase A1 — Typed writing-rules loader** (MEDIUM, ~4 commits)
+
+- Create `lib/writing-rules-schema.ts` — Zod schema with v1/v2 compat
+- Create `lib/writing-rules.ts` — typed loader with `getRulesFor()`, `getBlocklist()`, `getSuppressedSkills()`
+- Unit tests: `tests/writing-rules.test.ts`
+- Refactor `resume-validator.ts` + `grade-content.ts` to use typed loader (instead of raw JSON.parse)
+- **Risk:** Low (additive, existing behavior preserved via v1 compat)
+- **Why now:** Foundation for all other SSOT phases; clean code on main
+
+**Phase A3 — Prompt hydration helpers** (SMALL, ~2 commits)
+
+- Create `lib/prompts/hydrate-rules.ts` — `renderRulesAsProse()`, `renderActionVerbList()`, `renderSuppressedSkills()`
+- Add placeholders to `lib/agent/context.ts`: `{{WRITING_RULES}}`, `{{ACTION_VERBS}}`, `{{SUPPRESSED_SKILLS}}`
+- Tests: `tests/hydrate-rules.test.ts`
+- **Risk:** Low (new code, no existing behavior changed yet)
+- **Depends on:** Phase A1
+
+**Phase A5 partial — Safe deduplication** (SMALL, ~2 commits)
+
+- Remove duplicated MAJOR_COMPANIES list from `resume-quality.ts` (derive from writing-rules or career-data)
+- Remove duplicated suppress list from anywhere using raw strings (use typed loader)
+- **Risk:** Low (just wiring existing data through the typed loader)
+- **Depends on:** Phase A1
+
+### Deferred to post-merge (separate PR on main)
+
+- A4 (prompt cutovers) — risky, could regress resume quality 415
+- Phase 0.5 (atomic facts) — large structural migration
+- A6 (invariant checker) — medium, partially covered by data-consistency tests
+- A7-A9 (RAG, fix-fact, provenance) — depend on Phase 0.5
+
+### Sequence
+
+```
+Plan cleanup (Part 1)
+      ↓
+Phase A1 (typed loader) → tests pass
+      ↓
+Phase A3 (hydration helpers) → tests pass
+      ↓
+Phase A5 partial (safe dedup) → tests pass
+      ↓
+Final commit + push → CI green
+```
+
+## Part 4: Final Pre-Merge Verification
+
+After all SSOT work:
+
+1. `npm test` — 511+ tests pass
+2. `npm run check` — full release checklist
+3. `npm run build` — clean build
+4. Push all commits
+5. Verify CI passes on PR #39
+6. Update PR description with SSOT work summary
 
 ## Critical Files
 
-- `lib/resume-quality.ts` — manual merge (add Autonomize AI, keep Modular Earth removed)
-- `lib/prompts/resume-writer.system.md` — manual edit (add Autonomize AI to differentiators)
-- `data/sources/linkedin/Positions.csv` — 6 field patches across 3 companies
-- `tests/data-consistency.test.ts` — authoritative date assertions (fraud prevention)
-- `lib/generated/current-role.ts` — must show Autonomize AI after regen
-- `data/generated/career-data.json` — must show correct dates after regen
-
-## User Decisions (April 11, 2026)
-
-1. **PR merge strategy:** Squash merge — single clean commit on main, full detail in PR description
-2. **Autonomize test assertion:** Add now during merge — fraud-prevention guard for current role
-3. **Execution scope:** Through Phase 9 (PR marked ready). Paul merges to main + cleanup in follow-up
-4. **Resume quality:** Iterative retries until quality is maximized. Optimize for quality, accuracy, honesty. No budget concern — targeting NVIDIA job at up to $350k. Every dollar spent on resume quality is worth it.
-
-## Verification
-
-After each block, verify with:
-
-- `npm test` (493+ tests)
-- `npm run build` (zero TypeScript errors)
-- `npm run check:quick` (data file validation)
-
-Final verification:
-
-- `npm run check` (full release checklist)
-- All 7 branches' unique files exist on UAT
-- Autonomize AI present in: career-data.json, current-role.ts, resume-quality.ts, resume-writer.system.md, CLAUDE.md
-- Modular Earth: in projects.json, NOT in positions.json or MAJOR_COMPANIES
-- Resume: Autonomize first position (Apr 2026 – Present), Arine Sep 2025 – Mar 2026
-- NVIDIA tailored prompt (`data/prompts/tailored/nvidia.json`) survives merge intact
-
-## Pre-Flight Status (verified April 11, 2026)
-
-| Check                    | Status                                      |
-| ------------------------ | ------------------------------------------- |
-| pandoc 3.1.3             | PASS                                        |
-| typst 0.14.2             | PASS                                        |
-| node v24.14.0            | PASS                                        |
-| npm 11.11.0              | PASS                                        |
-| gh CLI (praeducer)       | PASS                                        |
-| ANTHROPIC_API_KEY        | PASS                                        |
-| Working tree clean       | PASS                                        |
-| All 7 branches on remote | PASS                                        |
-| LinkedIn CSV exists      | PASS                                        |
-| CSV patches needed       | 3 positions (Hyperbloom, NeuroLex, Decooda) |
-
-## Risks and Mitigations
-
-| Risk                                  | Severity | Mitigation                                                             |
-| ------------------------------------- | -------- | ---------------------------------------------------------------------- |
-| Phase 3 conflict resolution (9 files) | Medium   | Follow resolution matrix exactly; 5-grep Autonomize gate before commit |
-| Resume quality < 400 on first gen     | Low      | Iterative retry until maximized (user authorized unlimited budget)     |
-| .npmrc Windows path breaks WSL npm    | Medium   | Remove immediately after Phase 3 merge (not deferred to Phase 8)       |
-| package-lock.json cascade             | Low      | Unconditional `npm install` after Phase 3 to regenerate clean lock     |
-
-## What the User Should Do
-
-1. Stay available for Phase 8.7 local smoke test (localhost:3000 browser check)
-2. After I mark PR ready, run UAT on Vercel preview URL per `docs/uat-checklist.md`
-3. Squash-merge the PR to main when satisfied
-4. Phase 10 cleanup (delete branches, close PRs) will be a separate follow-up session
+- `lib/writing-rules-schema.ts` — NEW (Zod schema)
+- `lib/writing-rules.ts` — NEW (typed loader)
+- `lib/prompts/hydrate-rules.ts` — NEW (prompt helpers)
+- `lib/agent/context.ts` — MODIFY (add placeholder substitution)
+- `lib/resume-validator.ts` — MODIFY (use typed loader)
+- `scripts/grade-content.ts` — MODIFY (use typed loader)
+- `lib/resume-quality.ts` — MODIFY (derive MAJOR_COMPANIES)
+- `tests/writing-rules.test.ts` — NEW
+- `tests/hydrate-rules.test.ts` — NEW
+- `.claude/plans/README.md` — MODIFY (consolidate)
+- `.claude/plans/backlog.md` — MODIFY (reconcile)
